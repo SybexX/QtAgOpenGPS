@@ -170,3 +170,8 @@ void FormGPS::DoRemoteSwitches()
         } // if swOFFHi !=0
     }//if serial or udp port open
 }
+
+void FormGPS::DoBlockageMonitoring()
+{
+
+}

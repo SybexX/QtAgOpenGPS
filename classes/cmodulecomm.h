@@ -20,6 +20,9 @@ public:
 
     uchar ssP[9];
 
+    uchar blockagemoduleid[16];
+    uchar blockagesecnum[16];
+    uchar blockageseccount[16];
     int
             swHeader = 0,
             swMain = 1,

@@ -514,6 +514,7 @@ public:
     //void SectionCalcMulti();
     void BuildMachineByte();
     void DoRemoteSwitches();
+    void DoBlockageMonitoring();
 
 
     /************************
