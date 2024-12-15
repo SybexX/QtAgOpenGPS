@@ -117,8 +117,8 @@ class FormLoop : public QObject
         int focusSkipCounter = 310;
         bool isSendToSerial = false, isSendToUDP = true;
 
-        bool lastHelloGPS, lastHelloAutoSteer, lastHelloMachine, lastHelloIMU;
-        bool isConnectedIMU, isConnectedSteer, isConnectedMachine = true;
+        bool lastHelloGPS, lastHelloAutoSteer, lastHelloMachine, lastHelloIMU, lastHelloBlockage;
+        bool isConnectedIMU, isConnectedSteer, isConnectedMachine = true, isConnectedBlockage = true;
 
         int packetSizeNTRIP = 256;
 

@@ -86,7 +86,7 @@ void FormLoop::DoTraffic()
 	traffic.helloFromMachine++;
 	traffic.helloFromAutoSteer++;
 	traffic.helloFromIMU++;
-
+    traffic.helloFromBlockage++;
     traffic.cntrGPSOut = 0;
 }
 
@@ -154,6 +154,24 @@ void FormLoop::DoHelloAlarmLogic()
     }
     else if (traffic.helloFromIMU < 90)
         isConnectedIMU = true;
+
+    if (isConnectedBlockage)
+    {
+        currentHello = traffic.helloFromBlockage < 3;
+
+        if (currentHello != lastHelloBlockage)
+        {
+            agio->setProperty("blockageConnected", currentHello);
+
+            if (currentHello) qDebug() << "Connected to Blockage";
+            else qDebug() << "Not connected to Blockage";
+
+            lastHelloBlockage = currentHello;
+            ShowAgIO();
+        }
+    }
+    else if (traffic.helloFromBlockage < 90)
+        isConnectedBlockage = true;
 
     currentHello = traffic.cntrGPSOut != 0;
 

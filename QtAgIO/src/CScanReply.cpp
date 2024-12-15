@@ -15,6 +15,7 @@ CScanReply::CScanReply(QObject *parent)
       isNewMachine(false),
       isNewGPS(false),
       isNewIMU(false),
+      isNewBlockage(false),
       isNewData(false)
 {
     // Optional: other initialization code

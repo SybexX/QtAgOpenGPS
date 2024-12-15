@@ -11,7 +11,8 @@ CTraffic::CTraffic(QObject *parent)
 	  cntrGPSOut(0),
 	  helloFromMachine(99),
 	  helloFromAutoSteer(99),
-	  helloFromIMU(99)
+      helloFromIMU(99),
+      helloFromBlockage(99)
 {
 	//optional: other initialization code
 }
