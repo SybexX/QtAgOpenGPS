@@ -185,7 +185,7 @@ Dialog {
                     icon.source: prefix + "/images/Config/Con_ModulesMenu.png"
                 }
                 ButtonGroup {
-                    buttons: [ configModulesSettings, configModulesPinsbtn ]
+                    buttons: [ configModulesSettings, configModulesPinsbtn,  configBlockageMonbtn]
                 }
                 Column{
                     id: modulesMenu
@@ -204,6 +204,10 @@ Dialog {
                     MainConfigSecondaryBtns{
                         id: configModulesPinsbtn
                         icon.source: prefix + "/images/Config/ConS_ImplementSection.png"
+                    }
+                    MainConfigSecondaryBtns{
+                        id: configBlockageMonbtn
+                        icon.source: prefix + "/images/Config/ConS_Blockage.png"
                     }
                 }
                 MainConfigMainBtns{
@@ -405,6 +409,12 @@ Dialog {
             anchors.fill: mainConfig
             anchors.margins:1
             visible: modulesMenu.visible && configModulesPinsbtn.checked
+        }
+        ConfigModulesBlockage{  //Dim
+            id:configModulesBlockage
+            anchors.fill: mainConfig
+            anchors.margins:1
+            visible: modulesMenu.visible && configBlockageMonbtn.checked
         }
         ConfigTrams{
             id:configTrams

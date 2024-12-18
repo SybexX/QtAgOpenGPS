@@ -111,6 +111,7 @@ extern AOGProperty property_setBrand_TBrand;
 extern AOGProperty property_setHeadland_isSectionControlled;
 extern AOGProperty property_setSound_isAutoSteerOn;
 extern AOGProperty property_setRelay_pinConfig;
+extern AOGProperty property_setBlockageConfig;
 extern AOGProperty property_setDisplay_camSmooth;
 extern AOGProperty property_setGPS_dualHeadingOffset;
 extern AOGProperty property_setF_isSteerWorkSwitchEnabled;

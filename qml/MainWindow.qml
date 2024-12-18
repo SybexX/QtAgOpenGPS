@@ -1192,7 +1192,7 @@ Window {
             }
             Comp.BlockageRows {
                 id: blockageRows
-                visible: false //aog.isJobStarted ? true : false  // need connect with c++ Dim
+                visible: true //aog.isJobStarted ? true : false  // need connect with c++ Dim
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: simBarRect.top
                 anchors.bottomMargin: 8

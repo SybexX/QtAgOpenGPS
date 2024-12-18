@@ -116,6 +116,7 @@ Item {
     property bool setHeadland_isSectionControlled: true
     property bool setSound_isAutoSteerOn: true
     property var setRelay_pinConfig: [ 1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ]
+    property var setBlockageConfig: [ 1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ]
     property int setDisplay_camSmooth: 50
     property double setGPS_dualHeadingOffset: 0
     property bool setF_isSteerWorkSwitchEnabled: false

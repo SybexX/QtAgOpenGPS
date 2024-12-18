@@ -658,5 +658,7 @@
         <file>icon.png</file>
         <file>qml/components/BlockageRows.qml</file>
         <file>qml/components/BlockageRow.qml</file>
+        <file>images/Config/ConS_Blockage.png</file>
+        <file>qml/config/ConfigModulesBlockage.qml</file>
     </qresource>
 </RCC>
