@@ -1190,6 +1190,16 @@ Window {
                 width: 660  * theme.scaleWidth
                 //onHeightChanged: anchors.bottomMargin = (bottomButtons.height + simBarRect.height + (24 * theme.scaleHeight))
             }
+            Comp.BlockageRows {
+                id: blockageRows
+                visible: false //aog.isJobStarted ? true : false  // need connect with c++ Dim
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: simBarRect.top
+                anchors.bottomMargin: 8
+                height: 100 * theme.scaleHeight
+                //width: 800  * theme.scaleWidth
+
+            }
             DisplayButtons{ // window that shows the buttons to change display. Rotate up/down, day/night, zoom in/out etc. See DisplayButtons.qml
                 id: displayButtons
                 width: childrenRect.width + 10

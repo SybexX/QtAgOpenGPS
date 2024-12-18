@@ -656,5 +656,7 @@
         <file>qml/config/steercomponents/MainConfigMainBtns.qml</file>
         <file>qml/config/steercomponents/MainConfigSecondaryBtns.qml</file>
         <file>icon.png</file>
+        <file>qml/components/BlockageRows.qml</file>
+        <file>qml/components/BlockageRow.qml</file>
     </qresource>
 </RCC>
