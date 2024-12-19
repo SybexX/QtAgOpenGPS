@@ -119,6 +119,12 @@ def parse_settings(file):
                 default_value = 'default_relay_pinConfig'
                 qt = 'leavealone'
 
+            elif t == 'System.String' and n == 'setBlockageConfig':
+                preamble.append('QVector<int> default_BlockageConfig = { ' + s.Value.contents[0] + ' };')
+                mock_qml.append("property var %s: [ %s ]" % (n, s.Value.contents[0]))
+                default_value = 'default_BlockageConfig'
+                qt = 'leavealone'
+
             elif t == 'System.String' or \
                  t == 'AgOpenGPS.TBrand' or \
                  t == 'AgOpenGPS.HBrand' or \

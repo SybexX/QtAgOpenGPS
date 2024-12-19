@@ -113,7 +113,7 @@ AOGProperty property_setBrand_TBrand("display/TBrand","AGOpenGPS");
 AOGProperty property_setHeadland_isSectionControlled("todo/headlandIsSectionControlled",true);
 AOGProperty property_setSound_isAutoSteerOn("display/autoSteerSound",true);
 AOGProperty property_setRelay_pinConfig("todo/relayPinConfig",default_relay_pinConfig);
-AOGProperty property_setBlockageConfig("todo/BlockageConfig",default_BlockageConfig);
+AOGProperty property_setBlockageConfig("seed/BlockageConfig",default_BlockageConfig);
 AOGProperty property_setDisplay_camSmooth("display/camSmooth",50);
 AOGProperty property_setGPS_dualHeadingOffset("gps/dualHeadingOffset",0);
 AOGProperty property_setF_isSteerWorkSwitchEnabled("tool/isSteerWorkSwitchEnabled",false);
