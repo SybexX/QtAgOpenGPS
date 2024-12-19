@@ -15,10 +15,10 @@ Rectangle {
     color: "transparent"
 
 
-    property int numSections: 48  // need connect with settings Dim
+    property int numSections: 32  // need connect with settings Dim
     property int countMin: 10     // need connect with settings Dim
     property int countMax: 50     // need connect with settings Dim
-    property var rowCount: [ 0,90,90,15,19,15,90,90,15,19,15,20,0,15,90,90,15,19,15,20,0,60,90,90,15,19,15,20,0,70,90,90,15,19,15,20,0,78,90,90,15,19,15,20,0,0,78,90 ] // need connect with settings
+    property var rowCount: [ 0,60,60,15,19,15,60,60,15,19,15,20,0,15,60,60,15,19,15,20,0,60,50,50,15,19,15,20,0,70,30,10,15,19,15,20,0,78,90,20,15,19,15,20,0,0,28,40 ] // need connect with settings
     property color offColor: "Crimson"
     property color offTextColor: "White"
     property color onColor: "DarkGoldenrod"
@@ -46,6 +46,13 @@ Rectangle {
             blockageRows.onTextColor = "White"
         }
     }
+    function setSizes() {
+        //same colors for sections and zones
+        //numSections = settings.setBlockrow1
+        //countMin =  settings.setBlockcountMin
+        //countMax =  settings.setBlockcountMax
+        }
+
 /*
     function setRowCount (sectionNo: int, new_state: int) {
         //states: 0 = off, 1 = auto, 2 = on
@@ -79,12 +86,15 @@ Rectangle {
         }
     }
 
-    Connections {
-        target: settings
-        function onSetDisplay_isDayModeChanged() {
-            setColors()
-        }
+Connections {
+    target: settings
+    function onSetDisplay_isDayModeChanged() {
+        setColors()
     }
+    function onSetBlockageConfigChanged() {
+        setSizes()
+    }
+}
 
     ListModel {
         id: rowModel
@@ -95,7 +105,7 @@ Rectangle {
         BlockageRow {
             width: (800 * theme.scaleWidth / numSections) < 50 ? (15 * theme.scaleWidth) : (20 * theme.scaleWidth)
             //width: 15 * theme.scaleWidth
-            height: (blockageRows.rowCount[model.rowNo]+20 * theme.scaleHeight)
+            height: (blockageRows.rowCount[model.rowNo]+20) * theme.scaleHeight
             buttonText: (model.rowNo + 1).toFixed(0)
             visible: (model.rowNo < numSections) ? true : false
             color: (blockageRows.rowCount[model.rowNo] < countMin ? offColor : (blockageRows.rowCount[model.rowNo] < countMax ? autoColor : onColor))

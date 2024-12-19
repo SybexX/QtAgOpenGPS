@@ -22,15 +22,13 @@ Rectangle{
 
     function load_settings() {
 
-        if (settings.setBlockageConfig.length < 24) {
-            for( var i=settings.setBlockageConfig.length ; i < 24 ; i ++) {
-                console.debug("adding to setBlockageConfig.")
-                settings.setBlockageConfig[i] = 0
-            }
-        }
-
-
-        crops.currentIndex = settings.setBlockageConfig[10]
+        graincountMin.boundValue = settings.setBlockcountMin
+        graincountMax.boundValue = settings.setBlockcountMax
+        modulerows1.boundValue = settings.setBlockrow1
+        modulerows2.boundValue = settings.setBlockrow2
+        modulerows3.boundValue = settings.setBlockrow3
+        modulerows4.boundValue = settings.setBlockrow4
+        crops.currentIndex = settings.setBlockageConfig[0]
 
         mandatory.visible = false
 
@@ -38,14 +36,20 @@ Rectangle{
 
     function save_settings() {
 
-        settings.setBlockageConfig[10] = crops.currentIndex
+        settings.setBlockageConfig[0] = crops.currentIndex
+        settings.setBlockcountMin = graincountMin.value
+        settings.setBlockcountMax = graincountMax.value
+        settings.setBlockrow1 = modulerows1.value
+        settings.setBlockrow2 = modulerows2.value
+        settings.setBlockrow3 = modulerows3.value
+        settings.setBlockrow4 = modulerows4.value
 
         mandatory.visible = false
     }
 
     GridLayout{
         flow: Grid.LeftToRight
-        columns: 5
+        columns: 4
         rows: 5
         anchors.bottom: back.top
         anchors.top: parent.top
@@ -108,58 +112,6 @@ Rectangle{
                 font.bold: true
                 anchors.top: parent.bottom
             }
-        }
-        SpinBoxCM{
-            id: modulerows5
-            from: 0
-            to:16
-            boundValue: settings.setBlockageConfig[4]
-            onValueModified: settings.setBlockageConfig[4] = value
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            TextLine{
-                text: qsTr("Rows on module 5: ")
-                font.bold: true
-                anchors.top: parent.bottom
-            }
-        }
-        SpinBoxCM{
-            id: modulerows6
-            from: 0
-            to:16
-            boundValue: settings.setBlockageConfig[5]
-            onValueModified: settings.setBlockageConfig[5] = value
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            TextLine{
-                text: qsTr("Rows on module 6: ")
-                font.bold: true
-                anchors.top: parent.bottom
-            }
-        }
-        SpinBoxCM{
-            id: modulerows7
-            from: 0
-            to:16
-            boundValue: settings.setBlockageConfig[6]
-            onValueModified: settings.setBlockageConfig[6] = value
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            TextLine{
-                text: qsTr("Rows on module 7: ")
-                font.bold: true
-                anchors.top: parent.bottom
-            }
-        }
-        SpinBoxCM{
-            id: modulerows8
-            from: 0
-            to:16
-            boundValue: settings.setBlockageConfig[7]
-            onValueModified: settings.setBlockageConfig[7] = value
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            TextLine{
-                text: qsTr("Rows on module 8: ")
-                font.bold: true
-                anchors.top: parent.bottom
-            }
 
         }
         SpinBoxCM{
@@ -218,17 +170,14 @@ Rectangle{
         anchors.margins: 20
         icon.source: prefix + "/images/back-button.png"
         onClicked: {
-            settings.setBlockageConfig[0] = 0
-            settings.setBlockageConfig[1] = 0
-            settings.setBlockageConfig[2] = 0
-            settings.setBlockageConfig[3] = 0
-            settings.setBlockageConfig[4] = 0
-            settings.setBlockageConfig[5] = 0
-            settings.setBlockageConfig[6] = 0
-            settings.setBlockageConfig[7] = 0
-            settings.setBlockageConfig[8] = 0
-            settings.setBlockageConfig[9] = 0
-            crops.currentIndex = 0
+            graincountMin.boundValue = 0
+            graincountMax.boundValue = 0
+            modulerows1.boundValue = 0
+            modulerows2.boundValue = 0
+            modulerows3.boundValue = 0
+            modulerows4.boundValue = 0
+            crops.currentIndex[0] = 0
+
         }
     }
     IconButtonTransparent{
@@ -257,6 +206,7 @@ Rectangle{
             text: qsTr("Send + Save")
         }
         onClicked: save_settings()
+
     }
 
     Image{

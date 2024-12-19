@@ -8,7 +8,7 @@ import QtQuick
 Rectangle {
     id: block
     width: 15 * theme.scaleWidth
-    height: 100 * theme.scaleHeight
+    //height: 100 * theme.scaleHeight
 
     border.width: 1
     border.color: "black"
@@ -23,7 +23,7 @@ Rectangle {
         color: textColor
         text: block.buttonText
         anchors.bottom: parent.bottom
-        font.pixelSize: 22
+        font.pixelSize: 13 * theme.scaleWidth
         anchors.horizontalCenter: parent.horizontalCenter
     }
 }

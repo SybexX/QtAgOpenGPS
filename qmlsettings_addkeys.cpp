@@ -114,6 +114,12 @@ void QMLSettings::setupKeys() {
     addKey(QString("setSound_isAutoSteerOn"),QString("display/autoSteerSound"),"bool");
     addKey(QString("setRelay_pinConfig"),QString("todo/relayPinConfig"),"leavealone");
     addKey(QString("setBlockageConfig"),QString("todo/BlockageConfig"),"leavealone");
+    addKey(QString("setBlockrow1"),QString("seed/Blockrow1"),"double");
+    addKey(QString("setBlockrow2"),QString("seed/Blockrow2"),"double");
+    addKey(QString("setBlockrow3"),QString("seed/Blockrow3"),"double");
+    addKey(QString("setBlockrow4"),QString("seed/Blockrow4"),"double");
+    addKey(QString("setBlockcountMin"),QString("seed/BlockcountMin"),"double");
+    addKey(QString("setBlockcountMax"),QString("seed/BlockcountMax"),"double");
     addKey(QString("setDisplay_camSmooth"),QString("display/camSmooth"),"int");
     addKey(QString("setGPS_dualHeadingOffset"),QString("gps/dualHeadingOffset"),"double");
     addKey(QString("setF_isSteerWorkSwitchEnabled"),QString("tool/isSteerWorkSwitchEnabled"),"bool");
