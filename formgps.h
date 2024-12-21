@@ -217,7 +217,7 @@ public:
     bool isPureDisplayOn = true, isSkyOn = true, isRollMeterOn = false, isTextureOn = true;
     bool isDay = true, isDayTime = true, isBrightnessOn = true;
     bool isKeyboardOn = true, isAutoStartAgIO = true, isSvennArrowOn = true;
-
+    bool isConnectedBlockage = false; //Dim
     bool isUTurnOn = true, isLateralOn = true;
 
     //sunrise, sunset

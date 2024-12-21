@@ -173,5 +173,9 @@ void FormGPS::DoRemoteSwitches()
 
 void FormGPS::DoBlockageMonitoring()
 {
+  isConnectedBlockage = true;
+        QObject *aog = qmlItem(qml_root,"aog");
+        aog->setProperty("blockageConnected", isConnectedBlockage);
+
 
 }

@@ -8,14 +8,14 @@ import QtQuick.Layouts 1.1
 Rectangle {
     id: blockageRows
     anchors.horizontalCenter: parent.horizontalCenter
-    //width: 15 * theme.scaleWidth * numSections
-    width: (800 * theme.scaleWidth / numSections) < 50 ? (15 * theme.scaleWidth * numSections) : (20 * theme.scaleWidth * numSections)
+    //width: 15 * theme.scaleWidth * numRows
+    width: (800 * theme.scaleWidth / numRows) < 50 ? (15 * theme.scaleWidth * numRows) : (20 * theme.scaleWidth * numRows)
     //height: childrenRect.height * theme.scaleHeight
 
     color: "transparent"
 
 
-    property int numSections: 32  // need connect with settings Dim
+    property int numRows: 32  // need connect with settings Dim
     property int countMin: 10     // need connect with settings Dim
     property int countMax: 50     // need connect with settings Dim
     property var rowCount: [ 0,60,60,15,19,15,60,60,15,19,15,20,0,15,60,60,15,19,15,20,0,60,50,50,15,19,15,20,0,70,30,10,15,19,15,20,0,78,90,20,15,19,15,20,0,0,28,40 ] // need connect with settings
@@ -48,9 +48,10 @@ Rectangle {
     }
     function setSizes() {
         //same colors for sections and zones
-        //numSections = settings.setBlockrow1
-        //countMin =  settings.setBlockcountMin
-        //countMax =  settings.setBlockcountMax
+        numRows = (Number(settings.setBlockrow1 + settings.setBlockrow2 + settings.setBlockrow3 + settings.setBlockrow4)*100)
+        countMin =  Number(settings.setBlockcountMin)*100
+        countMax =  Number(settings.setBlockcountMax)*100
+        console.debug(Number(settings.setBlockrow1)*100)
         }
 
 /*
@@ -70,9 +71,9 @@ Rectangle {
     }
 */
 
-    onNumSectionsChanged: {
+    onNumRowsChanged: {
         rowModel.clear()
-        for (var i = 0; i < numSections; i++) {
+        for (var i = 0; i < numRows; i++) {
             rowModel.append( { rowNo: i } )
         y}
     }
@@ -80,8 +81,9 @@ Rectangle {
     //callbacks, connections, and signals
     Component.onCompleted:  {
         setColors()
+        setSizes()
         rowModel.clear()
-        for (var i = 0; i < numSections; i++) {
+        for (var i = 0; i < numRows; i++) {
             rowModel.append( { rowNo: i } )
         }
     }
@@ -91,7 +93,7 @@ Connections {
     function onSetDisplay_isDayModeChanged() {
         setColors()
     }
-    function onSetBlockageConfigChanged() {
+    function onSetBlockrow1Changed() {
         setSizes()
     }
 }
@@ -103,11 +105,11 @@ Connections {
     Component {
         id: rowViewDelegate
         BlockageRow {
-            width: (800 * theme.scaleWidth / numSections) < 50 ? (15 * theme.scaleWidth) : (20 * theme.scaleWidth)
+            width: (800 * theme.scaleWidth / numRows) < 50 ? (15 * theme.scaleWidth) : (20 * theme.scaleWidth)
             //width: 15 * theme.scaleWidth
             height: (blockageRows.rowCount[model.rowNo]+20) * theme.scaleHeight
             buttonText: (model.rowNo + 1).toFixed(0)
-            visible: (model.rowNo < numSections) ? true : false
+            visible: (model.rowNo < numRows) ? true : false
             color: (blockageRows.rowCount[model.rowNo] < countMin ? offColor : (blockageRows.rowCount[model.rowNo] < countMax ? autoColor : onColor))
             textColor: (blockageRows.rowCount[model.rowNo]===0 ? offTextColor : (blockageRows.rowCount[model.rowNo] === 1 ? autoTextColor : onTextColor))
         }

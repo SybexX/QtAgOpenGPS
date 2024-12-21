@@ -47,7 +47,7 @@ Item {
     property double frameTime: 0
 
     property bool isJobStarted: true
-
+    property bool blockageConnected: false
     property int manualBtnState: 0
     property int autoBtnState: 0
     property bool autoYouturnBtnState: true
