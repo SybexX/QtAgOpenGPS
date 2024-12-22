@@ -1194,7 +1194,7 @@ Window {
                 id: blockageRows
                 visible: aog.blockageConnected ? true : false  // need connect with c++ Dim
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: simBarRect.top
+                anchors.bottom: parent.bottom
                 anchors.bottomMargin: 8
                 height: 100 * theme.scaleHeight
                 //width: 800  * theme.scaleWidth

@@ -136,6 +136,7 @@ void FormGPS::setupGui()
     InterfaceProperty<RecordedPathInterface, btnStates>::set_qml_root(qmlItem(qml_root, "recordedPathInterface"));
 
     QMLSectionButtons::set_aog_root(qmlItem(qml_root, "aog"));
+    qmlblockage::set_aog_root(qmlItem(qml_root, "aog"));
 
     //hook up our AOGInterface properties
     QObject *aog = qmlItem(qml_root, "aog");
@@ -146,6 +147,7 @@ void FormGPS::setupGui()
 
     //react to UI changing this property
     connect(aog,SIGNAL(sectionButtonStateChanged()), &tool.sectionButtonState, SLOT(onStatesUpdated()));
+    connect(aog,SIGNAL(rowCountChanged()), &tool.blockageRowState, SLOT(onRowCountUpdated())); //Dim
 
     openGLControl = qml_root->findChild<AOGRendererInSG *>("openglcontrol");
     //This is a bit hackish, but all rendering is done in this item, so

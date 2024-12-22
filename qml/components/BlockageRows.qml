@@ -15,10 +15,10 @@ Rectangle {
     color: "transparent"
 
 
-    property int numRows: 32  // need connect with settings Dim
-    property int countMin: 10     // need connect with settings Dim
-    property int countMax: 50     // need connect with settings Dim
-    property var rowCount: [ 0,60,60,15,19,15,60,60,15,19,15,20,0,15,60,60,15,19,15,20,0,60,50,50,15,19,15,20,0,70,30,10,15,19,15,20,0,78,90,20,15,19,15,20,0,0,28,40 ] // need connect with settings
+    property int numRows:  Number(settings.setBlockrow1 + settings.setBlockrow2 + settings.setBlockrow3 + settings.setBlockrow4)*100
+    property int countMin: Number(settings.setBlockcountMin)*100
+    property int countMax: Number(settings.setBlockcountMax)*100
+    property var rowCount: aog.rowCount // need connect with settings
     property color offColor: "Crimson"
     property color offTextColor: "White"
     property color onColor: "DarkGoldenrod"
@@ -51,25 +51,9 @@ Rectangle {
         numRows = (Number(settings.setBlockrow1 + settings.setBlockrow2 + settings.setBlockrow3 + settings.setBlockrow4)*100)
         countMin =  Number(settings.setBlockcountMin)*100
         countMax =  Number(settings.setBlockcountMax)*100
-        console.debug(Number(settings.setBlockrow1)*100)
         }
 
-/*
-    function setRowCount (sectionNo: int, new_state: int) {
-        //states: 0 = off, 1 = auto, 2 = on
-        var temp1 = aog.sectionRowCount
-        var temp2 = blockageRows.rowCount
-        var j
 
-
-            //1:1 correlation between buttons and sections
-            temp1[sectionNo] = new_state //this is the tie-in back to the C++ land
-            temp2[sectionNo] = new_state //this is the onscreen button
-
-        aog.rowCount = temp1
-        sectionButtons.rowCount = temp2
-    }
-*/
 
     onNumRowsChanged: {
         rowModel.clear()

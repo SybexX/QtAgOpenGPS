@@ -281,13 +281,20 @@ void FormGPS::ReceiveFromAgIO()
             //
             if (datagram_data.length() != 14)
                 break;
-        qDebug() << "Connected to blockage";
+
             int i = data[6];
             mc.blockagemoduleid[i] = data[5];
+            //qDebug() << "ID: ";
+            //qDebug() << mc.blockagemoduleid[i];
             mc.blockagesecnum[i] = data[6];
+            qDebug() << "Row: ";
+            qDebug() << mc.blockagesecnum[i];
             mc.blockageseccount[i] = data[7];
+            qDebug() << "Count: ";
+            qDebug() << mc.blockageseccount[i];
             DoBlockageMonitoring();
             break;
+
         }
     }
     //qDebug() << pn->rawBuffer ;"Connected to blockage"
