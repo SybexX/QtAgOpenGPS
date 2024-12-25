@@ -269,5 +269,12 @@ extern AOGProperty property_displayShowBack;
 extern AOGProperty property_displayAntiAliasSamples;
 extern AOGProperty property_setDisplay_useTrackZero;
 extern AOGProperty property_setDisplay_topTrackNum;
+extern AOGProperty property_setBlockrow1;
+extern AOGProperty property_setBlockrow2;
+extern AOGProperty property_setBlockrow3;
+extern AOGProperty property_setBlockrow4;
+extern AOGProperty property_setSeeder_numRows;
+extern AOGProperty property_setBlockcountMin;
+extern AOGProperty property_setBlockcountMax;
 
 #endif // PROPERTIES_H

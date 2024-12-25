@@ -264,4 +264,11 @@ props = {'setwin': 'display/camPitch',
  'setWindow_QuickABLocation': 'dialogs/quickABLocation',
  'setDisplay_isLogElevation': 'display/isLogElevation',
  'setSound_isSectionsOn': 'display/soundIsSectionOn',
- 'setGPS_dualReverseDetectionDistance': 'gps/dualReverseDetectionDistance'}
+ 'setGPS_dualReverseDetectionDistance': 'gps/dualReverseDetectionDistance',
+ 'setBlockrow1': 'seed/Blockrow1",16);
+ 'setBlockrow2': 'seed/Blockrow2',
+ 'setBlockrow3': 'seed/Blockrow3',
+ 'setBlockrow4': 'seed/Blockrow4',
+ 'setSeeder_numRows': 'seed/SeedernumRows',
+ 'setBlockcountMin': 'seed/BlockcountMin',
+ 'setBlockcountMax': 'seed/BlockcountMax'}

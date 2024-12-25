@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QVariant>
 #include <QVariantList>
+#include "cmodulecomm.h"
 
 class qmlblockage : public QObject
 {
@@ -17,6 +18,7 @@ public:
     static inline QObject *aog_root = NULL;
     static inline void set_aog_root(QObject *aog_root_) { aog_root = aog_root_;}
 
+
     inline void set (int sectionno, int new_state) {
         if (needRead) {
             needRead = false;
@@ -25,7 +27,6 @@ public:
 
         rows[sectionno] = QVariant((int) new_state);
         aog_root->setProperty("rowCount", rows);
-        qDebug() << rows;
     }
 
 public slots:

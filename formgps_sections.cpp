@@ -176,15 +176,9 @@ void FormGPS::DoBlockageMonitoring()
   isConnectedBlockage = true;
         QObject *aog = qmlItem(qml_root,"aog");
         aog->setProperty("blockageConnected", isConnectedBlockage);
-        for(int s=0; s< 16; s++) {
+        for(int s=0; s< 48; s++) {
         tool.blockageRowState.set(s, mc.blockageseccount[s]);
-           // aog->setProperty("rowCount", mc.blockageseccount[s]);
-            qDebug() << "Count: ";
-            qDebug() << mc.blockageseccount[s];
         }
-
-
-        //DoBlockageMonitoring();
 }
 
 

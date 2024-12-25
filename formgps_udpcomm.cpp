@@ -283,15 +283,7 @@ void FormGPS::ReceiveFromAgIO()
                 break;
 
             int i = data[6];
-            mc.blockagemoduleid[i] = data[5];
-            //qDebug() << "ID: ";
-            //qDebug() << mc.blockagemoduleid[i];
-            mc.blockagesecnum[i] = data[6];
-            qDebug() << "Row: ";
-            qDebug() << mc.blockagesecnum[i];
-            mc.blockageseccount[i] = data[7];
-            qDebug() << "Count: ";
-            qDebug() << mc.blockageseccount[i];
+            mc.blockageseccount[data[5]*16+i] = data[7];
             DoBlockageMonitoring();
             break;
 
