@@ -211,8 +211,6 @@ void FormLoop::ReceiveFromUDP()
         data.resize(udpSocket->pendingDatagramSize());
         udpSocket->readDatagram(data.data(), data.size());
 
-        buffer = data;
-
         //verify the datagram isn't an NMEA string, and is from the module
         if (data.length() > 4 && data[0] == (char)0x80 && data[1] == (char)0x81)
         {

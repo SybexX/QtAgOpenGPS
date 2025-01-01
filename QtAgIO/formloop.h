@@ -170,10 +170,6 @@ class FormLoop : public QObject
 
         QQmlApplicationEngine engine; //grasping at straws, here
 
-		//data stream
-		//QByteArray buffer(1024);
-		QByteArray buffer;
-
 		//QByteArray helloFromAgIO( 0x80, 0x81, 0x7F, 200, 3, 56, 0, 0, 0x47 );
         QByteArray helloFromAgIO = QByteArray::fromRawData("\x80\x81\x7F\xC8\x03\x38\x00\x00\x47", 9);
 

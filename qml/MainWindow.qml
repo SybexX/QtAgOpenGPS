@@ -79,6 +79,7 @@ Window {
             console.log("steerConfigWindow visible")
             return true
         }
+        /*
         else if (abCurvePicker.visible === true) {
             console.log("abCurvePicker visible")
             return true
@@ -86,7 +87,7 @@ Window {
         else if (abLinePicker.visible === true) {
             console.log("abLinePicker visible")
             return true
-        }
+        }*/
         else if (tramLinesEditor.visible === true) {
             console.log("tramLinesEditor visible")
             return true
@@ -127,9 +128,9 @@ Window {
         id: aog
         objectName: "aog"
     }
-    Interfaces.LinesInterface {
-        objectName: "linesInterface"
-        id: linesInterface
+    Interfaces.TracksInterface {
+        objectName: "tracksInterface"
+        id: tracksInterface
     }
 
     Interfaces.FieldInterface {
@@ -137,10 +138,17 @@ Window {
         objectName: "fieldInterface"
     }
 
-    Interfaces.VehicleInterface {
+    /* only use in a mock setting.  Normally C++ will provide
+       this as a CVehicle instance.
+    MockVehicle {
         id: vehicleInterface
         objectName: "vehicleInterface"
     }
+
+    MockTracks {
+        id: trk
+        }
+    */
 
     Interfaces.BoundaryInterface {
         id: boundaryInterface
@@ -394,7 +402,7 @@ Window {
                 width: 70 * theme.scaleWidth
                 height: 70 * theme.scaleHeight
                 source: prefix + "/images/Images/z_ReverseArrow.png"
-                visible: aog.isReverse
+                visible: vehicleInterface.isReverse || vehicleInterface.isChangingDirection
             }
             MouseArea{
                 //button that catches any clicks on the vehicle in the GL Display
@@ -1347,6 +1355,7 @@ Window {
             id: steerConfigSettings
             visible: false
         }
+        /*
         ABCurvePicker{
             id: abCurvePicker
             objectName: "abCurvePicker"
@@ -1356,7 +1365,7 @@ Window {
             id: abLinePicker
             objectName: "abLinePicker"
             visible: false
-        }
+        }*/
         TramLinesEditor{
             id: tramLinesEditor
             anchors.right: parent.right
@@ -1399,6 +1408,7 @@ Window {
             anchors.fill: parent
         }
 
+        /*
         Tracks.TrackNewButtons{
             id: trackNewButtons
             visible: false
@@ -1412,7 +1422,7 @@ Window {
         }
         Tracks.TracksNewAddName{
             id: trackAddName
-        }
+        }*/
 
         Rectangle{//show "Are you sure?" when close button clicked
             id: closeDialog

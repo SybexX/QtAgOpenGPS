@@ -239,7 +239,7 @@ Popup{
                     ]
 
                     PathPolyline {
-                        id: headlandShapePolyLine
+                        id: headlandShapePolyine
                         path: headlandShapePath.p
                     }
                 }
@@ -251,7 +251,7 @@ Popup{
                 anchors.fill: parent
                 ShapePath {
                     id: sliceShapePath
-                    strokeColor: btnABCurve.checked ? "#f31700" : "#21f305"
+                    strokeColor: headlandAB.checked ? "#f31700" : "#21f305"
                     strokeWidth: 8
                     fillColor: "transparent"
                     startX: p[0].x

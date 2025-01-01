@@ -3,7 +3,6 @@ import QtQuick.Controls
 import QtQuick.Window
 import QtQuick.Layouts
 import "components" as Comp
-import "interfaces"
 
 Window {
 	id: ntrip
@@ -11,10 +10,6 @@ Window {
     width: 648
 	visible: true
     title: qsTr("NTRIP RTK")
-
-	NTripInterface {
-		id: ntripInterface
-	}
 
 	Rectangle {
 		id: source

@@ -63,32 +63,32 @@ QString FormLoop::Parse(QString& buffer)
 
 void FormLoop::ParseNMEA(QString& buffer)
 {
-    if (rawBuffer.isEmpty()) return;
+    if (buffer.isEmpty()) return;
 
     //find end of a sentence
-    int cr = rawBuffer.indexOf('\r');
+    int cr = buffer.indexOf('\r');
     if (cr == -1) return; // No end found, wait for more data
 
     // Find start of next sentence
-    int dollar = rawBuffer.indexOf('$');
+    int dollar = buffer.indexOf('$');
     if (dollar == -1) return;
 
     //if the $ isn't first, get rid of the tail of corrupt sentence
-    if (dollar >= cr) rawBuffer = rawBuffer.mid(dollar);
+    if (dollar >= cr) buffer = buffer.mid(dollar);
 
-    cr = rawBuffer.indexOf('\r');
+    cr = buffer.indexOf('\r');
     if (cr == -1) return; // No end found, wait for more data
-    dollar = rawBuffer.indexOf('$');
+    dollar = buffer.indexOf('$');
     if (dollar == -1) return;
 
     //if the $ isn't first, get rid of the tail of corrupt sentence
-    if (dollar >= cr) rawBuffer = rawBuffer.mid(dollar);
+    if (dollar >= cr) buffer = buffer.mid(dollar);
 
-    cr = rawBuffer.indexOf('\r');
-    dollar = rawBuffer.indexOf('$');
+    cr = buffer.indexOf('\r');
+    dollar = buffer.indexOf('$');
     if (cr == -1 || dollar == -1) return;
 
-    if (rawBuffer.length() > 301)
+    if (buffer.length() > 301)
     {
         //if (isLogNMEA)
         //{
@@ -97,7 +97,7 @@ void FormLoop::ParseNMEA(QString& buffer)
         //        + "\r\n" + rawBuffer + "\r\n");
         //}
 
-        rawBuffer.clear();
+        buffer.clear();
         return;
     }
 

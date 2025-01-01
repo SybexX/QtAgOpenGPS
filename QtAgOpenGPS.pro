@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl quick quickwidgets network
+QT       += core gui opengl quick quickwidgets network concurrent
 
 CONFIG += c++17
 
@@ -138,7 +138,8 @@ HEADERS  += formgps.h \
     classes/cabcurve.h \
     classes/csim.h \
     classes/crecordedpath.h \
-    classes/cdubins.h
+    classes/cdubins.h \
+    setter.h
 
 ! contains(DEFINES,LOCAL_QML) {
 RESOURCES += \

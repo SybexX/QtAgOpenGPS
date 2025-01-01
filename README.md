@@ -6,6 +6,10 @@ Note!
 ==========
 I haven't compiled for Windows in awhile. If this branch ever won't compile on Windows, contact me, or have a go at it yourself!
 
+Dev Notes
+----------
+Developer how-to has been moved to the [wiki](https://github.com/torriem/qtagopengps/wiki)
+
 What is QtAgOpenGPS?
 --------------------
 QtAgOpenGPS is a direct port of Brian Tischler's [AgOpenGPS](https://github.com/farmerbriantee/AgOpenGPS), which was originally

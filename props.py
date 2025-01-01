@@ -272,3 +272,5 @@ props = {'setwin': 'display/camPitch',
  'setSeeder_numRows': 'seed/SeedernumRows',
  'setBlockcountMin': 'seed/BlockcountMin',
  'setBlockcountMax': 'seed/BlockcountMax'}
+ 'setTool_isDisplayTramControl': 'display/showTramControl',
+ 'setAS_uTurnCompensation': 'autosteer/uTurnCompensation'}

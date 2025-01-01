@@ -44,6 +44,13 @@ void FormGPS::setupGui()
     rootContext()->setContextProperty("mainForm", this);
     rootContext()->setContextProperty("settings", &qml_settings);
 
+    rootContext()->setContextProperty("vehicleInterface", &vehicle);
+    //populate vehicle_list property in vehicleInterface
+    vehicle_update_list();
+
+    rootContext()->setContextProperty("trk", &trk);
+    rootContext()->setContextProperty("tram", &tram);
+
 #ifdef LOCAL_QML
     // Look for QML files relative to our current directory
     QStringList search_pathes = { "..",
@@ -105,23 +112,11 @@ void FormGPS::setupGui()
     InterfaceProperty<AOGInterface, double>::set_qml_root(qmlItem(qml_root, "aog"));
     InterfaceProperty<AOGInterface, btnStates>::set_qml_root(qmlItem(qml_root, "aog"));
 
-    InterfaceProperty<LinesInterface, int>::set_qml_root(qmlItem(qml_root, "linesInterface"));
-    InterfaceProperty<LinesInterface, uint>::set_qml_root(qmlItem(qml_root, "linesInterface"));
-    InterfaceProperty<LinesInterface, bool>::set_qml_root(qmlItem(qml_root, "linesInterface"));
-    InterfaceProperty<LinesInterface, double>::set_qml_root(qmlItem(qml_root, "linesInterface"));
-    InterfaceProperty<LinesInterface, btnStates>::set_qml_root(qmlItem(qml_root, "linesInterface"));
-
     InterfaceProperty<FieldInterface, int>::set_qml_root(qmlItem(qml_root, "fieldInterface"));
     InterfaceProperty<FieldInterface, uint>::set_qml_root(qmlItem(qml_root, "fieldInterface"));
     InterfaceProperty<FieldInterface, bool>::set_qml_root(qmlItem(qml_root, "fieldInterface"));
     InterfaceProperty<FieldInterface, double>::set_qml_root(qmlItem(qml_root, "fieldInterface"));
     InterfaceProperty<FieldInterface, btnStates>::set_qml_root(qmlItem(qml_root, "fieldInterface"));
-
-    InterfaceProperty<VehicleInterface, int>::set_qml_root(qmlItem(qml_root, "vehicleInterface"));
-    InterfaceProperty<VehicleInterface, uint>::set_qml_root(qmlItem(qml_root, "vehicleInterface"));
-    InterfaceProperty<VehicleInterface, bool>::set_qml_root(qmlItem(qml_root, "vehicleInterface"));
-    InterfaceProperty<VehicleInterface, double>::set_qml_root(qmlItem(qml_root, "vehicleInterface"));
-    InterfaceProperty<VehicleInterface, btnStates>::set_qml_root(qmlItem(qml_root, "vehicleInterface"));
 
     InterfaceProperty<BoundaryInterface, int>::set_qml_root(qmlItem(qml_root, "boundaryInterface"));
     InterfaceProperty<BoundaryInterface, uint>::set_qml_root(qmlItem(qml_root, "boundaryInterface"));
@@ -138,10 +133,18 @@ void FormGPS::setupGui()
     QMLSectionButtons::set_aog_root(qmlItem(qml_root, "aog"));
     qmlblockage::set_aog_root(qmlItem(qml_root, "aog"));
 
+    //initialize interface properties
+    isAutoSteerBtnOn = false;
+    sentenceCounter = 0;
+    manualBtnState = btnStates::Off;
+    autoBtnState = btnStates::Off;
+    isPatchesChangingColor = false;
+    isOutOfBounds = false;
+
     //hook up our AOGInterface properties
     QObject *aog = qmlItem(qml_root, "aog");
-    QObject *linesInterface = qmlItem(qml_root, "linesInterface");
-    QObject *vehicleInterface = qmlItem(qml_root, "vehicleInterface");
+    QObject *tracksInterface = qmlItem(qml_root, "tracksInterface");
+    //QObject *vehicleInterface = qmlItem(qml_root, "vehicleInterface");
     QObject *fieldInterface = qmlItem(qml_root, "fieldInterface");
     QObject *boundaryInterface = qmlItem(qml_root, "boundaryInterface");
 
@@ -161,21 +164,23 @@ void FormGPS::setupGui()
     connect(openGLControl,SIGNAL(clicked(QVariant)),this,SLOT(onGLControl_clicked(QVariant)));
     connect(openGLControl,SIGNAL(dragged(int,int,int,int)),this,SLOT(onGLControl_dragged(int,int,int,int)));
 
-    //TODO: save and restore these numbers from settings
-//    qml_root->setProperty("width",1024);
-//    qml_root->setProperty("height",768);
+    connect(aog,SIGNAL(sectionButtonStateChanged()), &tool.sectionButtonState, SLOT(onStatesUpdated()));
 
-    //AB Line Picker
-    //react to UI changing these properties
-    connect(aog,SIGNAL(currentABLineChanged()), this, SLOT(update_current_ABline_from_qml()));
-    connect(aog,SIGNAL(currentABCurveChanged()), this, SLOT(update_current_ABline_from_qml()));
-    //linesInterface signals
-    connect(linesInterface,SIGNAL(abLine_updateLines()),this,SLOT(update_ABlines_in_qml()));
-    connect(linesInterface,SIGNAL(abLine_addLine(QString, double, double, double)), this, SLOT(add_new_ABline(QString,double,double,double)));
-    connect(linesInterface,SIGNAL(abLine_setA(bool,double,double,double)), this, SLOT(start_newABLine(bool,double,double,double)));
-    connect(linesInterface,SIGNAL(abLine_deleteLine(int)), this, SLOT( delete_ABLine(int)));
-    connect(linesInterface,SIGNAL(abLine_swapHeading(int)), this, SLOT(swap_heading_ABLine(int)));
-    connect(linesInterface,SIGNAL(abLine_changeName(int, QString)), this, SLOT(change_name_ABLine(int,QString)));
+    connect(tracksInterface, SIGNAL(start_new(int)), this, SLOT(tracks_start_new(int)));
+    connect(tracksInterface, SIGNAL(mark_start(double,double,double)), this, SLOT(tracks_mark_start(double,double,double)));
+    connect(tracksInterface, SIGNAL(mark_end(int,double,double)), this, SLOT(tracks_mark_end(int,double,double)));
+    connect(tracksInterface, SIGNAL(finish_new(QString)), this, SLOT(tracks_finish_new(QString)));
+    connect(tracksInterface, SIGNAL(cancel_new()), this, SLOT(tracks_cancel_new()));
+    connect(tracksInterface, SIGNAL(pause_or_resume(bool)), this, SLOT(tracks_pause(bool)));
+    connect(tracksInterface, SIGNAL(add_point(double,double,double)), this, SLOT(tracks_add_point(double,double,double)));
+    connect(tracksInterface, SIGNAL(select(int)), this, SLOT(tracks_select(int)));
+    connect(tracksInterface, SIGNAL(swapAB(int)), this, SLOT(tracks_swapAB(int)));
+    connect(tracksInterface, SIGNAL(changeName(int,QString)), this, SLOT(tracks_changeName(int,QString)));
+    connect(tracksInterface, SIGNAL(delete_track(int)), this, SLOT(tracks_delete(int)));
+    connect(tracksInterface, SIGNAL(ref_nudge(double)), this, SLOT(tracks_ref_nudge(double)));
+    connect(tracksInterface, SIGNAL(nudge_zero()), this, SLOT(tracks_nudge_zero()));
+    connect(tracksInterface, SIGNAL(nudge_center()), this, SLOT(tracks_nudge_center()));
+    connect(tracksInterface, SIGNAL(nudge(double)), this, SLOT(tracks_nudge(double)));
 
     //on screen buttons
     connect(aog,SIGNAL(zoomIn()), this, SLOT(onBtnZoomIn_clicked()));
@@ -208,7 +213,7 @@ void FormGPS::setupGui()
     connect(aog,SIGNAL(swapAutoYouTurnDirection()), this, SLOT(onBtnSwapAutoYouTurnDirection_clicked()));
 
 
-    connect(qml_root, SIGNAL(save_everything()), this, SLOT(fileSaveEverythingBeforeClosingField()));
+    connect(qml_root, SIGNAL(save_everything()), this, SLOT(FileSaveEverythingBeforeClosingField()));
     //connect(qml_root,SIGNAL(closing(QQuickCloseEvent *)), this, SLOT(fileSaveEverythingBeforeClosingField(QQuickCloseEvent *)));
 
 
@@ -222,10 +227,10 @@ void FormGPS::setupGui()
     connect(aog,SIGNAL(snapToPivot()), this, SLOT(onBtnSnapToPivot_clicked()));
 
     //vehicle saving and loading
-    connect(vehicleInterface,SIGNAL(vehicle_update_list()), this, SLOT(vehicle_update_list()));
-    connect(vehicleInterface,SIGNAL(vehicle_load(QString)), this, SLOT(vehicle_load(QString)));
-    connect(vehicleInterface,SIGNAL(vehicle_delete(QString)), this, SLOT(vehicle_delete(QString)));
-    connect(vehicleInterface,SIGNAL(vehicle_saveas(QString)), this, SLOT(vehicle_saveas(QString)));
+    connect(&vehicle,SIGNAL(vehicle_update_list()), this, SLOT(vehicle_update_list()));
+    connect(&vehicle,SIGNAL(vehicle_load(QString)), this, SLOT(vehicle_load(QString)));
+    connect(&vehicle,SIGNAL(vehicle_delete(QString)), this, SLOT(vehicle_delete(QString)));
+    connect(&vehicle,SIGNAL(vehicle_saveas(QString)), this, SLOT(vehicle_saveas(QString)));
 
     //field saving and loading
     connect(fieldInterface,SIGNAL(field_update_list()), this, SLOT(field_update_list()));
@@ -424,10 +429,13 @@ void FormGPS::onBtnYouSkip_clicked(){
 void FormGPS::onBtnResetDirection_clicked(){
     qDebug()<<"reset Direction";
     // c#Array.Clear(stepFixPts, 0, stepFixPts.Length);
+
     std::memset(stepFixPts, 0, sizeof(stepFixPts));
-                    isFirstHeadingSet = false;
-                    vehicle.isReverse = false;
-                    TimedMessageBox(2000, "Reset Direction", "Drive Forward > 1.5 kmh");
+    isFirstHeadingSet = false;
+
+    //TODO: most of this should be done in QML
+    vehicle.setIsReverse(false);
+    TimedMessageBox(2000, "Reset Direction", "Drive Forward > 1.5 kmh");
 }
 void FormGPS::onBtnFlag_clicked() {
 
@@ -448,10 +456,10 @@ void FormGPS::onBtnContour_clicked(){
     if (ct.isContourBtnOn) {
         guidanceLookAheadTime = 0.5;
     }else{
-        if (ABLine.isBtnABLineOn | curve.isBtnCurveOn){
-            ABLine.isABValid = false;
-            curve.isCurveValid = false;
-        }
+        //if (ABLine.isBtnABLineOn | curve.isBtnCurveOn){
+        //    ABLine.isABValid = false;
+        //    curve.isCurveValid = false;
+        //}
         guidanceLookAheadTime = property_setAS_guidanceLookAheadTime;
     }
 }
@@ -461,6 +469,7 @@ void FormGPS::onBtnContourPriority_clicked(bool isRight){
     ct.isRightPriority = isRight;
     qDebug() << "Contour isRight: " << isRight;
 }
+
 void FormGPS::onBtnContourLock_clicked(){
     ct.SetLockToLine();
 }
@@ -588,13 +597,13 @@ void FormGPS::onBtnAutoYouTurn_clicked(){
      if (!yt.isYouTurnBtnOn)
      {
          //new direction so reset where to put turn diagnostic
-         yt.ResetCreatedYouTurn();
+         yt.ResetCreatedYouTurn(makeUTurnCounter);
 
          if (!isAutoSteerBtnOn) return;
          yt.isYouTurnBtnOn = true;
          yt.isTurnCreationTooClose = false;
          yt.isTurnCreationNotCrossingError = false;
-         yt.ResetYouTurn();
+         yt.ResetYouTurn(makeUTurnCounter);
          //mc.autoSteerData[mc.sdX] = 0;
 //         mc.machineControlData[mc.cnYouTurn] = 0;
 //         btnAutoYouTurn.Image = Properties.Resources.Youturn80;
@@ -604,10 +613,10 @@ void FormGPS::onBtnAutoYouTurn_clicked(){
          yt.isYouTurnBtnOn = false;
 //         yt.rowSkipsWidth = Properties.Vehicle.Default.set_youSkipWidth;
 //         btnAutoYouTurn.Image = Properties.Resources.YouTurnNo;
-         yt.ResetYouTurn();
+         yt.ResetYouTurn(makeUTurnCounter);
 
          //new direction so reset where to put turn diagnostic
-         yt.ResetCreatedYouTurn();
+         yt.ResetCreatedYouTurn(makeUTurnCounter);
 
          //mc.autoSteerData[mc.sdX] = 0;commented in aog
 //         mc.machineControlData[mc.cnYouTurn] = 0;
@@ -618,7 +627,7 @@ void FormGPS::onBtnSwapAutoYouTurnDirection_clicked()
      if (!yt.isYouTurnTriggered)
      {
          yt.isYouTurnRight = !yt.isYouTurnRight;
-         yt.ResetCreatedYouTurn();
+         yt.ResetCreatedYouTurn(makeUTurnCounter);
      }
      //else if (yt.isYouTurnBtnOn)
          //btnAutoYouTurn.PerformClick();
@@ -627,16 +636,16 @@ void FormGPS::onBtnSwapAutoYouTurnDirection_clicked()
 void FormGPS::onBtnManUTurn_clicked(bool right)
 {
     if (yt.isYouTurnTriggered) {
-        yt.ResetYouTurn();
+        yt.ResetYouTurn(makeUTurnCounter);
     }else {
         yt.isYouTurnTriggered = true;
-        yt.BuildManualYouTurn(vehicle, ABLine, curve, right, true);
+        yt.BuildManualYouTurn( right, true, vehicle, trk);
    }
 }
 
 void FormGPS::onBtnLateral_clicked(bool right)
 {
-   yt.BuildManualYouLateral(vehicle, ABLine, curve, right);
+   yt.BuildManualYouLateral(right, vehicle, trk);
 }
 
 void FormGPS::TimedMessageBox(int timeout, QString s1, QString s2)
