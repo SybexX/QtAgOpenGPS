@@ -110,7 +110,6 @@ Connections {
         //anchors.top: parent.top
         model: rowModel
         //spacing: 1
-        anchors.horizontalCenter: blockageRows.horizontalCenter
         boundsMovement: Flickable.StopAtBounds
         delegate: rowViewDelegate
     }

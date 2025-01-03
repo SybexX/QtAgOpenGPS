@@ -12,7 +12,6 @@ Rectangle {
 
     border.width: 1
     border.color: "black"
-    anchors.bottom: parent.bottom
     property string buttonText: ""
     property color textColor: "white"
 
