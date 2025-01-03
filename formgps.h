@@ -595,7 +595,7 @@ public:
 
     void MakeFlagMark(QOpenGLFunctions *gl);
     void DrawFlags(QOpenGLFunctions *gl, QMatrix4x4 mvp);
-    void DrawTramMarkers(QOpenGLFunctions *gl, QMatrix4x4 mvp);
+    void DrawTramMarkers();
     void CalcFrustum(const QMatrix4x4 &mvp);
     void calculateMinMax();
 

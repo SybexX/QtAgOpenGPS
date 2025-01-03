@@ -82,7 +82,10 @@ public:
     bool isChangingDirection = false;
     Q_PROPERTY(bool isChangingDirection MEMBER isChangingDirection NOTIFY isChangingDirectionChanged)
 
-
+    //tram indicator vars
+    int leftTramState, rightTramState;
+    Q_PROPERTY(int leftTramState MEMBER leftTramState NOTIFY leftTramStateChanged)
+    Q_PROPERTY(int rightTramState MEMBER rightTramState NOTIFY rightTramStateChanged)
 
     //headings
     double fixHeading = 0.0;
@@ -145,6 +148,8 @@ public:
     void setHydLiftDown(bool value);
     void setIsChangingDirection(bool value);
     void setIsReverse(bool value);
+    void setRightTramIndicator(int value);
+    void setLeftTramIndicator(int value);
 
 signals:
     //void setLookAheadGoal(double);
@@ -152,6 +157,8 @@ signals:
     void hydLiftDownChanged();
     void isChangingDirectionChanged();
     void isReverseChanged();
+    void rightTramStateChanged();
+    void leftTramStateChanged();
 
     //QML signals
     void vehicle_saveas(QString vehicle_name);

@@ -646,3 +646,20 @@ void CVehicle::setIsReverse(bool value)
         emit isReverseChanged();
     }
 }
+
+void CVehicle::setRightTramIndicator(int value){
+    if (rightTramState != value)
+    {
+        rightTramState = value;
+            emit rightTramStateChanged();
+    }
+
+}
+void CVehicle::setLeftTramIndicator(int value){
+    if (leftTramState != value)
+    {
+        leftTramState = value;
+            emit leftTramStateChanged();
+    }
+
+}

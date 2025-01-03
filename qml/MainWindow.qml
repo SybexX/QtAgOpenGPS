@@ -1144,6 +1144,19 @@ Window {
                 //TODO add contour
             }
 
+            TramIndicators{
+                id: tramLeft
+                anchors.top: tracknum.bottom
+                anchors.margins: 30
+                anchors.left: parent.horizontalCenter
+            }
+            TramIndicators{
+                id: tramRight
+                anchors.top: tracknum.bottom
+                anchors.margins: 30
+                anchors.right: parent.horizontalCenter
+            }
+
             //Components- this is where the windows that get displayed over the
             //ogl get instantiated.
             Field.FieldData{ //window that displays field acreage and such

@@ -457,7 +457,7 @@ void FormGPS::oglMain_Paint()
 
             //uturn buttons drawn in QML
 
-            if (tool.isDisplayTramControl && tram.displayMode != 0) { DrawTramMarkers(gl,projection*modelview); }
+            if (tool.isDisplayTramControl && tram.displayMode != 0) { DrawTramMarkers(); }
 
             //if this is on, vehicleInterface.isHydLiftOn is true
             if (p_239.pgn[p_239.hydLift] == 2)
@@ -876,52 +876,37 @@ void FormGPS::MakeFlagMark(QOpenGLFunctions *gl)
 
 }
 
-void FormGPS::DrawTramMarkers(QOpenGLFunctions *gl, QMatrix4x4 mvp)
+//DrawTramMarkers moved to QML
+void FormGPS::DrawTramMarkers()
 {
-    //int sizer = 60;
-    int center = -50 ;
-    int bottomSide = 100;
+    /*3 states. On, off, manual on
+     *  0 and 1 are automatic
+     *  0 off
+     *  1 on
+     *  2 manual
+     *  "flash" happens in qml.
+     *  I just changed dot_color to have the 3 states
+     */
+    int dot_color;
 
-    GLHelperTexture gltex;
-
-    QColor dot_color;
-
-    if (((tram.controlByte) & 2) == 2) dot_color = QColor::fromRgbF(0.29f, 0.990f, 0.290f, 0.983f);
-    else dot_color = QColor::fromRgbF(0.9f, 0.0f, 0.0f, 0.53f);
+    if (((tram.controlByte) & 2) == 2) dot_color = 1;// set to green #49FD49
+    else dot_color = 0;//
 
     if ((bool)tram.isLeftManualOn)
     {
-        if (isFlashOnOff) dot_color = QColor::fromRgbF(0.0f, 0.0f, 0.0f, 0.993f);
-        else dot_color = QColor::fromRgbF(0.99f, 0.990f, 0.0f, 0.993f);
+        dot_color = 2;
     }
+    vehicle.setLeftTramIndicator(dot_color);
+    //done with left
 
-    gltex.append( { QVector3D(center - 32, bottomSide - 32, 0), QVector2D(0,0) } );
-    gltex.append( { QVector3D(center + 32, bottomSide - 32, 0), QVector2D(1, 0) } );
-    gltex.append( { QVector3D(center + 32, bottomSide + 32, 0), QVector2D(1, 1) } );
-    gltex.append( { QVector3D(center - 32, bottomSide + 32, 0), QVector2D(0, 1) });
-
-    gltex.draw(gl,mvp,Textures::TRAMDOT,GL_QUADS,true,dot_color);
-
-    if (((tram.controlByte) & 1) == 1) dot_color = QColor::fromRgbF(0.29f, 0.990f, 0.290f, 0.983f);
-    else dot_color = QColor::fromRgbF(0.9f, 0.0f, 0.0f, 0.53f);
+    if (((tram.controlByte) & 1) == 1) dot_color = 1;
+    else dot_color = 0;
 
     if ((bool)tram.isRightManualOn)
     {
-        if (isFlashOnOff) dot_color = QColor::fromRgbF(0.0f, 0.0f, 0.0f, 0.993f);
-        else dot_color = QColor::fromRgbF(0.99f, 0.990f, 0.0f, 0.993f);
+        dot_color = 2;
     }
-
-    center += 100;
-
-    gltex.clear();
-
-    gltex.append( { QVector3D(center - 32, bottomSide - 32, 0), QVector2D(0, 0) } );
-    gltex.append( { QVector3D(center + 32, bottomSide - 32, 0), QVector2D(1, 0) } );
-    gltex.append( { QVector3D(center + 32, bottomSide + 32, 0), QVector2D(1, 1) } );
-    gltex.append( { QVector3D(center - 32, bottomSide + 32, 0), QVector2D(0, 1) } );
-
-    gltex.draw(gl,mvp,Textures::TRAMDOT,GL_QUADS,true,dot_color);
-
+    vehicle.setRightTramIndicator(dot_color);
 }
 
 void FormGPS::DrawFlags(QOpenGLFunctions *gl, QMatrix4x4 mvp)
