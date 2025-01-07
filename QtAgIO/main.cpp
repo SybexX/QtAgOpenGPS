@@ -5,6 +5,7 @@
 #include <QStandardPaths>
 #include "formloop.h"
 #include "agioproperty.h"
+#include "bluetoothdevicelist.h"
 
 AgIOSettings *settings;
 
@@ -40,6 +41,7 @@ int main(int argc, char *argv[])
     settings = new AgIOSettings();
     AgIOProperty::init_defaults();
     settings->sync();
+
 
     FormLoop formLoop;
 	

@@ -29,5 +29,19 @@ Drawer{
                 advancedMenu.showMenu()
             }
         }
+        Comp.ButtonColor{
+            id: bluetooth
+            width: 180
+            height: 50
+            text: qsTr("Bluetooth")
+            onClicked: {
+                settingsWindow.close()
+                if(!utils.isTrue(settings.setBluetooth_isOn)){ //start bt if off
+                    agio.bt_search()
+                    settings.setBluetooth_isOn = true
+                }
+                bluetoothMenu.show()
+            }
+        }
     }
 }

@@ -4,9 +4,10 @@
 #include <QQuickWindow>
 #include <QQmlApplicationEngine>
 #include "qmlsettings.h"
+#include "bluetoothdevicelist.h"
+#include "bluetoothmanager.h"
 
 extern QMLSettings qml_settings;
-
 FormLoop::FormLoop(QObject *parent) : QObject(parent),
     qml_root(parent),
     wwwNtrip("192.168.1.100", 2101, 2102), // Example initial values
@@ -17,12 +18,21 @@ FormLoop::FormLoop(QObject *parent) : QObject(parent),
 	qml_settings.setupKeys();
 	qml_settings.loadSettings();
 
+    btDevicesList = new BluetoothDeviceList(this);// I don't like this, but right now, the class
+    //has to be in place when the QML starts.
+
+    bluetoothManager = new BluetoothManager(this, this);
+
 	setupGUI();
 	loadSettings();
     //loadSettings();
 
     LoadLoopback();
 	LoadUDPNetwork();
+
+    if(property_setBluetooth_isOn)
+        bluetoothManager->startBluetoothDiscovery();
+
    //buffer.resize(1024);
     ConfigureNTRIP();
 

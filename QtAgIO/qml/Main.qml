@@ -233,6 +233,11 @@ Window {
             advancedMenu.visible = true
         }
     }
+    BluetoothMenu{
+        id: bluetoothMenu
+        visible: false
+    }
+
     Window{//warn that we will need to open the firewall if we are using Linux
         //I've forgotten this several times--a real pain.
         modality: Qt.WindowModal

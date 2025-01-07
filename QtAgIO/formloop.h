@@ -22,6 +22,8 @@
 
 
 class FormUDP;
+class BluetoothDeviceList;
+class BluetoothManager;
 
 //in cs, the ipEndPoint is both the ip address and port.
 //cpp doesn't have that luxury, so we create a struct.
@@ -323,6 +325,11 @@ class FormLoop : public QObject
     private slots:
         void ConfigureNTRIP();
         void NTRIPDebugMode(bool doWeDebug);
+
+    private:
+        BluetoothManager* bluetoothManager;
+    public:
+        BluetoothDeviceList *btDevicesList;// for sending the list to frontend
 };
 
 

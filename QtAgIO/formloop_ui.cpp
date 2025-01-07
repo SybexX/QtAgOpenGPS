@@ -11,6 +11,8 @@
 #include <QHostInfo>
 #include <QDir>
 #include "agioproperty.h"
+#include "bluetoothdevicelist.h"
+#include "bluetoothmanager.h"
 
 extern QMLSettings qml_settings;
 
@@ -32,6 +34,7 @@ void FormLoop::setupGUI()
     engine.rootContext()->setContextProperty("screenPixelDensity",QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio());
     engine.rootContext()->setContextProperty("mainForm", this);
 	engine.rootContext()->setContextProperty("settings", &qml_settings);
+engine.rootContext()->setContextProperty("bluetoothDeviceList", btDevicesList);
 
 
 #ifdef LOCAL_QML
@@ -110,6 +113,11 @@ void FormLoop::setupGUI()
     connect(agio, SIGNAL(configureNTRIP()), this, SLOT(ConfigureNTRIP())); //ConfigureNTRIP lives in formloop_ntripcomm.cpp
     connect(agio, SIGNAL(ntripDebug(bool)), this, SLOT(NTRIPDebugMode(bool)));
     connect(agio, SIGNAL(setIPFromUrl(QString)), this, SLOT(LookupNTripIP(QString)));
+
+    //bluetooth
+    connect(agio, SIGNAL(bt_search(QString)), bluetoothManager, SLOT(userConnectBluetooth(QString)));
+    connect(agio, SIGNAL(bt_kill()), bluetoothManager, SLOT(kill()));
+    connect(agio, SIGNAL(bt_remove_device(QString)), bluetoothManager, SLOT(userRemoveDevice(QString)));
 
 
 }

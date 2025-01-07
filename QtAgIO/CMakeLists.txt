@@ -32,6 +32,8 @@ qt_add_executable(QtAgIO
     formloop_formudp.cpp
     inc/CTraffic.h src/CTraffic.cpp
     inc/CScanReply.h src/CScanReply.cpp
+    inc/bluetoothdevicelist.h src/bluetoothdevicelist.cpp
+    inc/bluetoothmanager.h src/bluetoothmanager.cpp
     interfaceproperty.h
 )
 
@@ -52,6 +54,9 @@ target_include_directories(QtAgIO
     PRIVATE .
 )
 
+#this is needed by QtAgIO only
+find_package(Qt6 REQUIRED COMPONENTS Bluetooth)
+
 # Libraries to link
 target_link_libraries(QtAgIO PRIVATE
     Qt6::Core
@@ -61,6 +66,7 @@ target_link_libraries(QtAgIO PRIVATE
     Qt6::Quick
     Qt6::QuickWidgets
     Qt6::Multimedia
+    Qt6::Bluetooth
 )
 
 target_compile_options(QtAgIO PRIVATE 
