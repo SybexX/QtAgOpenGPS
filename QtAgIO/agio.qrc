@@ -99,6 +99,5 @@
         <file>qml/components/ScrollableTextArea.qml</file>
         <file>images/B_Blockage.png</file>
         <file>qml/BluetoothMenu.qml</file>
->>>>>>> dev
     </qresource>
 </RCC>
