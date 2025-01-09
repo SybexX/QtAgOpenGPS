@@ -317,12 +317,12 @@ void FormGPS::DoRemoteSwitches()
 
 void FormGPS::DoBlockageMonitoring()
 {
-  isConnectedBlockage = true;
-        QObject *aog = qmlItem(qml_root,"aog");
-        aog->setProperty("blockageConnected", isConnectedBlockage);
-        for(int s=0; s< 48; s++) {
+    isConnectedBlockage = true;
+    QObject *aog = qmlItem(qml_root,"aog");
+    aog->setProperty("blockageConnected", isConnectedBlockage);
+    for(int s=0; s< 48; s++) {
         tool.blockageRowState.set(s, mc.blockageseccount[s]);
-        }
+    }
 }
 
 
