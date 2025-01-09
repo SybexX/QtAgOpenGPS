@@ -63,6 +63,8 @@ QString FormLoop::Parse(QString& buffer)
 
 void FormLoop::ParseNMEA(QString& buffer)
 {
+
+    traffic.cntrGPSOut += buffer.length();
     if (buffer.isEmpty()) return;
 
     //find end of a sentence

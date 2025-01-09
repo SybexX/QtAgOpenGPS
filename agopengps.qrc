@@ -660,5 +660,11 @@
         <file>images/Config/ConS_Blockage.png</file>
         <file>qml/config/ConfigModulesBlockage.qml</file>
         <file>qml/TramIndicators.qml</file>
+        <file>qml/MainTopPanel.qml</file>
+        <file>qml/MainLeftColumn.qml</file>
+        <file>qml/MainRightColumn.qml</file>
+        <file>qml/MainBottomRow.qml</file>
+        <file>qml/AutoUturnBtn.qml</file>
+        <file>qml/ManualTurnBtns.qml</file>
     </qresource>
 </RCC>

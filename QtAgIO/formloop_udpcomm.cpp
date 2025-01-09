@@ -325,7 +325,6 @@ void FormLoop::ReceiveFromUDP()
 
         else if (data[0] == 36 && (data[1] == 71 || data[1] == 80 || data[1] == 75))
         {
-            traffic.cntrGPSOut += data.length();
             rawBuffer += QString::fromLatin1(data); //is this right? David
               ParseNMEA(rawBuffer);
             if(!haveWeSentToParser) {
