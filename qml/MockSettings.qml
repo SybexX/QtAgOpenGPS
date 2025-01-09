@@ -42,7 +42,7 @@ Item {
     property double setAS_snapDistance: 20
     property bool setF_isWorkSwitchManualSections: false
     property bool setAS_isAutoSteerAutoOn: false
-    property int setDisplay_lineWidth: 2
+    property int setDisplay_lineWidth: 3
     property point setDisplay_panelSimLocation: "97, 600"
     property double setTram_tramWidth: 24
     property double setTram_snapAdj: 1
@@ -116,13 +116,6 @@ Item {
     property bool setHeadland_isSectionControlled: true
     property bool setSound_isAutoSteerOn: true
     property var setRelay_pinConfig: [ 1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ]
-    property var setBlockageConfig: [ 1,2,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ]
-    property double setBlockcountMin: 100
-    property double setBlockcountMax: 1000
-    property double setBlockrow1: 16
-    property double setBlockrow2: 16
-    property double setBlockrow3: 16
-    property double setBlockrow4: 0
     property int setDisplay_camSmooth: 50
     property double setGPS_dualHeadingOffset: 0
     property bool setF_isSteerWorkSwitchEnabled: false
@@ -151,7 +144,7 @@ Item {
     property double setSection_position15: 0
     property double setSection_position16: 0
     property double setSection_position17: 0
-    property double purePursuitIntegralGainAB: 0.15
+    property double purePursuitIntegralGainAB: 0
     property double set_youMoveDistance: 0.25
     property double setVehicle_antennaHeight: 3
     property double setVehicle_toolLookAheadOn: 1
@@ -204,7 +197,7 @@ Item {
     property bool setTool_isToolFront: false
     property double setVehicle_trackWidth: 1.9
     property bool setArdMac_isDanfoss: false
-    property double stanleyIntegralGainAB: 0.15
+    property double stanleyIntegralGainAB: 0
     property bool setSection_isFast: false
     property double setArdMac_user1: 1
     property double setArdMac_user2: 2
@@ -219,14 +212,14 @@ Item {
     property int setTool_numSectionsMulti: 20
     property var setTool_zones: [ 2,10,20,0,0,0,0,0,0 ]
     property double setTool_sectionWidthMulti: 0.5
-    property bool setDisplay_isBrightnessOn: true
+    property bool setDisplay_isBrightnessOn: false
     property string setKey_hotkeys: "ACFGMNPTYVW12345678"
     property double setVehicle_goalPointLookAheadHold: 3
     property bool setTool_isSectionOffWhenOut: true
     property int set_uTurnStyle: 0
     property double setGPS_minimumStepLimit: 0.05
     property bool setAS_isSteerInReverse: false
-    property double setAS_functionSpeedLimit: 8
+    property double setAS_functionSpeedLimit: 12
     property double setAS_maxSteerSpeed: 15
     property double setAS_minSteerSpeed: 0
     property string setBrand_HBrand: "AgOpenGPS"
@@ -258,15 +251,30 @@ Item {
     property double setGPS_dualReverseDetectionDistance: 0.25
     property bool setTool_isDisplayTramControl: true
     property double setAS_uTurnCompensation: 1
+    property string setWindow_gridSize: "400, 400"
+    property point setWindow_gridLocation: "20, 20"
+    property bool setWindow_isKioskMode: false
+    property bool setDisplay_isAutoOffAgIO: true
+    property bool setWindow_isShutdownComputer: false
+    property bool setDisplay_isShutdownWhenNoPower: false
+    property bool setDisplay_isHardwareMessages: false
+    property int setGPS_jumpFixAlarmDistance: 0
+    property int setAS_deadZoneDistance: 1
+    property int setAS_deadZoneHeading: 10
+    property bool setMenu_isLightbarNotSteerBar: false
+    property bool setTool_isDirectionMarkers: true
+    property int setAS_numGuideLines: 10
+    property int setAS_deadZoneDelay: 5
+    property double setTram_alpha: 0.8
     property bool setFeature_isHeadlandOn: true
-    property bool setFeature_isTramOn: true
+    property bool setFeature_isTramOn: false
     property bool setFeature_isBoundaryOn: true
-    property bool setFeature_isBndContourOn: true
-    property bool setFeature_isRecPathOn: true
-    property bool setFeature_isABSmoothOn: true
-    property bool setFeature_isHideContourOn: true
-    property bool setFeature_isWebCamOn: true
-    property bool setFeature_isOffsetFixOn: true
+    property bool setFeature_isBndContourOn: false
+    property bool setFeature_isRecPathOn: false
+    property bool setFeature_isABSmoothOn: false
+    property bool setFeature_isHideContourOn: false
+    property bool setFeature_isWebCamOn: false
+    property bool setFeature_isOffsetFixOn: false
     property bool setFeature_isAgIOOn: true
     property bool setFeature_isContourOn: true
     property bool setFeature_isYouTurnOn: true
