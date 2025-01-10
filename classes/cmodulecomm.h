@@ -22,7 +22,11 @@ public:
 
     uchar blockagemoduleid[16];
     uchar blockagesecnum[16];
-    uchar blockageseccount[16];
+    uchar blockageseccount[64];
+    uchar blockageseccount1[16];
+    uchar blockageseccount2[16];
+    uchar blockageseccount3[16];
+    uchar blockageseccount4[16];
     int
             swHeader = 0,
             swMain = 1,
