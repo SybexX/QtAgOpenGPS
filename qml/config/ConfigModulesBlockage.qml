@@ -22,12 +22,12 @@ Rectangle{
 
     function load_settings() {
 
-        graincountMin.boundValue = settings.setBlockcountMin
-        graincountMax.boundValue = settings.setBlockcountMax
-        modulerows1.boundValue = settings.setBlockrow1
-        modulerows2.boundValue = settings.setBlockrow2
-        modulerows3.boundValue = settings.setBlockrow3
-        modulerows4.boundValue = settings.setBlockrow4
+        graincountMin.boundValue = settings.setSeed_blockCountMin
+        graincountMax.boundValue = settings.setSeed_blockCountMax
+        modulerows1.boundValue = settings.setSeed_blockRow1
+        modulerows2.boundValue = settings.setSeed_blockRow2
+        modulerows3.boundValue = settings.setSeed_blockRow3
+        modulerows4.boundValue = settings.setSeed_blockRow4
 
 
         mandatory.visible = false
@@ -37,12 +37,12 @@ Rectangle{
     function save_settings() {
 
 
-        settings.setBlockcountMin = graincountMin.value
-        settings.setBlockcountMax = graincountMax.value
-        settings.setBlockrow1 = modulerows1.value
-        settings.setBlockrow2 = modulerows2.value
-        settings.setBlockrow3 = modulerows3.value
-        settings.setBlockrow4 = modulerows4.value
+        settings.setSeed_blockCountMin = graincountMin.value
+        settings.setSeed_blockCountMax = graincountMax.value
+        settings.setSeed_blockRow1 = modulerows1.value
+        settings.setSeed_blockRow2 = modulerows2.value
+        settings.setSeed_blockRow3 = modulerows3.value
+        settings.setSeed_blockRow4 = modulerows4.value
         blockageRows.setSizes()
         mandatory.visible = false
     }
@@ -65,8 +65,8 @@ Rectangle{
             id: modulerows1
             from: 0
             to:16
-            boundValue: settings.setBlockrow1
-            onValueModified: settings.setBlockrow1 = value
+            boundValue: settings.setSeed_blockRow1
+            onValueModified: settings.setSeed_blockRow1 = value
             anchors.bottomMargin: 10 * theme.scaleHeight
             TextLine{
                 text: qsTr("Rows on module 1: ")
@@ -78,8 +78,8 @@ Rectangle{
             id: modulerows2
             from: 0
             to:16
-            boundValue: settings.setBlockrow2
-            onValueModified: settings.setBlockrow2 = value
+            boundValue: settings.setSeed_blockRow2
+            onValueModified: settings.setSeed_blockRow2 = value
             anchors.bottomMargin: 10 * theme.scaleHeight
             TextLine{
                 text: qsTr("Rows on module 2: ")
@@ -91,8 +91,8 @@ Rectangle{
             id: modulerows3
             from: 0
             to:16
-            boundValue: settings.setBlockrow3
-            onValueModified: settings.setBlockrow3 = value
+            boundValue: settings.setSeed_blockRow3
+            onValueModified: settings.setSeed_blockRow3 = value
             anchors.bottomMargin: 10 * theme.scaleHeight
             TextLine{
                 text: qsTr("Rows on module 3: ")
@@ -104,8 +104,8 @@ Rectangle{
             id: modulerows4
             from: 0
             to:16
-            boundValue: settings.setBlockrow4
-            onValueModified: settings.setBlockrow4 = value
+            boundValue: settings.setSeed_blockRow4
+            onValueModified: settings.setSeed_blockRow4 = value
             anchors.bottomMargin: 10 * theme.scaleHeight
             TextLine{
                 text: qsTr("Rows on module 4: ")
@@ -118,8 +118,8 @@ Rectangle{
             id: graincountMin
             from: 0
             to:1000
-            boundValue: settings.setBlockcountMin
-            onValueModified: settings.setBlockcountMin = value
+            boundValue: settings.setSeed_blockCountMin
+            onValueModified: settings.setSeed_blockCountMin = value
             anchors.bottomMargin: 10 * theme.scaleHeight
             TextLine{
                 text: qsTr("Grain countMin: ")
@@ -131,8 +131,8 @@ Rectangle{
             id: graincountMax
             from: 0
             to:1000
-            boundValue: settings.setBlockcountMax
-            onValueModified: settings.setBlockcountMax = value
+            boundValue: settings.setSeed_blockCountMax
+            onValueModified: settings.setSeed_blockCountMax = value
             anchors.bottomMargin: 10 * theme.scaleHeight
             TextLine{
                 text: qsTr("Grain countMax: ")

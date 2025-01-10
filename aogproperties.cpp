@@ -291,3 +291,10 @@ AOGProperty property_setDisplay_colorDayBackground("display/colorDayBackground",
 AOGProperty property_setDisplay_colorNightBackground("display/colorNightBackground",false);
 AOGProperty property_setDisplay_colorDayBorder("display/colorDayBorder",false);
 AOGProperty property_setDisplay_colorNightBorder("display/colorNightBorder",false);
+AOGProperty property_setSeed_blockCountMin("seed/blockCountMin",false);
+AOGProperty property_setSeed_blockCountMax("seed/blockCountMax",false);
+AOGProperty property_setSeed_blockRow1("seed/blockRow1",false);
+AOGProperty property_setSeed_blockRow2("seed/blockRow2",false);
+AOGProperty property_setSeed_blockRow3("seed/blockRow3",false);
+AOGProperty property_setSeed_blockRow4("seed/blockRow4",false);
+AOGProperty property_setSeed_numRows("seed/numRows",false);

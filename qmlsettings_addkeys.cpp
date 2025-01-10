@@ -286,4 +286,11 @@ void QMLSettings::setupKeys() {
     addKey(QString("setFeature_isLateralOn"),QString("displayFeatures/isLateralOn"), "bool");
     addKey(QString("setDisplay_useTrackZero"),QString("display/useTrackZero"),"bool");
     addKey(QString("setDisplay_topTrackNum"),QString("display/topTrackNum"),"bool");
+    addKey(QString("setSeed_blockCountMin"),QString("seed/blockCountMin"),"double");
+    addKey(QString("setSeed_blockCountMax"),QString("seed/blockCountMax"),"double");
+    addKey(QString("setSeed_blockRow1"),QString("seed/blockRow1"),"int");
+    addKey(QString("setSeed_blockRow2"),QString("seed/blockRow2"),"int");
+    addKey(QString("setSeed_blockRow3"),QString("seed/blockRow3"),"int");
+    addKey(QString("setSeed_blockRow4"),QString("seed/blockRow4"),"int");
+    addKey(QString("setSeed_numRows"),QString("seed/numRows"),"int");
 }
