@@ -9,7 +9,7 @@ Rectangle {
     id: block
     width: 15 * theme.scaleWidth
     //height: 100 * theme.scaleHeight
-
+    anchors.bottom: parent.bottom
     border.width: 1
     border.color: "black"
     property string buttonText: ""
