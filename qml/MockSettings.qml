@@ -32,8 +32,6 @@ Item {
     property bool setMenu_isPureOn: true
     property bool setMenu_isSimulatorOn: true
     property bool setMenu_isSkyOn: true
-    property string setF_culture: "en"
-    property string setF_workingDirectory: "Default"
     property int setDisplay_lightbarCmPerPixel: 5
     property string setGPS_fixFromWhichSentence: "GGA"
     property string setGPS_headingFromWhichSource: "Fix"
@@ -42,7 +40,7 @@ Item {
     property double setAS_snapDistance: 20
     property bool setF_isWorkSwitchManualSections: false
     property bool setAS_isAutoSteerAutoOn: false
-    property int setDisplay_lineWidth: 3
+    property int setDisplay_lineWidth: 2
     property point setDisplay_panelSimLocation: "97, 600"
     property double setTram_tramWidth: 24
     property double setTram_snapAdj: 1
@@ -54,7 +52,7 @@ Item {
     property string setDisplay_colorDayFrame: "#d2d2e6"
     property string setDisplay_colorNightFrame: "#323241"
     property string setDisplay_colorSectionsDay: "#1b97a0"
-    property string setDisplay_colorFieldDay: "#64647d"
+    property string setDisplay_colorFieldDay: "#919191"
     property bool setDisplay_isDayMode: true
     property string setDisplay_colorSectionsNight: "#1b6464"
     property string setDisplay_colorFieldNight: "#3c3c3c"
@@ -73,7 +71,7 @@ Item {
     property bool setSound_isUturnOn: true
     property bool setSound_isHydLiftOn: true
     property string setDisplay_colorTextNight: "#e6e6e6"
-    property string setDisplay_colorTextDay: "#0a0a14"
+    property string setDisplay_colorTextDay: "Black"
     property bool setTram_isTramOnBackBuffer: true
     property double setDisplay_camZoom: 9
     property string setDisplay_colorVehicle: "White"
@@ -85,7 +83,7 @@ Item {
     property int setGPS_udpWatchMsec: 50
     property bool setF_isSteerWorkSwitchManualSections: false
     property bool setAS_isConstantContourOn: false
-    property double setAS_guidanceLookAheadTime: 2.5
+    property double setAS_guidanceLookAheadTime: 1.5
     property string setFeatures: ""
     property bool setIMU_isDualAsIMU: false
     property double setAS_sideHillComp: 0
@@ -152,12 +150,11 @@ Item {
     property double setVehicle_toolOffset: 0
     property bool setTool_isToolRearFixed: false
     property double setVehicle_antennaPivot: 0.1
-    property double setVehicle_wheelbase: 2.8
+    property double setVehicle_wheelbase: 3.3
     property double setVehicle_hitchLength: -1
     property double setVehicle_toolLookAheadOff: 0.5
     property bool setVehicle_isPivotBehindAntenna: true
     property bool setVehicle_isSteerAxleAhead: true
-    property string setVehicle_vehicleName: "Default Vehicle"
     property double setVehicle_slowSpeedCutoff: 0.5
     property double setVehicle_tankTrailingHitchLength: -3
     property int setVehicle_minCoverage: 100
@@ -170,7 +167,7 @@ Item {
     property double setVehicle_antennaOffset: 0
     property double set_youTurnDistanceFromBoundary: 2
     property double setVehicle_lookAheadMinimum: 2
-    property double setVehicle_goalPointLookAheadMult: 1
+    property double setVehicle_goalPointLookAheadMult: 1.5
     property double stanleyDistanceErrorGain: 1
     property double stanleyHeadingErrorGain: 1
     property bool setVehicle_isStanleyUsed: false
@@ -266,6 +263,11 @@ Item {
     property int setAS_numGuideLines: 10
     property int setAS_deadZoneDelay: 5
     property double setTram_alpha: 0.8
+    property double setVehicle_goalPointAcquireFactor: 0.9
+    property bool setBnd_isDrawPivot: true
+    property bool setDisplay_isSectionLinesOn: true
+    property bool setDisplay_isLineSmooth: false
+    property string setWindow_tramLineSize: "921, 676"
     property bool setFeature_isHeadlandOn: true
     property bool setFeature_isTramOn: false
     property bool setFeature_isBoundaryOn: true
@@ -296,4 +298,5 @@ Item {
     property int setSeed_blockRow3: 16
     property int setSeed_blockRow4: 0
     property int setSeed_numRows: 32
+    property bool setSeed_blockageIsOn: false
 }

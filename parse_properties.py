@@ -130,6 +130,15 @@ add_props = [
       'qml_type': 'int',
       'qml_default': '32',
     },
+
+    { 'ini_path': 'seed/blockageIsOn',
+      'cpp_name': 'property_setSeed_blockageIsOn',
+      'cpp_default' : 'false',
+      'cpp_type' : 'bool',
+      'qml_name' : 'setSeed_blockageIsOn',
+      'qml_type': 'bool',
+      'qml_default': 'false',
+    },
 ]
 
 def parse_settings(file):

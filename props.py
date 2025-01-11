@@ -288,4 +288,9 @@ props = {'setwin': 'display/camPitch',
  'setTool_isDirectionMarkers': 'tool/isDirectionMarkers',
  'setAS_numGuideLines': 'autosteer/numGuideLines',
  'setAS_deadZoneDelay': 'autosteer/deadZoneDelay',
- 'setTram_alpha': 'tram/alpha'}
+ 'setTram_alpha': 'tram/alpha',
+ 'setVehicle_goalPointAcquireFactor': 'vehicle/goalPointAcquireFactor',
+ 'setBnd_isDrawPivot': '',
+ 'setDisplay_isSectionLinesOn': '',
+ 'setDisplay_isLineSmooth': '',
+ 'setWindow_tramLineSize': ''}

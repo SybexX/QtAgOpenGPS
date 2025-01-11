@@ -29,8 +29,6 @@ void QMLSettings::setupKeys() {
     addKey(QString("setMenu_isPureOn"),QString("display/isPureOn"),"bool");
     addKey(QString("setMenu_isSimulatorOn"),QString("sim/on"),"bool");
     addKey(QString("setMenu_isSkyOn"),QString("display/isSkyOn"),"bool");
-    addKey(QString("setF_culture"),QString("display/culture"),"QString");
-    addKey(QString("setF_workingDirectory"),QString("display/workingDir"),"QString");
     addKey(QString("setDisplay_lightbarCmPerPixel"),QString("display/lightbarCMPerPixel"),"int");
     addKey(QString("setGPS_fixFromWhichSentence"),QString("gps/fixFromWhichSentence"),"QString");
     addKey(QString("setGPS_headingFromWhichSource"),QString("gps/headingFromWhichSource"),"QString");
@@ -154,7 +152,6 @@ void QMLSettings::setupKeys() {
     addKey(QString("setVehicle_toolLookAheadOff"),QString("tool/lookAheadOff"),"double");
     addKey(QString("setVehicle_isPivotBehindAntenna"),QString("vehicle/isPivotBehindAntenna"),"bool");
     addKey(QString("setVehicle_isSteerAxleAhead"),QString("vehicle/isSteerAxleAhead"),"bool");
-    addKey(QString("setVehicle_vehicleName"),QString("vehicle/name"),"QString");
     addKey(QString("setVehicle_slowSpeedCutoff"),QString("vehicle/slowSpeedCutoff"),"double");
     addKey(QString("setVehicle_tankTrailingHitchLength"),QString("tool/tankTrailingHitchLength"),"double");
     addKey(QString("setVehicle_minCoverage"),QString("vehicle/minCoverage"),"int");
@@ -263,6 +260,11 @@ void QMLSettings::setupKeys() {
     addKey(QString("setAS_numGuideLines"),QString("autosteer/numGuideLines"),"int");
     addKey(QString("setAS_deadZoneDelay"),QString("autosteer/deadZoneDelay"),"int");
     addKey(QString("setTram_alpha"),QString("tram/alpha"),"double");
+    addKey(QString("setVehicle_goalPointAcquireFactor"),QString("vehicle/goalPointAcquireFactor"),"double");
+    addKey(QString("setBnd_isDrawPivot"),QString(""),"bool");
+    addKey(QString("setDisplay_isSectionLinesOn"),QString(""),"bool");
+    addKey(QString("setDisplay_isLineSmooth"),QString(""),"bool");
+    addKey(QString("setWindow_tramLineSize"),QString(""),"QString");
     addKey(QString("setFeature_isHeadlandOn"),QString("displayFeatures/isHeadlandOn"), "bool");
     addKey(QString("setFeature_isTramOn"),QString("displayFeatures/isTramOn"), "bool");
     addKey(QString("setFeature_isBoundaryOn"),QString("displayFeatures/isBoundaryOn"), "bool");
@@ -288,9 +290,10 @@ void QMLSettings::setupKeys() {
     addKey(QString("setDisplay_topTrackNum"),QString("display/topTrackNum"),"bool");
     addKey(QString("setSeed_blockCountMin"),QString("seed/blockCountMin"),"double");
     addKey(QString("setSeed_blockCountMax"),QString("seed/blockCountMax"),"double");
-    addKey(QString("setSeed_blockRow1"),QString("seed/blockRow1"),"double");
-    addKey(QString("setSeed_blockRow2"),QString("seed/blockRow2"),"double");
-    addKey(QString("setSeed_blockRow3"),QString("seed/blockRow3"),"double");
-    addKey(QString("setSeed_blockRow4"),QString("seed/blockRow4"),"double");
-    addKey(QString("setSeed_numRows"),QString("seed/numRows"),"double");
+    addKey(QString("setSeed_blockRow1"),QString("seed/blockRow1"),"int");
+    addKey(QString("setSeed_blockRow2"),QString("seed/blockRow2"),"int");
+    addKey(QString("setSeed_blockRow3"),QString("seed/blockRow3"),"int");
+    addKey(QString("setSeed_blockRow4"),QString("seed/blockRow4"),"int");
+    addKey(QString("setSeed_numRows"),QString("seed/numRows"),"int");
+    addKey(QString("setSeed_blockageIsOn"),QString("seed/blockageIsOn"),"bool");
 }
