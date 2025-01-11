@@ -265,6 +265,10 @@ void QMLSettings::setupKeys() {
     addKey(QString("setDisplay_isSectionLinesOn"),QString(""),"bool");
     addKey(QString("setDisplay_isLineSmooth"),QString(""),"bool");
     addKey(QString("setWindow_tramLineSize"),QString(""),"QString");
+    addKey(QString("setBnd_isDrawPivot"),QString("bnd/isDrawPivot"),"bool");
+    addKey(QString("setDisplay_isSectionLinesOn"),QString("display/isSectionLinesOn"),"bool");
+    addKey(QString("setDisplay_isLineSmooth"),QString("display/isLineSmooth"),"bool");
+    addKey(QString("setWindow_tramLineSize"),QString("dialogs/tramLineSize"),"QString");
     addKey(QString("setFeature_isHeadlandOn"),QString("displayFeatures/isHeadlandOn"), "bool");
     addKey(QString("setFeature_isTramOn"),QString("displayFeatures/isTramOn"), "bool");
     addKey(QString("setFeature_isBoundaryOn"),QString("displayFeatures/isBoundaryOn"), "bool");

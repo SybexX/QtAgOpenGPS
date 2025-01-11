@@ -294,3 +294,7 @@ props = {'setwin': 'display/camPitch',
  'setDisplay_isSectionLinesOn': '',
  'setDisplay_isLineSmooth': '',
  'setWindow_tramLineSize': ''}
+ 'setBnd_isDrawPivot': 'bnd/isDrawPivot',
+ 'setDisplay_isSectionLinesOn': 'display/isSectionLinesOn',
+ 'setDisplay_isLineSmooth': 'display/isLineSmooth',
+ 'setWindow_tramLineSize': 'dialogs/tramLineSize'}

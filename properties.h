@@ -300,5 +300,6 @@ extern AOGProperty property_setSeed_blockRow3;
 extern AOGProperty property_setSeed_blockRow4;
 extern AOGProperty property_setSeed_numRows;
 extern AOGProperty property_setSeed_blockageIsOn;
+extern AOGProperty property_setVehicle_vehicleName;
 
 #endif // PROPERTIES_H

@@ -138,6 +138,13 @@ add_props = [
       'qml_name' : 'setSeed_blockageIsOn',
       'qml_type': 'bool',
       'qml_default': 'false',
+     },
+
+    { 'ini_path': 'vehicle/vehicleName',
+      'cpp_name': 'property_setVehicle_vehicleName',
+      'cpp_default' : 'QString("Default Vehicle")',
+      'qml_name' : 'setVehicle_vehicleName',
+      'qml_default' : "Default Vehicle"
     },
 ]
 
