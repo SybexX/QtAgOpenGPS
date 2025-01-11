@@ -18,7 +18,8 @@ Rectangle{
         Comp.TextLine{ color: "white"; font.pixelSize: 30; text: qsTr("Avg ")+aog.blockage_avg}
         Comp.TextLine{ color: "white"; font.pixelSize: 30; text: qsTr("Max ")+aog.blockage_max}
         Comp.TextLine{ color: "white"; font.pixelSize: 30; text: qsTr("Row N max  ")+aog.blockage_max_i}
-        Comp.TextLine{ color: "white"; font.pixelSize: 30; text: qsTr("Min ")+aog.blockage_min}
-        Comp.TextLine{ color: "white"; font.pixelSize: 30; text: qsTr("Row N min ")+aog.blockage_min_i}
+        Comp.TextLine{ color: "white"; font.pixelSize: 30; text: qsTr("Min ")+aog.blockage_min1+(" ")+aog.blockage_min2}
+        Comp.TextLine{ color: "white"; font.pixelSize: 30; text: qsTr("Row N min ")+aog.blockage_min1_i+(" ")+aog.blockage_min2_i}
+        Comp.TextLine{ color: "white"; font.pixelSize: 30; text: qsTr("Blocked ")+aog.blockage_blocked}
         }
 }

@@ -351,19 +351,36 @@ void FormGPS::doBlockageMonitoring()
             i_max = i;
         }
     }
-    int min = mc.blockageseccount[0];
-    int i_min=0;
+    int min1 = 65535;
+    int min2 = 65535;
+    int i_min1=0;
+    int i_min2=0;
     for (int i = 0; i < 32; ++i) {
-        if (mc.blockageseccount[i] < min) {
-            min = mc.blockageseccount[i];
-            i_min = i;
+        if (mc.blockageseccount[i] < min1) {
+            min1 = mc.blockageseccount[i];
+            i_min1 = i;
         }
     }
+    for(i=0; i<32; i++)
+        if(mc.blockageseccount[i]<min2 && i_min1!=i)
+        {
+            min2=mc.blockageseccount[i];
+            i_min2=i;
+        }
+    int count=0;
+    for (int i = 0; i < 32; i++)
+    if (mc.blockageseccount[i] < 12) count++;
+
+
+
     tool.blockage_avg = avg;
-    tool.blockage_min = min;
+    tool.blockage_min1 = min1;
+    tool.blockage_min2 = min2;
     tool.blockage_max = max;
-    tool.blockage_min_i = i_min;
-    tool.blockage_max_i = i_max;
+    tool.blockage_min1_i = (i_min1+1);
+    tool.blockage_min2_i = (i_min2+1);
+    tool.blockage_max_i = i_max+1;
+    tool.blockage_blocked = count;
 }
 
 
