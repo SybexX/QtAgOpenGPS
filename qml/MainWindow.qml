@@ -531,6 +531,12 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: false
             }
+            BlockageData{ //window that displays GPS data
+                id: blockageData
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                visible: false
+            }
 
             SimController{
                 id: simBarRect

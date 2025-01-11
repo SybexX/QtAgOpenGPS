@@ -666,5 +666,6 @@
         <file>qml/MainBottomRow.qml</file>
         <file>qml/AutoUturnBtn.qml</file>
         <file>qml/ManualTurnBtns.qml</file>
+        <file>qml/BlockageData.qml</file>
     </qresource>
 </RCC>

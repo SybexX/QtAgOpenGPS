@@ -1206,6 +1206,9 @@ void FormGPS::UpdateFixPosition()
 	aog->setProperty("hz", gpsHz);
     //aog->setProperty("isReverse" , vehicle.isReverse);
     aog->setProperty("isReverseWithIMU", isReverseWithIMU);
+    aog->setProperty("blockage_avg", tool.blockage_avg);
+    aog->setProperty("blockage_min", tool.blockage_min);
+    aog->setProperty("blockage_max", tool.blockage_max);
 
     double tool_lat, tool_lon;
     pn.ConvertLocalToWGS84(vehicle.pivotAxlePos.northing, vehicle.pivotAxlePos.easting, tool_lat, tool_lon);

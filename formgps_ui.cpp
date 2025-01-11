@@ -699,7 +699,7 @@ void FormGPS::modules_send_238() {
     p_238.pgn[p_238.user3] = (int)property_setArdMac_user3;
     p_238.pgn[p_238.user4] = (int)property_setArdMac_user4;
 
-    qDebug() << p_238.pgn;
+    qDebug() << (int)property_setArdMac_user1;
     SendPgnToLoop(p_238.pgn);
 }
 void FormGPS::modules_send_251() {

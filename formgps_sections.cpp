@@ -323,21 +323,50 @@ void FormGPS::doBlockageMonitoring()
     aog->setProperty("blockageConnected", isConnectedBlockage);
     int k=0;
     int k1 = (int)property_setSeed_blockRow1;
-    qDebug() << k1;
     int k2 = (int)property_setSeed_blockRow2;
     int k3 = (int)property_setSeed_blockRow3;
     int k4 = (int)property_setSeed_blockRow4;
-    for(int i=0;i<k1;i++) // 16 - modulerows1
+    for(int i=0;i<16;i++) // 16 - modulerows1
         mc.blockageseccount[k++]=mc.blockageseccount1[i];
-    for(int i=0;i<k2;i++) // 16 - modulerows2
+    for(int i=0;i<16;i++) // 16 - modulerows2
         mc.blockageseccount[k++]=mc.blockageseccount2[i];
-    for(int i=0;i<k3;i++) // 16 - modulerows3
+    for(int i=0;i<16;i++) // 16 - modulerows3
         mc.blockageseccount[k++]=mc.blockageseccount3[i];
     for(int i=0;i<k4;i++) // 16 - modulerows4
         mc.blockageseccount[k++]=mc.blockageseccount4[i];
     for(int s=0; s< 48; s++) {
         tool.blockageRowState.set(s, mc.blockageseccount[s]);
     }
+
+    int i;
+    double avg=0;
+    for(i=0; i < 32; i++) avg+=mc.blockageseccount[i];
+    avg/=32;
+    qDebug() << "average ";
+    qDebug() << avg;
+
+    int max = mc.blockageseccount[0];
+
+    for (int i = 0; i < 32; ++i) {
+        if (mc.blockageseccount[i] > max) {
+            max = mc.blockageseccount[i];
+        }
+    }
+    qDebug() << "Max ";
+    qDebug() << max;
+
+    int min = mc.blockageseccount[0];
+
+    for (int i = 0; i < 32; ++i) {
+        if (mc.blockageseccount[i] < min) {
+            min = mc.blockageseccount[i];
+        }
+    }
+    qDebug() << "Min ";
+    qDebug() << min;
+    tool.blockage_avg = avg;
+    tool.blockage_min = min;
+    tool.blockage_max = max;
 }
 
 

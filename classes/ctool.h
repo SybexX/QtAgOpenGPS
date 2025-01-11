@@ -81,6 +81,9 @@ public:
     CSection section[MAXSECTIONS+1];
     QMLSectionButtons sectionButtonState;
     qmlblockage blockageRowState;
+    int blockage_avg;
+    int blockage_min;
+    int blockage_max;
 
     //list of the list of patch data individual triangles for field sections
     QVector<QSharedPointer<PatchTriangleList>> patchSaveList;

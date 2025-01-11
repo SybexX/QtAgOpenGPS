@@ -141,6 +141,10 @@ Item {
     property bool hydLiftDown: false
     property bool hydLiftIsOn: false
     property bool isHeadlandOn: false
+    property int blockage_avg: 0
+    property int blockage_min: 0
+    property int blockage_max: 0
+
 
     onSteerAngleActualChanged: steerAngleActualRounded = Number(Math.round(steerAngleActual)).toLocaleString(Qt.locale(), 'f', 1)
     onSteerAngleSetChanged: steerAngleSetRounded = Number(Math.round((steerAngleSet) * .01)).toLocaleString(Qt.locale(), 'f', 1)
