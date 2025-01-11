@@ -144,6 +144,8 @@ Item {
     property int blockage_avg: 0
     property int blockage_min: 0
     property int blockage_max: 0
+    property int blockage_min_i: 0
+    property int blockage_max_i: 0
 
 
     onSteerAngleActualChanged: steerAngleActualRounded = Number(Math.round(steerAngleActual)).toLocaleString(Qt.locale(), 'f', 1)

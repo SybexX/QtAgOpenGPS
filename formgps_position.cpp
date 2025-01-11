@@ -1209,6 +1209,8 @@ void FormGPS::UpdateFixPosition()
     aog->setProperty("blockage_avg", tool.blockage_avg);
     aog->setProperty("blockage_min", tool.blockage_min);
     aog->setProperty("blockage_max", tool.blockage_max);
+    aog->setProperty("blockage_min_i", tool.blockage_min_i);
+    aog->setProperty("blockage_max_i", tool.blockage_max_i);
 
     double tool_lat, tool_lon;
     pn.ConvertLocalToWGS84(vehicle.pivotAxlePos.northing, vehicle.pivotAxlePos.easting, tool_lat, tool_lon);

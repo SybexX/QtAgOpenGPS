@@ -84,6 +84,8 @@ public:
     int blockage_avg;
     int blockage_min;
     int blockage_max;
+    int blockage_min_i;
+    int blockage_max_i;
 
     //list of the list of patch data individual triangles for field sections
     QVector<QSharedPointer<PatchTriangleList>> patchSaveList;

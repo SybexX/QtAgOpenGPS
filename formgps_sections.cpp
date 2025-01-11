@@ -323,6 +323,7 @@ void FormGPS::doBlockageMonitoring()
     aog->setProperty("blockageConnected", isConnectedBlockage);
     int k=0;
     int k1 = (int)property_setSeed_blockRow1;
+    qDebug() << k1;
     int k2 = (int)property_setSeed_blockRow2;
     int k3 = (int)property_setSeed_blockRow3;
     int k4 = (int)property_setSeed_blockRow4;
@@ -342,31 +343,27 @@ void FormGPS::doBlockageMonitoring()
     double avg=0;
     for(i=0; i < 32; i++) avg+=mc.blockageseccount[i];
     avg/=32;
-    qDebug() << "average ";
-    qDebug() << avg;
-
     int max = mc.blockageseccount[0];
-
+    int i_max=0;
     for (int i = 0; i < 32; ++i) {
         if (mc.blockageseccount[i] > max) {
             max = mc.blockageseccount[i];
+            i_max = i;
         }
     }
-    qDebug() << "Max ";
-    qDebug() << max;
-
     int min = mc.blockageseccount[0];
-
+    int i_min=0;
     for (int i = 0; i < 32; ++i) {
         if (mc.blockageseccount[i] < min) {
             min = mc.blockageseccount[i];
+            i_min = i;
         }
     }
-    qDebug() << "Min ";
-    qDebug() << min;
     tool.blockage_avg = avg;
     tool.blockage_min = min;
     tool.blockage_max = max;
+    tool.blockage_min_i = i_min;
+    tool.blockage_max_i = i_max;
 }
 
 
