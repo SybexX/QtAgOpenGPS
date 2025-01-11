@@ -213,6 +213,7 @@ Item {
 
     signal modules_send_238()
 	signal modules_send_251()
+    signal doBlockageMonitoring()
 
     signal sim_bump_speed(bool up)
     signal sim_zero_speed()

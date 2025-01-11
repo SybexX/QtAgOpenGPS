@@ -6,6 +6,7 @@
 #include "qmlutil.h"
 #include "common.h"
 #include "cpgn.h"
+#include "aogproperty.h"
 
 
 /* SectionSetPosition(), SectionCalcWidths(), and SectionCalcMulti() are all in CTool */
@@ -315,11 +316,25 @@ void FormGPS::DoRemoteSwitches()
     }
 }
 
-void FormGPS::DoBlockageMonitoring()
+void FormGPS::doBlockageMonitoring()
 {
     isConnectedBlockage = true;
     QObject *aog = qmlItem(qml_root,"aog");
     aog->setProperty("blockageConnected", isConnectedBlockage);
+    int k=0;
+    int k1 = (int)property_setSeed_blockRow1;
+    qDebug() << k1;
+    int k2 = (int)property_setSeed_blockRow2;
+    int k3 = (int)property_setSeed_blockRow3;
+    int k4 = (int)property_setSeed_blockRow4;
+    for(int i=0;i<k1;i++) // 16 - modulerows1
+        mc.blockageseccount[k++]=mc.blockageseccount1[i];
+    for(int i=0;i<k2;i++) // 16 - modulerows2
+        mc.blockageseccount[k++]=mc.blockageseccount2[i];
+    for(int i=0;i<k3;i++) // 16 - modulerows3
+        mc.blockageseccount[k++]=mc.blockageseccount3[i];
+    for(int i=0;i<k4;i++) // 16 - modulerows4
+        mc.blockageseccount[k++]=mc.blockageseccount4[i];
     for(int s=0; s< 48; s++) {
         tool.blockageRowState.set(s, mc.blockageseccount[s]);
     }

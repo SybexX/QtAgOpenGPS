@@ -45,6 +45,8 @@ Rectangle{
         settings.setSeed_blockRow4 = modulerows4.value
         blockageRows.setSizes()
         mandatory.visible = false
+
+        aog.doBlockageMonitoring()
     }
 
     GridLayout{

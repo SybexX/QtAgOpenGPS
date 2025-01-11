@@ -520,7 +520,7 @@ public:
     //void SectionCalcMulti();
     void BuildMachineByte();
     void DoRemoteSwitches();
-    void DoBlockageMonitoring();
+    //void doBlockageMonitoring();
 
 
     /************************
@@ -704,6 +704,7 @@ public slots:
     //modules ui callback
     void modules_send_238();
 	void modules_send_251();
+    void doBlockageMonitoring();
 
     //boundary UI for recording new boundary
     void boundary_calculate_area();

@@ -287,18 +287,7 @@ void FormGPS::ReceiveFromAgIO()
             if (data[5] == 1) mc.blockageseccount2[i] = data[7];
             if (data[5] == 2) mc.blockageseccount3[i] = data[7];
             if (data[5] == 3) mc.blockageseccount4[i] = data[7];
-
-            int k=0;
-            for(int i=0;i<16;i++) // 16 - modulerows1
-                mc.blockageseccount[k++]=mc.blockageseccount1[i];
-            for(int i=0;i<16;i++) // 16 - modulerows2
-                mc.blockageseccount[k++]=mc.blockageseccount2[i];
-            for(int i=0;i<16;i++) // 16 - modulerows3
-                mc.blockageseccount[k++]=mc.blockageseccount3[i];
-            for(int i=0;i<16;i++) // 16 - modulerows4
-                mc.blockageseccount[k++]=mc.blockageseccount4[i];
-
-            DoBlockageMonitoring();
+            doBlockageMonitoring();
             break;
 
         }
