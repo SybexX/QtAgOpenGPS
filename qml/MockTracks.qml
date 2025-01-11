@@ -5,12 +5,15 @@
 import QtQuick 2.15
 
 Item {
-    id: mockTracks
 
-    property var model: [ {index: 0, name: "AB 0", isVisible: true, mode: 2},
-             {index: 1, name: "Cu 33", isVisible: true, mode: 4},
-             {index: 2, name: "Piv", isVisible: true, mode: 4} ]
+    ListModel {
+        id: mymodel
+        ListElement { index: 0; name: "AB 0"; isVisible: true; mode: 2}
+        ListElement {index: 1; name: "Cu 33"; isVisible: true; mode: 4}
+        ListElement {index: 2; name: "Piv this is a very long name"; isVisible: true; mode: 64} 
+    }
     
+    property var model: mymodel
     property int idx: -1
     property int newRefSide: 1
     property bool isAutoTrack: false
@@ -20,4 +23,9 @@ Item {
     property int mode: 0
     property int newMode: 0
     property string newName: ""
+    
+    Component.onCompleted: {
+        console.log(mymodel)
+    }
+
 }

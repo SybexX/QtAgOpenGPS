@@ -392,5 +392,5 @@ if __name__ == '__main__':
             print (line)
 
         for i in add_props:
-            print ('AOGProperty %s("%s",false);' % (i['cpp_name'], i['ini_path']))
+            print ('AOGProperty %s("%s",%s);' % (i['cpp_name'], i['ini_path'], i['cpp_default']))
 

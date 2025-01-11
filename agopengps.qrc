@@ -667,5 +667,7 @@
         <file>qml/AutoUturnBtn.qml</file>
         <file>qml/ManualTurnBtns.qml</file>
         <file>qml/BlockageData.qml</file>
+        <file>qml/tracks/TrackPickDelegate.qml</file>
+        <file>qml/tracks/TracksListView.qml</file>
     </qresource>
 </RCC>

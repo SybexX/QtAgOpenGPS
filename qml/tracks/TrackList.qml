@@ -9,7 +9,6 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import QtQml.Models
 import "../components"
-
 import ".."
 
 MoveablePopup {
@@ -29,36 +28,20 @@ MoveablePopup {
     //signal addLine(string name, double easting, double northing, double heading)
     //signal setA(bool start_cancel); //true to mark an A point, false to cancel new point
 
-    Connections {
-        target: linesInterface
-        function onAbLinesListChanged() {
-            trackPickerDialog.reloadModel()
-        }
-    }
 	function show() {
 		trackPickerDialog.visible = true
 	}
-
-    function reloadModel() {
-        trackModel.clear()
-        for( var i = 0; i < linesInterface.abLinesList.length ; i++ ) {
-            trackModel.append(linesInterface.abLinesList[i])
-        }
-        if (aog.currentABCurve >-1)
-            trackView.currentIndex = aog.currentABCurve
-
-    }
 
     onVisibleChanged:  {
         //when we show or hide the dialog, ask the main
         //program to update our lines list in the
         //AOGInterface object
-        linesInterface.abLine_updateLines()
-        trackView.currentIndex = aog.currentABLine
+        //linesInterface.abLine_updateLines()
+        trackView.currentIndex = trk.idx
         //preselect first AB line if none was in use before
         //to make it faster for user
         if (trackView.currentIndex < 0)
-            if (linesInterface.abLinesList.length > 0)
+            if (trk.model.count > 0)
                 trackView.currentIndex = 0
     }
 
@@ -178,96 +161,27 @@ MoveablePopup {
                 //objectName: "trackModel"
 			//}
 
-			ListModel { //fake for testing
-				id: trackModel
-				ListElement {name: "Track 1"}
-				ListElement {name: "Track 2"}
-				ListElement {name: "Track 3"}
-				ListElement {name: "Track 4"}
-			}
+            //See MockTrack.qml for static test model
 
             Component.onCompleted: {
-                reloadModel()
+                //reloadModel()
+                console.log("model is ")
+                console.log(trk.mymodel)
             }
 
-            ListView {
+
+            TracksListView {
                 id: trackView
                 anchors.fill: parent
-                model: trackModel
+                model: trk.model
                 //property int currentIndex: -1
                 clip: true
 
-                delegate: RadioButton{
+                delegate: TrackPickDelegate {
                     id: control
-                    checked: trackView.currentIndex === index ? true : false
-                    indicator: Rectangle{
-                        id: controlRect
-                        color: aog.backgroundColor
-                        anchors.fill: control
-                        IconButtonTransparent{
-                            id: isLineOrCurve
-                            enabled: false
-                            icon.source: prefix + "/images/TrackLine.png"
-                            iconChecked: prefix + "/images/TrackCurve.png"
-                            height: control.height
-                            width: control.height
-                        }
-                        Rectangle{
-                            anchors.margins: 2
-                            anchors.left: isLineOrCurve.right
-                            height: control.height
-                            anchors.verticalCenter: controlRect.verticalCenter
-                            anchors.right: isHidden.left
-                            //color: (control.down) ? aog.backgroundColor : aog.blackDayWhiteNight
-                            //color: (control.down) ? aog.blackDayWhiteNight : aog.backgroundColor
-                            color: control.checked ? "blue" : "white"
-                            visible: control.checked
-                        }
-                        ButtonColor{
-                            id: isHidden
-                            color: "red"
-                        }
-                    }
-
-                    onDownChanged: {
-                        trackView.currentIndex = index
-                    }
-
-
-                    //anchors.fill: parent
-                    //color: "light gray"
-                    Text{
-                        anchors.left: parent.left
-                        anchors.leftMargin: 5
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: model.name
-                        font.pixelSize: 25
-                        font.bold: true
-                        //color: control.checked ? aog.backgroundColor : aog.blackDayWhiteNight
-                        color: control.checked ? aog.blackDayWhiteNight : aog.backgroundColor
-                        z: 2
-                    }
                 }
-                /*	ButtonColor{
-                        id: isHidden
-                        anchors.right: parent.right
-                        height: parent.height * .8
-                        width: height
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: "green"
-                        colorChecked: "red"
-                    }*/
             }
         }
-
-        Rectangle{ //for some reason, listview will display on top of its parent, this blocks that
-            id: bottomRow
-            anchors.bottom: parent.bottom
-            height: 10
-            color: parent.color
-            width: trackPickerDialog.width
-            anchors.left: trackPickerDialog.left
-            z: 1
-        }
-	}
+    }
 }
+

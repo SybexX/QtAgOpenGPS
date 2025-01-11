@@ -177,6 +177,7 @@ void FormGPS::setupGui()
     connect(tracksInterface, SIGNAL(swapAB(int)), this, SLOT(tracks_swapAB(int)));
     connect(tracksInterface, SIGNAL(changeName(int,QString)), this, SLOT(tracks_changeName(int,QString)));
     connect(tracksInterface, SIGNAL(delete_track(int)), this, SLOT(tracks_delete(int)));
+    connect(tracksInterface, SIGNAL(setVisible(int,bool)), this, SLOT(tracks_setVisible(int,bool)));
     connect(tracksInterface, SIGNAL(ref_nudge(double)), this, SLOT(tracks_ref_nudge(double)));
     connect(tracksInterface, SIGNAL(nudge_zero()), this, SLOT(tracks_nudge_zero()));
     connect(tracksInterface, SIGNAL(nudge_center()), this, SLOT(tracks_nudge_center()));

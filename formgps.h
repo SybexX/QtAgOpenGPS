@@ -664,6 +664,7 @@ public slots:
     void tracks_delete(int index);
     void tracks_changeName(int index, QString new_name);
     void tracks_swapAB(int index);
+    void tracks_setVisible(int index, bool isVisible);
 
     void tracks_ref_nudge(double dist_m);
     void tracks_nudge_zero();

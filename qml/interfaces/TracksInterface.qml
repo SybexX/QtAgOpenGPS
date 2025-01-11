@@ -16,6 +16,7 @@ Item {
         {index: 1, name: "two", isVisible: false, mode: 4 },
         {index: 2, name: "three", isVisible: true, mode: 64}
     ]*/
+    //MockTrack.qml provides a trk.model for testing
 
     //to select a track, set trk.idx to the index. -1 means tracks are off.
 
@@ -34,6 +35,7 @@ Item {
     signal swapAB(int index)
     signal changeName(int index, string new_name)
     signal delete_track(int index)
+    signal setVisible(int index, bool isVisible)
 
     //signal updateModel()
 

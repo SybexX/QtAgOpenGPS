@@ -311,6 +311,12 @@ void FormGPS::tracks_changeName(int index, QString new_name)
     trk.reloadModel();
 }
 
+void FormGPS::tracks_setVisible(int index, bool isVisible)
+{
+    trk.gArr[index].isVisible = isVisible;
+    trk.reloadModel();
+}
+
     /*
 void FormGPS::update_current_ABline_from_qml()
 {
