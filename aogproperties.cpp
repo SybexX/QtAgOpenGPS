@@ -260,17 +260,10 @@ AOGProperty property_setAS_numGuideLines("autosteer/numGuideLines",10);
 AOGProperty property_setAS_deadZoneDelay("autosteer/deadZoneDelay",5);
 AOGProperty property_setTram_alpha("tram/alpha",0.8);
 AOGProperty property_setVehicle_goalPointAcquireFactor("vehicle/goalPointAcquireFactor",0.9);
-<<<<<<< HEAD
-AOGProperty property_setBnd_isDrawPivot("",true);
-AOGProperty property_setDisplay_isSectionLinesOn("",true);
-AOGProperty property_setDisplay_isLineSmooth("",false);
-AOGProperty property_setWindow_tramLineSize("","921, 676");
-=======
 AOGProperty property_setBnd_isDrawPivot("bnd/isDrawPivot",true);
 AOGProperty property_setDisplay_isSectionLinesOn("display/isSectionLinesOn",true);
 AOGProperty property_setDisplay_isLineSmooth("display/isLineSmooth",false);
 AOGProperty property_setWindow_tramLineSize("dialogs/tramLineSize","921, 676");
->>>>>>> dev
 AOGProperty property_setFeature_isHeadlandOn("displayFeatures/isHeadlandOn",true);
 AOGProperty property_setFeature_isTramOn("displayFeatures/isTramOn",false);
 AOGProperty property_setFeature_isBoundaryOn("displayFeatures/isBoundaryOn",true);
