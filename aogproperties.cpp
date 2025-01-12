@@ -299,6 +299,6 @@ AOGProperty property_setSeed_blockRow1("seed/blockRow1",16);
 AOGProperty property_setSeed_blockRow2("seed/blockRow2",16);
 AOGProperty property_setSeed_blockRow3("seed/blockRow3",16);
 AOGProperty property_setSeed_blockRow4("seed/blockRow4",0);
-AOGProperty property_setSeed_numRows("seed/numRows",32);
+AOGProperty property_setSeed_numRows("seed/numRows",48);
 AOGProperty property_setSeed_blockageIsOn("seed/blockageIsOn",false);
 AOGProperty property_setVehicle_vehicleName("vehicle/vehicleName",QString("Default Vehicle"));

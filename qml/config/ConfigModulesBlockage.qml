@@ -43,6 +43,7 @@ Rectangle{
         settings.setSeed_blockRow2 = modulerows2.value
         settings.setSeed_blockRow3 = modulerows3.value
         settings.setSeed_blockRow4 = modulerows4.value
+        settings.setSeed_numRows = Number(settings.setSeed_blockRow1 + settings.setSeed_blockRow2 + settings.setSeed_blockRow3 + settings.setSeed_blockRow4)
         blockageRows.setSizes()
         mandatory.visible = false
 

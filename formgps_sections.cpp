@@ -323,29 +323,30 @@ void FormGPS::doBlockageMonitoring()
     aog->setProperty("blockageConnected", isConnectedBlockage);
     int k=0;
     int k1 = (int)property_setSeed_blockRow1;
-    qDebug() << k1;
     int k2 = (int)property_setSeed_blockRow2;
     int k3 = (int)property_setSeed_blockRow3;
     int k4 = (int)property_setSeed_blockRow4;
-    for(int i=0;i<16;i++) // 16 - modulerows1
+    int k5 = (int)property_setSeed_numRows;
+    int k6 = (int)property_setSeed_blockCountMin;
+    for(int i=0;i<k1;i++)
         mc.blockageseccount[k++]=mc.blockageseccount1[i];
-    for(int i=0;i<16;i++) // 16 - modulerows2
+    for(int i=0;i<k2;i++)
         mc.blockageseccount[k++]=mc.blockageseccount2[i];
-    for(int i=0;i<16;i++) // 16 - modulerows3
+    for(int i=0;i<k3;i++)
         mc.blockageseccount[k++]=mc.blockageseccount3[i];
-    for(int i=0;i<k4;i++) // 16 - modulerows4
+    for(int i=0;i<k4;i++)
         mc.blockageseccount[k++]=mc.blockageseccount4[i];
-    for(int s=0; s< 48; s++) {
+    for(int s=0; s< k5; s++) {
         tool.blockageRowState.set(s, mc.blockageseccount[s]);
     }
-
+    //qDebug() << k5;
     int i;
     double avg=0;
-    for(i=0; i < 32; i++) avg+=mc.blockageseccount[i];
-    avg/=32;
+    for(i=0; i < k5; i++) avg+=mc.blockageseccount[i];
+    avg/=k5;
     int max = mc.blockageseccount[0];
     int i_max=0;
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 0; i < k5; ++i) {
         if (mc.blockageseccount[i] > max) {
             max = mc.blockageseccount[i];
             i_max = i;
@@ -355,22 +356,21 @@ void FormGPS::doBlockageMonitoring()
     int min2 = 65535;
     int i_min1=0;
     int i_min2=0;
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 0; i < k5; ++i) {
         if (mc.blockageseccount[i] < min1) {
             min1 = mc.blockageseccount[i];
             i_min1 = i;
         }
     }
-    for(i=0; i<32; i++)
+    for(i=0; i<k5; i++)
         if(mc.blockageseccount[i]<min2 && i_min1!=i)
         {
             min2=mc.blockageseccount[i];
             i_min2=i;
         }
     int count=0;
-    for (int i = 0; i < 32; i++)
-    if (mc.blockageseccount[i] < 12) count++;
-
+    for (int i = 0; i < k5; i++)
+    if (mc.blockageseccount[i] < k6) count++;
 
 
     tool.blockage_avg = avg;
