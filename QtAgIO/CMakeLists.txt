@@ -8,6 +8,7 @@ project(QtAgIO
 
 
 #Qt magic
+find_package(Qt6 REQUIRED COMPONENTS Quick Bluetooth Widgets QuickWidgets)
 qt_standard_project_setup()
 
 
@@ -55,7 +56,6 @@ target_include_directories(QtAgIO
 )
 
 #this is needed by QtAgIO only
-find_package(Qt6 REQUIRED COMPONENTS Bluetooth)
 
 # Libraries to link
 target_link_libraries(QtAgIO PRIVATE
@@ -65,7 +65,6 @@ target_link_libraries(QtAgIO PRIVATE
     Qt6::Widgets
     Qt6::Quick
     Qt6::QuickWidgets
-    Qt6::Multimedia
     Qt6::Bluetooth
 )
 
