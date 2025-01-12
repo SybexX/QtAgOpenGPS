@@ -293,8 +293,8 @@ AOGProperty property_setDisplay_colorDayBackground("display/colorDayBackground",
 AOGProperty property_setDisplay_colorNightBackground("display/colorNightBackground",QColor::fromRgb(50, 50, 65));
 AOGProperty property_setDisplay_colorDayBorder("display/colorDayBorder",QColor::fromRgb(215, 228, 242));
 AOGProperty property_setDisplay_colorNightBorder("display/colorNightBorder",QColor::fromRgb(210, 210, 230));
-AOGProperty property_setSeed_blockCountMin("seed/blockCountMin",100);
-AOGProperty property_setSeed_blockCountMax("seed/blockCountMax",1000);
+AOGProperty property_setSeed_blockCountMin("seed/blockCountMin",10);
+AOGProperty property_setSeed_blockCountMax("seed/blockCountMax",50);
 AOGProperty property_setSeed_blockRow1("seed/blockRow1",16);
 AOGProperty property_setSeed_blockRow2("seed/blockRow2",16);
 AOGProperty property_setSeed_blockRow3("seed/blockRow3",16);

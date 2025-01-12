@@ -63,10 +63,10 @@ Rectangle{
         anchors.rightMargin: 10 * theme.scaleWidth
 
 
-        SpinBoxCM{
+        SpinBoxCustomized{
             id: modulerows1
             from: 0
-            to:16
+            to:255
             boundValue: settings.setSeed_blockRow1
             onValueModified: settings.setSeed_blockRow1 = value
             anchors.bottomMargin: 10 * theme.scaleHeight
@@ -76,10 +76,10 @@ Rectangle{
                 anchors.top: parent.bottom
             }
         }
-        SpinBoxCM{
+        SpinBoxCustomized{
             id: modulerows2
             from: 0
-            to:16
+            to:255
             boundValue: settings.setSeed_blockRow2
             onValueModified: settings.setSeed_blockRow2 = value
             anchors.bottomMargin: 10 * theme.scaleHeight
@@ -89,10 +89,10 @@ Rectangle{
                 anchors.top: parent.bottom
             }
         }
-        SpinBoxCM{
+        SpinBoxCustomized{
             id: modulerows3
             from: 0
-            to:16
+            to:255
             boundValue: settings.setSeed_blockRow3
             onValueModified: settings.setSeed_blockRow3 = value
             anchors.bottomMargin: 10 * theme.scaleHeight
@@ -102,10 +102,10 @@ Rectangle{
                 anchors.top: parent.bottom
             }
         }
-        SpinBoxCM{
+        SpinBoxCustomized{
             id: modulerows4
             from: 0
-            to:16
+            to:255
             boundValue: settings.setSeed_blockRow4
             onValueModified: settings.setSeed_blockRow4 = value
             anchors.bottomMargin: 10 * theme.scaleHeight
@@ -116,7 +116,7 @@ Rectangle{
             }
 
         }
-        SpinBoxCM{
+        SpinBoxCustomized{
             id: graincountMin
             from: 0
             to:1000
@@ -129,7 +129,7 @@ Rectangle{
                 anchors.top: parent.bottom
             }
         }
-        SpinBoxCM{
+        SpinBoxCustomized{
             id: graincountMax
             from: 0
             to:1000

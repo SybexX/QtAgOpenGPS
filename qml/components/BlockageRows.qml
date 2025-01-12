@@ -15,9 +15,9 @@ Rectangle {
     color: "transparent"
 
 
-    property int numRows:  Number(settings.setSeed_blockRow1 + settings.setSeed_blockRow2 + settings.setSeed_blockRow3 + settings.setSeed_blockRow4)*100
-    property int countMin: Number(settings.setSeed_blockCountMin)*100
-    property int countMax: Number(settings.setSeed_blockCountMax)*100
+    property int numRows:  Number(settings.setSeed_blockRow1 + settings.setSeed_blockRow2 + settings.setSeed_blockRow3 + settings.setSeed_blockRow4)
+    property int countMin: Number(settings.setSeed_blockCountMin)
+    property int countMax: Number(settings.setSeed_blockCountMax)
     property var rowCount: aog.rowCount // need connect with settings
     property color offColor: "Crimson"
     property color offTextColor: "White"
@@ -48,9 +48,9 @@ Rectangle {
     }
     function setSizes() {
         //same colors for sections and zones
-        numRows = (Number(settings.setSeed_blockRow1 + settings.setSeed_blockRow2 + settings.setSeed_blockRow3 + settings.setSeed_blockRow4)*100)
-        countMin =  Number(settings.setSeed_blockCountMin)*100
-        countMax =  Number(settings.setSeed_blockCountMax)*100
+        numRows = Number(settings.setSeed_blockRow1 + settings.setSeed_blockRow2 + settings.setSeed_blockRow3 + settings.setSeed_blockRow4)
+        countMin =  Number(settings.setSeed_blockCountMin)
+        countMax =  Number(settings.setSeed_blockCountMax)
         }
 
 
