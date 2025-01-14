@@ -150,7 +150,7 @@ void FormGPS::setupGui()
 
     //react to UI changing this property
     connect(aog,SIGNAL(sectionButtonStateChanged()), &tool.sectionButtonState, SLOT(onStatesUpdated()));
-    connect(aog,SIGNAL(rowCountChanged()), &tool.blockageRowState, SLOT(onRowCountUpdated())); //Dim
+    connect(aog,SIGNAL(rowCountChanged()), &tool.blockageRowState, SLOT(onRowsUpdated())); //Dim
 
     openGLControl = qml_root->findChild<AOGRendererInSG *>("openglcontrol");
     //This is a bit hackish, but all rendering is done in this item, so

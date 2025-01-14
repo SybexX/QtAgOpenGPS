@@ -669,5 +669,6 @@
         <file>qml/BlockageData.qml</file>
         <file>qml/tracks/TrackPickDelegate.qml</file>
         <file>qml/tracks/TracksListView.qml</file>
+        <file>images/Blockage.png</file>
     </qresource>
 </RCC>

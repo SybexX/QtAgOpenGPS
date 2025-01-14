@@ -91,7 +91,7 @@ Connections {
         BlockageRow {
             width: (800 * theme.scaleWidth / numRows) < 50 ? (15 * theme.scaleWidth) : (20 * theme.scaleWidth)
             //width: 15 * theme.scaleWidth
-            height: (blockageRows.rowCount[model.rowNo]+20) * theme.scaleHeight
+            height: aog.blockage_max > (50 * theme.scaleHeight) ? (blockageRows.rowCount[model.rowNo] * 50/aog.blockage_max+20)*theme.scaleHeight : (blockageRows.rowCount[model.rowNo]+20) * theme.scaleHeight
             buttonText: (model.rowNo + 1).toFixed(0)
             visible: (model.rowNo < numRows) ? true : false
             color: (blockageRows.rowCount[model.rowNo] < countMin ? offColor : (blockageRows.rowCount[model.rowNo] < countMax ? autoColor : onColor))
