@@ -670,5 +670,6 @@
         <file>qml/tracks/TrackPickDelegate.qml</file>
         <file>qml/tracks/TracksListView.qml</file>
         <file>images/Blockage.png</file>
+        <file>qml/components/Spacer.qml</file>
     </qresource>
 </RCC>

@@ -48,13 +48,15 @@ public:
 
         return *this;
     }
-    inline InterfaceProperty &operator-=(double rhs) {
+    inline InterfaceProperty &operator-=(T rhs) {
         prop_root->setProperty(prop_name, QVariant((T)(*this) - rhs));
 
         return *this;
     }
 
     inline InterfaceProperty &operator=(T newvalue) { prop_root->setProperty(prop_name, QVariant(newvalue)); return *this;}
+
+    inline InterfaceProperty &operator=(InterfaceProperty &newvalue) { prop_root->setProperty(prop_name, newvalue.prop_root->property(prop_name)); return *this;}
 
 };
 

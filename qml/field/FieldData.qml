@@ -22,14 +22,16 @@ Rectangle {
         anchors.margins: 15
         anchors.horizontalCenter: parent.horizontalCenter
         TextLine{ color: "white"; text: qsTr("Total: ")+ utils.area_to_unit_string(aog.areaBoundaryOuterLessInner, 2)}
+        Spacer {}
+        Rectangle{ color: "white"; height:2; width: fieldData.width * .75; anchors.horizontalCenter: parent.horizontalCenter;}
         TextLine{ color: "white"; text: qsTr("Worked")}
-        TextLine{ color: "white"; text: "---------------"}
         TextLine{ color: "white"; text: qsTr("Applied: ")+ utils.area_to_unit_string(aog.workedAreaTotal, 2)}
         TextLine{ color: "white"; text: qsTr("Remain: ")+ utils.area_to_unit_string((aog.areaBoundaryOuterLessInner - aog.workedAreaTotal), 2)}
         TextLine{ color: "white"; text: Number(aog.percentLeft).toLocaleString(Qt.locale(), 'f', 0)+"%"}
         TextLine{ color: "white"; text: aog.timeTilFinished}
+        Spacer {}
+        Rectangle{ color: "white"; height:2; width: fieldData.width * .75; anchors.horizontalCenter: parent.horizontalCenter;}
         TextLine{ color: "white"; text: qsTr("Actual")}
-        TextLine{ color: "white"; text: "----------------"}
         TextLine{ color: "white"; text: qsTr("Applied: ")+ utils.area_to_unit_string(aog.actualAreaCovered, 2)}
         TextLine{ color: "white"; text: qsTr("Remain: ") + utils.area_to_unit_string((aog.areaBoundaryOuterLessInner - aog.actualAreaCovered), 2)}
         TextLine{ color: "white"; text: qsTr("Overlap: ") + utils.area_to_unit_string((aog.workedAreaTotal - aog.actualAreaCovered), 2)}

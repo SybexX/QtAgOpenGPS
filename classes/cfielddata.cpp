@@ -9,7 +9,7 @@ void CFieldData::UpdateFieldBoundaryGUIAreas(QVector<CBoundaryList> &bndList)
     if (bndList.count() > 0)
     {
         areaOuterBoundary = bndList[0].area;
-        areaBoundaryOuterLessInner = areaOuterBoundary;
+        areaBoundaryOuterLessInner = (double)areaOuterBoundary;
 
         for (int i = 1; i < bndList.count(); i++)
         {

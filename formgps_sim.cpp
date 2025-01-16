@@ -15,7 +15,6 @@ void FormGPS::simConnectSlots()
             this,SLOT(onSimNewPosition(double,double,double,double,double,double,double)),
             Qt::UniqueConnection);
     connect(&timerSim,SIGNAL(timeout()),this,SLOT(onSimTimerTimeout()),Qt::UniqueConnection);
-    connect(&timerSim,SIGNAL(timeout()),this,SLOT(onSimTimerTimeout()),Qt::UniqueConnection);
 
     if (property_setMenu_isSimulatorOn) {
         pn.latitude = sim.latitude;

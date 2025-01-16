@@ -43,14 +43,12 @@ Drawer {
                 text: "Drive In"
                 icon.source: prefix + "/images/AutoManualIsAuto.png"
                 onClicked: { fieldMenu.visible = false ; fieldOpen.sortBy = 2 ; fieldOpen.visible = true; }
-                enabled: !aog.isJobStarted
             }
             IconButtonTextBeside{
                 objectName: "btnFieldISOXML"
                 isChecked: false
                 text: "ISO-XML"
                 icon.source: prefix + "/images/ISOXML.png"
-                enabled: !aog.isJobStarted
             }
             IconButtonTextBeside{
                 objectName: "btnFieldFromKML"
@@ -58,14 +56,12 @@ Drawer {
                 text: "From KML"
                 icon.source: prefix + "/images/BoundaryLoadFromGE.png"
                 onClicked: fieldFromKML.visible = true
-                enabled: !aog.isJobStarted
             }
             IconButtonTextBeside{
                 objectName: "btnFieldFromExisting"
                 isChecked: false
                 text: "From Existing"
                 icon.source: prefix + "/images/FileExisting.png"
-                enabled: !aog.isJobStarted
                 onClicked: {
                     fieldMenu.visible = false
                     fieldFromExisting.visible = true
@@ -76,7 +72,6 @@ Drawer {
                 isChecked: false
                 text: "New"
                 icon.source: prefix + "/images/FileNew.png"
-                enabled: !aog.isJobStarted
                 onClicked: {
                     fieldMenu.visible = false
                     fieldNew.visible = true
@@ -122,7 +117,6 @@ Drawer {
                 isChecked: false
                 text: "Open"
                 icon.source: prefix + "/images/FileOpen.png"
-                enabled: !aog.isJobStarted
                 onClicked: {
                     fieldMenu.visible = false
                     fieldOpen.visible = true;

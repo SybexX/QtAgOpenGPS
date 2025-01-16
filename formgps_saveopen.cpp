@@ -851,7 +851,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
     //read field directory
     line = reader.readLine();
 
-    currentFieldDirectory = line.trimmed();
+    currentFieldDirectory = fieldDir;
     property_setF_CurrentDir = currentFieldDirectory;
 
     //Offset header

@@ -105,6 +105,15 @@ qt_add_executable(QtAgOpenGPS
     TODO.txt
     parse_properties.py
     README.md
+    android/AndroidManifest.xml
+    android/build.gradle
+    android/gradle.properties
+    android/gradle/wrapper/gradle-wrapper.jar
+    android/gradle/wrapper/gradle-wrapper.properties
+    android/gradlew
+    android/gradlew.bat
+    android/res/values/libs.xml
+    android/res/xml/qtprovider_paths.xml
 )
 
 if(ANDROID)
@@ -140,7 +149,7 @@ target_link_libraries(QtAgOpenGPS PRIVATE
     Qt6::Quick
     Qt6::QuickWidgets
     Qt6::Network
-	Qt6::Multimedia
+    Qt6::Multimedia
 )
 
 # Compile defines
