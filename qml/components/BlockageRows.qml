@@ -18,7 +18,7 @@ Rectangle {
     property int numRows:  Number(settings.setSeed_blockRow1 + settings.setSeed_blockRow2 + settings.setSeed_blockRow3 + settings.setSeed_blockRow4)
     property int countMin: Number(settings.setSeed_blockCountMin)
     property int countMax: Number(settings.setSeed_blockCountMax)
-    property var rowCount: aog.rowCount // need connect with settings
+    property var rowCount: aog.rowCount
     property color offColor: "Crimson"
     property color offTextColor: "White"
     property color onColor: "DarkGoldenrod"

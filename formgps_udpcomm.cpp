@@ -283,16 +283,17 @@ void FormGPS::ReceiveFromAgIO()
 
             int i = data[6];
             //mc.blockageseccount[data[5]*16+i] = data[7];
-            if (data[5] == 0) mc.blockageseccount1[i] = data[7];
-            if (data[5] == 1) mc.blockageseccount2[i] = data[7];
-            if (data[5] == 2) mc.blockageseccount3[i] = data[7];
-            if (data[5] == 3) mc.blockageseccount4[i] = data[7];
+            if (data[5] == 0) mc.blockageseccount1[i] = (qint16)((data[8] << 8) + data[7]);
+            if (data[5] == 1) mc.blockageseccount2[i] = (qint16)((data[8] << 8) + data[7]);
+            if (data[5] == 2) mc.blockageseccount3[i] = (qint16)((data[8] << 8) + data[7]);
+            if (data[5] == 3) mc.blockageseccount4[i] = (qint16)((data[8] << 8) + data[7]);
             doBlockageMonitoring();
             break;
 
         }
     }
     //qDebug() << pn->rawBuffer ;"Connected to blockage"
+    qDebug() << mc.blockageseccount1[1];
 
 }
 
