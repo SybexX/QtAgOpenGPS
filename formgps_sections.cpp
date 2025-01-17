@@ -331,25 +331,25 @@ void FormGPS::doBlockageMonitoring()
     double k7 = property_setVehicle_toolWidth;
     double rowwidth = k7/k5;
     for(int i=0;i<k1;i++)
-        mc.blockageseccount[k++]=mc.blockageseccount1[i];
+        mc.blockageseccount[k++]=mc.blockageseccount1[i]*7.2/rowwidth/pn.vtgSpeed;
     for(int i=0;i<k2;i++)
-        mc.blockageseccount[k++]=mc.blockageseccount2[i];
+        mc.blockageseccount[k++]=mc.blockageseccount2[i]*7.2/rowwidth/pn.vtgSpeed;
     for(int i=0;i<k3;i++)
-        mc.blockageseccount[k++]=mc.blockageseccount3[i];
+        mc.blockageseccount[k++]=mc.blockageseccount3[i]*7.2/rowwidth/pn.vtgSpeed;
     for(int i=0;i<k4;i++)
-        mc.blockageseccount[k++]=mc.blockageseccount4[i];
+        mc.blockageseccount[k++]=mc.blockageseccount4[i]*7.2/rowwidth/pn.vtgSpeed;
     for(int s=0; s< k5; s++) {
         tool.blockageRowState.set(s, mc.blockageseccount[s]);
     }
     int i;
     double avg=0;
-    for(i=0; i < k5; i++) avg+=(mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed);
+    for(i=0; i < k5; i++) avg+=(mc.blockageseccount[i]);
     avg/=k5;
     int max = 0;
     int i_max=0;
     for (int i = 0; i < k5; ++i) {
         if (mc.blockageseccount[i] > max) {
-            max = (mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed);
+            max = (mc.blockageseccount[i]);
             i_max = i;
         }
     }
@@ -358,15 +358,15 @@ void FormGPS::doBlockageMonitoring()
     int i_min1=0;
     int i_min2=0;
     for (int i = 0; i < k5; ++i) {
-        if (mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed < min1) {
-            min1 = (mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed);
+        if (mc.blockageseccount[i] < min1) {
+            min1 = (mc.blockageseccount[i]);
             i_min1 = i;
         }
     }
     for(i=0; i<k5; i++)
-        if(mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed<min2 && i_min1!=i)
+        if(mc.blockageseccount[i]<min2 && i_min1!=i)
         {
-            min2=(mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed);
+            min2=(mc.blockageseccount[i]);
             i_min2=i;
         }
     int count=0;

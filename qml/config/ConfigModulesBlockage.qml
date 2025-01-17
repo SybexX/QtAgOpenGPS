@@ -120,7 +120,7 @@ Rectangle{
         SpinBoxCustomized{
             id: graincountMin
             from: 0
-            to:1000
+            to:10000
             boundValue: settings.setSeed_blockCountMin
             onValueModified: settings.setSeed_blockCountMin = value
             anchors.bottomMargin: 10 * theme.scaleHeight
@@ -133,7 +133,7 @@ Rectangle{
         SpinBoxCustomized{
             id: graincountMax
             from: 0
-            to:1000
+            to:10000
             boundValue: settings.setSeed_blockCountMax
             onValueModified: settings.setSeed_blockCountMax = value
             anchors.bottomMargin: 10 * theme.scaleHeight

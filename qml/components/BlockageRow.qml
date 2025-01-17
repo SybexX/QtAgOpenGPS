@@ -14,6 +14,7 @@ Rectangle {
     border.color: "black"
     property string buttonText: ""
     property color textColor: "white"
+    radius: 5 * theme.scaleWidth
 
     color: "red"
 
