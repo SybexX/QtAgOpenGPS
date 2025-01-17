@@ -328,6 +328,8 @@ void FormGPS::doBlockageMonitoring()
     int k4 = (int)property_setSeed_blockRow4;
     int k5 = (int)property_setSeed_numRows;
     int k6 = (int)property_setSeed_blockCountMin;
+    double k7 = property_setVehicle_toolWidth;
+    double rowwidth = k7/k5;
     for(int i=0;i<k1;i++)
         mc.blockageseccount[k++]=mc.blockageseccount1[i];
     for(int i=0;i<k2;i++)
@@ -339,16 +341,15 @@ void FormGPS::doBlockageMonitoring()
     for(int s=0; s< k5; s++) {
         tool.blockageRowState.set(s, mc.blockageseccount[s]);
     }
-    //qDebug() << k5;
     int i;
     double avg=0;
-    for(i=0; i < k5; i++) avg+=mc.blockageseccount[i];
+    for(i=0; i < k5; i++) avg+=(mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed);
     avg/=k5;
-    int max = mc.blockageseccount[0];
+    int max = 0;
     int i_max=0;
     for (int i = 0; i < k5; ++i) {
         if (mc.blockageseccount[i] > max) {
-            max = mc.blockageseccount[i];
+            max = (mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed);
             i_max = i;
         }
     }
@@ -357,15 +358,15 @@ void FormGPS::doBlockageMonitoring()
     int i_min1=0;
     int i_min2=0;
     for (int i = 0; i < k5; ++i) {
-        if (mc.blockageseccount[i] < min1) {
-            min1 = mc.blockageseccount[i];
+        if (mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed < min1) {
+            min1 = (mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed);
             i_min1 = i;
         }
     }
     for(i=0; i<k5; i++)
-        if(mc.blockageseccount[i]<min2 && i_min1!=i)
+        if(mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed<min2 && i_min1!=i)
         {
-            min2=mc.blockageseccount[i];
+            min2=(mc.blockageseccount[i]*7.2/rowwidth/pn.vtgSpeed);
             i_min2=i;
         }
     int count=0;
