@@ -151,10 +151,9 @@ MoveablePopup {
             anchors.left: leftColumn.right
             anchors.top:topLine.bottom
             anchors.right: rightColumn.left
-            anchors.bottom: bottomRow.top
+            anchors.bottom: parent.bottom
             anchors.bottomMargin: 0
             anchors.margins: 10
-            color: "green"
 
             //ListModel { //this will be populated by the backend cpp code
               //  id: trackModel
@@ -166,7 +165,7 @@ MoveablePopup {
             Component.onCompleted: {
                 //reloadModel()
                 console.log("model is ")
-                console.log(trk.mymodel)
+                console.log(trk.model)
             }
 
 

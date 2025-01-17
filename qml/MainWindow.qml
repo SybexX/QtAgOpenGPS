@@ -796,9 +796,11 @@ Window {
             id: trackNewSet
             anchors.fill: parent
         }
+        */
         Tracks.TrackList{
             id: trackList
         }
+        /*
         Tracks.TracksNewAddName{
             id: trackAddName
         }*/
