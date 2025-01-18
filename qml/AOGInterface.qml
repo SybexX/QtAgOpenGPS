@@ -184,6 +184,8 @@ Item {
 
     property int current_trackNum: 0
 
+    property int sensorData: -1
+
     //on-screen buttons
 
     //snap track buttons

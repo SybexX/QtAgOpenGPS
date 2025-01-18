@@ -503,6 +503,7 @@ void FormGPS::oglMain_Paint()
             return;
         }
         oglBack_Paint();
+        oglZoom_Paint();
         gl->glFlush();
 
     }
@@ -552,6 +553,7 @@ void FormGPS::oglMain_Paint()
         //if we just had a new position and updated the back buffer then
         //proecss the section lookaheads:
         QTimer::singleShot(0,this, &FormGPS::processSectionLookahead);
+        QTimer::singleShot(0,this, &FormGPS::processOverlapCount);
         //qDebug() << "GL thread is different: " << !(QThread::currentThread() == QCoreApplication::instance()->thread());
         //qDebug() << "end of new frame render at " << swFrame.elapsed();
     }
@@ -613,7 +615,7 @@ void FormGPS::openGLControl_Shutdown()
     worldGrid.destroyGLBuffers();
 }
 
-//main openGL draw function
+//back buffer openGL draw function
 void FormGPS::oglBack_Paint()
 {
     //Because this is potentially running in another thread, we cannot
@@ -846,6 +848,122 @@ void FormGPS::oglBack_Paint()
 //Draw section OpenGL window, not visible
 void FormGPS::openGLControlBack_Initialized()
 {
+}
+
+//back buffer openGL draw function
+void FormGPS::oglZoom_Paint()
+{
+    //Because this is potentially running in another thread, we cannot
+    //safely make any GUI calls to set buttons, etc.  So instead, we
+    //do the GL drawing here and get the lookahead pixmap from GL here.
+    //After this, this widget will emit a finished signal, where the main
+    //thread can then run the second part of this function, which I've
+    //split out into its own function.
+    QOpenGLContext *glContext = QOpenGLContext::currentContext();
+    QMatrix4x4 projection;
+    QMatrix4x4 modelview;
+
+    GLHelperOneColor gldraw;
+
+    /* use the QML context with an offscreen surface to draw
+     * the lookahead triangles
+     */
+    if (!zoomFBO ) {
+        QOpenGLFramebufferObjectFormat format;
+        format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+        //TODO: zoomFBO is leaking... delete it in the destructor?
+        //I think context has to be active to delete it...
+        zoomFBO = new QOpenGLFramebufferObject(QSize(400,400),format);
+    }
+    QSurface *origSurface = glContext->surface();
+
+    glContext->makeCurrent(&zoomSurface);
+    zoomFBO->bind();
+    glContext->functions()->glViewport(0,0,400,400);
+    QOpenGLFunctions *gl = glContext->functions();
+
+    //int width = glContext->surface()->size().width();
+    //int height = glContext->surface()->size().height();
+
+    gl->glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    gl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    gl->glCullFace(GL_BACK);
+    gl->glClearColor(0, 0, 0, 1.0f);
+
+    if (isJobStarted)
+    {
+        gl->glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        projection.setToIdentity(); //Reset the view
+        projection.perspective(glm::toDegrees((double)1.0f), 1.0f, 100.0f, 5000.0f);
+        modelview.setToIdentity();
+
+        calculateMinMax();
+        //back the camera up
+
+        modelview.translate(0, 0, -maxFieldDistance);
+
+        //translate to that spot in the world
+        modelview.translate(-fieldCenterX, -fieldCenterY, 0);
+
+        //draw patches
+        int count2;
+
+        for (int j = 0; j < triStrip.count(); j++)
+        {
+            //every time the section turns off and on is a new patch
+            int patchCount = triStrip[j].patchList.count();
+
+            if (patchCount > 0)
+            {
+                //for every new chunk of patch
+                for (auto &triList: triStrip[j].patchList)
+                {
+                    //draw the triangle in each triangle strip
+                    gldraw.clear();
+
+                    count2 = triList->count();
+                    int mipmap = 2;
+
+                    //if large enough patch and camera zoomed out, fake mipmap the patches, skip triangles
+                    if (count2 >= (mipmap))
+                    {
+                        int step = mipmap;
+                        for (int i = 1; i < count2; i += step)
+                        {
+                            gldraw.append(QVector3D((*triList)[i].x(), (*triList)[i].y(), 0)); i++;
+                            gldraw.append(QVector3D((*triList)[i].x(), (*triList)[i].y(), 0)); i++;
+
+                            //too small to mipmap it
+                            if (count2 - i <= (mipmap))
+                                break;
+                        }
+                    }
+
+                    else
+                    {
+                        for (int i = 1; i < count2; i++) gldraw.append(QVector3D((*triList)[i].x(), (*triList)[i].y(), 0));
+                    }
+
+                    gldraw.draw(gl,projection*modelview,QColor::fromRgbF(0.5, 0.5, 0.5, 0.5),GL_TRIANGLE_STRIP,1.0f);
+                }
+            }
+        } //end of section patches
+
+        gl->glFlush();
+
+        //oglZoom.SwapBuffers();
+
+        //QImage overPix;
+        overPix = zoomFBO->toImage().mirrored().convertToFormat(QImage::Format_RGBX8888);
+        memcpy(overPixels, overPix.constBits(), overPix.size().width() * overPix.size().height() * 4);
+    }
+
+    glContext->functions()->glFlush();
+
+    //restore QML's context
+    zoomFBO->bindDefault();
+    glContext->doneCurrent();
+    glContext->makeCurrent(origSurface);
 }
 
 void FormGPS::MakeFlagMark(QOpenGLFunctions *gl)

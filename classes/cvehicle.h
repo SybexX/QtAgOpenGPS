@@ -129,6 +129,9 @@ public:
     QRect bounding_box;
     QPoint pivot_axle_xy;
 
+    Q_PROPERTY(QList<QVariant> vehicle_list MEMBER vehicle_list NOTIFY vehicle_listChanged)
+    QList<QVariant> vehicle_list;
+
     void loadSettings();
 
     explicit CVehicle(QObject *parent = 0);
@@ -159,6 +162,7 @@ signals:
     void isReverseChanged();
     void rightTramStateChanged();
     void leftTramStateChanged();
+    void vehicle_listChanged();
 
     //QML signals
     void vehicle_saveas(QString vehicle_name);

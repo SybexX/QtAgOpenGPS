@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QtCore>
 #include <QString>
+#include "interfaceproperty.h"
 
 class CAHRS;
 
@@ -40,7 +41,9 @@ public:
 
     int pwmDisplay = 0;
     double actualSteerAngleDegrees = 0;
-    int actualSteerAngleChart = 0, sensorData = -1;
+    int actualSteerAngleChart = 0;
+
+    InterfaceProperty<AOGInterface, int> sensorData = InterfaceProperty<AOGInterface, int>("sensorData");
 
     //for the workswitch
     bool isWorkSwitchActiveLow, isRemoteWorkSystemOn, isWorkSwitchEnabled,

@@ -336,7 +336,7 @@ void FormGPS::FileLoadTracks()
         trk.idx = trk.gArr.count() - 1;
 
         //read header $CurveLine
-        trk.gArr[trk.idx].name = reader.readLine();
+        trk.gArr[trk.idx].name = line;
 
         trk.gArr[trk.idx].heading = reader.readLine().toDouble();
 

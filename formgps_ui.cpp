@@ -44,9 +44,9 @@ void FormGPS::setupGui()
     rootContext()->setContextProperty("mainForm", this);
     rootContext()->setContextProperty("settings", &qml_settings);
 
-    rootContext()->setContextProperty("vehicleInterface", &vehicle);
     //populate vehicle_list property in vehicleInterface
     vehicle_update_list();
+    rootContext()->setContextProperty("vehicleInterface", &vehicle);
 
     rootContext()->setContextProperty("trk", &trk);
     rootContext()->setContextProperty("tram", &tram);

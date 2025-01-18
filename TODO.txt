@@ -4,6 +4,15 @@ To do
 2. Move section lookahead stuff out of GL drawing functinone somehow.
    Maybe after rendering frame, save a pixmap of the entire widget.
 
+3. Create the "Top Field View"/"Grid Rotate" window
+4. Finish out the "Steer Settings" Pages.
+    Anyone working on this, please keep your branch up-do-date with David's "dev" branch,
+    as he will be working on this in there
+
+5. Add "Auto reconnect" to UDP code in QtAgIO.
+6. Remove unused C# code in QtAgIO
+7. Finish the reset logic in 'reset_all' in SteerConfigSettings.qml
+
 For 1 and 2, do we need some way of synchronization so we know for sure
 that the data that gets processed in the timer loop has now been rendered?
 Does it matter?
