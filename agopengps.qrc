@@ -671,5 +671,7 @@
         <file>qml/tracks/TracksListView.qml</file>
         <file>images/Blockage.png</file>
         <file>qml/components/Spacer.qml</file>
+        <file>qml/steerconfig/WasBar.qml</file>
+        <file>qml/TramIndicators.qml</file>
     </qresource>
 </RCC>

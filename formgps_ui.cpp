@@ -248,6 +248,8 @@ void FormGPS::setupGui()
     //React to UI setting hyd life settings
     connect(aog, SIGNAL(modules_send_238()), this, SLOT(modules_send_238()));
 	connect(aog, SIGNAL(modules_send_251()), this, SLOT(modules_send_251()));
+    connect(aog, SIGNAL(modules_send_252()), this, SLOT(modules_send_252()));
+
     connect(aog, SIGNAL(doBlockageMonitoring()), this, SLOT(doBlockageMonitoring()));
 
     connect(aog, SIGNAL(sim_bump_speed(bool)), &sim, SLOT(speed_bump(bool)));
@@ -716,6 +718,22 @@ void FormGPS::modules_send_251() {
 
 	qDebug() << p_251.pgn;
 	SendPgnToLoop(p_251.pgn);
+}
+
+void FormGPS::modules_send_252() {
+    //qDebug() << "Sending 252 message to AgIO";
+    p_252.pgn[p_252.gainProportional] = (int)property_setAS_Kp;
+    p_252.pgn[p_252.highPWM] = (int)property_setAS_highSteerPWM;
+    p_252.pgn[p_252.lowPWM] = (int)property_setAS_lowSteerPWM;
+    p_252.pgn[p_252.minPWM] = property_setAS_minSteerPWM;
+    p_252.pgn[p_252.countsPerDegree] = (int)property_setAS_countsPerDegree;
+    p_252.pgn[p_252.wasOffsetHi] = (char)((int)property_setAS_wasOffset >> 8);
+    p_252.pgn[p_252.wasOffsetLo] = (char)property_setAS_wasOffset;
+    p_252.pgn[p_252.ackerman] = (int)property_setAS_ackerman;
+
+
+    qDebug() << p_252.pgn;
+    SendPgnToLoop(p_252.pgn);
 }
 
 void FormGPS::headland_save() {

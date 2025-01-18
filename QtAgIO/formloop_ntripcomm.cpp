@@ -124,19 +124,12 @@ void FormLoop::StartNTRIP()
 		//if we had a timer already, kill it
         if (tmr)
 		{
-            //tmr.Dispose();
             tmr->stop();
-            //delete tmr;
-            //tmr = nullptr;
 		}
 
 		//create new timer at fast rate to start
 		if (sendGGAInterval > 0)
 		{
-			/*this.tmr = new System.Windows.Forms.Timer();
-			this.tmr.Interval = 5000;
-            this.tmr.Tick += new EventHandler(NTRIPtick);*/
-			//is this right? David
             tmr = new QTimer(this);
             tmr->setSingleShot(false);
             tmr->setInterval(5000);
@@ -149,9 +142,6 @@ void FormLoop::StartNTRIP()
 			// Close the socket if it is still open
             if (clientSocket && clientSocket->state() == QAbstractSocket::ConnectedState)
             {
-                //clientSocket.Shutdown(SocketShutdown.Both);
-                //clientSocket.Close();
-                //correct? David
                 clientSocket->disconnectFromHost();
 
                 clientSocket->close();
@@ -279,7 +269,6 @@ void FormLoop::ReconnectRequest()
     if (tmr != nullptr)
 	{
         tmr->stop();
-        //delete tmr;
 	}
 }
 
@@ -326,13 +315,9 @@ void FormLoop::SendAuthorization()
         QString str = "GET /" + mount + " HTTP/" + htt + "\r\n";
         str += "User-Agent: NTRIP AgOpenGPSClient/20221020\r\n";
         str += "Authorization: Basic " + auth + "\r\n"; //This line can be removed if no authorization is needed
-            //str += GGASentence; //this line can be removed if no position feedback is needed
         str += "Accept: */*\r\nConnection: close\r\n";
         str += "\r\n";
 
-        // Convert to byte array and send.
-        // is this right? david
-        //Byte[] byteDateLine = Encoding.ASCII.GetBytes(str.ToCharArray());
         QByteArray byteDateLine = str.toLatin1();
 
         if(clientSocket->write(byteDateLine, byteDateLine.length())){
@@ -463,6 +448,7 @@ void FormLoop::SendGGA()
 		BuildGGA();
         //I'm not sure about this. sbGGA is a stringbuilder in cs, however, I think it's a
         //regular qstring in qt.
+		//or a QStringList?
         //QString str = sbGGA.toString();
         QString str = sbGGA;
 
@@ -491,7 +477,6 @@ void FormLoop::SendGGA()
 		{
             QByteArray localMsg;
             localMsg.resize(nBytesRec);
-            //Array.Copy(casterRecBuffer, localMsg, nBytesRec);
             localMsg.append(casterRecBuffer, nBytesRec);
 
             OnAddMessage(localMsg);
@@ -501,7 +486,6 @@ void FormLoop::SendGGA()
 			// If no data was recieved then the connection is probably dead
             qDebug() << "Shutting down clientSocket as we got no data";
             TimedMessageBox(3000, tr("NTRIP Error"), tr("Shutting down clientSocket as we got no data"));
-            //clientSocket.Shutdown(SocketShutdown.Both);
             clientSocket->close();
 		}
 	}
@@ -540,13 +524,6 @@ void FormLoop::NtripPort_DataReceived()//this is the serial port, right?
 
  QString FormLoop::ToBase64(QString str)
 {
-    /*Encoding asciiEncoding = Encoding.ASCII;
-	byte[] byteArray = new byte[asciiEncoding.GetByteCount(str)];
-	byteArray = asciiEncoding.GetBytes(str);
-	return Convert.ToBase64String(byteArray, 0, byteArray.Length);
-    is the following code correct??
-    */
-
     // Get the ASCII-encoded QByteArray
     QByteArray byteArray = str.toLatin1(); // Latin-1 is equivalent to ASCII for plain English characters
 
@@ -562,11 +539,11 @@ void FormLoop::ShutDownNTRIP()
     if (clientSocket != NULL && clientSocket->state() == QAbstractSocket::ConnectedState)
 	{
 		//shut it down
-                clientSocket->disconnectFromHost();
-                if (clientSocket->state() != QAbstractSocket::UnconnectedState) {
-                    clientSocket->waitForDisconnected(3000); // Optional: Wait for up to 3 seconds to ensure the socket is disconnected
-                }
-                clientSocket->close();
+		clientSocket->disconnectFromHost();
+		if (clientSocket->state() != QAbstractSocket::UnconnectedState) {
+			clientSocket->waitForDisconnected(3000); // Optional: Wait for up to 3 seconds to ensure the socket is disconnected
+		}
+		clientSocket->close();
         //start it up again
 		ReconnectRequest();
 
@@ -614,9 +591,7 @@ QString FormLoop::CalculateChecksum(QString Sentence)
 {
 	int sum = 0, inx;
 
-    //char[] sentence_chars = Sentence.ToCharArray();
     QVector<QChar> sentence_chars(Sentence.begin(), Sentence.end());
-    //is the above right? I don't know what I'm doing.
     QChar tmp;
 
 	// All character xor:ed results in the trailing hex checksum
@@ -629,18 +604,17 @@ QString FormLoop::CalculateChecksum(QString Sentence)
 		if (tmp == '*')
 			break;
         //sum ^= tmp;    // Build checksum
-        //is this correct?
         sum ^= tmp.unicode();    // Build checksum
     }
 
 	// Calculated checksum converted to a 2 digit hex string
     //return String.Format("{0:X2}", sum);
-    return QString::asprintf("%02X", sum); //correct??
+    return QString::asprintf("%02X", sum);
 
 }
 
 //private readonly StringBuilder sbGGA = new StringBuilder();
-//see formloop.h line 195
+//moved to formloop.h line 195
 
 void FormLoop::BuildGGA()
 {
@@ -669,10 +643,7 @@ void FormLoop::BuildGGA()
 	latMinu -= latDeg;
 	longMinu -= longDeg;
 
-	//is this section right?? ChatGPT says it is. David
-	//latMinu = Math.Round(latMinu * 60.0, 7);
 	latMinu = qRound(latMinu * 60 * 1000000) / 1000000.0;
-	//longMinu = Math.Round(longMinu * 60.0, 7);
 	longMinu = qRound(longMinu * 60 * 1000000) / 1000000.0;
 
 	latDeg *= 100.0;
@@ -688,38 +659,21 @@ void FormLoop::BuildGGA()
 	if (longitude >= 0) EW = 'E';
 	else EW = 'W';
 
-	//sbGGA.clear();
-    //sbGGA.append("$GPGGA,");
-    //sbGGA.append(DateTime.Now.toString("HHmmss.00,", CultureInfo.InvariantCulture));
-    //sbGGA.append(Math.Abs(latNMEA).toString("0000.000", CultureInfo.InvariantCulture)).append(',').append(NS).append(',');
-    //sbGGA.append(Math.Abs(longNMEA).toString("00000.000", CultureInfo.InvariantCulture)).append(',').append(EW);
-    //sbGGA.append(",1,10,1,43.4,M,46.4,M,5,0*");
-
-    //sbGGA.append(CalculateChecksum(sbGGA.toString()));
-    //sbGGA.append("\r\n");
 	sbGGA.clear();
     sbGGA.append("$GPGGA,");
-    //sbGGA.append(DateTime.Now.toString("HHmmss.00,", CultureInfo.InvariantCulture));
 	sbGGA.append(QDateTime::currentDateTime().toString("HHmmss.00,"));
-    //sbGGA.append(abs(latNMEA).toString("0000.000", CultureInfo.InvariantCulture)).append(',').append(NS).append(',');
     sbGGA.append(QString::number(abs(latNMEA), 'f', 3)).append(',').append(NS).append(',');
-    //sbGGA.append(abs(longNMEA).toString("00000.000", CultureInfo.InvariantCulture)).append(',').append(EW);
 	sbGGA.append(QString::number(abs(longNMEA), 'f', 3)).append(',').append(EW);
-    //sbGGA.append(',').append(fixQualityData.toString()).append(',');
 	sbGGA.append(",").append(QString::number(fixQualityData)).append(',');
-    //sbGGA.append(satellitesData.toString()).append(',');
 	sbGGA.append(QString::number(satellitesData)).append(',');
 
-    //if (hdopData > 0) sbGGA.append(hdopData.toString("0.##", CultureInfo.InvariantCulture)).append(',');
 	if (hdopData > 0) sbGGA.append(QString::number(hdopData, 'f', 2)).append(',');
 
     else sbGGA.append("1,");
 
-    //sbGGA.append(altitudeData.toString("#.###", CultureInfo.InvariantCulture)).append(',');
 	sbGGA.append(QString::number(altitudeData, 'f', 3)).append(',');
     sbGGA.append("M,");
     sbGGA.append("46.4,M,");  //udulation
-    //sbGGA.append(ageData.toString("0.#", CultureInfo.InvariantCulture)).append(','); //age
     sbGGA.append(QString::number(ageData, 'f', 1)).append(','); //age
     sbGGA.append("0*");
 

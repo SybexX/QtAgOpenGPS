@@ -160,9 +160,9 @@ signals:
     void hydLiftDownChanged();
     void isChangingDirectionChanged();
     void isReverseChanged();
+    void vehicle_listChanged();
     void rightTramStateChanged();
     void leftTramStateChanged();
-    void vehicle_listChanged();
 
     //QML signals
     void vehicle_saveas(QString vehicle_name);

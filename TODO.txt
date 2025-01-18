@@ -10,8 +10,9 @@ To do
     as he will be working on this in there
 
 5. Add "Auto reconnect" to UDP code in QtAgIO.
-6. Remove unused C# code in QtAgIO
 7. Finish the reset logic in 'reset_all' in SteerConfigSettings.qml
+8. IsAutoSteerBtnOn
+9. Trams
 
 For 1 and 2, do we need some way of synchronization so we know for sure
 that the data that gets processed in the timer loop has now been rendered?

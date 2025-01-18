@@ -33,13 +33,11 @@ FormLoop::FormLoop(QObject *parent) : QObject(parent),
     if(property_setBluetooth_isOn)
         bluetoothManager->startBluetoothDiscovery();
 
-   //buffer.resize(1024);
     ConfigureNTRIP();
 
     halfSecondTimer = new QTimer(this);
     halfSecondTimer->setInterval(500);
     connect(halfSecondTimer, &QTimer::timeout, this, &FormLoop::timer1_Tick);
-    //halfSecondTimer->start();
 
     oneSecondTimer = new QTimer(this);
     oneSecondTimer->setInterval(1000);

@@ -42,11 +42,9 @@ QString FormLoop::Parse(QString& buffer)
         if (end == -1) return NULL;
 
         //the NMEA sentence to be parsed
-        //sentence = buffer.Substring(0, end + 1);
         sentence = buffer.left(end + 1);
 
         //remove the processed sentence from the rawBuffer
-        //buffer = buffer.Substring(end + 1);
         buffer = buffer.mid(end + 1);
     }
 
@@ -54,7 +52,6 @@ QString FormLoop::Parse(QString& buffer)
     while (!ValidateChecksum(sentence));
 
     // Remove trailing checksum and \r\n and return
-    //sentence = sentence.Substring(0, sentence.IndexOf("*", StringComparison.Ordinal));
     sentence = sentence.left(sentence.indexOf('*'));
 
     return sentence;
@@ -92,7 +89,7 @@ void FormLoop::ParseNMEA(QString& buffer)
 
     if (buffer.length() > 301)
     {
-        //if (isLogNMEA)
+        //if (isLogNMEA) //TODO: Log NMEA
         //{
         //    logNMEASentence.Append("\r\n" +
         //        DateTime.UtcNow.ToString(" ->>  mm:ss.fff ", CultureInfo.InvariantCulture)
@@ -121,12 +118,12 @@ void FormLoop::ParseNMEA(QString& buffer)
 
 
         //extract the next NMEA single sentence
-        nextNMEASentence = Parse(buffer); //is this right? David 6/22/24
+        nextNMEASentence = Parse(buffer);
     if (nextNMEASentence.isEmpty()) break;
 
         words = nextNMEASentence.split(',');
 
-        //if (isLogNMEA)
+        //if (isLogNMEA) //TODO: Log NMEA
         //{
         //    logNMEASentence.Append(DateTime.UtcNow.ToString("HHmmss.fff ", CultureInfo.InvariantCulture)
         //    + " " + nextNMEASentence + "\r\n");
@@ -222,7 +219,7 @@ void FormLoop::ParseNMEA(QString& buffer)
         UpdateUIVars();
         isNMEAToSend = false;
 
-        QByteArray nmeaPGN(57, 0); //is this right? David 6/22/24
+        QByteArray nmeaPGN(57, 0);
 
         nmeaPGN[0] = 0x80;
         nmeaPGN[1] = 0x81;
@@ -242,68 +239,54 @@ void FormLoop::ParseNMEA(QString& buffer)
         previousAltitude = altitude;
 
         //longitude
-        //Buffer.BlockCopy(BitConverter.GetBytes(longitudeSend), 0, nmeaPGN, 5, 8);
         std::memcpy(nmeaPGN.data() + 5, &longitudeSend, 8);
         longitudeSend = glm::DOUBLE_MAX;
 
         //latitude
-        //Buffer.BlockCopy(BitConverter.GetBytes(latitudeSend), 0, nmeaPGN, 13, 8);
         std::memcpy(nmeaPGN.data() + 13, &latitudeSend, 8);
         latitudeSend = glm::DOUBLE_MAX;
 
         //the different dual antenna headings
-        //Buffer.BlockCopy(BitConverter.GetBytes(headingTrueDual), 0, nmeaPGN, 21, 4);
         std::memcpy(nmeaPGN.data() + 21, &headingTrueDual, 4);
         headingTrueDual = glm::FLOAT_MAX;
 
         //single antenna heading in degrees
-        //Buffer.BlockCopy(BitConverter.GetBytes(headingTrue), 0, nmeaPGN, 25, 4);
         std::memcpy(nmeaPGN.data() + 25, &headingTrue, 4);
         headingTrue = glm::FLOAT_MAX;
 
         //speed converted to kmh from knots
-        //Buffer.BlockCopy(BitConverter.GetBytes(speed), 0, nmeaPGN, 29, 4);
         std::memcpy(nmeaPGN.data() + 29, &speed, 4);
         speed = glm::FLOAT_MAX;
 
         //roll value in degrees
-        //Buffer.BlockCopy(BitConverter.GetBytes(roll), 0, nmeaPGN, 33, 4);
         std::memcpy(nmeaPGN.data() + 33, &roll, 4);
         this->roll = glm::FLOAT_MAX;
 
         //altitude in meters
-        //Buffer.BlockCopy(BitConverter.GetBytes(altitude), 0, nmeaPGN, 37, 4);
         std::memcpy(nmeaPGN.data() + 37, &altitude, 4);
         this->altitude = glm::FLOAT_MAX;
 
-        //Buffer.BlockCopy(BitConverter.GetBytes(satellitesTracked), 0, nmeaPGN, 41, 2);
         std::memcpy(nmeaPGN.data() + 41, &satellitesTracked, 2);
         satellitesTracked = glm::USHORT_MAX;
 
         nmeaPGN[43] = fixQuality;
         fixQuality = glm::BYTE_MAX;
 
-        //Buffer.BlockCopy(BitConverter.GetBytes(hdopX100), 0, nmeaPGN, 44, 2);
         std::memcpy(nmeaPGN.data() + 44, &hdopX100, 2);
         hdopX100 = glm::USHORT_MAX;
 
-        //Buffer.BlockCopy(BitConverter.GetBytes(ageX100), 0, nmeaPGN, 46, 2);
         std::memcpy(nmeaPGN.data() + 46, &ageX100, 2);
         ageX100 = glm::USHORT_MAX;
 
-        //Buffer.BlockCopy(BitConverter.GetBytes(imuHeading), 0, nmeaPGN, 48, 2);
         std::memcpy(nmeaPGN.data() + 48, &imuHeading, 2);
         imuHeading = glm::USHORT_MAX;
 
-        //Buffer.BlockCopy(BitConverter.GetBytes(imuRoll), 0, nmeaPGN, 50, 2);
         std::memcpy(nmeaPGN.data() + 50, &imuRoll, 2);
         imuRoll = glm::SHORT_MAX;
 
-        //Buffer.BlockCopy(BitConverter.GetBytes(imuPitch), 0, nmeaPGN, 52, 2);
         std::memcpy(nmeaPGN.data() + 52, &imuPitch, 2);
         imuPitch = glm::SHORT_MAX;
 
-        //Buffer.BlockCopy(BitConverter.GetBytes(imuYawRate), 0, nmeaPGN, 54, 2);
         std::memcpy(nmeaPGN.data() + 54, &imuYawRate, 2);//note warning
         imuYawRate = glm::SHORT_MAX;
 
@@ -332,44 +315,33 @@ void FormLoop::ParseKSXT()
 
         bool ok; //did the parsing go ok? If so, use the val, if not, don't
 
-        //double.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out longitude);
         longitude = words[2].toDouble(&ok); //try to parse
         if (ok){ //did it work? Use if it did, skip if it didn't
             longitudeSend = longitude;
         }
 
-        //double.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out latitude);
         latitude = words[3].toDouble(&ok);
         if (ok){
             latitudeSend = latitude;
         }
 
-        //float.TryParse(words[4], NumberStyles.Float, CultureInfo.InvariantCulture, out altitude);
         altitude = words[4].toFloat(&ok);
         if (ok){
             altitudeData = altitude;
         }
 
-        //float.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out headingTrueDual);
         headingTrueDual = words[5].toFloat(&ok);
         if (ok){
             headingTrueDualData = headingTrueDual;
         }
 
-        //float.TryParse(words[6], NumberStyles.Float, CultureInfo.InvariantCulture, out rollK);
         rollK = words[6].toFloat(&ok); //why do we need to parse??
 
-        //float.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out speed);
         speed = words[8].toFloat(&ok);
         if (ok){
             speedData = speed;
         }
 
-        /*	byte.TryParse(words[10], NumberStyles.Float, CultureInfo.InvariantCulture, out fixQuality);
-			if (fixQuality == 0) fixQualityData = 0;
-			else if (fixQuality == 1) fixQualityData = 1;
-			else if (fixQuality == 2) fixQualityData = 5;
-			else if (fixQuality == 3) fixQualityData = 4;*/
         fixQuality = words[10].toInt(&ok);
         if (ok) {
             switch (fixQuality) {
@@ -392,42 +364,26 @@ void FormLoop::ParseKSXT()
 
         fixQuality = fixQualityData;
 
-        /*int headingQuality;
-
-		  int.TryParse(words[11], NumberStyles.Float, CultureInfo.InvariantCulture, out headingQuality);
-
-          if (headingQuality == 3)   // roll only when rtk
-		  {
-		  roll = (float)(rollK);
-		  rollData = rollK;
-		  }
-		  else
-		  {
-		  roll = FLOAT_MIN;
-		  rollData = 0;
-		  }*/
         int headingQuality = words[11].toInt(&ok);
 
         if (headingQuality == 3) {
             roll = rollK;
             rollData = rollK;
         } else {
-            roll = glm::FLOAT_MIN; // Assuming FLOAT_MIN is defined appropriately
+            roll = glm::FLOAT_MIN;
             rollData = 0;
         }
 
-        //unsigned short.TryParse(words[13], NumberStyles.Float, CultureInfo.InvariantCulture, out satellitesTracked);
         satellitesTracked = words[13].toUShort(&ok);
         if (ok){
             satellitesData = satellitesTracked;
         }
 
-
-        //float.TryParse(words[20], NumberStyles.Float, CultureInfo.InvariantCulture, out ageData);
         ageData = words[20].toFloat(&ok);
         if (ok){
             ageX100 = (unsigned short)(ageData * 100.0);
         }
+		//NOT IN AOG. DO NOT REMOVE.
         // the ByNav sends 0 for lat/lon if invalid signal.
         //see AOG-Intl for discussion
         //https://t.me/agopengpsinternational/126430
@@ -470,35 +426,30 @@ void FormLoop::ParseGGA()
         //{
 
         //FixQuality
-        //byte.TryParse(words[6], NumberStyles.Float, CultureInfo.InvariantCulture, out fixQuality);
         fixQuality = words[6].toUShort(&ok);
         if(ok){
             fixQualityData = fixQuality;
         }
 
         //satellites tracked
-        //unsigned short.TryParse(words[7], NumberStyles.Float, CultureInfo.InvariantCulture, out satellitesTracked);
         satellitesTracked = words[7].toUShort(&ok);
         if (ok){
             satellitesData = satellitesTracked;
         }
 
         //hdop
-        //float.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out hdopData);
         hdopData = words[8].toFloat(&ok);
         if (ok){
             hdopX100 = (unsigned short)(hdopData * 100.0);
         }
 
         //altitude
-        //float.TryParse(words[9], NumberStyles.Float, CultureInfo.InvariantCulture, out altitude);
         altitude = words[9].toFloat(&ok);
         if (ok){
             altitudeData = altitude;
         }
 
         //age
-        //float.TryParse(words[13], NumberStyles.Float, CultureInfo.InvariantCulture, out ageData);
         ageData = words[13].toFloat(&ok);
         if (ok){
             ageX100 = (unsigned short)(ageData * 100.0);
@@ -515,10 +466,8 @@ void FormLoop::ParseGGA()
         }
 
         decim -= 2;
-        //double.TryParse(words[2].Substring(0, decim), NumberStyles.Float, CultureInfo.InvariantCulture, out latitude);
         latitude = words[2].mid(0, decim).toDouble();
 
-        //double.TryParse(words[2].Substring(decim), NumberStyles.Float, CultureInfo.InvariantCulture, out double temp);
         double temp = words[2].mid(decim).toDouble();
         temp *= 0.01666666666667;
         latitude += temp;
@@ -535,10 +484,8 @@ void FormLoop::ParseGGA()
         }
 
         decim -= 2;
-        //double.TryParse(words[4].Substring(0, decim), NumberStyles.Float, CultureInfo.InvariantCulture, out longitude);
         longitude = words[4].mid(0, decim).toDouble();
 
-        //double.TryParse(words[4].Substring(decim), NumberStyles.Float, CultureInfo.InvariantCulture, out temp);
         temp = words[4].mid(decim).toDouble();
 
         longitude += temp * 0.0166666666667;
@@ -566,7 +513,6 @@ void FormLoop::ParseVTG()
     {
         //kph for speed
 
-        //float.TryParse(words[7], NumberStyles.Float, CultureInfo.InvariantCulture, out speed);
         speed = words[7].toFloat(&ok);
         if (ok){
             speedData = speed;
@@ -580,7 +526,6 @@ void FormLoop::ParseVTG()
     if (!words[1].isEmpty())
     {
         //True heading
-        //float.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out headingTrue);
         headingTrue = words[1].toFloat(&ok);
         if (ok){
             headingTrueData = headingTrue;
@@ -613,10 +558,8 @@ void FormLoop::ParseAVR()
 
     if (!words[1].isEmpty())
     {
-        //float.TryParse(words[8] == "Roll" ? words[7] : words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out rollK);
         QString wordToParse = (words[8] == "Roll") ? words[7] : words[5];
         rollK = wordToParse.toFloat();
-            //is this right? Makes sense to me. David 6/22
 
         //Kalman filter
         Pc = P + varProcess;
@@ -637,16 +580,13 @@ void FormLoop::ParseHPD()
     if (!words[1].isEmpty())
     {
         //Dual heading
-        //float.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out headingTrueDual);
         headingTrueDual = words[3].toFloat(&ok);
         if (ok){
             headingTrueDualData = headingTrueDual;
         }
 
-        //float.TryParse(words[4], NumberStyles.Float, CultureInfo.InvariantCulture, out rollK);
         rollK = words[4].toFloat();
 
-        //double.TryParse(words[18], NumberStyles.Float, CultureInfo.InvariantCulture, out double baseline);
         double baseline = words[18].toDouble();
 
         //int.TryParse(words[21], NumberStyles.Float, CultureInfo.InvariantCulture, out int solheading);
@@ -716,48 +656,41 @@ void FormLoop::ParseOGI()
         }
 
         //satellites tracked
-        //unsigned short.TryParse(words[7], NumberStyles.Float, CultureInfo.InvariantCulture, out satellitesTracked);
         satellitesTracked = words[7].toUShort(&ok);
         if (ok){
             satellitesData = satellitesTracked;
         }
 
         //hdop
-        //float.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out hdopData);
         hdopData = words[8].toFloat(&ok);
         if (ok){
             hdopX100 = (unsigned short)(hdopData * 100.0);
         }
 
         //altitude
-        //float.TryParse(words[9], NumberStyles.Float, CultureInfo.InvariantCulture, out altitude);
         altitude = words[9].toFloat(&ok);
         if (ok){
             altitudeData = altitude;
         }
 
         //kph for speed - knots read
-        //ffloat.TryParse(words[11], NumberStyles.Float, CultureInfo.InvariantCulture, out speed);
         speed = words[11].toFloat(&ok);
         speed *= 1.852f;
         speedData = speed;
 
         //Dual antenna derived heading
-        //float.TryParse(words[12], NumberStyles.Float, CultureInfo.InvariantCulture, out headingTrueDual);
         headingTrueDual = words[12].toFloat(&ok);
         if (ok){
             headingTrueDualData = headingTrueDual;
         }
 
         //roll
-        //float.TryParse(words[13], NumberStyles.Float, CultureInfo.InvariantCulture, out roll);
         roll = words[13].toFloat(&ok);
         if (ok){
             rollData = roll;
         }
 
         //get latitude and convert to decimal degrees
-        //int decim = words[2].IndexOf(".", StringComparison.Ordinal);
         int decim = words[2].indexOf(".");
         if (decim == -1)
         {
@@ -766,16 +699,13 @@ void FormLoop::ParseOGI()
         }
 
         //age
-        //float.TryParse(words[10], NumberStyles.Float, CultureInfo.InvariantCulture, out ageData);
         ageData = words[10].toFloat(&ok);
         if (ok){
             ageX100 = (unsigned short)(ageData * 100.0);
         }
 
         decim -= 2;
-        //double.TryParse(words[2].Substring(0, decim), NumberStyles.Float, CultureInfo.InvariantCulture, out latitude);
         latitude = words[2].mid(0, decim).toDouble();
-        //double.TryParse(words[2].Substring(decim), NumberStyles.Float, CultureInfo.InvariantCulture, out double temp);
         double temp = words[2].mid(decim).toDouble();
 
         temp *= 0.01666666666666666666666666666667;
@@ -794,10 +724,8 @@ void FormLoop::ParseOGI()
         }
 
         decim -= 2;
-        //double.TryParse(words[4].Substring(0, decim), NumberStyles.Float, CultureInfo.InvariantCulture, out longitude);
         longitude = words[4].mid(0, decim).toDouble();
 
-        //double.TryParse(words[4].Substring(decim), NumberStyles.Float, CultureInfo.InvariantCulture, out temp);
         temp = words[4].mid(decim).toDouble();
 
         longitude += temp * 0.01666666666666666666666666666667;
@@ -859,12 +787,8 @@ void FormLoop::ParsePANDA()
         }
 
         decim -= 2;
-        //double.TryParse(words[2].Substring(0, decim),
-        //			NumberStyles.Float, CultureInfo.InvariantCulture, out latitude);
 
         latitude = words[2].mid(0, decim).toDouble();
-        /*double.TryParse(words[2].Substring(decim),
-							  NumberStyles.Float, CultureInfo.InvariantCulture, out double temp);*/
         double temp = words[2].mid(decim).toDouble();
 
         temp *= 0.01666666666666666666666666666667;
@@ -883,12 +807,8 @@ void FormLoop::ParsePANDA()
         }
 
         decim -= 2;
-        /*double.TryParse(words[4].Substring(0, decim),
-							  NumberStyles.Float, CultureInfo.InvariantCulture, out longitude);*/
         longitude = words[4].mid(0, decim).toDouble();
 
-        /*double.TryParse(words[4].Substring(decim),
-							  NumberStyles.Float, CultureInfo.InvariantCulture, out temp);*/
         temp = words[4].mid(decim).toDouble();
 
         longitude += temp * 0.01666666666666666666666666666667;
@@ -903,41 +823,35 @@ void FormLoop::ParsePANDA()
         }
 
         //satellites tracked
-        //unsigned short.TryParse(words[7], NumberStyles.Float, CultureInfo.InvariantCulture, out satellitesTracked);
         satellitesTracked = words[7].toUShort(&ok);
         if (ok) {
             satellitesData = satellitesTracked;
         }
 
         //hdop
-        //float.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out hdopData);
         hdopData = words[8].toFloat(&ok);
         if (ok) {
             hdopX100 = (unsigned short)(hdopData * 100.0);
         }
 
         //altitude
-        //float.TryParse(words[9], NumberStyles.Float, CultureInfo.InvariantCulture, out altitude);
         altitude = words[9].toFloat(&ok);
         if (ok) {
             altitudeData = altitude;
         }
 
         //age
-        //float.TryParse(words[10], NumberStyles.Float, CultureInfo.InvariantCulture, out ageData);
         ageData = words[10].toFloat(&ok);
         if (ok) {
             ageX100 = (unsigned short)(ageData * 100.0);
         }
 
         //kph for speed - knots read
-        //float.TryParse(words[11], NumberStyles.Float, CultureInfo.InvariantCulture, out speed);
         speed = words[11].toFloat();
         speed *= 1.852f;
         speedData = speed;
 
         //imu heading
-        //unsigned short.TryParse(words[12], NumberStyles.Float, CultureInfo.InvariantCulture, out imuHeading);
         imuHeading = words[12].toUShort(&ok);
         if (ok) {
             imuHeadingData = imuHeading;
@@ -945,7 +859,6 @@ void FormLoop::ParsePANDA()
         }
 
         //roll
-        //short.TryParse(words[13], NumberStyles.Float, CultureInfo.InvariantCulture, out imuRoll);
         imuRoll = words[13].toShort(&ok);
         if (ok) {
             imuRollData = imuRoll;
@@ -953,7 +866,6 @@ void FormLoop::ParsePANDA()
         }
 
         //Pitch
-        //short.TryParse(words[14], NumberStyles.Float, CultureInfo.InvariantCulture, out imuPitch);
         imuPitch = words[14].toShort(&ok);
         if (ok) {
             imuPitchData = imuPitch;
@@ -961,7 +873,6 @@ void FormLoop::ParsePANDA()
         }
 
         //YawRate
-        //short.TryParse(words[15], NumberStyles.Float, CultureInfo.InvariantCulture, out imuYawRate);
         imuYawRate = words[15].toShort(&ok);
         if (ok) {
             imuYawRateData = imuYawRate;
@@ -1020,7 +931,6 @@ void FormLoop::ParseSTI032()
     if (!words[10].isEmpty())
     {
         //baselineCourse: angle between baseline vector (from kinematic base to rover) and north direction, degrees
-        //float.TryParse(words[10], NumberStyles.Float, CultureInfo.InvariantCulture, out float baselineCourse);
         float baselineCourse = words[10].toFloat(&ok);
         if (ok){
             headingTrueDual = ((baselineCourse < 270.0f) ? (baselineCourse + 90.0f) : (baselineCourse - 270.0f)); //Rover Antenna on the left, kinematic base on the right!!!
@@ -1029,12 +939,9 @@ void FormLoop::ParseSTI032()
 
     if (!words[8].isEmpty() && !words[9].isEmpty())
     {
-        //double.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out double upProjection); //difference in hight of both antennas (rover - kinematic base)
         double upProjection = words[8].toDouble(&ok); //difference in hight of both antennas (rover - kinematic base)
-            //double.TryParse(words[9], NumberStyles.Float, CultureInfo.InvariantCulture, out double baselineLength); //distance between kinematic base and rover
         double baselineLength = words[9].toDouble(&ok); //distance between kinematic base and rover
-        //rollK = (float)glm.toDegrees(math.Atan(upProjection / baselineLength)); //roll to the right is positiv (rover left, kinematic base right!)
-        rollK = static_cast<float>(atan(upProjection / baselineLength) * (180.0 / M_PI)); // roll to the right is positive (rover left, kinematic base right!) //is this Right? David
+        rollK = static_cast<float>(atan(upProjection / baselineLength) * (180.0 / M_PI)); // roll to the right is positive (rover left, kinematic base right!)
 
         //that won't work.
         //Kalman filter
@@ -1055,18 +962,15 @@ void FormLoop::ParseTRA()
     bool ok;
     if (!words[1].isEmpty())
     {
-        //float.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out headingTrueDual);
         headingTrueDual = words[2].toFloat(&ok);
         if (ok){
             headingTrueDualData = headingTrueDual;
         }
 
         //  Console.WriteLine(HeadingForced);
-        //float.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out rollK);
         rollK = words[3].toFloat();
         // Console.WriteLine(nRoll);
 
-        //int.TryParse(words[5], NumberStyles.Float, CultureInfo.InvariantCulture, out int trasolution);
         int trasolution = words[5].toInt(&ok);
         if (trasolution != 4) rollK = 0;
         rollData = rollK;
@@ -1095,19 +999,16 @@ void FormLoop::ParseRMC()
         && !words[5].isEmpty() && !words[6].isEmpty())
     {
         //Convert from knots to kph for speed
-        //float.TryParse(words[7], NumberStyles.Float, CultureInfo.InvariantCulture, out speed);
         speed = words[7].toFloat();
         speed *= 1.852f;
         speedData = speed;
 
         //True heading
-        //float.TryParse(words[8], NumberStyles.Float, CultureInfo.InvariantCulture, out headingTrueDual);
         headingTrueDual = words[8].toFloat(&ok);
         if (ok){
             headingTrueDualData = headingTrueDual;
         }
 
-        //double.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out double UTC);
         double UTC = words[1].toDouble();
         if ((UTC < LastUpdateUTC ? 240000 + UTC : UTC) - LastUpdateUTC > 0.045)
         {
@@ -1124,9 +1025,7 @@ void FormLoop::ParseRMC()
             decim -= 2;
 
 
-            //double.TryParse(words[3].Substring(0, decim), NumberStyles.Float, CultureInfo.InvariantCulture, out latitude);
             latitude = words[3].mid(0, decim).toDouble();
-            //double.TryParse(words[3].Substring(decim), NumberStyles.Float, CultureInfo.InvariantCulture, out double temp);
             double temp = words[3].mid(decim).toDouble();
 
             latitude += temp * 0.01666666666666666666666666666667;
@@ -1144,9 +1043,7 @@ void FormLoop::ParseRMC()
             }
 
             decim -= 2;
-            //double.TryParse(words[5].Substring(0, decim), NumberStyles.Float, CultureInfo.InvariantCulture, out longitude);
             longitude = words[5].mid(0, decim).toDouble();
-            //double.TryParse(words[5].Substring(decim), NumberStyles.Float, CultureInfo.InvariantCulture, out temp);
             temp = words[5].mid(decim).toDouble();
             longitude += temp * 0.01666666666666666666666666666667;
 
@@ -1175,18 +1072,16 @@ bool FormLoop::ValidateChecksum(QString Sentence)
             {
                 if (inx >= sentenceChars.length()) // No checksum found
                     return false;
-                auto tmp = sentenceChars[inx]; //is this right? David
+                auto tmp = sentenceChars[inx]; 
                 // Indicates end of data and start of checksum
                 if (tmp == '*') break;
                 sum ^= tmp;    // Build checksum
             }
 
             // Calculated checksum converted to a 2 digit hex string
-            //string sumStr = string.Format("{0:X2}", sum);
             QString sumStr = QString::asprintf("%02X", sum);
 
             // Compare to checksum in sentence
-            //return sumStr.Equals(Sentence.Substring(inx + 1, 2));
             return sumStr == Sentence.mid(inx + 1, 2);
         }
         else

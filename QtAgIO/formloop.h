@@ -48,11 +48,9 @@ class FormLoop : public QObject
 	~FormLoop();
 
 		/* settings related stuff*/
-		//QSettings settings;
 		void loadSettings();
 
 
-		//I don't know if we need or not. But here it is
 		//settings dialog callbacks
 		void on_settings_reload();
 		void on_settings_save();
@@ -89,8 +87,6 @@ class FormLoop : public QObject
         //used to send communication check pgn= C8 or 200
         QByteArray sendIPToModules = QByteArray::fromRawData("\x80\x81\x7F\xC9\x05\xC9\xC9\xC0\xA8\x05\x47", 11);
 
-        //QByteArray ipCurrent = { 192, 168, 5 };
-        //QByteArray ipNew = { 192, 168, 5 };
         QByteArray ipCurrent;
         QByteArray ipNew;
 
@@ -170,9 +166,8 @@ class FormLoop : public QObject
 
 	private:
 
-        QQmlApplicationEngine engine; //grasping at straws, here
+        QQmlApplicationEngine engine;
 
-		//QByteArray helloFromAgIO( 0x80, 0x81, 0x7F, 200, 3, 56, 0, 0, 0x47 );
         QByteArray helloFromAgIO = QByteArray::fromRawData("\x80\x81\x7F\xC8\x03\x38\x00\x00\x47", 9);
 
 
@@ -192,7 +187,6 @@ class FormLoop : public QObject
 		QString rawBuffer = 0;
 
 		QStringList words;
-		//QString words;
 		QString nextNMEASentence = 0;
 
 		bool isNMEAToSend = false;
@@ -277,7 +271,6 @@ class FormLoop : public QObject
 
         QTcpSocket *clientSocket; //server connection   line 21
         QByteArray casterRecBuffer; //received data buffer
-        //casterRecBuffer(2800); don't know if this is right yet
 
         QByteArray trip;
 
@@ -296,15 +289,10 @@ class FormLoop : public QObject
 		int toUDP_Port = 0;
 		int NTRIP_Watchdog = 100;
 
-		/*
-		   internal SerialPort spRadio = new SerialPort("Radio", 9600, Parity.None, 8, StopBits.One);
-		   */
-		
 		   QList<int> rList;
 		   QList<int> aList;
 
 		//NTRIP metering
-		//Queue<byte> rawTrip = new Queue<byte>();
 		QQueue<quint8> rawTrip;
 
 		QString sbGGA; //string builder
