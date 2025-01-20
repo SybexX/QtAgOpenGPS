@@ -51,17 +51,71 @@ Item {
 		property int decimals: spinBox_Customized.decimals
 		anchors.horizontalCenter: parent.horizontalCenter
 		anchors.verticalCenter: parent.verticalCenter
-		height: 30 * theme.scaleHeight
-		width: 100 * theme.scaleWidth
+        height: 40 * theme.scaleHeight
+        width: 150 * theme.scaleWidth
 
 		Keys.onReturnPressed: {
 			//console.debug("enter was pressed.  ignore it.")
 		}
-		contentItem: TextInput {
-			id: text_input
-			text: parent.value
-		}
 
+        contentItem: TextInput {
+            id: text_input
+            text: spinner.textFromValue(spinner.value, spinner.locale)
+            font: spinner.font
+            color: "black"
+            horizontalAlignment: Qt.AlignHCenter
+            verticalAlignment: Qt.AlignVCenter
+            anchors.horizontalCenter: spinner.horizontalCenter
+            anchors.verticalCenter: spinner.verticalCenter
+            readOnly: !spinner.editable
+            validator: spinner.validator
+            inputMethodHints: Qt.ImhFormattedNumbersOnly
+            anchors.right: up.indicator.left
+            anchors.left: up.indicator.right
+        }
+
+        up.indicator: Rectangle {
+            x: spinner.mirrored ? 0 : parent.width - width
+            height: parent.height
+            implicitHeight: 40 * theme.scaleHeight
+            implicitWidth: 40 * theme.scaleWidth
+            color: spinner.up.pressed ? "#yellow" : "#f6f6f6"
+            border.color: enabled ? "darkgray" : "lightgray"
+
+            Text {
+                text: "+"
+                font.pixelSize: spinner.font.pixelSize * 2
+                color: "black"
+                anchors.fill: parent
+                fontSizeMode: Text.Fit
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+        }
+
+        down.indicator: Rectangle {
+            x: spinner.mirrored ? parent.width - width : 0
+            height: parent.height
+            implicitHeight: 40 * theme.scaleHeight
+            implicitWidth: 40 * theme.scaleWidth
+            color: spinner.down.pressed ? "#yellow" : "#f6f6f6"
+            border.color: enabled ? "darkgray" : "lightgray"
+
+            Text {
+                text: "–"
+                font.pixelSize: spinner.font.pixelSize * 2
+                color: "black"
+                anchors.fill: parent
+                fontSizeMode: Text.Fit
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+        }
+        background: Rectangle {
+            implicitHeight: 40 * theme.scaleHeight
+            implicitWidth: 150 * theme.scaleWidth
+            border.color: "darkgray"
+        }
 		onValueModified: {
 			//this only fires when the user interactively changes the spinbox.
 
