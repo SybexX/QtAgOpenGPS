@@ -12,7 +12,7 @@ import "../components"
 MoveablePopup {
 	id: steerConfigWindow
     closePolicy: Popup.NoAutoClose
-    height: 475 * theme.scaleHeight
+    height: pwmWindow.visible ? 700 * theme.scaleHeight : 500 * theme.scaleHeight
     modal: false
     visible: false
     width:400 * theme.scaleWidth
@@ -321,7 +321,7 @@ MoveablePopup {
                 MouseArea{
                     id: angleInfoMouse
                     anchors.fill: parent
-                    onClicked: steerConfigSettings.show()
+                    onClicked: pwmWindow.visible = !pwmWindow.visible
 
                 }
                 RowLayout{
@@ -360,18 +360,15 @@ MoveablePopup {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 8 * theme.scaleHeight
             anchors.left: steerSlidersConfig.left
-            anchors.leftMargin: 8 * theme.scaleWidth
-            anchors.rightMargin: 8 * theme.scaleWidth
             anchors.top: steerSlidersConfig.bottom
             anchors.topMargin: 8 * theme.scaleHeight
             visible: false
             width: steerSlidersConfig.width
+            height: children
             RowLayout{
                 id: pwmRow
                 anchors.bottomMargin: 10 * theme.scaleHeight
                 anchors.left: parent.left
-                anchors.leftMargin: 10 * theme.scaleWidth
-                anchors.rightMargin: 10 * theme.scaleWidth
                 anchors.top: parent.top
                 anchors.topMargin: 10 * theme.scaleHeight
                 height: 50 * theme.scaleHeight
@@ -383,7 +380,7 @@ MoveablePopup {
                     icon.source: prefix + "/images/SteerDriveOff.png"
                     iconChecked: prefix + "/images/SteerDriveOn.png"
                     implicitHeight: parent.height
-                    implicitWidth: parent.width/4
+                    implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                     isChecked: false
                 }
                 IconButton{
@@ -391,14 +388,14 @@ MoveablePopup {
                     color3: "white"
                     icon.source: prefix + "/images/SnapLeft.png"
                     implicitHeight: parent.height
-                    implicitWidth: parent.width/4
+                    implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                 }
                 IconButton{
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SnapRight.png"
                     implicitHeight: parent.height
-                    implicitWidth: parent.width/4
+                    implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                 }
                 IconButton{
                     border: 2
@@ -406,7 +403,7 @@ MoveablePopup {
                     icon.source: prefix + "/images/SteerZeroSmall.png"
                     id: pwmZero
                     implicitHeight: parent.height
-                    implicitWidth: parent.width/4
+                    implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                 }
             }
             Text{
