@@ -132,6 +132,7 @@ Item {
     property double steerAngleSet: 0
     property double steerAngleSetRounded: 0
     property double steerAngleActualRounded: 0
+    property double lblCalcSteerAngleInner: 0
     property double rawHz:0
     property double hz:0
     property double droppedSentences: 0

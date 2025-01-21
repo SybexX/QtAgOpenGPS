@@ -1239,6 +1239,7 @@ void FormGPS::UpdateFixPosition()
     aog->setProperty("steerAngleSet", vehicle.guidanceLineSteerAngle);
     aog->setProperty("droppedSentences", udpWatchCounts);
     aog->setProperty("lblPWMDisplay", mc.pwmDisplay);
+    aog->setProperty("lblCalcSteerAngleInner", vehicle.driveFreeSteerAngle);
 
     //TODO: access this in QML directly from trk.howManyPathsAway property
     aog->setProperty("current_trackNum", trk.getHowManyPathsAway());

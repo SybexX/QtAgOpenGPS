@@ -655,16 +655,40 @@ void FormGPS::onBtnLateral_clicked(bool right)
 }
 
 void FormGPS::btnSteerAngleUp_clicked(){
+    vehicle.driveFreeSteerAngle++;
+    if (vehicle.driveFreeSteerAngle > 40) vehicle.driveFreeSteerAngle = 40;
+
     qDebug()<<"btnSteerAngleUp_clicked";
 }
 void FormGPS::btnSteerAngleDown_clicked(){
+    vehicle.driveFreeSteerAngle--;
+    if (vehicle.driveFreeSteerAngle < -40) vehicle.driveFreeSteerAngle = -40;
+
     qDebug()<<"btnSteerAngleDown_clicked";
 }
 void FormGPS::btnFreeDrive_clicked(){
-    //vehicle.isInFreeDriveMode = !vehicle.isInFreeDriveMode;
+
+
+    if (vehicle.isInFreeDriveMode)
+    {
+        //turn OFF free drive mode
+        vehicle.isInFreeDriveMode = false;
+        vehicle.driveFreeSteerAngle = 0;
+    }
+    else
+    {
+        //turn ON free drive mode
+        vehicle.isInFreeDriveMode = true;
+        vehicle.driveFreeSteerAngle = 0;
+    }
+
     qDebug()<<"btnFreeDrive_clicked";
 }
 void FormGPS::btnFreeDriveZero_clicked(){
+    if (vehicle.driveFreeSteerAngle == 0)
+        vehicle.driveFreeSteerAngle = 5;
+    else vehicle.driveFreeSteerAngle = 0;
+
     qDebug()<<"btnFreeDriveZero_clicked";
 }
 void FormGPS::btnStartSA_clicked(){

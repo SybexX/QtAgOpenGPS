@@ -374,7 +374,7 @@ MoveablePopup {
                 height: 50 * theme.scaleHeight
                 width: parent.width
                 IconButton{
-                    //id: btnFreeDrive
+                    id: btnFreeDrive
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SteerDriveOff.png"
@@ -382,6 +382,7 @@ MoveablePopup {
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                     isChecked: false
+                    checkable: true
                     onClicked: aog.btnFreeDrive()
                 }
                 IconButton{
@@ -392,6 +393,7 @@ MoveablePopup {
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                     onClicked: aog.btnSteerAngleDown()
+                    enabled: btnFreeDrive.checked
                 }
                 IconButton{
                     //id: btnSteerAngleUp
@@ -401,6 +403,7 @@ MoveablePopup {
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                     onClicked: aog.btnSteerAngleUp()
+                    enabled: btnFreeDrive.checked
                 }
                 IconButton{
                     //id: btnFreeDriveZero
@@ -425,7 +428,7 @@ MoveablePopup {
                 text: qsTr("0r +5")
             }
             IconButton{
-                //id: btnStartSA
+                id: btnStartSA
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 border: 2
@@ -440,7 +443,7 @@ MoveablePopup {
             Text{
                 anchors.top: btnStartSA.top
                 anchors.left: btnStartSA.right
-                //text: qsTr("Steer Angle: "+ aog.lblCalcSteerAngleInner)
+                text: qsTr("Steer Angle: "+ aog.lblCalcSteerAngleInner)
                 Layout.alignment: Qt.AlignCenter
             }
             Text{
