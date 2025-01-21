@@ -25,8 +25,8 @@ Slider{
     leftPadding: leftInset
     rightInset: rightText.textWidth
     rightPadding: rightInset
-    implicitHeight: 75
-    implicitWidth: 200
+    implicitHeight: 50 * theme.scaleHeight
+    implicitWidth: 250 * theme.scaleWidth
 
     /*As was noted on the Qt forum, the text is still part of
       the clickable area, the idea is catcher will catch those
@@ -46,14 +46,7 @@ Slider{
         id: backgroundRect
         x: parent.leftPadding
         y: parent.topPadding + parent.availableHeight / 2 - height / 2
-    /*    anchors.left: parent.left
-        anchors.leftMargin: leftText.width
-        anchors.top: parent.top
-        anchors.topMargin: topText.height
-        anchors.right: parent.right
-        anchors.rightMargin: rightText.width
-        anchors.bottom: parent.bottom
-     */   radius: 2
+        radius: 2
         color: "white"
 
 
@@ -63,7 +56,7 @@ Slider{
         id: handleRect
         height: backgroundRect.height - 4
         radius: 2
-        width: 12
+        width: 40 * theme.scaleWidth
         visible: true
         color: "lightgray"
         x: parent.leftPadding + parent.visualPosition * (parent.availableWidth - width)
@@ -76,16 +69,24 @@ Slider{
         anchors.left: handleRect.right
         anchors.top: backgroundRect.top
         anchors.bottom: backgroundRect.bottom
-        width: 20
+        //width: 20
         onClicked: sliderCustomized.value = sliderCustomized.value + sliderCustomized.stepSize * multiplicationValue
-        background: Rectangle{
-            color: "transparent"
-            Text{
+        background: Rectangle {
+            height: parent.height
+            implicitHeight: 40 * theme.scaleHeight
+            implicitWidth: 40 * theme.scaleWidth
+            border.color: enabled ? "darkgray" : "lightgray"
+
+            Text {
+                text: "+"
+                font.pixelSize: sliderCustomized.font.pixelSize * 1.5
+                color: "black"
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
-                text: ">"
-                color: sliderCustomized.enabled ? "black" : "grey"
-
+                anchors.rightMargin: 5 * theme.scaleWidth
+                fontSizeMode: Text.Fit
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
             }
         }
 
@@ -97,13 +98,23 @@ Slider{
         anchors.top: backgroundRect.top
         onClicked: sliderCustomized.value = sliderCustomized.value - sliderCustomized.stepSize * multiplicationValue
         anchors.bottom: backgroundRect.bottom
-        width: 20
-        background: Rectangle{
-            Text{
+        //width: 20
+        background: Rectangle {
+            height: parent.height
+            implicitHeight: 40 * theme.scaleHeight
+            implicitWidth: 40 * theme.scaleWidth
+            border.color: enabled ? "darkgray" : "lightgray"
+
+            Text {
+                text: "–"
+                font.pixelSize: sliderCustomized.font.pixelSize * 1.5
+                color: "black"
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
-                text: "<"
-                color: sliderCustomized.enabled ? "black" : "grey"
+                anchors.leftMargin: 5 * theme.scaleWidth
+                fontSizeMode: Text.Fit
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
             }
         }
     }

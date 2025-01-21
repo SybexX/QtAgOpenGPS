@@ -144,7 +144,7 @@ Item {
 
     onSteerAngleActualChanged: steerAngleActualRounded = Number(Math.round(steerAngleActual)).toLocaleString(Qt.locale(), 'f', 1)
     onSteerAngleSetChanged: steerAngleSetRounded = Number(Math.round((steerAngleSet) * .01)).toLocaleString(Qt.locale(), 'f', 1)
-
+    property int lblPWMDisplay: 0
     property point vehicle_xy: Qt.point(0,0)
     property rect vehicle_bounding_box: Qt.rect(0,0,0,0)
 
