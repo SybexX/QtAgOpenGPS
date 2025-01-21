@@ -382,30 +382,37 @@ MoveablePopup {
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                     isChecked: false
+                    checkable: true
+                    onClicked: aog.btnFreeDrive()
                 }
                 IconButton{
-                    id: btnSteerAngleDown
+                    //id: btnSteerAngleDown
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SnapLeft.png"
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
+                    onClicked: aog.btnSteerAngleDown()
+                    enabled: btnFreeDrive.checked
                 }
                 IconButton{
-                    id: btnSteerAngleUp
+                    //id: btnSteerAngleUp
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SnapRight.png"
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
+                    onClicked: aog.btnSteerAngleUp()
+                    enabled: btnFreeDrive.checked
                 }
                 IconButton{
-                    id: btnFreeDriveZero
+                    //id: btnFreeDriveZero
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SteerZeroSmall.png"
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
+                    onClicked: aog.btnFreeDriveZero()
                 }
             }
             Text{
@@ -431,17 +438,18 @@ MoveablePopup {
                 iconChecked: prefix + "/images/Stop.png"
                 isChecked: false
                 width: 75 * theme.scaleWidth
+                onClicked: aog.btnStartSA()
             }
             Text{
                 anchors.top: btnStartSA.top
                 anchors.left: btnStartSA.right
-                text: qsTr("Steer Angle: + aog.lblCalcSteerAngleInner")
+                text: qsTr("Steer Angle: "+ aog.lblCalcSteerAngleInner)
                 Layout.alignment: Qt.AlignCenter
             }
             Text{
                 anchors.bottom: btnStartSA.bottom
                 anchors.left: btnStartSA.right
-                text: qsTr("Set:  + aog.lblDiameter")
+                //text: qsTr("Set: " + aog.lblDiameter)
                 Layout.alignment: Qt.AlignCenter
             }
         }

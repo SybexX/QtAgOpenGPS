@@ -132,6 +132,7 @@ Item {
     property double steerAngleSet: 0
     property double steerAngleSetRounded: 0
     property double steerAngleActualRounded: 0
+    property double lblCalcSteerAngleInner: 0
     property double rawHz:0
     property double hz:0
     property double droppedSentences: 0
@@ -222,6 +223,12 @@ Item {
     signal sim_reset()
     signal sim_rotate()
     signal reset_direction()
+
+    signal btnSteerAngleUp()
+    signal btnSteerAngleDown()
+    signal btnFreeDrive()
+    signal btnFreeDriveZero()
+    signal btnStartSA()
 
     signal centerOgl()
 
