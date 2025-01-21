@@ -374,7 +374,7 @@ MoveablePopup {
                 height: 50 * theme.scaleHeight
                 width: parent.width
                 IconButton{
-                    id: pwmSteer
+                    id: btnFreeDrive
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SteerDriveOff.png"
@@ -384,6 +384,7 @@ MoveablePopup {
                     isChecked: false
                 }
                 IconButton{
+                    id: btnSteerAngleDown
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SnapLeft.png"
@@ -391,6 +392,7 @@ MoveablePopup {
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                 }
                 IconButton{
+                    id: btnSteerAngleUp
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SnapRight.png"
@@ -398,10 +400,10 @@ MoveablePopup {
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                 }
                 IconButton{
+                    id: btnFreeDriveZero
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SteerZeroSmall.png"
-                    id: pwmZero
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                 }
@@ -409,7 +411,7 @@ MoveablePopup {
             Text{
                 anchors.left: pwmRow.left
                 anchors.top: pwmRow.bottom
-                text: qsTr("PWM: ")
+                text: qsTr("PWM: "+ aog.lblPWMDisplay)
             }
             Text{
                 anchors.right: pwmRow.right
@@ -419,7 +421,7 @@ MoveablePopup {
                 text: qsTr("0r +5")
             }
             IconButton{
-                id: steerRecord
+                id: btnStartSA
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 border: 2
@@ -431,14 +433,16 @@ MoveablePopup {
                 width: 75 * theme.scaleWidth
             }
             Text{
-                anchors.top: steerRecord.top
-                anchors.left: steerRecord.right
-                text: qsTr("Steer Angle: ")
+                anchors.top: btnStartSA.top
+                anchors.left: btnStartSA.right
+                text: qsTr("Steer Angle: + aog.lblCalcSteerAngleInner")
+                Layout.alignment: Qt.AlignCenter
             }
             Text{
-                anchors.bottom: steerRecord.bottom
-                anchors.left: steerRecord.right
-                text: qsTr("Diameter: ")
+                anchors.bottom: btnStartSA.bottom
+                anchors.left: btnStartSA.right
+                text: qsTr("Set:  + aog.lblDiameter")
+                Layout.alignment: Qt.AlignCenter
             }
         }
     }
