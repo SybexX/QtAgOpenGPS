@@ -70,8 +70,6 @@ Item {
             readOnly: !spinner.editable
             validator: spinner.validator
             inputMethodHints: Qt.ImhFormattedNumbersOnly
-            anchors.right: up.indicator.left
-            anchors.left: up.indicator.right
         }
 
         up.indicator: Rectangle {

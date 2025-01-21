@@ -223,6 +223,12 @@ Item {
     signal sim_rotate()
     signal reset_direction()
 
+    signal btnSteerAngleUp()
+    signal btnSteerAngleDown()
+    signal btnFreeDrive()
+    signal btnFreeDriveZero()
+    signal btnStartSA()
+
     signal centerOgl()
 
     signal deleteAppliedArea();

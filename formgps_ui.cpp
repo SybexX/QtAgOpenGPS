@@ -252,6 +252,12 @@ void FormGPS::setupGui()
     connect(aog, SIGNAL(sim_zero_speed()), &sim, SLOT(speed_zero()));
     connect(aog, SIGNAL(sim_reset()), &sim, SLOT(reset()));
 
+    connect(aog, SIGNAL(btnSteerAngleUp()), this, SLOT(btnSteerAngleUp_clicked()));
+    connect(aog, SIGNAL(btnSteerAngleDown()), this, SLOT(btnSteerAngleDown_clicked()));
+    connect(aog, SIGNAL(btnFreeDrive()), this, SLOT(btnFreeDrive_clicked()));
+    connect(aog, SIGNAL(btnFreeDriveZero()), this, SLOT(btnFreeDriveZero_clicked()));
+    connect(aog, SIGNAL(btnStartSA()), this, SLOT(btnStartSA_clicked()));
+
     //boundary signals and slots
     connect(&yt, SIGNAL(outOfBounds()),boundaryInterface,SLOT(setIsOutOfBoundsTrue()));
     connect(boundaryInterface, SIGNAL(calculate_area()), this, SLOT(boundary_calculate_area()));
@@ -646,6 +652,23 @@ void FormGPS::onBtnManUTurn_clicked(bool right)
 void FormGPS::onBtnLateral_clicked(bool right)
 {
    yt.BuildManualYouLateral(right, vehicle, trk);
+}
+
+void FormGPS::btnSteerAngleUp_clicked(){
+    qDebug()<<"btnSteerAngleUp_clicked";
+}
+void FormGPS::btnSteerAngleDown_clicked(){
+    qDebug()<<"btnSteerAngleDown_clicked";
+}
+void FormGPS::btnFreeDrive_clicked(){
+    //vehicle.isInFreeDriveMode = !vehicle.isInFreeDriveMode;
+    qDebug()<<"btnFreeDrive_clicked";
+}
+void FormGPS::btnFreeDriveZero_clicked(){
+    qDebug()<<"btnFreeDriveZero_clicked";
+}
+void FormGPS::btnStartSA_clicked(){
+    qDebug()<<"btnStartSA_clicked";
 }
 
 void FormGPS::TimedMessageBox(int timeout, QString s1, QString s2)

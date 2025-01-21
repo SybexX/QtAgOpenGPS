@@ -374,7 +374,7 @@ MoveablePopup {
                 height: 50 * theme.scaleHeight
                 width: parent.width
                 IconButton{
-                    id: btnFreeDrive
+                    //id: btnFreeDrive
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SteerDriveOff.png"
@@ -382,30 +382,34 @@ MoveablePopup {
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
                     isChecked: false
+                    onClicked: aog.btnFreeDrive()
                 }
                 IconButton{
-                    id: btnSteerAngleDown
+                    //id: btnSteerAngleDown
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SnapLeft.png"
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
+                    onClicked: aog.btnSteerAngleDown()
                 }
                 IconButton{
-                    id: btnSteerAngleUp
+                    //id: btnSteerAngleUp
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SnapRight.png"
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
+                    onClicked: aog.btnSteerAngleUp()
                 }
                 IconButton{
-                    id: btnFreeDriveZero
+                    //id: btnFreeDriveZero
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SteerZeroSmall.png"
                     implicitHeight: parent.height
                     implicitWidth:  parent.width /4 - 4 * theme.scaleWidth
+                    onClicked: aog.btnFreeDriveZero()
                 }
             }
             Text{
@@ -421,7 +425,7 @@ MoveablePopup {
                 text: qsTr("0r +5")
             }
             IconButton{
-                id: btnStartSA
+                //id: btnStartSA
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 border: 2
@@ -431,17 +435,18 @@ MoveablePopup {
                 iconChecked: prefix + "/images/Stop.png"
                 isChecked: false
                 width: 75 * theme.scaleWidth
+                onClicked: aog.btnStartSA()
             }
             Text{
                 anchors.top: btnStartSA.top
                 anchors.left: btnStartSA.right
-                text: qsTr("Steer Angle: + aog.lblCalcSteerAngleInner")
+                //text: qsTr("Steer Angle: "+ aog.lblCalcSteerAngleInner)
                 Layout.alignment: Qt.AlignCenter
             }
             Text{
                 anchors.bottom: btnStartSA.bottom
                 anchors.left: btnStartSA.right
-                text: qsTr("Set:  + aog.lblDiameter")
+                //text: qsTr("Set: " + aog.lblDiameter)
                 Layout.alignment: Qt.AlignCenter
             }
         }

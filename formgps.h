@@ -785,6 +785,12 @@ public slots:
 
     void onDeleteAppliedArea_clicked();
 
+    void btnSteerAngleUp_clicked(); // steersetup
+    void btnSteerAngleDown_clicked();
+    void btnFreeDrive_clicked();
+    void btnFreeDriveZero_clicked();
+    void btnStartSA_clicked();
+
     /***************************
      * from OpenGL.Designer.cs *
      ***************************/
