@@ -39,6 +39,13 @@ Window{
                 onCheckedChanged: agio.ntripDebug(ckNtripDebug.checkState)
                 Layout.alignment: Qt.AlignRight
             }
+            Comp.CheckBoxCustomized {
+                id: ckBluetoothDebug
+                text: "Console Bluetooth Debug"
+                checked: false
+                onCheckedChanged: agio.bluetoothDebug(ckBluetoothDebug.checkState)
+                Layout.alignment: Qt.AlignLeft
+            }
         }
     }
 }
