@@ -126,7 +126,7 @@ public:
     int flagNumberPicked = 0;
 
     //bool for whether or not a job is active
-    bool /*isJobStarted = false,*/ isAreaOnRight = true /*, isAutoSteerBtnOn = false*/;
+    bool /*isJobStarted = false,*/ isAreaOnRight = true /*, isBtnAutoSteerOn = false*/;
 
     //this bool actually lives in the QML aog object.
     InterfaceProperty<AOGInterface,bool> isJobStarted = InterfaceProperty<AOGInterface,bool>("isJobStarted");
