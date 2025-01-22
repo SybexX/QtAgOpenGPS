@@ -9,7 +9,6 @@ To do
     Anyone working on this, please keep your branch up-do-date with David's "dev" branch,
     as he will be working on this in there
 
-5. Add "Auto reconnect" to UDP code in QtAgIO.
 7. Finish the reset logic in 'reset_all' in SteerConfigSettings.qml
 9. Trams
 

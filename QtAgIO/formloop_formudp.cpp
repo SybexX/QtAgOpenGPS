@@ -260,6 +260,7 @@ void FormLoop::btnSendSubnet_Click()
                 }
             }
         }
+        RestartUDPSocket();
     }
 
     /*property_setUDP_IP1 = ipCurrent[0] = ipNew[0];
