@@ -307,7 +307,6 @@ void FormLoop::RestartUDPSocket(){
         if(udpSocket)
             udpSocket->close();
 
-        //if(property_setUDP_isOn)
         LoadUDPNetwork();
     });
 }
