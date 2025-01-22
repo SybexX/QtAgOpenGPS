@@ -10,7 +10,7 @@ BluetoothManager::~BluetoothManager(){
 }
 void BluetoothManager::startBluetoothDiscovery(){
 
-    qDebug() << "starting disc";
+    if(consoleDebug) qDebug() << "starting bluetooth discovery";
     //empty device list
     formLoop->btDevicesList->clear();
 
@@ -36,15 +36,14 @@ void BluetoothManager::deviceDiscovered(const QBluetoothDeviceInfo &device)
 
     deviceList = property_setBluetooth_deviceList.value().toStringList();
 
-    qDebug() << device.name();
     if(devicesUserWants.contains(device.name())){
-        qDebug() << "Bluetooth Device usr found!";
+        if(consoleDebug) qDebug() << "Bluetooth Device usr found!";
         connectToDevice(device);
         return;
     }
 
     if(deviceList.contains(device.name())){
-        qDebug() << "Bluetooth Device found!";
+        if(consoleDebug) qDebug() << "Bluetooth Device found!";
         connectToDevice(device);
         return;
     }
@@ -61,8 +60,10 @@ void BluetoothManager::connectToDevice(const QBluetoothDeviceInfo &device){
     // it's cleared
     connectedDeviceName = device.name();
 
-    qDebug() << "Attempting to connect to ";
-    qDebug() << connectedDeviceName;
+    if(consoleDebug){
+        qDebug() << "Attempting to connect to ";
+        qDebug() << connectedDeviceName;
+    }
 
     deviceConnecting = true;
 
@@ -89,7 +90,7 @@ void BluetoothManager::connected(){
 
     formLoop->agio->setProperty("connectedBTDevices", connectedDeviceName);
 
-    qDebug() << "Waiting for incoming data...";
+    if(consoleDebug) qDebug() << "Waiting for incoming data...";
 }
 void BluetoothManager::disconnected(){
 
@@ -113,7 +114,6 @@ void BluetoothManager::disconnected(){
 
 void BluetoothManager::readData(){
     QByteArray data = socket->readAll();
-    qDebug() << "Received data: " << data;
     rawBuffer += QString::fromLatin1(data);
     formLoop->ParseNMEA(rawBuffer);
 }
@@ -127,29 +127,29 @@ void BluetoothManager::onSocketErrorOccurred(QBluetoothSocket::SocketError error
     // Handle different error cases
     switch (error) {
     case QBluetoothSocket::SocketError::HostNotFoundError:
-        qDebug() << "Error: Host not found for device" << connectedDeviceName;
+        if(consoleDebug) qDebug() << "Error: Host not found for device" << connectedDeviceName;
         //this is because a paired device that is not connected will show up as an available device
         //when "searching" for devices
         devicesNotAvailable.append(connectedDeviceName);
         socket->disconnectFromService();
         break;
     case QBluetoothSocket::SocketError::ServiceNotFoundError:
-        qDebug() << "Error: Service not found for device" << connectedDeviceName;
+        if(consoleDebug) qDebug() << "Error: Service not found for device" << connectedDeviceName;
         break;
     case QBluetoothSocket::SocketError::NetworkError:
-        qDebug() << "Error: Network error occurred while communicating with" << connectedDeviceName;
+        if(consoleDebug) qDebug() << "Error: Network error occurred while communicating with" << connectedDeviceName;
         break;
     case QBluetoothSocket::SocketError::OperationError:
-        qDebug() << "Error: Operation error occurred for device" << connectedDeviceName;
+        if(consoleDebug) qDebug() << "Error: Operation error occurred for device" << connectedDeviceName;
         break;
     default:
-        qDebug() << "Error: Unknown error occurred for device" << connectedDeviceName << "Error code:" << error;
+        if(consoleDebug) qDebug() << "Error: Unknown error occurred for device" << connectedDeviceName << "Error code:" << error;
     }
 }
 
 void BluetoothManager::userConnectBluetooth(const QString &device){
     devicesUserWants.append(device);
-    qDebug() << devicesUserWants;
+    if(consoleDebug) qDebug() << devicesUserWants;
     startBluetoothDiscovery();
 }
 
@@ -166,4 +166,8 @@ void BluetoothManager::userRemoveDevice(const QString &device){
 void BluetoothManager::kill(){
     socket->disconnectFromService();
     property_setBluetooth_isOn = false;
+}
+
+void BluetoothManager::bluetooth_console_debug(bool doWeDebug){
+    consoleDebug = doWeDebug;
 }
