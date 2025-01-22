@@ -252,6 +252,12 @@ void FormGPS::setupGui()
     connect(aog, SIGNAL(sim_zero_speed()), &sim, SLOT(speed_zero()));
     connect(aog, SIGNAL(sim_reset()), &sim, SLOT(reset()));
 
+    connect(aog, SIGNAL(btnSteerAngleUp()), this, SLOT(btnSteerAngleUp_clicked()));
+    connect(aog, SIGNAL(btnSteerAngleDown()), this, SLOT(btnSteerAngleDown_clicked()));
+    connect(aog, SIGNAL(btnFreeDrive()), this, SLOT(btnFreeDrive_clicked()));
+    connect(aog, SIGNAL(btnFreeDriveZero()), this, SLOT(btnFreeDriveZero_clicked()));
+    connect(aog, SIGNAL(btnStartSA()), this, SLOT(btnStartSA_clicked()));
+
     //boundary signals and slots
     connect(&yt, SIGNAL(outOfBounds()),boundaryInterface,SLOT(setIsOutOfBoundsTrue()));
     connect(boundaryInterface, SIGNAL(calculate_area()), this, SLOT(boundary_calculate_area()));
@@ -646,6 +652,47 @@ void FormGPS::onBtnManUTurn_clicked(bool right)
 void FormGPS::onBtnLateral_clicked(bool right)
 {
    yt.BuildManualYouLateral(right, vehicle, trk);
+}
+
+void FormGPS::btnSteerAngleUp_clicked(){
+    vehicle.driveFreeSteerAngle++;
+    if (vehicle.driveFreeSteerAngle > 40) vehicle.driveFreeSteerAngle = 40;
+
+    qDebug()<<"btnSteerAngleUp_clicked";
+}
+void FormGPS::btnSteerAngleDown_clicked(){
+    vehicle.driveFreeSteerAngle--;
+    if (vehicle.driveFreeSteerAngle < -40) vehicle.driveFreeSteerAngle = -40;
+
+    qDebug()<<"btnSteerAngleDown_clicked";
+}
+void FormGPS::btnFreeDrive_clicked(){
+
+
+    if (vehicle.isInFreeDriveMode)
+    {
+        //turn OFF free drive mode
+        vehicle.isInFreeDriveMode = false;
+        vehicle.driveFreeSteerAngle = 0;
+    }
+    else
+    {
+        //turn ON free drive mode
+        vehicle.isInFreeDriveMode = true;
+        vehicle.driveFreeSteerAngle = 0;
+    }
+
+    qDebug()<<"btnFreeDrive_clicked";
+}
+void FormGPS::btnFreeDriveZero_clicked(){
+    if (vehicle.driveFreeSteerAngle == 0)
+        vehicle.driveFreeSteerAngle = 5;
+    else vehicle.driveFreeSteerAngle = 0;
+
+    qDebug()<<"btnFreeDriveZero_clicked";
+}
+void FormGPS::btnStartSA_clicked(){
+    qDebug()<<"btnStartSA_clicked";
 }
 
 void FormGPS::TimedMessageBox(int timeout, QString s1, QString s2)

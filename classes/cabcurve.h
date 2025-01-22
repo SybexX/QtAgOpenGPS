@@ -101,7 +101,7 @@ public:
 
     void GetCurrentCurveLine(Vec3 pivot,
                              Vec3 steer,
-                             bool isAutoSteerBtnOn,
+                             bool isBtnAutoSteerOn,
                              CVehicle &vehicle,
                              CTrk &track,
                              CYouTurn &yt,

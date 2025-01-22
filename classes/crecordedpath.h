@@ -98,7 +98,7 @@ public:
 
     explicit CRecordedPath(QObject *parent = 0);
     bool StartDrivingRecordedPath(CVehicle &vehicle, const CYouTurn &yt);
-    void UpdatePosition(CVehicle &vehicle, const CYouTurn &yt, bool isAutoSteerBtnOn);
+    void UpdatePosition(CVehicle &vehicle, const CYouTurn &yt, bool isBtnAutoSteerOn);
     void StopDrivingRecordedPath();
     void GetDubinsPath(CVehicle &vehicle, Vec3 goal, const CYouTurn &yt);
     void PurePursuitRecPath(CVehicle &vehicle, int ptCount);

@@ -37,7 +37,7 @@ ColumnLayout {
                 if(btnContourLock.isContourLockedByUser)
                     btnContourLock.isContourLockedByUser = false
             }
-            function onIsAutoSteerBtnOnChanged() {
+            function onIsBtnAutoSteerOnChanged() {
                 if (!btnContourLock.isContourLockedByUser && btnContour.checked === true){
                     if(btnContourLock.checked !== aog.isBtnAutoSteerOn){
                         aog.btnContourLock()
@@ -159,7 +159,7 @@ ColumnLayout {
         }
         Connections {
             target: aog
-            function onIsAutoSteerBtnOnChanged() {
+            function onIsBtnAutoSteerOnChanged() {
                 //TODO: use track interface in trk
                 if (aog.isBtnAutoSteerOn && ((aog.currentABCurve > -1) || (aog.currentABLine > -1))) {
                     btnAutoSteer.checked = true

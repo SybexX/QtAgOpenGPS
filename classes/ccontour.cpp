@@ -287,7 +287,7 @@ void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehi
 
 }
 
-void CContour::DistanceFromContourLine(bool isAutoSteerBtnOn,
+void CContour::DistanceFromContourLine(bool isBtnAutoSteerOn,
                                        CVehicle &vehicle,
                                        CYouTurn &yt,
                                        CAHRS &ahrs,
@@ -459,7 +459,7 @@ void CContour::DistanceFromContourLine(bool isAutoSteerBtnOn,
 
                 //pivotErrorTotal = pivotDistanceError + pivotDerivative;
 
-                if (isAutoSteerBtnOn
+                if (isBtnAutoSteerOn
                     && fabs(pivotDerivative) < (0.1)
                     && vehicle.avgSpeed > 2.5
                     && !yt.isYouTurnTriggered)

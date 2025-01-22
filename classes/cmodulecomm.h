@@ -45,7 +45,7 @@ public:
     bool workSwitchHigh, oldWorkSwitchHigh, steerSwitchHigh, oldSteerSwitchHigh, oldSteerSwitchRemote;
 
     explicit CModuleComm(QObject *parent = 0);
-    void CheckWorkAndSteerSwitch(CAHRS &ahrs, bool isAutoSteerBtnOn);
+    void CheckWorkAndSteerSwitch(CAHRS &ahrs, bool isBtnAutoSteerOn);
 signals:
     void stopAutoSteer(void);
     void turnOffManulSections(void);

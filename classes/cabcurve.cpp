@@ -645,7 +645,7 @@ void CABCurve::BuildNewCurveAsync(double distAway,
 
 void CABCurve::GetCurrentCurveLine(Vec3 pivot,
                                    Vec3 steer,
-                                   bool isAutoSteerBtnOn,
+                                   bool isBtnAutoSteerOn,
                                    CVehicle &vehicle,
                                    CTrk &track,
                                    CYouTurn &yt,
@@ -686,7 +686,7 @@ void CABCurve::GetCurrentCurveLine(Vec3 pivot,
         }
         else if (property_setVehicle_isStanleyUsed)//Stanley
         {
-            gyd.StanleyGuidanceCurve(pivot, steer, curList, isAutoSteerBtnOn, vehicle, *this, ahrs);
+            gyd.StanleyGuidanceCurve(pivot, steer, curList, isBtnAutoSteerOn, vehicle, *this, ahrs);
         }
         else// Pure Pursuit ------------------------------------------
         {
@@ -832,7 +832,7 @@ void CABCurve::GetCurrentCurveLine(Vec3 pivot,
 
                 //pivotErrorTotal = pivotDistanceError + pivotDerivative;
 
-                if (isAutoSteerBtnOn && vehicle.avgSpeed > 2.5 && fabs(pivotDerivative) < 0.1)
+                if (isBtnAutoSteerOn && vehicle.avgSpeed > 2.5 && fabs(pivotDerivative) < 0.1)
                 {
                     //if over the line heading wrong way, rapidly decrease integral
                     if ((inty < 0 && distanceFromCurrentLinePivot < 0) || (inty > 0 && distanceFromCurrentLinePivot > 0))
@@ -894,7 +894,7 @@ void CABCurve::GetCurrentCurveLine(Vec3 pivot,
 
             if (track.mode <= (int)TrackMode::Curve)
             {
-                if (isAutoSteerBtnOn && !vehicle.isReverse)
+                if (isBtnAutoSteerOn && !vehicle.isReverse)
                 {
                     if (isHeadingSameWay)
                     {

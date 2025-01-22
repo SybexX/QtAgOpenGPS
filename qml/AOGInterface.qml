@@ -71,7 +71,7 @@ Item {
 
     //loopbackConnected is true, unless the backend changes it to false
     onLoopbackConnectedChanged: closeAOG.open()
-//    onIsAutoSteerBtnOnChanged: {
+//    onIsBtnAutoSteerOnChanged: {
 //        console.debug("isBtnAutoSteerOn is now in aog inface " + isBtnAutoSteerOn)
 //    }
 
@@ -132,6 +132,7 @@ Item {
     property double steerAngleSet: 0
     property double steerAngleSetRounded: 0
     property double steerAngleActualRounded: 0
+    property double lblCalcSteerAngleInner: 0
     property double rawHz:0
     property double hz:0
     property double droppedSentences: 0
@@ -144,7 +145,7 @@ Item {
 
     onSteerAngleActualChanged: steerAngleActualRounded = Number(Math.round(steerAngleActual)).toLocaleString(Qt.locale(), 'f', 1)
     onSteerAngleSetChanged: steerAngleSetRounded = Number(Math.round((steerAngleSet) * .01)).toLocaleString(Qt.locale(), 'f', 1)
-
+    property int lblPWMDisplay: 0
     property point vehicle_xy: Qt.point(0,0)
     property rect vehicle_bounding_box: Qt.rect(0,0,0,0)
 
@@ -222,6 +223,12 @@ Item {
     signal sim_reset()
     signal sim_rotate()
     signal reset_direction()
+
+    signal btnSteerAngleUp()
+    signal btnSteerAngleDown()
+    signal btnFreeDrive()
+    signal btnFreeDriveZero()
+    signal btnStartSA()
 
     signal centerOgl()
 

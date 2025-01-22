@@ -111,7 +111,7 @@ public:
     void DrawTrackGoalPoint(QOpenGLFunctions *gl, const QMatrix4x4 &mvp);
 
     void BuildCurrentLine(Vec3 pivot,
-                          double secondsSinceStart, bool isAutoSteerbtnOn, int &makeUTurnCounter,
+                          double secondsSinceStart, bool isBtnAutoSteerOn, int &makeUTurnCounter,
                           CYouTurn &yt,
                           CVehicle &vehicle,
                           const CBoundary &bnd,

@@ -809,14 +809,6 @@ Window{
                 flow: Grid.TopToBottom
                 rows: 4
                 columns: 4
-                /*Column{
-                                 id: manualTurnsLimit
-                                 height: safety.height
-                                 width: 100 * theme.scaleWidth
-                                 spacing: 1 * theme.scaleHeight
-                                 onSpacingChanged: console.log("onSpacingChanged to " + spacing)
-                                 Layout.alignment: Qt.AlignTop
-                                 */
                 Text{ text: qsTr("Manual Turns Limit"); Layout.alignment: Qt.AlignCenter}
                 Image{
                     source: prefix + "/images/Config/con_VehicleFunctionSpeedLimit.png"
@@ -834,15 +826,7 @@ Window{
                     Layout.alignment: Qt.AlignCenter
                 }
                 Text{ text: qsTr(utils.speed_unit()); Layout.alignment: Qt.AlignCenter}
-                //}
-
-                /* Column{
-                                     id: minSpeed
-                                     width: 100 * theme.scaleWidth
-                                     height: safety.height
-                                     spacing: 1 * theme.scaleHeight
-                                     Layout.alignment: Qt.AlignTop
-                                     */   Text{ text: qsTr("Min AutoSteer Speed"); Layout.alignment: Qt.AlignCenter}
+                Text{ text: qsTr("Min AutoSteer Speed"); Layout.alignment: Qt.AlignCenter}
                 Image{
                     id: minAutoSteerImage
                     source: prefix + "/images/Config/ConV_MinAutoSteer.png"
@@ -860,14 +844,6 @@ Window{
                     Layout.alignment: Qt.AlignCenter
                 }
                 Text{ text: qsTr(utils.speed_unit()); Layout.alignment: Qt.AlignCenter}
-                /*}
-                                     Column{
-                                         id: maxSpeed
-                                         width: 100 * theme.scaleWidth
-                                         height: safety.height
-                                         spacing: 1 * theme.scaleHeight
-                                         Layout.alignment: Qt.AlignTop
-                                         */
                 Text{ text: qsTr("Max AutoSteer Speed"); Layout.alignment: Qt.AlignCenter}
                 Image{
                     id: maxAutoSteerImage
@@ -886,14 +862,7 @@ Window{
                     Layout.alignment: Qt.AlignCenter
                 }
                 Text{ text: qsTr(utils.speed_unit()); Layout.alignment: Qt.AlignCenter}
-                /* }
-                                         Column{
-                                             id: maxTurnRate
-                                             width: 100 * theme.scaleWidth
-                                             height: safety.height
-                                             spacing: 1 * theme.scaleHeight
-                                             Layout.alignment: Qt.AlignTop
-                                             */   Text{ text: qsTr("Max Turn Rate"); Layout.alignment: Qt.AlignCenter}
+                Text{ text: qsTr("Max Turn Rate"); Layout.alignment: Qt.AlignCenter}
                 Image{
                     source: prefix + "/images/Config/ConV_MaxAngVel.png"
                     width: parent.width
@@ -902,7 +871,7 @@ Window{
                     fillMode: Image.PreserveAspectFit
                 }
 
-                //The from and to values are deg/sce, but the final value output is in radians always
+                //The from and to values are deg/sec, but the final value output is in radians always
                 SpinBoxCustomized {
                     Layout.alignment: Qt.AlignCenter
                     id: spinner
@@ -911,10 +880,8 @@ Window{
                     editable: true
                     value: utils.radians_to_deg(settings.setVehicle_maxAngularVelocity) // should be in radians!
                     onValueChanged: settings.setVehicle_maxAngularVelocity = utils.deg_to_radians(value)
-                    //stepSize: spinBoxCM.stepSize
                 }
                 Text{ text: qsTr("Degrees/sec"); Layout.alignment: Qt.AlignCenter}
-                //  }
             }
         }
         //endregion steerSettings

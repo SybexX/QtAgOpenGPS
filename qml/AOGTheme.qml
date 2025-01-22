@@ -87,7 +87,7 @@ Item {
     }
     Connections{//sounds functions go here.
         target: aog
-        function onIsAutoSteerBtnOnChanged() {//will need another function for every sound option
+        function onIsBtnAutoSteerOnChanged() {//will need another function for every sound option
             if(settings.setSound_isAutoSteerOn){//does the user want the sound on?
                 if(aog.isBtnAutoSteerOn)
                     engage.play()

@@ -126,7 +126,7 @@ public:
     int flagNumberPicked = 0;
 
     //bool for whether or not a job is active
-    bool /*isJobStarted = false,*/ isAreaOnRight = true /*, isAutoSteerBtnOn = false*/;
+    bool /*isJobStarted = false,*/ isAreaOnRight = true /*, isBtnAutoSteerOn = false*/;
 
     //this bool actually lives in the QML aog object.
     InterfaceProperty<AOGInterface,bool> isJobStarted = InterfaceProperty<AOGInterface,bool>("isJobStarted");
@@ -784,6 +784,12 @@ public slots:
     void onBtnCenterOgl_clicked();
 
     void onDeleteAppliedArea_clicked();
+
+    void btnSteerAngleUp_clicked(); // steersetup
+    void btnSteerAngleDown_clicked();
+    void btnFreeDrive_clicked();
+    void btnFreeDriveZero_clicked();
+    void btnStartSA_clicked();
 
     /***************************
      * from OpenGL.Designer.cs *

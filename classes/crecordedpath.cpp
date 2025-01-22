@@ -92,7 +92,7 @@ bool CRecordedPath::StartDrivingRecordedPath(CVehicle &vehicle,
     return true;
 }
 
-void CRecordedPath::UpdatePosition(CVehicle &vehicle, const CYouTurn &yt, bool isAutoSteerBtnOn)
+void CRecordedPath::UpdatePosition(CVehicle &vehicle, const CYouTurn &yt, bool isBtnAutoSteerOn)
 {
     if (isFollowingDubinsToPath)
     {
@@ -103,7 +103,7 @@ void CRecordedPath::UpdatePosition(CVehicle &vehicle, const CYouTurn &yt, bool i
         pivotAxlePosRP = vehicle.steerAxlePos;
 
         //StanleyDubinsPath(vehicle, pn, shuttleListCount);
-        PurePursuitDubins(vehicle, yt, isAutoSteerBtnOn, shuttleListCount);
+        PurePursuitDubins(vehicle, yt, isBtnAutoSteerOn, shuttleListCount);
 
         //check if close to recorded path
         int cnt = shuttleDubinsList.size();
@@ -168,7 +168,7 @@ void CRecordedPath::UpdatePosition(CVehicle &vehicle, const CYouTurn &yt, bool i
         //mf.sim.stepDistance = shuttleDubinsList[C].speed / 35;
         pivotAxlePosRP = vehicle.steerAxlePos;
 
-        PurePursuitDubins(vehicle, yt, isAutoSteerBtnOn, shuttleListCount);
+        PurePursuitDubins(vehicle, yt, isBtnAutoSteerOn, shuttleListCount);
     }
 }
 
@@ -379,7 +379,7 @@ void CRecordedPath::PurePursuitRecPath(CVehicle &vehicle, int ptCount)
     vehicle.guidanceLineSteerAngle = (short)(steerAngleRP * 100);
 }
 
-void CRecordedPath::PurePursuitDubins(CVehicle &vehicle, const CYouTurn &yt, bool isAutoSteerBtnOn, int ptCount)
+void CRecordedPath::PurePursuitDubins(CVehicle &vehicle, const CYouTurn &yt, bool isBtnAutoSteerOn, int ptCount)
 {
     double dist, dx, dz;
     double minDistA = 1000000, minDistB = 1000000;
@@ -441,7 +441,7 @@ void CRecordedPath::PurePursuitDubins(CVehicle &vehicle, const CYouTurn &yt, boo
 
         //pivotErrorTotal = pivotDistanceError + pivotDerivative;
 
-        if (isAutoSteerBtnOn
+        if (isBtnAutoSteerOn
             && fabs(pivotDerivative) < (0.1)
             && vehicle.avgSpeed > 2.5
             && !yt.isYouTurnTriggered)
