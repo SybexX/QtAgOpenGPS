@@ -43,15 +43,6 @@ MoveablePopup {
         if (trackView.currentIndex < 0)
             if (trk.model.count > 0)
                 trackView.currentIndex = 0
-
-
-        //console.debug("trackview model ");
-        //console.debug(trk.model)
-        //console.debug(trk.model.count)
-        //console.debug(trk.rowCount())
-
-        //I don't know why this is necessary:
-        trackView.model = trk.model //refresh the model... this should be automatic
     }
 
     Rectangle{
@@ -182,23 +173,10 @@ MoveablePopup {
             TracksListView {
                 id: trackView
                 anchors.fill: parent
-                model: ListModel {
-                    id: dummy
-                }
-                //model: mocktrk.model
+                model: trk.model
                 //property int currentIndex: -1
-                clip: true
 
-                /*
-                delegate: TrackPickDelegate {
-                    id: control
-                }*/
-                /*
-                delegate: Text {
-                    id: control
-                    text: name
-                }
-                */
+                clip: true
             }
         }
     }
