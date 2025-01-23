@@ -53,6 +53,7 @@ void FormLoop::LoadUDPNetwork()
     {
         qDebug() << "Failed to bind udpSocket: " << udpSocket->errorString();
         agio->setProperty("ethernetConnected", false);
+        RestartUDPSocket();
     }else {
         udpSocket->setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
         qDebug() << "udpSocket bound to " << ethUDP.address << ":" << ethUDP.portToListen;
@@ -62,6 +63,7 @@ void FormLoop::LoadUDPNetwork()
 
     //trigger ReceiveFromUDP() when a packet is present
     connect(udpSocket, &QUdpSocket::readyRead, this, &FormLoop::ReceiveFromUDP);
+    connect(udpSocket, &QUdpSocket::disconnected, this, &FormLoop::RestartUDPSocket);
 
 
 }
@@ -298,4 +300,13 @@ void FormLoop::ReceiveFromUDP()
             }
         }
     }
+}
+
+void FormLoop::RestartUDPSocket(){
+    QTimer::singleShot(3000, this, [this]() {
+        if(udpSocket)
+            udpSocket->close();
+
+        LoadUDPNetwork();
+    });
 }

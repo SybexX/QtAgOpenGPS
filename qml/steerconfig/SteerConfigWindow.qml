@@ -330,7 +330,8 @@ MoveablePopup {
                     spacing: 10 * theme.scaleWidth
 
                     Text {
-                        text: qsTr("Set: " + aog.steerAngleSetRounded)
+                        //text: qsTr("Set: " + aog.steerAngleSetRounded)
+                        text: qsTr("Set: " + aog.steerAngleSet)
                         Layout.alignment: Qt.AlignCenter
                     }
                     Text {
@@ -338,7 +339,7 @@ MoveablePopup {
                         Layout.alignment: Qt.AlignCenter
                     }
                     Text {
-                        property double err: Math.round(aog.steerAngleActual, 1) - aog.steerAngleSetRounded
+                        property double err: Math.round(aog.steerAngleActual, 1) - aog.steerAngleSet
                         id: errorlbl
                         Layout.alignment: Qt.AlignCenter
                         onErrChanged: err > 0 ? errorlbl.color = "red" : errorlbl.color = "darkgreen"
@@ -443,7 +444,7 @@ MoveablePopup {
             Text{
                 anchors.top: btnStartSA.top
                 anchors.left: btnStartSA.right
-                text: qsTr("Steer Angle: "+ aog.lblCalcSteerAngleInner)
+                //text: qsTr("Steer Angle: "+ aog.lblCalcSteerAngleInner)
                 Layout.alignment: Qt.AlignCenter
             }
             Text{

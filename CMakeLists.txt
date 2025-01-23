@@ -101,7 +101,7 @@ qt_add_executable(QtAgOpenGPS
     classes/vecfix2fix.h
     LICENSE
     props.py
-    TODO.txt
+    TODO.md
     parse_properties.py
     README.md
     android/AndroidManifest.xml

@@ -36,6 +36,8 @@ private:
     bool deviceConnected = false;
     bool deviceConnecting = false;
 
+    bool consoleDebug = false;
+
 private slots:
     void connectToDevice(const QBluetoothDeviceInfo &device);
     void connected();
@@ -44,5 +46,6 @@ private slots:
     void discoveryFinished();
     void onSocketErrorOccurred(QBluetoothSocket::SocketError error);
     void readData();
+    void bluetooth_console_debug(bool doWeDebug);
 };
 #endif  //BLUETOOTHMANAGER_H

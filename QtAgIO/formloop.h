@@ -155,6 +155,8 @@ class FormLoop : public QObject
 		void LoadUDPNetwork();
 		void LoadLoopback();
 
+        void RestartUDPSocket();
+
 		//send
         void SendUDPMessage(QByteArray byteData, QHostAddress address, uint portNumber);
 		void SendDataToLoopBack(QByteArray byteData);

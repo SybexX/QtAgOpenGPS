@@ -144,7 +144,7 @@ ColumnLayout {
         iconChecked: prefix + "/images/AutoSteerOn.png"
         checkable: true
         checked: aog.isBtnAutoSteerOn
-        enabled: aog.isTrackOn || aog.isContourBtnOn
+        //enabled: aog.isTrackOn || aog.isContourBtnOn
         //Is remote activation of autosteer enabled? //todo. Eliminated in 6.3.3
         buttonText: (settings.setAS_isAutoSteerAutoOn === true ? "R" : "M")
         onClicked: {
