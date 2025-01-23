@@ -666,5 +666,6 @@
         <file>qml/components/Spacer.qml</file>
         <file>qml/steerconfig/WasBar.qml</file>
         <file>qml/TramIndicators.qml</file>
+        <file>qml/wizards/ChartSteer.qml</file>
     </qresource>
 </RCC>
