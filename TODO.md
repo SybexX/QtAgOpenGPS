@@ -20,5 +20,9 @@ To do
  * dp() - device independent pixels where 160 pixels is 1 real inch
  * sp() - similar to dp but for text.
  * https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
- 
+ 13. Set the categories to consistent in the ini file.
+ 14. Add the necessary code to turn blockage on/off, and merge into dev.
+ 15. Show AB and AC on main screen, implement timer like in AOG
+16. Add NTRIP to bluetooth
+17. Serial. Add NTRIP to bluetooth
 
