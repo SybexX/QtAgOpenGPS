@@ -3,7 +3,6 @@ import QtQuick.Controls
 
 ListView {
     property int selected: -1
-    model: trk.model
 
     ScrollBar.vertical: ScrollBar {
         policy: ScrollBar.AlwaysOn
@@ -16,4 +15,8 @@ ListView {
             selected = model.index
         }
     }
+    /*delegate: Text {
+        id: t
+        text: name
+    }*/
 }

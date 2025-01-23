@@ -20,6 +20,11 @@ Item {
     property bool isAutoSnapToPivot: false
     property bool isAutoSnapped: false
     property int howManyPathsAway: 2
+    
+    function rowCount() {
+        return mymodel.count
+    }
+
     property int mode: 0
     property int newMode: 0
     property string newName: ""

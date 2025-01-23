@@ -43,6 +43,15 @@ MoveablePopup {
         if (trackView.currentIndex < 0)
             if (trk.model.count > 0)
                 trackView.currentIndex = 0
+
+
+        //console.debug("trackview model ");
+        //console.debug(trk.model)
+        //console.debug(trk.model.count)
+        //console.debug(trk.rowCount())
+
+        //I don't know why this is necessary:
+        trackView.model = trk.model //refresh the model... this should be automatic
     }
 
     Rectangle{
@@ -104,7 +113,7 @@ MoveablePopup {
 				icon.source: prefix + "/images/Cancel64.png"
 				onClicked: {
 					trackPickerDialog.visible = false
-					aog.currentTrack = -1
+                    //trk.idx = -1
                     trackView.currentIndex = -1
 				}
 			}
@@ -168,17 +177,28 @@ MoveablePopup {
                 console.log(trk.model)
             }
 
+            color: "red"
 
             TracksListView {
                 id: trackView
                 anchors.fill: parent
-                model: trk.model
+                model: ListModel {
+                    id: dummy
+                }
+                //model: mocktrk.model
                 //property int currentIndex: -1
                 clip: true
 
+                /*
                 delegate: TrackPickDelegate {
                     id: control
+                }*/
+                /*
+                delegate: Text {
+                    id: control
+                    text: name
                 }
+                */
             }
         }
     }
