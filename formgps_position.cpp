@@ -1107,7 +1107,7 @@ void FormGPS::UpdateFixPosition()
 
                     if ((distancePivotToTurnLine <= 20.0) && (distancePivotToTurnLine >= 18.0) && !yt.isYouTurnTriggered)
 
-                    /* TODO: sounds
+                    /* moved to QML
                     if (!sounds.isBoundAlarming)
                     {
                         if (sounds.isTurnSoundOn) sounds.sndBoundaryAlarm.Play();
@@ -1118,7 +1118,7 @@ void FormGPS::UpdateFixPosition()
                     if ((distancePivotToTurnLine <= 1.0) && (distancePivotToTurnLine >= 0) && !yt.isYouTurnTriggered)
                     {
                         yt.YouTurnTrigger(trk, vehicle);
-                        //TODO: sounds
+                        //moved to QML
                         //sounds.isBoundAlarming = false;
                     }
 
