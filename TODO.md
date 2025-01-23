@@ -12,4 +12,6 @@ To do
 7. Finish the reset logic in 'reset_all' in SteerConfigSettings.qml
 8. ~~IsAutoSteerBtnOn~~ (done)
 9. Trams
+10. Create lines from boundary dialog
+ * Will be similar to HeadAche and HeadLine as far as how the rendering will work.  Does not use OpenGL. Uses QML canvaas and arrays of lines, etc.
 
