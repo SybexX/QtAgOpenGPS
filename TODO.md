@@ -14,4 +14,11 @@ To do
 9. Trams
 10. Create lines from boundary dialog
  * Will be similar to HeadAche and HeadLine as far as how the rendering will work.  Does not use OpenGL. Uses QML canvaas and arrays of lines, etc.
+11. Fix TimedMessage.qml to be a proper width and height to actually show a message.
+12. Implement device-independent scaling functions for screen units in QML
+ * similar to what Android native apps use.
+ * dp() - device independent pixels where 160 pixels is 1 real inch
+ * sp() - similar to dp but for text.
+ * https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
+ 
 

@@ -315,6 +315,7 @@ void FormGPS::FileLoadTracks()
         FileLoadABLines();
         FileLoadCurveLines();
         FileSaveTracks();
+        trk.reloadModel();
         return;
     }
 
@@ -397,6 +398,7 @@ void FormGPS::FileLoadTracks()
             }
         }
     }
+    trk.reloadModel();
 }
 
 void FormGPS::FileSaveCurveLines()

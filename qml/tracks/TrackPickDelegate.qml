@@ -6,8 +6,6 @@ RadioDelegate {
     id: control
     text: model.name
     checked: model.index === trk.idx
-    anchors.left: parent.left
-    anchors.right: parent.right
 
     Component.onCompleted: {
         console.debug(width)
@@ -41,16 +39,16 @@ RadioDelegate {
         Rectangle {
             width: controlWidth - 50 - trackname.height - 200 //control.width - 50 - trackname.height
             height: trackname.height
-            color: "transparent"
+            color: "grey"
             Text {
                 id: trackname
-                width: controlWidth - 50 - trackname.height - 100
+                width: parent.width - 50 - trackname.height - 100
 
                 //rightPadding: control.indicator.width + control.spacing
-                text: control.text
+                text: "Testing"
                 font: control.font
                 opacity: enabled ? 1.0 : 0.3
-                color: control.checked ? "white" : "black"
+                color: "light blue" //control.checked ? "white" : "black"
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
             }

@@ -104,7 +104,7 @@ MoveablePopup {
 				icon.source: prefix + "/images/Cancel64.png"
 				onClicked: {
 					trackPickerDialog.visible = false
-					aog.currentTrack = -1
+                    //trk.idx = -1
                     trackView.currentIndex = -1
 				}
 			}
@@ -168,17 +168,15 @@ MoveablePopup {
                 console.log(trk.model)
             }
 
+            color: "red"
 
             TracksListView {
                 id: trackView
                 anchors.fill: parent
                 model: trk.model
                 //property int currentIndex: -1
-                clip: true
 
-                delegate: TrackPickDelegate {
-                    id: control
-                }
+                clip: true
             }
         }
     }
