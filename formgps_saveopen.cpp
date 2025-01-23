@@ -479,8 +479,7 @@ void FormGPS::FileLoadCurveLines()
     QFile curveFile(filename);
     if (!curveFile.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Couldn't open " << filename << "for reading!";
-        //TODO timed messagebox
+        TimedMessageBox(1500, tr("Field Error"), (tr("Couldn't open ") + filename + tr("for reading!")));
         return;
     }
 
@@ -632,8 +631,7 @@ void FormGPS::FileLoadABLines()
     QFile linesFile(filename);
     if (!linesFile.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Couldn't open " << filename << "for reading!";
-        //TODO timed messagebox
+        TimedMessageBox(1500, tr("Field Error"), (tr("Couldn't open ") + filename + tr(" for reading!")));
         return;
     }
 
@@ -685,8 +683,7 @@ QMap<QString,QVariant> FormGPS::FileFieldInfo(QString fieldDir)
     QFile fieldFile(filename);
     if (!fieldFile.open(QIODevice::ReadOnly))
     {
-        qWarning() << fieldDir << " is not a valid field";
-        //TODO timed messagebox
+        TimedMessageBox(1500, tr("Field Error"), (fieldDir + tr(" is not a valid field!")));
         return field_info;
     }
 
@@ -819,8 +816,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
     QFile fieldFile(filename);
     if (!fieldFile.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Couldn't open field " << filename << "for reading!";
-        //TODO timed messagebox
+        TimedMessageBox(1500, tr("Field Error"), (tr("Couldn't open field ") + filename + tr(" for reading!")));
         return false;
     }
 
@@ -913,9 +909,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
         QFile sectionsFile(filename);
         if (!sectionsFile.open(QIODevice::ReadOnly))
         {
-            qWarning() << "Couldn't open sections " << filename << "for reading!";
-            //TODO timed messagebox
-            //return;
+            TimedMessageBox(1500, tr("Field Error"), (tr("Couldn't open sections ") + filename + tr(" for reading!")));
         } else
         {
 
@@ -982,8 +976,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
     QFile contourFile(filename);
     if (!contourFile.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Couldn't open contour " << filename << "for reading!";
-        //TODO timed messagebox
+        TimedMessageBox(1500, tr("Field Error"), (tr("Couldn't open contour ") + filename + tr(" for reading!")));
     } else
     {
 
@@ -1027,9 +1020,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
         QFile flagsFile(filename);
         if (!flagsFile.open(QIODevice::ReadOnly))
         {
-            qWarning() << "Couldn't open flags " << filename << "for reading!";
-            //TODO timed messagebox
-            //return;
+            TimedMessageBox(1500, tr("Field Error"), (tr("Couldn't open flags ") + filename + tr(" for reading!")));
         } else
         {
 
@@ -1097,9 +1088,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
     QFile boundariesFile(filename);
     if (!boundariesFile.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Couldn't open boundaries " << filename << "for reading!";
-        //TODO timed messagebox
-        //return;
+        TimedMessageBox(1500, tr("Field Error"), (tr("Couldn't open boundaries ") + filename + tr(" for reading!")));
     } else
     {
 
@@ -1190,8 +1179,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
         QFile headlandFile(filename);
         if (!headlandFile.open(QIODevice::ReadOnly))
         {
-            qWarning() << "Couldn't open headland " << filename << "for reading!";
-            //TODO timed messagebox
+            TimedMessageBox(1500, tr("Field Error"), (tr("Couldn't open headland ") + filename + tr(" for reading!")));
         } else {
             reader.setDevice(&headlandFile);
 
@@ -1262,8 +1250,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
     QFile tramFile(filename);
     if (!tramFile.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Couldn't open tram file " << filename << "for reading!";
-        //TODO timed messagebox
+        TimedMessageBox(1500, tr("Field Error"), (tr("Couldn't open tram file ") + filename + tr(" for reading!")));
     } else {
         reader.setDevice(&tramFile);
             //read header
@@ -1348,8 +1335,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
     QFile recpathFile(filename);
     if (!recpathFile.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Couldn't open recpath " << filename << "for reading!";
-        //TODO timed messagebox
+        TimedMessageBox(1500, tr("Field Error"), (tr("Couldn't open Recorded Path ") + filename + tr(" for reading!")));
     } else
     {
 
@@ -2050,8 +2036,7 @@ void FormGPS::FileLoadRecPath()
     QFile recFile(filename);
     if (!recFile.open(QIODevice::ReadOnly))
     {
-        qWarning() << "Couldn't open " << filename << "for reading!";
-        //TODO timed messagebox
+        TimedMessageBox(1500, tr("Field Error"), (tr("Couldn't open ") + filename + tr(" for reading!")));
         return;
     }
 
