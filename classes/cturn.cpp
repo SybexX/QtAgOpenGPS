@@ -172,9 +172,12 @@ void CBoundary::BuildTurnLines(CFieldData &fd)
             }
         }
 
-        Vec3 end(bndList[j].turnLine[0].easting,
-                 bndList[j].turnLine[0].northing, bndList[j].turnLine[0].heading);
-        bndList[j].turnLine.append(end);
+        if(bndList[j].turnLine.count() > 0)
+        {
+            Vec3 end(bndList[j].turnLine[0].easting,
+                     bndList[j].turnLine[0].northing, bndList[j].turnLine[0].heading);
+            bndList[j].turnLine.append(end);
+        }
     }
 }
 

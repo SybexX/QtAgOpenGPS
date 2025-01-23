@@ -101,7 +101,7 @@ public:
                                 const CYouTurn &yt,
                                 const CVehicle &vehicle);
     void GetCurrentABLine(Vec3 pivot, Vec3 steer,
-                          bool isAutoSteerBtnOn,
+                          bool isBtnAutoSteerOn,
                           CVehicle &vehicle,
                           CYouTurn &yt,
                           const CAHRS &ahrs,

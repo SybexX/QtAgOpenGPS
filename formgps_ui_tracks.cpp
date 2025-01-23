@@ -385,7 +385,7 @@ void FormGPS::update_current_ABline_from_qml()
     }
 
     if (ABLine.numABLineSelected == 0 && curve.numCurveLineSelected == 0 && (bool)ct.isContourBtnOn == false) {
-        isAutoSteerBtnOn = false;
+        isBtnAutoSteerOn = false;
     }
 }
 

@@ -92,6 +92,8 @@ public:
     Q_PROPERTY (int newMode READ getNewMode NOTIFY newModeChanged)
     Q_PROPERTY (QString newName READ getNewName WRITE setNewName NOTIFY newNameChanged)
 
+    Q_PROPERTY (int count READ rowCount NOTIFY countChanged())
+
     explicit CTrack(QObject* parent = nullptr);
 
     // CTrack interface
@@ -109,7 +111,7 @@ public:
     void DrawTrackGoalPoint(QOpenGLFunctions *gl, const QMatrix4x4 &mvp);
 
     void BuildCurrentLine(Vec3 pivot,
-                          double secondsSinceStart, bool isAutoSteerbtnOn, int &makeUTurnCounter,
+                          double secondsSinceStart, bool isBtnAutoSteerOn, int &makeUTurnCounter,
                           CYouTurn &yt,
                           CVehicle &vehicle,
                           const CBoundary &bnd,
@@ -154,6 +156,7 @@ signals:
     void newModeChanged();
     void newNameChanged();
     void newRefSideChanged();
+    void countChanged();
 
 public slots:
     void reloadModel() {

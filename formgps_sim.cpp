@@ -67,7 +67,7 @@ void FormGPS::onSimTimerTimeout()
     QObject *qmlobject;
     //double stepDistance = qmlobject->property("value").toReal() / 10.0 /gpsHz;
     //sim.setSimStepDistance(stepDistance);
-    if (recPath.isDrivingRecordedPath || (isAutoSteerBtnOn && (vehicle.guidanceLineDistanceOff !=32000)))
+    if (recPath.isDrivingRecordedPath || (isBtnAutoSteerOn && (vehicle.guidanceLineDistanceOff !=32000)))
     {
         sim.DoSimTick(vehicle.guidanceLineSteerAngle * 0.01);
     } else {

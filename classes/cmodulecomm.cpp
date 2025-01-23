@@ -10,14 +10,14 @@ CModuleComm::CModuleComm(QObject *parent) : QObject(parent)
     isWorkSwitchActiveLow = true;
 }
 
-void CModuleComm::CheckWorkAndSteerSwitch(CAHRS &ahrs, bool isAutoSteerBtnOn)
+void CModuleComm::CheckWorkAndSteerSwitch(CAHRS &ahrs, bool isBtnAutoSteerOn)
 {
     //AutoSteerAuto button enable - Ray Bear inspired code - Thx Ray!
     if (ahrs.isAutoSteerAuto && steerSwitchHigh != oldSteerSwitchRemote)
     {
         oldSteerSwitchRemote = steerSwitchHigh;
         //steerSwith is active low
-        if (steerSwitchHigh == isAutoSteerBtnOn)
+        if (steerSwitchHigh == isBtnAutoSteerOn)
             emit stopAutoSteer();
             //mf.btnAutoSteer.PerformClick();
     }
@@ -55,7 +55,7 @@ void CModuleComm::CheckWorkAndSteerSwitch(CAHRS &ahrs, bool isAutoSteerBtnOn)
         {
             oldSteerSwitchHigh = steerSwitchHigh;
 
-            if ((isAutoSteerBtnOn && ahrs.isAutoSteerAuto)
+            if ((isBtnAutoSteerOn && ahrs.isAutoSteerAuto)
                 || (!ahrs.isAutoSteerAuto && !steerSwitchHigh))
             {
                 if (isSteerWorkSwitchManualSections)

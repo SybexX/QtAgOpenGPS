@@ -6,7 +6,7 @@ Rectangle {
     id:wasbar
     height: 15 * theme.scaleHeight
     color: "lightGrey"
-    border.color: black
+    border.color: "black"
     border.width: 2
     property int wasvalue: 0
 

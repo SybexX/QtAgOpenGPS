@@ -119,7 +119,7 @@ void CABLine::BuildCurrentABLineList(Vec3 pivot,
 }
 
 void CABLine::GetCurrentABLine(Vec3 pivot, Vec3 steer,
-                               bool isAutoSteerBtnOn,
+                               bool isBtnAutoSteerOn,
                                CVehicle &vehicle,
                                CYouTurn &yt,
                                const CAHRS &ahrs,
@@ -151,7 +151,7 @@ void CABLine::GetCurrentABLine(Vec3 pivot, Vec3 steer,
 
     //Stanley
     else if (property_setVehicle_isStanleyUsed)
-        gyd.StanleyGuidanceABLine(currentLinePtA, currentLinePtB, pivot, steer, isAutoSteerBtnOn, vehicle,*this, ahrs,yt);
+        gyd.StanleyGuidanceABLine(currentLinePtA, currentLinePtB, pivot, steer, isBtnAutoSteerOn, vehicle,*this, ahrs,yt);
 
     //Pure Pursuit
     else
@@ -190,7 +190,7 @@ void CABLine::GetCurrentABLine(Vec3 pivot, Vec3 steer,
 
             //pivotErrorTotal = pivotDistanceError + pivotDerivative;
 
-            if (isAutoSteerBtnOn
+            if (isBtnAutoSteerOn
                 && fabs(pivotDerivative) < (0.1)
                 && vehicle.avgSpeed > 2.5
                 && !yt.isYouTurnTriggered)

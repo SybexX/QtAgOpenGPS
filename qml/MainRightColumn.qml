@@ -37,9 +37,9 @@ ColumnLayout {
                 if(btnContourLock.isContourLockedByUser)
                     btnContourLock.isContourLockedByUser = false
             }
-            function onIsAutoSteerBtnOnChanged() {
+            function onIsBtnAutoSteerOnChanged() {
                 if (!btnContourLock.isContourLockedByUser && btnContour.checked === true){
-                    if(btnContourLock.checked !== aog.isAutoSteerBtnOn){
+                    if(btnContourLock.checked !== aog.isBtnAutoSteerOn){
                         aog.btnContourLock()
                     }
                 }
@@ -135,7 +135,7 @@ ColumnLayout {
         iconChecked: prefix + "/images/YouTurn80.png"
         buttonText: "AutoUturn"
         visible: aog.isTrackOn
-        enabled: aog.isAutoSteerBtnOn
+        enabled: aog.isBtnAutoSteerOn
         onClicked: aog.autoYouTurn()
     }
     Comp.MainWindowBtns {
@@ -143,38 +143,39 @@ ColumnLayout {
         icon.source: prefix + "/images/AutoSteerOff.png"
         iconChecked: prefix + "/images/AutoSteerOn.png"
         checkable: true
-        checked: aog.isAutoSteerBtnOn
-        enabled: aog.isTrackOn || aog.isContourBtnOn
+        checked: aog.isBtnAutoSteerOn
+        //enabled: aog.isTrackOn || aog.isContourBtnOn
         //Is remote activation of autosteer enabled? //todo. Eliminated in 6.3.3
         buttonText: (settings.setAS_isAutoSteerAutoOn === true ? "R" : "M")
         onClicked: {
             if (checked && ((aog.currentABCurve > -1) || (aog.currentABLine > -1) || btnContour.isChecked)) {
                 console.debug("okay to turn on autosteer button.")
-                aog.isAutoSteerBtnOn = true;
+                aog.isBtnAutoSteerOn = true;
             } else {
                 console.debug("keep autosteer button off.")
                 checked = false;
-                aog.isAutoSteerBtnOn = false;
+                aog.isBtnAutoSteerOn = false;
             }
         }
         Connections {
             target: aog
-            function onIsAutoSteerBtnOnChanged() {
-                if (aog.isAutoSteerBtnOn && ((aog.currentABCurve > -1) || (aog.currentABLine > -1))) {
+            function onIsBtnAutoSteerOnChanged() {
+                //TODO: use track interface in trk
+                if (aog.isBtnAutoSteerOn && ((aog.currentABCurve > -1) || (aog.currentABLine > -1))) {
                     btnAutoSteer.checked = true
                 } else {
                     //default to turning everything off
                     btnAutoSteer.checked = false
-                    aog.isAutoSteerBtnOn = false
+                    aog.isBtnAutoSteerOn = false
                 }
             }
             function onSpeedKphChanged() {
                 if (btnAutoSteer.checked) {
                     if (aog.speedKph < settings.setAS_minSteerSpeed) {
-                        aog.isAutoSteerBtnOn = false
+                        aog.isBtnAutoSteerOn = false
                     } else if (aog.speedKph > settings.setAS_maxSteerSpeed) {
                         //timedMessage
-                        aog.isAutoSteerBtnOn = false
+                        aog.isBtnAutoSteerOn = false
                     }
                 }
             }

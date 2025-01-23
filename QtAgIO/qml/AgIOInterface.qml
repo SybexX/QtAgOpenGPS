@@ -81,6 +81,7 @@ Item {
     signal bt_kill()
     signal bt_remove_device(string device)
     property string connectedBTDevices: ""
+    signal bluetoothDebug(bool doWeDebug);
 
 }
 

@@ -78,7 +78,7 @@ Rectangle{
             icon.source: prefix + "/images/YouTurn80.png"
             onClicked: {
                 aog.sim_rotate()
-                aog.isAutoSteerBtnOn = false;
+                aog.isBtnAutoSteerOn = false;
             }
         }
     }

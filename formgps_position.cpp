@@ -719,25 +719,25 @@ void FormGPS::UpdateFixPosition()
 
     if (ct.isContourBtnOn)
     {
-        ct.DistanceFromContourLine(isAutoSteerBtnOn, vehicle, yt, ahrs, pn, vehicle.pivotAxlePos, vehicle.steerAxlePos);
+        ct.DistanceFromContourLine(isBtnAutoSteerOn, vehicle, yt, ahrs, pn, vehicle.pivotAxlePos, vehicle.steerAxlePos);
     }
     else
     {
         //auto track routine
-        if (trk.isAutoTrack && !isAutoSteerBtnOn && trk.autoTrack3SecTimer > 1)
+        if (trk.isAutoTrack && !isBtnAutoSteerOn && trk.autoTrack3SecTimer > 1)
         {
             trk.autoTrack3SecTimer = 0;
 
             trk.SwitchToClosestRefTrack(vehicle.steerAxlePos, vehicle);
         }
 
-        trk.BuildCurrentLine(vehicle.pivotAxlePos,secondsSinceStart,isAutoSteerBtnOn,makeUTurnCounter,yt,vehicle,bnd,ahrs,gyd,pn);
+        trk.BuildCurrentLine(vehicle.pivotAxlePos,secondsSinceStart,isBtnAutoSteerOn,makeUTurnCounter,yt,vehicle,bnd,ahrs,gyd,pn);
     }
 
     // autosteer at full speed of updates
 
     //if the whole path driving driving process is green
-    if (recPath.isDrivingRecordedPath) recPath.UpdatePosition(vehicle, yt, isAutoSteerBtnOn);
+    if (recPath.isDrivingRecordedPath) recPath.UpdatePosition(vehicle, yt, isBtnAutoSteerOn);
 
     // If Drive button off - normal autosteer
     if (!vehicle.isInFreeDriveMode)
@@ -750,7 +750,7 @@ void FormGPS::UpdateFixPosition()
         //save distance for display
         lightbarDistance = vehicle.guidanceLineDistanceOff;
 
-        if (!isAutoSteerBtnOn) //32020 means auto steer is off
+        if (!isBtnAutoSteerOn) //32020 means auto steer is off
         {
             //NOTE: Is this supposed to be commented out?
             //vehicle.guidanceLineDistanceOff = 32020;
@@ -767,7 +767,7 @@ void FormGPS::UpdateFixPosition()
         //convert to cm from mm and divide by 2 - lightbar
         int distanceX2;
         //if (vehicle.guidanceLineDistanceOff == 32020 || vehicle.guidanceLineDistanceOff == 32000)
-        if (!isAutoSteerBtnOn || vehicle.guidanceLineDistanceOff == 32000)
+        if (!isBtnAutoSteerOn || vehicle.guidanceLineDistanceOff == 32000)
             distanceX2 = 255;
 
         else
@@ -783,7 +783,7 @@ void FormGPS::UpdateFixPosition()
 
         if (!timerSim.isActive())
         {
-            if (isAutoSteerBtnOn && vehicle.avgSpeed > vehicle.maxSteerSpeed)
+            if (isBtnAutoSteerOn && vehicle.avgSpeed > vehicle.maxSteerSpeed)
             {
                 onStopAutoSteer();
                 if (isMetric)
@@ -792,7 +792,7 @@ void FormGPS::UpdateFixPosition()
                     TimedMessageBox(3000, tr("AutoSteer Disabled"), tr("Above Maximum Safe Steering Speed: ") + locale.toString(vehicle.maxSteerSpeed * 0.621371, 'g', 1) + tr(" MPH"));
             }
 
-            if (isAutoSteerBtnOn && vehicle.avgSpeed < vehicle.minSteerSpeed)
+            if (isBtnAutoSteerOn && vehicle.avgSpeed < vehicle.minSteerSpeed)
             {
                 minSteerSpeedTimer++;
                 if (minSteerSpeedTimer > 80)
@@ -887,26 +887,26 @@ void FormGPS::UpdateFixPosition()
 
     if (ct.isContourBtnOn)
     {
-        ct.DistanceFromContourLine(isAutoSteerBtnOn, vehicle, yt, ahrs, pn, vehicle.pivotAxlePos, vehicle.steerAxlePos);
+        ct.DistanceFromContourLine(isBtnAutoSteerOn, vehicle, yt, ahrs, pn, vehicle.pivotAxlePos, vehicle.steerAxlePos);
     }
     else
     {
         if (curve.isCurveSet && curve.isBtnCurveOn)
         {
             //do the calcs for AB Curve
-            curve.GetCurrentCurveLine(vehicle.pivotAxlePos, vehicle.steerAxlePos, secondsSinceStart, isAutoSteerBtnOn, mc.steerSwitchHigh, vehicle, bnd, yt, ahrs, gyd, pn);
+            curve.GetCurrentCurveLine(vehicle.pivotAxlePos, vehicle.steerAxlePos, secondsSinceStart, isBtnAutoSteerOn, mc.steerSwitchHigh, vehicle, bnd, yt, ahrs, gyd, pn);
         }
 
         if (ABLine.isABLineSet && ABLine.isBtnABLineOn)
         {
-            ABLine.GetCurrentABLine(vehicle.pivotAxlePos, vehicle.steerAxlePos, secondsSinceStart, isAutoSteerBtnOn, mc.steerSwitchHigh, vehicle, yt, ahrs, gyd, pn);
+            ABLine.GetCurrentABLine(vehicle.pivotAxlePos, vehicle.steerAxlePos, secondsSinceStart, isBtnAutoSteerOn, mc.steerSwitchHigh, vehicle, yt, ahrs, gyd, pn);
         }
     }
 
     // autosteer at full speed of updates
 
     //if the whole path driving driving process is green
-    if (recPath.isDrivingRecordedPath) recPath.UpdatePosition(vehicle, yt, isAutoSteerBtnOn);
+    if (recPath.isDrivingRecordedPath) recPath.UpdatePosition(vehicle, yt, isBtnAutoSteerOn);
 
     // If Drive button off - normal autosteer
     if (!vehicle.isInFreeDriveMode)
@@ -919,7 +919,7 @@ void FormGPS::UpdateFixPosition()
         //save distance for display
         lightbarDistance = vehicle.guidanceLineDistanceOff;
 
-        if (!isAutoSteerBtnOn) //32020 means auto steer is off
+        if (!isBtnAutoSteerOn) //32020 means auto steer is off
         {
             //vehicle.guidanceLineDistanceOff = 32020;
             p_254.pgn[p_254.status] = 0;
@@ -935,7 +935,7 @@ void FormGPS::UpdateFixPosition()
         //convert to cm from mm and divide by 2 - lightbar
         int distanceX2;
         //if (vehicle.guidanceLineDistanceOff == 32020 || vehicle.guidanceLineDistanceOff == 32000)
-        if (!isAutoSteerBtnOn || vehicle.guidanceLineDistanceOff == 32000)
+        if (!isBtnAutoSteerOn || vehicle.guidanceLineDistanceOff == 32000)
             distanceX2 = 255;
 
         else
@@ -951,7 +951,7 @@ void FormGPS::UpdateFixPosition()
 
         if (!timerSim.isActive())
         {
-            if (isAutoSteerBtnOn && vehicle.avgSpeed > vehicle.maxSteerSpeed)
+            if (isBtnAutoSteerOn && vehicle.avgSpeed > vehicle.maxSteerSpeed)
             {
                 onStopAutoSteer();
 
@@ -961,7 +961,7 @@ void FormGPS::UpdateFixPosition()
                     TimedMessageBox(3000, tr("AutoSteer Disabled"), tr("Above Maximum Safe Steering Speed: ") + locale.toString(vehicle.maxSteerSpeed * 0.621371, 'g', 1) + tr(" MPH"));
             }
 
-            if (isAutoSteerBtnOn && vehicle.avgSpeed < vehicle.minSteerSpeed)
+            if (isBtnAutoSteerOn && vehicle.avgSpeed < vehicle.minSteerSpeed)
             {
                 minSteerSpeedTimer++;
                 if (minSteerSpeedTimer > 80)
@@ -1107,7 +1107,7 @@ void FormGPS::UpdateFixPosition()
 
                     if ((distancePivotToTurnLine <= 20.0) && (distancePivotToTurnLine >= 18.0) && !yt.isYouTurnTriggered)
 
-                    /* TODO: sounds
+                    /* moved to QML
                     if (!sounds.isBoundAlarming)
                     {
                         if (sounds.isTurnSoundOn) sounds.sndBoundaryAlarm.Play();
@@ -1118,11 +1118,11 @@ void FormGPS::UpdateFixPosition()
                     if ((distancePivotToTurnLine <= 1.0) && (distancePivotToTurnLine >= 0) && !yt.isYouTurnTriggered)
                     {
                         yt.YouTurnTrigger(trk, vehicle);
-                        //TODO: sounds
+                        //moved to QML
                         //sounds.isBoundAlarming = false;
                     }
 
-                    //if (isAutoSteerBtnOn && vehicle.guidanceLineDistanceOff > 300 && !yt.isYouTurnTriggered)
+                    //if (isBtnAutoSteerOn && vehicle.guidanceLineDistanceOff > 300 && !yt.isYouTurnTriggered)
                     //{
                     //    yt.ResetCreatedYouTurn();
                     //}
@@ -1144,7 +1144,7 @@ void FormGPS::UpdateFixPosition()
             //else
             //{
             //    //mc.isOutOfBounds = true;
-            //    if (isAutoSteerBtnOn)
+            //    if (isBtnAutoSteerOn)
             //    {
             //        if (yt.isYouTurnBtnOn)
             //        {
@@ -1244,8 +1244,10 @@ void FormGPS::UpdateFixPosition()
     aog->setProperty("vehicle_bounding_box",vehicle.bounding_box);
 
     aog->setProperty("steerAngleActual", mc.actualSteerAngleDegrees);
-    aog->setProperty("steerAngleSet", vehicle.guidanceLineSteerAngle);
+    //aog->setProperty("steerAngleSet", vehicle.guidanceLineSteerAngle);
     aog->setProperty("droppedSentences", udpWatchCounts);
+    aog->setProperty("lblPWMDisplay", mc.pwmDisplay);
+    aog->setProperty("steerAngleSet", vehicle.driveFreeSteerAngle);
 
     //TODO: access this in QML directly from trk.howManyPathsAway property
     aog->setProperty("current_trackNum", trk.getHowManyPathsAway());
@@ -1323,7 +1325,7 @@ void FormGPS::TheRest()
 
     if ((vehicle.avgSpeed - previousSpeed  ) < -vehicle.panicStopSpeed && vehicle.panicStopSpeed != 0)
     {
-        if (isAutoSteerBtnOn) onStopAutoSteer();
+        if (isBtnAutoSteerOn) onStopAutoSteer();
     }
 
     previousSpeed = vehicle.avgSpeed;

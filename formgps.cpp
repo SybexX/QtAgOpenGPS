@@ -534,7 +534,7 @@ void FormGPS::processSectionLookahead() {
 
     //Checks the workswitch or steerSwitch if required
     if (ahrs.isAutoSteerAuto || mc.isRemoteWorkSystemOn)
-        mc.CheckWorkAndSteerSwitch(ahrs,isAutoSteerBtnOn);
+        mc.CheckWorkAndSteerSwitch(ahrs,isBtnAutoSteerOn);
 
     // check if any sections have changed status
     number = 0;
@@ -902,7 +902,7 @@ void FormGPS::tmrWatchdog_timeout()
         worldGrid.isRateTrigger = true;
 
         //Make sure it is off when it should
-        if ((!ct.isContourBtnOn && trk.idx == -1 && isAutoSteerBtnOn)
+        if ((!ct.isContourBtnOn && trk.idx == -1 && isBtnAutoSteerOn)
             ) onStopAutoSteer();
 
     } //end every 1/2 second
@@ -1084,7 +1084,7 @@ void FormGPS::JobClose()
 
     //AutoSteer
     //btnAutoSteer.Enabled = false;
-    isAutoSteerBtnOn = false;
+    isBtnAutoSteerOn = false;
 
     //auto YouTurn shutdown
     yt.isYouTurnBtnOn = false;

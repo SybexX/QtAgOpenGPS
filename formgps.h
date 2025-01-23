@@ -126,11 +126,11 @@ public:
     int flagNumberPicked = 0;
 
     //bool for whether or not a job is active
-    bool /*isJobStarted = false,*/ isAreaOnRight = true /*, isAutoSteerBtnOn = false*/;
+    bool /*isJobStarted = false,*/ isAreaOnRight = true /*, isBtnAutoSteerOn = false*/;
 
     //this bool actually lives in the QML aog object.
     InterfaceProperty<AOGInterface,bool> isJobStarted = InterfaceProperty<AOGInterface,bool>("isJobStarted");
-    InterfaceProperty<AOGInterface,bool> isAutoSteerBtnOn = InterfaceProperty<AOGInterface,bool>("isAutoSteerBtnOn");
+    InterfaceProperty<AOGInterface,bool> isBtnAutoSteerOn = InterfaceProperty<AOGInterface,bool>("isBtnAutoSteerOn");
 
     //if we are saving a file
     bool isSavingFile = false, isLogElevation = false;
@@ -552,7 +552,7 @@ public:
     //data buffer for pixels read from off screen buffer
     //uchar grnPixels[80001];
     LookAheadPixels grnPixels[150001];
-    LookAheadPixels overPixels[160000]; //400x400
+    LookAheadPixels *overPixels = new LookAheadPixels[160000]; //400x400
     QImage grnPix; //for debugging purposes to show in a window
     QImage overPix; //for debugging purposes to show in a window
 
@@ -787,6 +787,12 @@ public slots:
     void onBtnCenterOgl_clicked();
 
     void onDeleteAppliedArea_clicked();
+
+    void btnSteerAngleUp_clicked(); // steersetup
+    void btnSteerAngleDown_clicked();
+    void btnFreeDrive_clicked();
+    void btnFreeDriveZero_clicked();
+    void btnStartSA_clicked();
 
     /***************************
      * from OpenGL.Designer.cs *

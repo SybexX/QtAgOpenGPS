@@ -68,7 +68,7 @@ public:
     explicit CContour(QObject *parent = 0);
     void SetLockToLine();
     void BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehicle, Vec3 pivot);
-    void DistanceFromContourLine(bool isAutoSteerBtnOn, CVehicle &vehicle, CYouTurn &yt, CAHRS &ahrs,  CNMEA &pn, Vec3 pivot, Vec3 steer);
+    void DistanceFromContourLine(bool isBtnAutoSteerOn, CVehicle &vehicle, CYouTurn &yt, CAHRS &ahrs,  CNMEA &pn, Vec3 pivot, Vec3 steer);
     void StartContourLine();
     void AddPoint(Vec3 pivot);
     void StopContourLine(QVector<QSharedPointer<QVector<Vec3>>> &contourSaveList);

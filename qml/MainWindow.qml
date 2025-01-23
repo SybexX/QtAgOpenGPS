@@ -331,7 +331,7 @@ Window {
                              "#f0f218f0" :
                              (aog.steerSwitchHigh === true ?
                                   "#faf80007" :
-                                  (aog.isAutoSteerBtnOn === true ?
+                                  (aog.isBtnAutoSteerOn === true ?
                                        "#f80df807" : "#f0f2c007")))
 
         }
