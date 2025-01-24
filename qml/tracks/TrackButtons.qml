@@ -32,6 +32,9 @@ Comp.TimedRectangle {
         Comp.IconButtonTransparent{
             icon.source: prefix + "/images/SwitchOff.png"
             Layout.alignment: Qt.AlignCenter
+            onClicked: {
+                tracksInterface.select(-1);
+            }
         }
         Comp.IconButtonTransparent{
             icon.source: prefix + "/images/ABTracks.png"

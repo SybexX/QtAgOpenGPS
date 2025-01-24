@@ -104,8 +104,6 @@ MoveablePopup {
 				icon.source: prefix + "/images/Cancel64.png"
 				onClicked: {
 					trackPickerDialog.visible = false
-                    //trk.idx = -1
-                    trackView.currentIndex = -1
 				}
 			}
 		}
@@ -138,11 +136,11 @@ MoveablePopup {
                 icon.source: prefix + "/images/OK64.png"
                 onClicked: {
                     trackPickerDialog.visible = false
-                    if (trackView.currentIndex > -1) {
-                        aog.currentTrack = trackView.currentIndex
-                        trackPickerDialog.visible = false
-                    } else
-                        trackPickerDialog.visible = false
+                    if (trackView.selected > -1 && trackView.trackVisible) {
+                        console.debug("Activating track ", trackView.selected)
+                        tracksInterface.select(trackView.selected)
+                    }
+                    trackPickerDialog.visible = false
                 }
             }
         }
@@ -161,14 +159,6 @@ MoveablePopup {
 			//}
 
             //See MockTrack.qml for static test model
-
-            Component.onCompleted: {
-                //reloadModel()
-                console.log("model is ")
-                console.log(trk.model)
-            }
-
-            color: "red"
 
             TracksListView {
                 id: trackView

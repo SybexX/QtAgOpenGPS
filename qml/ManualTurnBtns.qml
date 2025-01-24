@@ -14,9 +14,10 @@ Grid{
         imageFillMode: Image.Stretch
         icon.source: prefix + "/images/qtSpecific/z_TurnManualL.png"
         onClicked: {
-            if (settings.setAS_functionSpeedLimit > aog.speedKph)
+            if (settings.setAS_functionSpeedLimit > aog.speedKph) {
+                console.debug("limit ", settings.setAS_functionSpeedLimit, " speed ", aog.speedKph)
                 aog.uturn(false)
-            else
+            } else
                 timedMessage.addMessage(2000,qsTr("Too Fast"), qsTr("Slow down below") + " " +
                                         utils.speed_to_unit_string(settings.setAS_functionSpeedLimit,1) + " " + utils.speed_unit())
         }
@@ -46,7 +47,7 @@ Grid{
                 aog.lateral(false)
             else
                 timedMessage.addMessage(2000,qsTr("Too Fast"), qsTr("Slow down below") + " " +
-                                        aog.convert_speed_text(settings.setAS_functionSpeedLimit,1) + " " + aog.speed_unit())
+                                        aog.speed_to_unit_string(settings.setAS_functionSpeedLimit,1) + " " + aog.speed_unit())
         }
     }
     Comp.IconButtonTransparent{
@@ -59,7 +60,7 @@ Grid{
                 aog.lateral(true)
             else
                 timedMessage.addMessage(2000,qsTr("Too Fast"), qsTr("Slow down below") + " " +
-                                        aog.convert_speed_text(settings.setAS_functionSpeedLimit,1) + " " + aog.speed_unit())
+                                        aog.speed_to_unit_string(settings.setAS_functionSpeedLimit,1) + " " + aog.speed_unit())
         }
     }
 }

@@ -3,71 +3,54 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 RadioDelegate {
-    id: control
-    text: model.name
-    checked: model.index === trk.idx
+    id: trackDelegate
 
-    Component.onCompleted: {
-        console.debug(width)
-        controlWidth = width
-    }
+    required property int index
+    required property string name
+    required property bool isVisible
+    required property int mode
+
+    property int scrollbar_width: 10
+
 
     property double controlWidth: width
+    width: parent.width - scrollbar_width
 
     contentItem: RowLayout {
         anchors.left: parent.left
-        //anchors.right: parent.right
-        //width: control.width
-
-            Component.onCompleted: {
-                console.debug(control.width)
-                console.debug(width)
-            }
+        anchors.right: parent.right - trackDelegate.scrollbar_width
 
         Image {
             id: trackType
-            width: 50
-            height: 50
-            anchors.margins: 2
 
-            source: (model.mode === 2) ? prefix + "/images/TrackLine.png" :
-                    (model.mode === 4) ? prefix + "/images/TrackCurve.png" :
-                    (model.mode === 64) ? prefix + "/images/TrackPivot.png" :
+            source: (trackDelegate.mode === 2) ? prefix + "/images/TrackLine.png" :
+                    (trackDelegate.mode === 4) ? prefix + "/images/TrackCurve.png" :
+                    (trackDelegate.mode === 64) ? prefix + "/images/TrackPivot.png" :
                                        prefix + "/images/HelpSmall.png"
         }
 
-        Rectangle {
-            width: controlWidth - 50 - trackname.height - 200 //control.width - 50 - trackname.height
-            height: trackname.height
-            color: "grey"
             Text {
                 id: trackname
-                width: parent.width - 50 - trackname.height - 100
+                Layout.fillWidth: true
 
-                //rightPadding: control.indicator.width + control.spacing
-                text: "Testing"
-                font: control.font
+                //rightPadding: trackDelegate.indicator.width + trackDelegate.spacing
+                text: trackDelegate.name
+                font: trackDelegate.font
                 opacity: enabled ? 1.0 : 0.3
-                color: "light blue" //control.checked ? "white" : "black"
+                color: aog.textColor
                 elide: Text.ElideRight
                 verticalAlignment: Text.AlignVCenter
             }
-            Component.onCompleted: {
-                console.debug(control.width)
-                console.debug(width)
-            }
-        }
 
         Button {
             id: isTrackVisible
             background: Rectangle {
                 implicitWidth: trackname.height
                 implicitHeight: trackname.height
-                color: model.isVisible ? "green" : "red"
+                color: trackDelegate.isVisible ? "green" : "red"
             }
             onClicked: {
-                tracksInterface.setVisible(model.index, !model.isVisible)
-                model.isVisible = !model.isVisible
+                tracksInterface.setVisible(trackDelegate.index, !trackDelegate.isVisible)
             }
         }
     }
@@ -76,10 +59,8 @@ RadioDelegate {
     }
 
     background: Rectangle {
-        implicitWidth: 100
-        implicitHeight: 40
-        visible: control.down || control.highlighted || control.checked
-        color: control.checked ? aog.blackDayWhiteNight : aog.backgroundColor
+        visible: trackDelegate.down || trackDelegate.highlighted || trackDelegate.checked
+        color: trackDelegate.checked ? aog.borderColor : aog.backgroundColor
     }
 }
 
