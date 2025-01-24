@@ -20,5 +20,7 @@ To do
  * dp() - device independent pixels where 160 pixels is 1 real inch
  * sp() - similar to dp but for text.
  * https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
- 
+13. Consider using QML_SINGLETON to embed things like CTrack and CVehicle in the QML space.  Would have to pull pointers back to FormGPS, though.  For now I'm going to stick with setContextProperty.
+ * concerned a bit with threading.  Reading properties is probably thread safe, but setting properties might not be.
+14. Fix world grid lines. 
 
