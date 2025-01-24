@@ -5,12 +5,9 @@
 //Loaded by formgps_ui.cpp.
 import QtQuick
 import QtQuick.Window
-import QtQuick.Controls.Fusion
-import QtQuick.Layouts
 import QtQuick.Effects
 import QtQuick.Dialogs
-import QtMultimedia
-import AgOpenGPS 1.0
+import qtagopengps.renderer
 
 import "interfaces" as Interfaces
 import "boundary" as Boundary

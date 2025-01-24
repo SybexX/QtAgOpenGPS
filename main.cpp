@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
     //We're supposed to be compatible with the saved data
     //from this version of AOG:
     QCoreApplication::setApplicationVersion("4.1.0");
-    qmlRegisterType<AOGRendererInSG>("AgOpenGPS",1,0,"AOGRenderer");
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     qRegisterMetaTypeStreamOperators<QList<int> >("QList<int>");
     qRegisterMetaTypeStreamOperators<QVector<int> >("QVector<int>");
