@@ -115,6 +115,16 @@ qt_add_executable(QtAgOpenGPS
     android/res/xml/qtprovider_paths.xml
 )
 
+qt_add_qml_module(QtAgOpenGPS
+    URI qtagopengps.renderer
+    VERSION 1.0
+    QML_FILES qml/MainWindow.qml
+    SOURCES
+        aogrenderer.cpp
+        aogrenderer.h
+    DEPENDENCIES Qt6::QtQuick
+)
+
 if(ANDROID)
     set(LOCAL_QML OFF)
 else()

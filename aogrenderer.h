@@ -8,12 +8,14 @@
 #include <QQuickWindow>
 //#include <QOpenGLContext>
 #include <QQuickFramebufferObject>
+#include <QtQml/qqmlregistration.h>
 
 #include <functional>
 Q_DECLARE_METATYPE(std::function<void (void)>)
 
 class AOGRenderer : public QQuickFramebufferObject::Renderer
 {
+
 protected:
     virtual void synchronize(QQuickFramebufferObject *);
 
@@ -49,6 +51,8 @@ private:
 class AOGRendererInSG : public QQuickFramebufferObject
 {
     Q_OBJECT
+    QML_NAMED_ELEMENT(AOGRenderer)
+
 public:
     AOGRenderer *theRenderer;
 
