@@ -275,9 +275,27 @@ void FormGPS::ReceiveFromAgIO()
             DoRemoteSwitches();
 
             break;
+
+        case 0xf4://blockage
+            //
+            if (datagram_data.length() != 10)
+                break;
+
+            int i = data[6];
+            //mc.blockageseccount[data[5]*16+i] = data[7];
+            if (data[5] == 0) mc.blockageseccount1[i] = (qint16)((uint8_t(data[8]) << 8) + uint8_t(data[7]));
+            if (data[5] == 1) mc.blockageseccount2[i] = (qint16)((uint8_t(data[8]) << 8) + uint8_t(data[7]));
+            if (data[5] == 2) mc.blockageseccount3[i] = (qint16)((uint8_t(data[8]) << 8) + uint8_t(data[7]));
+            if (data[5] == 3) mc.blockageseccount4[i] = (qint16)((uint8_t(data[8]) << 8) + uint8_t(data[7]));
+            doBlockageMonitoring();
+            //qDebug() << mc.blockageseccount1[1];
+            break;
+
         }
     }
-    //qDebug() << pn->rawBuffer ;
+    //qDebug() << pn->rawBuffer ;"Connected to blockage"
+
+
 }
 
 void FormGPS::DisableSim()

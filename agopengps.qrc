@@ -655,16 +655,24 @@
         <file>qml/config/steercomponents/MainConfigMainBtns.qml</file>
         <file>qml/config/steercomponents/MainConfigSecondaryBtns.qml</file>
         <file>icon.png</file>
+        <file>qml/components/BlockageRows.qml</file>
+        <file>qml/components/BlockageRow.qml</file>
+        <file>images/Config/ConS_Blockage.png</file>
+        <file>qml/config/ConfigModulesBlockage.qml</file>
+        <file>qml/TramIndicators.qml</file>
         <file>qml/MainTopPanel.qml</file>
         <file>qml/MainLeftColumn.qml</file>
         <file>qml/MainRightColumn.qml</file>
         <file>qml/MainBottomRow.qml</file>
         <file>qml/AutoUturnBtn.qml</file>
         <file>qml/ManualTurnBtns.qml</file>
+        <file>qml/BlockageData.qml</file>
         <file>qml/tracks/TrackPickDelegate.qml</file>
         <file>qml/tracks/TracksListView.qml</file>
+        <file>images/Blockage.png</file>
         <file>qml/components/Spacer.qml</file>
         <file>qml/steerconfig/WasBar.qml</file>
         <file>qml/TramIndicators.qml</file>
+        <file>qml/wizards/ChartSteer.qml</file>
     </qresource>
 </RCC>

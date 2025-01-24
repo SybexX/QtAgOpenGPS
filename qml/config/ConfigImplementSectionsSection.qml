@@ -265,7 +265,7 @@ Item{
         anchors.bottom: middleRow.top
         model: section_model
         cellWidth: 200 * theme.scaleWidth
-		cellHeight: 85 * theme.scaleHeight
+        cellHeight: 85 * theme.scaleHeight
 
         clip: true
 
@@ -291,10 +291,10 @@ Item{
         id: middleRow
         anchors.top: parent.verticalCenter
         anchors.right: parent.right
-		anchors.topMargin: 40 * theme.scaleHeight
-		anchors.bottomMargin: 40 * theme.scaleHeight
-		anchors.leftMargin: 40 * theme.scaleWidth
-		anchors.rightMargin: 40 * theme.scaleWidth
+        anchors.topMargin: 40 * theme.scaleHeight
+        anchors.bottomMargin: 40 * theme.scaleHeight
+        anchors.leftMargin: 40 * theme.scaleWidth
+        anchors.rightMargin: 40 * theme.scaleWidth
         width: children.width
         height: children.height
         spacing: 120 * theme.scaleWidth

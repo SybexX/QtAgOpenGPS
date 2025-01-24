@@ -47,7 +47,7 @@ Item {
     property double frameTime: 0
 
     property bool isJobStarted: true
-
+    property bool blockageConnected: false
     property int manualBtnState: 0
     property int autoBtnState: 0
     property bool autoYouturnBtnState: true
@@ -61,7 +61,7 @@ Item {
     //for mapping zones to sections
 
     property variant sectionButtonState: [ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ]
-
+    property variant rowCount: [ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ]
     property bool isContourBtnOn: false
     property bool btnIsContourLocked: false
     property bool isBtnAutoSteerOn: false
@@ -142,6 +142,16 @@ Item {
     property bool hydLiftDown: false
     property bool hydLiftIsOn: false
     property bool isHeadlandOn: false
+    property int blockage_avg: 0
+    property int blockage_min1: 0
+    property int blockage_min2: 0
+    property int blockage_max: 0
+    property int blockage_min1_i: 0
+    property int blockage_min2_i: 0
+    property int blockage_max_i: 0
+    property int blockage_blocked: 0;
+
+
 
     onSteerAngleActualChanged: steerAngleActualRounded = Number(Math.round(steerAngleActual)).toLocaleString(Qt.locale(), 'f', 1)
     onSteerAngleSetChanged: steerAngleSetRounded = Number(Math.round((steerAngleSet) * .01)).toLocaleString(Qt.locale(), 'f', 1)
@@ -217,6 +227,8 @@ Item {
     signal modules_send_238()
 	signal modules_send_251()
     signal modules_send_252()
+
+    signal doBlockageMonitoring()
 
     signal sim_bump_speed(bool up)
     signal sim_zero_speed()

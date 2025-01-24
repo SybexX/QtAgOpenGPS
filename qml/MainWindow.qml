@@ -528,6 +528,12 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
                 visible: false
             }
+            BlockageData{ //window that displays GPS data
+                id: blockageData
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                visible: false
+            }
 
             SimController{
                 id: simBarRect
@@ -567,6 +573,16 @@ Window {
                 height: 40 * theme.scaleHeight
                 width: 660  * theme.scaleWidth
                 //onHeightChanged: anchors.bottomMargin = (bottomButtons.height + simBarRect.height + (24 * theme.scaleHeight))
+            }
+            Comp.BlockageRows {
+                id: blockageRows
+                visible: aog.blockageConnected ? true : false  // need connect with c++ Dim
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 8
+                height: 100 * theme.scaleHeight
+                //width: 800  * theme.scaleWidth
+
             }
             DisplayButtons{ // window that shows the buttons to change display. Rotate up/down, day/night, zoom in/out etc. See DisplayButtons.qml
                 id: displayButtons

@@ -97,6 +97,7 @@
         <file>qml/UnitConversion.qml</file>
         <file>qml/CloseAgIO.qml</file>
         <file>qml/components/ScrollableTextArea.qml</file>
+        <file>images/B_Blockage.png</file>
         <file>qml/BluetoothMenu.qml</file>
     </qresource>
 </RCC>

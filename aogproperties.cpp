@@ -293,4 +293,12 @@ AOGProperty property_setDisplay_colorDayBackground("display/colorDayBackground",
 AOGProperty property_setDisplay_colorNightBackground("display/colorNightBackground",QColor::fromRgb(50, 50, 65));
 AOGProperty property_setDisplay_colorDayBorder("display/colorDayBorder",QColor::fromRgb(215, 228, 242));
 AOGProperty property_setDisplay_colorNightBorder("display/colorNightBorder",QColor::fromRgb(210, 210, 230));
+AOGProperty property_setSeed_blockCountMin("seed/blockCountMin",1000);
+AOGProperty property_setSeed_blockCountMax("seed/blockCountMax",5000);
+AOGProperty property_setSeed_blockRow1("seed/blockRow1",16);
+AOGProperty property_setSeed_blockRow2("seed/blockRow2",16);
+AOGProperty property_setSeed_blockRow3("seed/blockRow3",16);
+AOGProperty property_setSeed_blockRow4("seed/blockRow4",0);
+AOGProperty property_setSeed_numRows("seed/numRows",48);
+AOGProperty property_setSeed_blockageIsOn("seed/blockageIsOn",false);
 AOGProperty property_setVehicle_vehicleName("vehicle/vehicleName",QString("Default Vehicle"));

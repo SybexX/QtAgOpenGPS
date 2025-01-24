@@ -227,7 +227,7 @@ public:
     bool isPureDisplayOn = true, isSkyOn = true, isRollMeterOn = false, isTextureOn = true;
     bool isDay = true, isDayTime = true, isBrightnessOn = true;
     bool isKeyboardOn = true, isAutoStartAgIO = true, isSvennArrowOn = true;
-
+    bool isConnectedBlockage = false; //Dim
     bool isUTurnOn = true, isLateralOn = true;
 
     //sunrise, sunset
@@ -526,6 +526,7 @@ public:
     //void SectionCalcMulti();
     void BuildMachineByte();
     void DoRemoteSwitches();
+    //void doBlockageMonitoring();
 
 
     /************************
@@ -714,6 +715,8 @@ public slots:
     void modules_send_238();
 	void modules_send_251();
     void modules_send_252();
+
+    void doBlockageMonitoring();
 
     //boundary UI for recording new boundary
     void boundary_calculate_area();

@@ -99,6 +99,7 @@ qt_add_executable(QtAgOpenGPS
     classes/vec3.h classes/vec3.cpp
     classes/vec4.h classes/vec4.cpp
     classes/vecfix2fix.h
+    classes/qmlblockage.h classes/qmlblockage.cpp
     LICENSE
     props.py
     TODO.md

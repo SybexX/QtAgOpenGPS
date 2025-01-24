@@ -261,6 +261,10 @@ void QMLSettings::setupKeys() {
     addKey(QString("setAS_deadZoneDelay"),QString("autosteer/deadZoneDelay"),"int");
     addKey(QString("setTram_alpha"),QString("tram/alpha"),"double");
     addKey(QString("setVehicle_goalPointAcquireFactor"),QString("vehicle/goalPointAcquireFactor"),"double");
+    addKey(QString("setBnd_isDrawPivot"),QString(""),"bool");
+    addKey(QString("setDisplay_isSectionLinesOn"),QString(""),"bool");
+    addKey(QString("setDisplay_isLineSmooth"),QString(""),"bool");
+    addKey(QString("setWindow_tramLineSize"),QString(""),"QString");
     addKey(QString("setBnd_isDrawPivot"),QString("bnd/isDrawPivot"),"bool");
     addKey(QString("setDisplay_isSectionLinesOn"),QString("display/isSectionLinesOn"),"bool");
     addKey(QString("setDisplay_isLineSmooth"),QString("display/isLineSmooth"),"bool");
@@ -288,4 +292,12 @@ void QMLSettings::setupKeys() {
     addKey(QString("setFeature_isLateralOn"),QString("displayFeatures/isLateralOn"), "bool");
     addKey(QString("setDisplay_useTrackZero"),QString("display/useTrackZero"),"bool");
     addKey(QString("setDisplay_topTrackNum"),QString("display/topTrackNum"),"bool");
+    addKey(QString("setSeed_blockCountMin"),QString("seed/blockCountMin"),"double");
+    addKey(QString("setSeed_blockCountMax"),QString("seed/blockCountMax"),"double");
+    addKey(QString("setSeed_blockRow1"),QString("seed/blockRow1"),"double");
+    addKey(QString("setSeed_blockRow2"),QString("seed/blockRow2"),"double");
+    addKey(QString("setSeed_blockRow3"),QString("seed/blockRow3"),"double");
+    addKey(QString("setSeed_blockRow4"),QString("seed/blockRow4"),"double");
+    addKey(QString("setSeed_numRows"),QString("seed/numRows"),"double");
+    addKey(QString("setSeed_blockageIsOn"),QString("seed/blockageIsOn"),"bool");
 }

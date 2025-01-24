@@ -6,6 +6,7 @@
 #include "qmlutil.h"
 #include "common.h"
 #include "cpgn.h"
+#include "aogproperty.h"
 
 
 /* SectionSetPosition(), SectionCalcWidths(), and SectionCalcMulti() are all in CTool */
@@ -314,3 +315,76 @@ void FormGPS::DoRemoteSwitches()
         }
     }
 }
+
+void FormGPS::doBlockageMonitoring()
+{
+    isConnectedBlockage = true;
+    QObject *aog = qmlItem(qml_root,"aog");
+    aog->setProperty("blockageConnected", isConnectedBlockage);
+    int k=0;
+    int k1 = (int)property_setSeed_blockRow1;
+    int k2 = (int)property_setSeed_blockRow2;
+    int k3 = (int)property_setSeed_blockRow3;
+    int k4 = (int)property_setSeed_blockRow4;
+    int k5 = (int)property_setSeed_numRows;
+    int k6 = (int)property_setSeed_blockCountMin;
+    double k7 = property_setVehicle_toolWidth;
+    double rowwidth = k7/k5;
+    for(int i=0;i<k1;i++)
+        mc.blockageseccount[k++]=mc.blockageseccount1[i]*7.2/rowwidth/pn.vtgSpeed;
+    for(int i=0;i<k2;i++)
+        mc.blockageseccount[k++]=mc.blockageseccount2[i]*7.2/rowwidth/pn.vtgSpeed;
+    for(int i=0;i<k3;i++)
+        mc.blockageseccount[k++]=mc.blockageseccount3[i]*7.2/rowwidth/pn.vtgSpeed;
+    for(int i=0;i<k4;i++)
+        mc.blockageseccount[k++]=mc.blockageseccount4[i]*7.2/rowwidth/pn.vtgSpeed;
+    for(int s=0; s< k5; s++) {
+        tool.blockageRowState.set(s, mc.blockageseccount[s]);
+    }
+    int i;
+    double avg=0;
+    for(i=0; i < k5; i++) avg+=(mc.blockageseccount[i]);
+    avg/=k5;
+    int max = 0;
+    int i_max=0;
+    for (int i = 0; i < k5; ++i) {
+        if (mc.blockageseccount[i] > max) {
+            max = (mc.blockageseccount[i]);
+            i_max = i;
+        }
+    }
+    int min1 = 65535;
+    int min2 = 65535;
+    int i_min1=0;
+    int i_min2=0;
+    for (int i = 0; i < k5; ++i) {
+        if (mc.blockageseccount[i] < min1) {
+            min1 = (mc.blockageseccount[i]);
+            i_min1 = i;
+        }
+    }
+    for(i=0; i<k5; i++)
+        if(mc.blockageseccount[i]<min2 && i_min1!=i)
+        {
+            min2=(mc.blockageseccount[i]);
+            i_min2=i;
+        }
+    int count=0;
+    for (int i = 0; i < k5; i++)
+    if (mc.blockageseccount[i] < k6) count++;
+
+
+    tool.blockage_avg = avg;
+    tool.blockage_min1 = min1;
+    tool.blockage_min2 = min2;
+    tool.blockage_max = max;
+    tool.blockage_min1_i = (i_min1+1);
+    tool.blockage_min2_i = (i_min2+1);
+    tool.blockage_max_i = i_max+1;
+    tool.blockage_blocked = count;
+}
+
+
+
+
+

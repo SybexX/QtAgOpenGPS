@@ -68,6 +68,78 @@ add_props = [
       'qml_default' : "#d2d2e6"
     },
 
+    { 'ini_path': 'seed/blockCountMin',
+      'cpp_name': 'property_setSeed_blockCountMin',
+      'cpp_default' : '100',
+      'cpp_type' : 'double',
+      'qml_name' : 'setSeed_blockCountMin',
+      'qml_type': 'double',
+      'qml_default': '100',
+    },
+
+    { 'ini_path': 'seed/blockCountMax',
+      'cpp_name': 'property_setSeed_blockCountMax',
+      'cpp_default' : '1000',
+      'cpp_type' : 'double',
+      'qml_name' : 'setSeed_blockCountMax',
+      'qml_type': 'double',
+      'qml_default': '1000',
+    },
+
+    { 'ini_path': 'seed/blockRow1',
+      'cpp_name': 'property_setSeed_blockRow1',
+      'cpp_default' : '16',
+      'cpp_type' : 'double',
+      'qml_name' : 'setSeed_blockRow1',
+      'qml_type': 'double',
+      'qml_default': '16',
+    },
+
+    { 'ini_path': 'seed/blockRow2',
+      'cpp_name': 'property_setSeed_blockRow2',
+      'cpp_default' : '16',
+      'cpp_type' : 'double',
+      'qml_name' : 'setSeed_blockRow2',
+      'qml_type': 'double',
+      'qml_default': '16',
+    },
+
+    { 'ini_path': 'seed/blockRow3',
+      'cpp_name': 'property_setSeed_blockRow3',
+      'cpp_default' : '16',
+      'cpp_type' : 'double',
+      'qml_name' : 'setSeed_blockRow3',
+      'qml_type': 'double',
+      'qml_default': '16',
+    },
+
+    { 'ini_path': 'seed/blockRow4',
+      'cpp_name': 'property_setSeed_blockRow4',
+      'cpp_default' : '0',
+      'cpp_type' : 'double',
+      'qml_name' : 'setSeed_blockRow4',
+      'qml_type': 'double',
+      'qml_default': '0',
+    },
+
+    { 'ini_path': 'seed/numRows',
+      'cpp_name': 'property_setSeed_numRows',
+      'cpp_default' : '32',
+      'cpp_type' : 'double',
+      'qml_name' : 'setSeed_numRows',
+      'qml_type': 'double',
+      'qml_default': '32',
+    },
+
+    { 'ini_path': 'seed/blockageIsOn',
+      'cpp_name': 'property_setSeed_blockageIsOn',
+      'cpp_default' : 'false',
+      'cpp_type' : 'bool',
+      'qml_name' : 'setSeed_blockageIsOn',
+      'qml_type': 'bool',
+      'qml_default': 'false',
+     },
+
     { 'ini_path': 'vehicle/vehicleName',
       'cpp_name': 'property_setVehicle_vehicleName',
       'cpp_default' : 'QString("Default Vehicle")',
@@ -129,6 +201,12 @@ def parse_settings(file):
                 preamble.append('QVector<int> default_relay_pinConfig = { ' + s.Value.contents[0] + ' };')
                 mock_qml.append("property var %s: [ %s ]" % (n, s.Value.contents[0]))
                 default_value = 'default_relay_pinConfig'
+                qt = 'leavealone'
+
+            elif t == 'System.String' and n == 'setBlockageConfig':
+                preamble.append('QVector<int> default_BlockageConfig = { ' + s.Value.contents[0] + ' };')
+                mock_qml.append("property var %s: [ %s ]" % (n, s.Value.contents[0]))
+                default_value = 'default_BlockageConfig'
                 qt = 'leavealone'
 
             elif t == 'System.String' or \

@@ -28,6 +28,7 @@ Item {
 	property bool gpsConnected: false
 	property bool imuConnected: false
 	property bool machineConnected: false
+    property bool blockageConnected: false
 
     property int ntripStatus: 0
     property int tripBytes: 0

@@ -77,6 +77,7 @@ import "components" as Comp
                 onClicked: {
                     fieldData.visible = !fieldData.visible
                     gpsData.visible = false
+                    blockageData.visible = false
                 }
             }
             Comp.IconButtonColor{
@@ -88,6 +89,7 @@ import "components" as Comp
                 onClicked: {
                     gpsData.visible = !gpsData.visible
                     fieldData.visible = false
+                    blockageData.visible = false
                 }
                 Connections{
                     target: aog
@@ -100,6 +102,20 @@ import "components" as Comp
                 }
 
             }
+            Comp.IconButton {
+                id: btnBlockageInfo
+                icon.source: prefix + "/images/Blockage.png"
+                Layout.alignment: Qt.AlignCenter
+                implicitWidth: theme.buttonSize
+                height:parent.height
+                visible: aog.blockageConnected
+                onClicked: {
+                    blockageData.visible = !blockageData.visible
+                    gpsData.visible = false
+                    fieldData.visible = false
+                }
+            }
+
 
             Text{
                 id: speed

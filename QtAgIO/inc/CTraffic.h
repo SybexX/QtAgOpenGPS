@@ -12,7 +12,7 @@ class  CTraffic : public QObject
         int cntrGPSInBytes = 0;
         int cntrGPSOut = 0;
 
-        unsigned int helloFromMachine = 99, helloFromAutoSteer = 99, helloFromIMU = 99;
+        unsigned int helloFromMachine = 99, helloFromAutoSteer = 99, helloFromIMU = 99, helloFromBlockage = 99;
 };
 
 #endif

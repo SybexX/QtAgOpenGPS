@@ -21,6 +21,13 @@ public:
 
     uchar ssP[9];
 
+    uchar blockagemoduleid[16];
+    uchar blockagesecnum[16];
+    int blockageseccount[64];
+    int blockageseccount1[16];
+    int blockageseccount2[16];
+    int blockageseccount3[16];
+    int blockageseccount4[16];
     int
             swHeader = 0,
             swMain = 1,

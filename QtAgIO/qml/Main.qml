@@ -159,6 +159,12 @@ Window {
                 icon.source: imagePath + "B_Machine.png"
                 color: agio.machineConnected ? "green" : "red"
             }
+            Comp.IconButtonColor {
+                id: btnModuleBlockage
+                text: qsTr("Blockage")
+                icon.source: imagePath + "B_Blockage.png"
+                color: agio.blockageConnected ? "green" : "red"
+            }
 
         }
         Row {

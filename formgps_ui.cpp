@@ -131,6 +131,7 @@ void FormGPS::setupGui()
     InterfaceProperty<RecordedPathInterface, btnStates>::set_qml_root(qmlItem(qml_root, "recordedPathInterface"));
 
     QMLSectionButtons::set_aog_root(qmlItem(qml_root, "aog"));
+    qmlblockage::set_aog_root(qmlItem(qml_root, "aog"));
 
     //initialize interface properties
     isBtnAutoSteerOn = false;
@@ -149,6 +150,7 @@ void FormGPS::setupGui()
 
     //react to UI changing this property
     connect(aog,SIGNAL(sectionButtonStateChanged()), &tool.sectionButtonState, SLOT(onStatesUpdated()));
+    connect(aog,SIGNAL(rowCountChanged()), &tool.blockageRowState, SLOT(onRowsUpdated())); //Dim
 
     openGLControl = qml_root->findChild<AOGRendererInSG *>("openglcontrol");
     //This is a bit hackish, but all rendering is done in this item, so
@@ -247,6 +249,8 @@ void FormGPS::setupGui()
     connect(aog, SIGNAL(modules_send_238()), this, SLOT(modules_send_238()));
 	connect(aog, SIGNAL(modules_send_251()), this, SLOT(modules_send_251()));
     connect(aog, SIGNAL(modules_send_252()), this, SLOT(modules_send_252()));
+
+    connect(aog, SIGNAL(doBlockageMonitoring()), this, SLOT(doBlockageMonitoring()));
 
     connect(aog, SIGNAL(sim_bump_speed(bool)), &sim, SLOT(speed_bump(bool)));
     connect(aog, SIGNAL(sim_zero_speed()), &sim, SLOT(speed_zero()));
@@ -744,7 +748,7 @@ void FormGPS::modules_send_238() {
     p_238.pgn[p_238.user3] = (int)property_setArdMac_user3;
     p_238.pgn[p_238.user4] = (int)property_setArdMac_user4;
 
-    qDebug() << p_238.pgn;
+    qDebug() << (int)property_setArdMac_user1;
     SendPgnToLoop(p_238.pgn);
 }
 void FormGPS::modules_send_251() {

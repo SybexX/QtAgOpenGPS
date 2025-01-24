@@ -24,7 +24,7 @@ class CScanReply : public QObject
 		bool isNewMachine;
 		bool isNewGPS;
 		bool isNewIMU;
-
+        bool isNewBlockage;
 		bool isNewData;
 };
 

@@ -228,6 +228,10 @@ void FormLoop::ReceiveFromUDP()
             else if (data[3] == 121 && data.size() == 11)
                 traffic.helloFromIMU = 0;
 
+            else if (data[3] == 125 && data.size() == 11) // maybe other pgn?
+                traffic.helloFromBlockage = 0;
+
+
             //scan Reply
             else if (data[3] == (char)203 && data.size() == 13) //
             {
@@ -286,6 +290,24 @@ void FormLoop::ReceiveFromUDP()
 
                     scanReply.isNewData = true;
                     scanReply.isNewGPS = true;
+                }
+
+                else if (data[2] == 125)    //Blockage module
+                {
+                    //scanReply.GPS_IP = data[5].ToString() + "." + data[6].ToString() + "." + data[7].ToString() + "." + data[8].ToString();
+
+                    scanReply.GPS_IP = QString::fromLatin1(data.mid(5, 4)).replace(" ", ".");
+
+                    scanReply.subnet[0] = data[9];
+                    scanReply.subnet[1] = data[10];
+                    scanReply.subnet[2] = data[11];
+
+                    //scanReply.subnetStr = data[9].ToString() + "." + data[10].ToString() + "." + data[11].ToString();
+
+                    scanReply.subnetStr = QString::fromLatin1(data.mid(9, 3)).replace(" ", ".");
+
+                    scanReply.isNewData = true;
+                    scanReply.isNewBlockage = true;
                 }
             }
         } // end of pgns
