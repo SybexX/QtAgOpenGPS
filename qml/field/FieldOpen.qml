@@ -33,16 +33,19 @@ Dialog {
         id: fieldTable
         anchors.top: topLine.bottom
         anchors.bottom: grid3.top
-        width:parent.width - 10
+        width: parent.width - 10
         anchors.left: parent.left
         anchors.topMargin: 10
         anchors.leftMargin: 5
         anchors.rightMargin: 15
         anchors.bottomMargin: 10
 
+        adjustWidth: - scrollbar.width
+
         sortBy: fieldOpen.sortBy
 
         anchors.right: topLine.right
+
         ScrollBar.vertical: ScrollBar {
             id: scrollbar
             anchors.left: fieldOpen.right
@@ -52,8 +55,6 @@ Dialog {
             active: true
             contentItem.opacity: 1
         }
-
-
     }
 
     Rectangle{

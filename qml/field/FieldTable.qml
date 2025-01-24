@@ -3,11 +3,8 @@
 //
 // Loaded by FieldOpen.qml. Contains the list of fields
 import QtQuick
-import QtQuick.Layouts
-import QtQuick.Controls
 
-import ".."
-import "../components"
+pragma ComponentBehavior: Bound
 
 ListView {
     id: tableView
@@ -90,11 +87,12 @@ ListView {
     Connections {
         target: fieldInterface
         function onField_listChanged() {
-            update_model()
+            tableView.update_model()
         }
     }
 
     property string currentFieldName: ""
+    property int adjustWidth: -10
 
     //Layout.minimumWidth: 200
     //Layout.minimumHeight: 200
@@ -111,7 +109,7 @@ ListView {
     header: Rectangle {
         z: 2
         color: "white"
-        implicitWidth: tableView.width - scrollbar.width
+        implicitWidth: tableView.width + tableView.adjustWidth
         height: childrenRect.height
 
         Rectangle {
@@ -140,10 +138,10 @@ ListView {
                 anchors.fill: parent
 
                 onClicked: {
-                    if (Math.abs(sortBy) != 1) {
-                        sortBy = 1
+                    if (Math.abs(tableView.sortBy) != 1) {
+                        tableView.sortBy = 1
                     } else {
-                        sortBy = -sortBy
+                        tableView.sortBy = -tableView.sortBy
                     }
                 }
             }
@@ -175,10 +173,10 @@ ListView {
                 anchors.fill: parent
 
                 onClicked: {
-                    if (Math.abs(sortBy) != 2) {
-                        sortBy = 2
+                    if (Math.abs(tableView.sortBy) != 2) {
+                        tableView.sortBy = 2
                     } else {
-                        sortBy = -sortBy
+                        tableView.sortBy = -tableView.sortBy
                     }
                 }
             }
@@ -210,10 +208,10 @@ ListView {
                 anchors.fill: parent
 
                 onClicked: {
-                    if (Math.abs(sortBy) != 3) {
-                        sortBy = 3
+                    if (Math.abs(tableView.sortBy) != 3) {
+                        tableView.sortBy = 3
                     } else {
-                        sortBy = -sortBy
+                        tableView.sortBy = -tableView.sortBy
                     }
                 }
             }
@@ -223,12 +221,19 @@ ListView {
     spacing: 2
 
     delegate: Rectangle {
+        id: fieldDelegate
         height: childrenRect.height
-        implicitWidth: tableView.width - scrollbar.width
+        implicitWidth: tableView.width + tableView.adjustWidth
 
-        color: ListView.isCurrentItem ? "light blue" : "light grey"
+        required property double boundaryArea
+        required property double distance
+        required property string name
+        required property int index
+
+        color: ListView.isCurrentItem ? "light blue" : "light grey" //TODO: use AOGTheme item
 
         Text {
+            id: fieldName
             anchors.top: parent.top
             anchors.left: parent.left
             width: parent.width * 0.5
@@ -236,20 +241,19 @@ ListView {
             anchors.topMargin: 5
             anchors.leftMargin: 5
 
-            id: name
-            text: model.name
+            text: fieldDelegate.name
             elide: Text.ElideRight
             font.pointSize: 18
         }
         Text {
             anchors.top: parent.top
-            anchors.left: name.right
+            anchors.left: fieldName.right
             anchors.leftMargin: 5
             anchors.topMargin: 5
             width: parent.width * 0.2
 
             id: distanceArea
-            text: utils.km_to_unit_string(model.distance,1)+ " " + utils.km_unit()
+            text: utils.km_to_unit_string(fieldDelegate.distance,1)+ " " + utils.km_unit()
             font.pointSize: 16
         }
         Text {
@@ -257,9 +261,9 @@ ListView {
             anchors.right: parent.right
             anchors.left: distanceArea.right
 
-            text: (model.boundaryArea < 1 ?
+            text: (fieldDelegate.boundaryArea < 1 ?
                        qsTr("No boundary") :
-                       utils.area_to_unit_string(model.boundaryArea,1) + " " + utils.area_unit())
+                       utils.area_to_unit_string(fieldDelegate.boundaryArea,1) + " " + utils.area_unit())
             font.pointSize: 16
         }
 
@@ -267,8 +271,8 @@ ListView {
             id: thisisdumb
             anchors.fill: parent
             onClicked: {
-                currentIndex = index
-                currentFieldName = model.name
+                tableView.currentIndex = fieldDelegate.index
+                tableView.currentFieldName = fieldDelegate.name
             }
         }
     }
