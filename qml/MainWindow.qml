@@ -7,7 +7,7 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Effects
 import QtQuick.Dialogs
-import qtagopengps.renderer
+import AOGRenderer
 
 import "interfaces" as Interfaces
 import "boundary" as Boundary
