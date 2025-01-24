@@ -398,6 +398,7 @@ void FormGPS::FileLoadTracks()
             }
         }
     }
+    trk.idx = -1;
     trk.reloadModel();
 }
 
@@ -549,6 +550,7 @@ void FormGPS::FileLoadCurveLines()
 
             trk.gArr[trk.gArr.count() - 1].ptB.easting = trk.gArr[trk.gArr.count() - 1].curvePts[trk.gArr[trk.gArr.count() - 1].curvePts.count() - 1].easting;
             trk.gArr[trk.gArr.count() - 1].ptB.northing = trk.gArr[trk.gArr.count() - 1].curvePts[trk.gArr[trk.gArr.count() - 1].curvePts.count() - 1].northing;
+            trk.gArr[trk.gArr.count() - 1].isVisible = true;
         }
         else
         {
@@ -668,6 +670,7 @@ void FormGPS::FileLoadABLines()
         trk.gArr[i].ptB.northing = words[3].toDouble();
         trk.gArr[i].ptB.easting = trk.gArr[i].ptA.easting + (sin(trk.gArr[i].heading) * 100);
         trk.gArr[i].ptB.northing = trk.gArr[i].ptA.northing + (cos(trk.gArr[i].heading) * 100);
+        trk.gArr[i].isVisible = true;
     }
 
     linesFile.close();
