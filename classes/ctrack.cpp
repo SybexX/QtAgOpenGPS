@@ -38,6 +38,13 @@ CTrack::CTrack(QObject* parent) : QAbstractListModel(parent)
     setIdx(-1);
 }
 
+CTrack::~CTrack()
+{
+    idx = -1;
+    gArr.clear();
+    reloadModel();
+}
+
 int CTrack::FindClosestRefTrack(Vec3 pivot, const CVehicle &vehicle)
 {
     if (idx < 0 || gArr.count() == 0) return -1;

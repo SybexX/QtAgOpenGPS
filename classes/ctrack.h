@@ -95,6 +95,7 @@ public:
     Q_PROPERTY (int count READ rowCount NOTIFY countChanged())
 
     explicit CTrack(QObject* parent = nullptr);
+    ~CTrack();
 
     // CTrack interface
     int FindClosestRefTrack(Vec3 pivot, const CVehicle &vehicle);
