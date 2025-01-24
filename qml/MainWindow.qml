@@ -209,7 +209,7 @@ Window {
             property Matrix4x4 panModelView
             property Matrix4x4 panProjection
 
-            onClicked: {
+            onClicked: function(mouse) {
                 parent.clicked(mouse)
             }
 
