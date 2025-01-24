@@ -27,11 +27,11 @@ Item {
     AOGTheme{
         id: aogTheme
     }
-    property color backgroundColor: theme.backgroundColor
-    property color textColor: theme.textColor
-    property color borderColor: theme.borderColor
-	property color blackDayWhiteNight: theme.blackDayWhiteNight
-	property color whiteDayBlackNight: theme.whiteDayBlackNight
+    property color backgroundColor: aogTheme.backgroundColor
+    property color textColor: aogTheme.textColor
+    property color borderColor: aogTheme.borderColor
+    property color blackDayWhiteNight: aogTheme.blackDayWhiteNight
+    property color whiteDayBlackNight: aogTheme.whiteDayBlackNight
     /*
     Connections {
         target: settings
