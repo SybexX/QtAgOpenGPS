@@ -24,8 +24,8 @@ To do
  * Serial. Add NTRIP to bluetooth
 
 Done
- * Set the categories to consistent in the ini file.
- * Add "Auto reconnect" to UDP code in QtAgIO.
+ * ~~Set the categories to consistent in the ini file.~~
+ * ~~Add "Auto reconnect" to UDP code in QtAgIO.~~
  * ~~ABLine and Contour line UI stuff out of the GL drawing function.~~ (pretty sure that was done a long time ago)
  * ~~Move section lookahead stuff out of GL drawing functinone somehow.
    Maybe after rendering frame, save a pixmap of the entire widget.~~ (done a long time ago)

@@ -515,7 +515,6 @@ QVariant CTrack::data(const QModelIndex &index, int role) const
     }
 
     const CTrk &trk = gArr.at(row);
-    qDebug() << row << role << trk.name;
     switch(role) {
     case RoleNames::index:
         return row;
