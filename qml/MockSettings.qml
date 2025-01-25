@@ -293,10 +293,10 @@ Item {
     property bool setDisplay_topTrackNum: false
     property double setSeed_blockCountMin: 100
     property double setSeed_blockCountMax: 1000
-    property int setSeed_blockRow1: 16
-    property int setSeed_blockRow2: 16
-    property int setSeed_blockRow3: 16
-    property int setSeed_blockRow4: 0
-    property int setSeed_numRows: 32
+    property double setSeed_blockRow1: 16
+    property double setSeed_blockRow2: 16
+    property double setSeed_blockRow3: 16
+    property double setSeed_blockRow4: 0
+    property double setSeed_numRows: 32
     property bool setSeed_blockageIsOn: false
 }
