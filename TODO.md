@@ -18,7 +18,7 @@ To do
  * Consider using QML_SINGLETON to embed things like CTrack and CVehicle in the QML space.  Would have to pull pointers back to FormGPS, though.  For now I'm going to stick with setContextProperty.
    * concerned a bit with threading.  Reading properties is probably thread safe, but setting properties might not be.
  * Fix world grid lines. 
- * Add the necessary code to turn blockage on/off, and merge into dev.
+ * Add the necessary code to turn blockage on/off.
  * Show AB and AC on main screen, implement timer like in AOG
  * Add NTRIP to bluetooth
  * Serial. Add NTRIP to bluetooth
