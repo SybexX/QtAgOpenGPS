@@ -69,6 +69,17 @@ ColumnLayout {
         Layout.alignment: Qt.AlignCenter
         implicitWidth: theme.buttonSize
         implicitHeight: theme.buttonSize
+
+        onClicked: {
+            if (trk.idx > -1) {
+                var a = trk.idx
+                a += 1
+                if (a >= trk.rowCount())
+                    a = 0
+
+                tracksInterface.select(a)
+            }
+        }
     }
     Comp.IconButton{
         id: btnTrackCycleBk
@@ -76,6 +87,18 @@ ColumnLayout {
         Layout.alignment: Qt.AlignCenter
         implicitWidth: theme.buttonSize
         implicitHeight: theme.buttonSize
+
+        onClicked: {
+            if (trk.idx > -1) {
+                var a = trk.idx
+                a -= 1
+                if (a < 0)
+                    a = trk.rowCount() - 1
+
+                tracksInterface.select(a)
+            }
+        }
+
     }
     Comp.IconButton{
         id: btnAutoTrack

@@ -18,7 +18,8 @@ RadioDelegate {
 
     contentItem: RowLayout {
         anchors.left: parent.left
-        anchors.right: parent.right - trackDelegate.scrollbar_width
+        anchors.right: parent.right
+        anchors.rightMargin: trackDelegate.scrollbar_width
 
         Image {
             id: trackType

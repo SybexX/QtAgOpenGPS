@@ -5,12 +5,13 @@ pragma ComponentBehavior: Bound
 
 ListView {
     id: tracksView
-    property int selected: trk.idx > -1 ? trk.idx : -1
+    property int selected: -1
     property bool trackVisible: false
 
     onVisibleChanged: {
         if (visible && trk.idx > -1) {
-            tracksView.selected = trk.idx
+            console.debug("turning on track ",trk.idx)
+            //tracksView.selected = trk.idx
             tracksView.currentIndex = trk.idx
         }
     }
@@ -21,6 +22,8 @@ ListView {
         active: ScrollBar.AlwaysOn
     }
 
+    keyNavigationEnabled: true
+
     delegate: TrackPickDelegate {
         id: control
         checked: control.index === tracksView.currentIndex
@@ -28,8 +31,10 @@ ListView {
         scrollbar_width: scrollbar.width
 
         onCheckedChanged: {
-            tracksView.selected = control.index
+            //tracksView.selected = control.index
+            tracksView.currentIndex = control.index
             tracksView.trackVisible = control.isVisible
+            console.debug("checked event... track selected is ",tracksView.currentIndex)
         }
     }
 }

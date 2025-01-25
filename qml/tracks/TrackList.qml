@@ -136,9 +136,9 @@ MoveablePopup {
                 icon.source: prefix + "/images/OK64.png"
                 onClicked: {
                     trackPickerDialog.visible = false
-                    if (trackView.selected > -1 && trackView.trackVisible) {
-                        console.debug("Activating track ", trackView.selected)
-                        tracksInterface.select(trackView.selected)
+                    if (trackView.currentIndex > -1 && trackView.trackVisible) {
+                        console.debug("Activating track ", trackView.currentIndex)
+                        tracksInterface.select(trackView.currentIndex)
                     }
                     trackPickerDialog.visible = false
                 }
