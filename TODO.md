@@ -18,13 +18,13 @@ To do
  * Consider using QML_SINGLETON to embed things like CTrack and CVehicle in the QML space.  Would have to pull pointers back to FormGPS, though.  For now I'm going to stick with setContextProperty.
    * concerned a bit with threading.  Reading properties is probably thread safe, but setting properties might not be.
  * Fix world grid lines. 
- * Set the categories to consistent in the ini file.
  * Add the necessary code to turn blockage on/off, and merge into dev.
  * Show AB and AC on main screen, implement timer like in AOG
  * Add NTRIP to bluetooth
  * Serial. Add NTRIP to bluetooth
 
 Done
+ * Set the categories to consistent in the ini file.
  * Add "Auto reconnect" to UDP code in QtAgIO.
  * ~~ABLine and Contour line UI stuff out of the GL drawing function.~~ (pretty sure that was done a long time ago)
  * ~~Move section lookahead stuff out of GL drawing functinone somehow.
