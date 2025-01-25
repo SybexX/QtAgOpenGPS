@@ -28,7 +28,7 @@ compare_branches() {
 
   # Print the comparison if it's valid
   if [[ -n $ahead && -n $behind ]]; then
-    printf "%-50s Ahead: %-10s Behind: %-10s\n" "$display_name" "$ahead" "$behind"
+    printf "%-50s Behind: %-10s Ahead: %-10s\n" "$display_name" "$ahead" "$behind"
   fi
 }
 
