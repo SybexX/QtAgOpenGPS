@@ -688,7 +688,7 @@ QMap<QString,QVariant> FormGPS::FileFieldInfo(QString fieldDir)
     QFile fieldFile(filename);
     if (!fieldFile.open(QIODevice::ReadOnly))
     {
-        TimedMessageBox(1500, tr("Field Error"), (fieldDir + tr(" is not a valid field!")));
+        TimedMessageBox(5000, tr("Field Error"), (fieldDir + tr(" is missing Field.txt! It will be ignored and should probably be deleted.")));
         return field_info;
     }
 
