@@ -6,7 +6,9 @@ cmake_minimum_required(VERSION 3.22)
 
 # Compiler cache for faster rebuilds (must be before project())
 # sccache supports GCC, Clang, and MSVC; ccache supports GCC and Clang
-find_program(SCCACHE_PROGRAM sccache)
+find_program(SCCACHE_PROGRAM sccache
+    HINTS "$ENV{HOME}/.cargo/bin" "$ENV{USERPROFILE}/.cargo/bin"
+)
 find_program(CCACHE_PROGRAM ccache)
 if(SCCACHE_PROGRAM)
     set(CMAKE_C_COMPILER_LAUNCHER ${SCCACHE_PROGRAM})
