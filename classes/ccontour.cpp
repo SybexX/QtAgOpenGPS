@@ -33,7 +33,7 @@ void CContour::setLockToLine()
     }
 }
 
-void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehicle, Vec3 pivot, QObject *mainWindow)
+void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehicle, Vec3 pivot)
 {
     double tool_toolWidth = SettingsManager::instance()->vehicle_toolWidth();
     double tool_toolOverlap = SettingsManager::instance()->vehicle_toolOverlap();
@@ -305,7 +305,7 @@ void CContour::DistanceFromContourLine(bool isBtnAutoSteerOn,
                                        CYouTurn &yt,
                                        CAHRS &ahrs,
                                        CNMEA &pn,
-                                       Vec3 pivot, Vec3 steer, QObject *mainWindow)
+                                       Vec3 pivot, Vec3 steer)
 {
     double wheelbase = SettingsManager::instance()->vehicle_wheelbase();
     double maxSteerAngle = SettingsManager::instance()->vehicle_maxSteerAngle();
@@ -681,7 +681,7 @@ void CContour::BuildFenceContours(CBoundary &bnd, double spacingInt, int patchCo
 }
 
 //draw the red follow me line
-void CContour::DrawContourLine(QOpenGLFunctions *gl, const QMatrix4x4 &mvp, QObject *mainWindow, QElapsedTimer &swFrame)
+void CContour::DrawContourLine(QOpenGLFunctions *gl, const QMatrix4x4 &mvp, QElapsedTimer &swFrame)
 {
     bool isStanleyUsed = SettingsManager::instance()->vehicle_isStanleyUsed();
     double lineWidth = SettingsManager::instance()->display_lineWidth();

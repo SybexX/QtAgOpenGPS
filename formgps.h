@@ -96,7 +96,6 @@ public:
      * Qt-specific things we need to keep track of *
      ***********************************************/
     QLocale locale;
-    QObject *mainWindow;
     QSignalMapper *sectionButtonsSignalMapper;
     QTimer *tmrWatchdog;
     QTimer timerGPS;  // Phase 6.0.24: Fixed 40 Hz timer for real GPS mode (like timerSim for simulation)
@@ -193,9 +192,6 @@ private:
 
     // ⚡ QML Interface Initialization - Delayed to avoid timing issues
     void initializeQMLInterfaces();
-
-    // ⚡ Safe QML Object Access - With NULL protection and retries
-    QObject* safeQmlItem(const QString& objectName, int maxRetries = 3);
 
     // Geodetic Conversion - Phase 6.0.20 Task 24 Step 3.5
     void updateMPerDegreeLat();

@@ -870,7 +870,7 @@ void FormGPS::UpdateFixPosition()
 
     if (MainWindowState::instance()->isContourBtnOn())
     {
-        ct.DistanceFromContourLine(MainWindowState::instance()->isBtnAutoSteerOn(), *CVehicle::instance(), yt, ahrs, pn, CVehicle::instance()->pivotAxlePos, CVehicle::instance()->steerAxlePos, mainWindow);
+        ct.DistanceFromContourLine(MainWindowState::instance()->isBtnAutoSteerOn(), *CVehicle::instance(), yt, ahrs, pn, CVehicle::instance()->pivotAxlePos, CVehicle::instance()->steerAxlePos);
     }
     else
     {
@@ -1204,7 +1204,7 @@ void FormGPS::UpdateFixPosition()
 #endif
 
     //Both the framebuffer and the qquickitem renderer share the same interface here.
-    QQuickItem *renderer = mainWindow->findChild<QQuickItem *>("openglcontrol");
+    QQuickItem *renderer = qobject_cast<QQuickItem *>(Backend::instance()->aogRenderer);
     // CRITICAL: Force OpenGL update in GUI thread to prevent threading violation
     if (renderer) {
         renderer->update();
@@ -1771,7 +1771,7 @@ void FormGPS::AddContourPoints()
         }
 
         //Build contour line if close enough to a patch
-        if (MainWindowState::instance()->isContourBtnOn()) ct.BuildContourGuidanceLine(secondsSinceStart, *CVehicle::instance(), CVehicle::instance()->pivotAxlePos, mainWindow);
+        if (MainWindowState::instance()->isContourBtnOn()) ct.BuildContourGuidanceLine(secondsSinceStart, *CVehicle::instance(), CVehicle::instance()->pivotAxlePos);
     }
     //save the north & east as previous
     prevContourPos.northing = CVehicle::instance()->pivotAxlePos.northing;
