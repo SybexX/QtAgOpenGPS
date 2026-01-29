@@ -1190,13 +1190,27 @@ Window {
                                 visible: true
                             }
                         ]
+
+                        inner: [
+                            BoundaryLine {
+                                points: [
+                                    Qt.vector3d(10,10,0),
+                                    Qt.vector3d(10,-10,0),
+                                    Qt.vector3d(-10,-10,0),
+                                    Qt.vector3d(-10,10,0)//,
+                                ]
+                                visible: true
+                            }
+                        ]
+
+                        beingMade: [
+                            Qt.vector3d(15,15,0),
+                            Qt.vector3d(15,-15,0),
+                            Qt.vector3d(-15,-15,0)
+                        ]
+
+                        markBoundary: 2 //metres left or right from pivot
                     }
-
-                    // Camera rotation from vehicle heading (radians to degrees)
-
-                    // Camera zoom/distance from Camera singleton (camSetDistance is negative)
-
-                    // Camera pitch from settings
 
                     // Visibility settings
                     showBoundary: true

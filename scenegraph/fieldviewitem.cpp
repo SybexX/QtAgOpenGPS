@@ -24,6 +24,8 @@
 
 #include "cvehicle.h"
 #include "cboundary.h"
+#include "settingsmanager.h"
+#include "boundaryinterface.h"
 
 #include <QSGGeometryNode>
 #include <QSGFlatColorMaterial>
@@ -127,6 +129,19 @@ FieldViewItem::FieldViewItem(QQuickItem *parent)
     connect(this, &FieldViewItem::boundaryColorChanged, this, &FieldViewItem::requestUpdate);
     connect(this, &FieldViewItem::guidanceColorChanged, this, &FieldViewItem::requestUpdate);
     connect(this, &FieldViewItem::backgroundColorChanged, this, &FieldViewItem::requestUpdate);
+
+    connect(SettingsManager::instance(), &SettingsManager::display_lineWidthChanged, [this]() {
+        m_renderData.lineWidth = SettingsManager::instance()->display_lineWidth();
+        requestUpdate();
+    });
+    m_renderData.lineWidth = SettingsManager::instance()->display_lineWidth();
+
+    connect(BoundaryInterface::instance(), &BoundaryInterface::isOutOfBoundsChanged, [this]() {
+        m_renderData.isOutOfBounds = BoundaryInterface::instance()->isOutOfBounds();
+        requestUpdate();
+    });
+    m_renderData.isOutOfBounds = BoundaryInterface::instance()->isOutOfBounds();
+
 
     // Schedule initial polish to sync singleton data before first render
     polish();
@@ -476,6 +491,11 @@ QSGNode *FieldViewItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         m_currentP,
         m_currentNcd,
         viewportSize,
+        m_renderData.vehicleX,
+        m_renderData.vehicleY,
+        m_renderData.vehicleHeading,
+        m_renderData.isOutOfBounds,
+        m_renderData.lineWidth,
         m_boundaries
     );
 

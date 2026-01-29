@@ -199,6 +199,8 @@ private:
         double vehicleY = 0;
         double vehicleHeading = 0;
         double steerAngle = 0;
+        bool isOutOfBounds = false;
+        int lineWidth = 1;
 
         // Boundary data
         QVector<QVector<QVector3D>> boundaries;

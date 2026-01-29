@@ -23,18 +23,32 @@ public:
     void update(const QMatrix4x4 &mv,
                 const QMatrix4x4 &p,
                 const QMatrix4x4 &ndc,
-                const QSize &viewportSize,
+                const QSize &viewportSize, float vehicleX, float vehicleY, float vehicleHeading,
+                bool isOutOfBounds,
+                int lineWidth,
                 const BoundariesProperties *properties);
 
     void clearChildren();
 
 private:
-    QList<QSGGeometryNode *> m_boundaryNodes;
+    QList<QSGGeometryNode *> m_outerNodes;
+    QList<QSGGeometryNode *> m_innerNodes;
+    QSGGeometryNode *m_lastPointToPivotNode;
+    QSGGeometryNode *m_bndBeingMadeNode;
+    QSGGeometryNode *m_beingMadeDotsNode;
 
-    void updateNodeMvp(QSGGeometryNode *node,
-                       const QMatrix4x4 mvp,
-                       const QSize &viewportSize);
+    void updateThickLineNode(QSGGeometryNode *node,
+                        const QMatrix4x4 mvp,
+                        const QSize &viewportSize,
+                        int lineWidth, const QColor &color);
 
+    void updateDashedLineNode(QSGGeometryNode *node,
+                              const QMatrix4x4 mvp,
+                              const QSize &viewportSize,
+                              int lineWidth,
+                              const QColor &color,
+                              int dashLength = 10,
+                              int dashGap = 10);
 };
 
 #endif // BOUNDARIESNODE_H
