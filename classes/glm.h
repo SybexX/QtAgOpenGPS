@@ -378,5 +378,12 @@ namespace glm {
 
         return QPointF(temp.x(), temp.y());
     }
+
+    inline static float dp(float px) {
+        if (QScreen *screen = QGuiApplication::primaryScreen()) {
+            return screen->devicePixelRatio() * px;
+        }
+        return px;
+    }
 }
 #endif // GLM_H
