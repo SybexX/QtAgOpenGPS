@@ -44,7 +44,7 @@ void main()
     // In NDC, range is [-1, 1] = 2 units for viewport dimensions
     // 1 pixel = 2 / viewportSize NDC units
     // In clip space: offset = pixelOffset * (2 / viewportSize) * abs(w)
-    float halfWidth = ubuf.lineWidth * 0.5;
+    float halfWidth = ubuf.lineWidth * 0.25;
     vec2 pixelToNDC = vec2(2.0 / ubuf.viewportSize.x, 2.0 / ubuf.viewportSize.y);
     vec2 ndcOffset = normal * halfWidth * pixelToNDC * side;
     vec2 clipOffset = ndcOffset * abs(currClip.w);

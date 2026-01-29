@@ -137,6 +137,7 @@ QSGGeometry *createLinesGeometry2(const QVector<QVector3D> &points);
 
 // For CONNECTED polylines: points[0]→points[1]→points[2]→...
 QSGGeometry *createThickLineGeometry(const QVector<QVector3D> &points);
+void updateThickLineGeometry(ThickLineVertex *data, const QVector<QVector3D> &points);
 
 // For DISCONNECTED line segments (like GL_LINES): points[0]→points[1], points[2]→points[3], ...
 QSGGeometry *createThickLinesGeometry(const QVector<QVector3D> &points);
@@ -145,6 +146,8 @@ QSGGeometry *createThickLinesGeometry(const QVector<QVector3D> &points);
 QSGGeometry *createThickLineLoopGeometry(const QVector<QVector3D> &points);
 
 QSGGeometry *createThickLineColorsGeometry(const QVector<ColorVertexVectors> &points);
+void updateThickLineColorsGeometry(ThickLineColorsVertex *data, const QVector<ColorVertexVectors> &points);
+
 QSGGeometry *createThickLinesColorsGeometry(const QVector<ColorVertexVectors> &points);
 QSGGeometry *createThickLineColorsLoopGeometry(const QVector<ColorVertexVectors> &points);
 
@@ -152,6 +155,7 @@ QSGGeometry *createThickLineColorsLoopGeometry(const QVector<ColorVertexVectors>
 // For CONNECTED polylines: points[0]→points[1]→points[2]→...
 // Use with DashedThickLineMaterial which expands to screen-pixel width and applies dash pattern
 QSGGeometry *createDashedThickLineGeometry(const QVector<QVector3D> &points);
+void updateDashedThickLineGeometry(DashedThickLineVertex *data, const QVector<QVector3D> &points);
 
 // For DISCONNECTED line segments (like GL_LINES): points[0]→points[1], points[2]→points[3], ...
 QSGGeometry *createDashedThickLinesGeometry(const QVector<QVector3D> &points);
