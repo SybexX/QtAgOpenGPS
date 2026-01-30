@@ -439,12 +439,17 @@ qt_add_qml_module(QtAgOpenGPS
     SOURCES scenegraph/thicklinecolorsmaterial.h scenegraph/thicklinecolorsmaterial.cpp
     SOURCES scenegraph/dashedthicklinematerial.h scenegraph/dashedthicklinematerial.cpp
     SOURCES scenegraph/texturefactory.h scenegraph/texturefactory.cpp
+    SOURCES scenegraph/textnode.h scenegraph/textnode.cpp
+    SOURCES scenegraph/dotsnode.h scenegraph/dotsnode.cpp
     SOURCES scenegraph/toolsproperties.h scenegraph/toolsproperties.cpp
     SOURCES scenegraph/boundaryproperties.h scenegraph/boundaryproperties.cpp
     SOURCES scenegraph/boundariesproperties.h scenegraph/boundariesproperties.cpp
     SOURCES scenegraph/toolsnode.h scenegraph/toolsnode.cpp
     SOURCES scenegraph/roundpointmaterial.h scenegraph/roundpointmaterial.cpp
     SOURCES scenegraph/roundpointsizematerial.h scenegraph/roundpointsizematerial.cpp
+    SOURCES scenegraph/tracksnode.h scenegraph/tracksnode.cpp
+    SOURCES scenegraph/tracksproperties.h scenegraph/tracksproperties.cpp
+    SOURCES scenegraph/trackproperties.h scenegraph/trackproperties.cpp
 
 )
 

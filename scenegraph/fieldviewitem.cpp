@@ -16,6 +16,8 @@
 #include "boundariesnode.h"
 #include "vehiclenode.h"
 #include "toolsnode.h"
+#include "tracksnode.h"
+
 #include "aogmaterial.h"
 #include "aoggeometry.h"
 #include "texturefactory.h"
@@ -55,12 +57,14 @@ FieldViewNode::FieldViewNode()
     vehicleNode = new VehicleNode();
     toolsNode = new ToolsNode();
     uiNode = new QSGNode();
+    tracksNode = new TracksNode();
 
     // Add children in render order (back to front)
     appendChildNode(fieldSurfaceNode);  // Field surface first (furthest back)
     appendChildNode(gridNode);          // Grid lines
     appendChildNode(boundaryNode);
     appendChildNode(coverageNode);
+    appendChildNode(tracksNode);
     appendChildNode(guidanceNode);
     appendChildNode(toolsNode);
     appendChildNode(vehicleNode);
@@ -89,6 +93,7 @@ FieldViewItem::FieldViewItem(QQuickItem *parent)
     m_vehicle = new VehicleProperties(this);
     m_tools = new ToolsProperties(this);
     m_boundaries = new BoundariesProperties(this);
+    m_tracks = new TracksProperties(this);
 
     // Connect camera property changes to update()
     connect(m_camera, &CameraProperties::zoomChanged, this, &FieldViewItem::requestUpdate);
@@ -142,6 +147,10 @@ FieldViewItem::FieldViewItem(QQuickItem *parent)
     });
     m_renderData.isOutOfBounds = BoundaryInterface::instance()->isOutOfBounds();
 
+    connect(m_tracks, &TracksProperties::tracksPropertiesChanged, [this]() {
+        m_tracksDirty = true;
+        requestUpdate();
+    });
 
     // Schedule initial polish to sync singleton data before first render
     polish();
@@ -204,6 +213,8 @@ ToolsProperties* FieldViewItem::tools() const { return m_tools; }
 
 BoundariesProperties* FieldViewItem::boundaries() const { return m_boundaries; }
 
+TracksProperties *FieldViewItem::tracks() const { return m_tracks; }
+
 void FieldViewItem::setBoundaries(BoundariesProperties *boundaries)
 {
     if (m_boundaries == boundaries)
@@ -258,13 +269,29 @@ void FieldViewItem::setTools(ToolsProperties *tools)
     requestUpdate();
 }
 
+void FieldViewItem::setTracks(TracksProperties *tracks)
+{
+    if (m_tracks == tracks)
+        return;
+
+    if (m_tracks) {
+        disconnect(m_tracks, nullptr, this, nullptr);
+
+        if (m_tracks->parent() == this)
+            delete m_tracks;
+    }
+
+    m_tracks = tracks;
+    if (m_tracks) {
+        connect (m_tracks, &TracksProperties::tracksPropertiesChanged, [this]() {
+            m_tracksDirty = true;
+        });
+    }
+}
+
 // ============================================================================
 // Visibility Property Accessors
 // ============================================================================
-
-bool FieldViewItem::showBoundary() const { return m_showBoundary; }
-void FieldViewItem::setShowBoundary(bool value) { m_showBoundary = value; }
-QBindable<bool> FieldViewItem::bindableShowBoundary() { return &m_showBoundary; }
 
 bool FieldViewItem::showCoverage() const { return m_showCoverage; }
 void FieldViewItem::setShowCoverage(bool value) { m_showCoverage = value; }
@@ -277,10 +304,6 @@ QBindable<bool> FieldViewItem::bindableShowGuidance() { return &m_showGuidance; 
 // ============================================================================
 // Color Property Accessors
 // ============================================================================
-
-QColor FieldViewItem::boundaryColor() const { return m_boundaryColor; }
-void FieldViewItem::setBoundaryColor(const QColor &color) { m_boundaryColor = color; }
-QBindable<QColor> FieldViewItem::bindableBoundaryColor() { return &m_boundaryColor; }
 
 QColor FieldViewItem::guidanceColor() const { return m_guidanceColor; }
 void FieldViewItem::setGuidanceColor(const QColor &color) { m_guidanceColor = color; }
@@ -447,11 +470,12 @@ QSGNode *FieldViewItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         );
     }
 
+    double camDistance = abs(m_camera->zoom());
+
     // Update grid if visible
     if (m_grid->visible()) {
         // Calculate grid spacing based on zoom
         double gridSpacing = 10.0;
-        double camDistance = abs(m_camera->zoom());
         if (camDistance <= 20000 && camDistance > 10000) gridSpacing = 2012;
         else if (camDistance <= 10000 && camDistance > 5000) gridSpacing = 1006;
         else if (camDistance <= 5000 && camDistance > 2000) gridSpacing = 503;
@@ -475,6 +499,34 @@ QSGNode *FieldViewItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         );
         m_gridDirty = false;
     }
+
+
+    float textSize;
+    if (m_camera->pitch() < -45) {
+        textSize = pow(camDistance, 0.8);
+        textSize /= 300;
+    } else {
+        textSize = pow(camDistance, 0.85);
+        textSize /=500;
+    }
+
+    if (m_tracksDirty) {
+        m_tracksDirty = false;
+        rootNode->tracksNode->clearChildren();
+    }
+
+    rootNode->tracksNode->update(m_currentMv,
+                                 m_currentP,
+                                 m_currentNcd,
+                                 viewportSize,
+                                 m_renderData.vehicleX,
+                                 m_renderData.vehicleY,
+                                 m_renderData.vehicleHeading,
+                                 m_renderData.isOutOfBounds,
+                                 m_renderData.lineWidth,
+                                 textSize,
+                                 m_textureFactory,
+                                 m_tracks);
 
     // Update boundary if visible and dirty
     if (m_boundaryDirty) {

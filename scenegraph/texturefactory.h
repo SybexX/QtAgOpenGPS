@@ -8,6 +8,7 @@
 
 #include <QSGTexture>
 #include <QHash>
+#include <QSize>
 
 class QQuickWindow;
 
@@ -36,6 +37,11 @@ public:
     // Returns nullptr if texture cannot be loaded
     QSGTexture *texture(TextureId id);
 
+    // Get texture dimensions (loads texture if not already loaded)
+    int textureWidth(TextureId id);
+    int textureHeight(TextureId id);
+    QSize textureSize(TextureId id);
+
     // Check if a texture is already loaded
     bool isLoaded(TextureId id) const;
 
@@ -54,6 +60,7 @@ private:
 
     QQuickWindow *m_window = nullptr;
     QHash<TextureId, QSGTexture *> m_textures;
+    QHash<TextureId, QSize> m_textureSizes;
 };
 
 #endif // TEXTUREFACTORY_H

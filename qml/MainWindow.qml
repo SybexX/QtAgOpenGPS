@@ -1212,8 +1212,23 @@ Window {
                         markBoundary: 2 //metres left or right from pivot
                     }
 
+                    tracks:  TracksProperties {
+                        newTrack: [
+
+                        ]
+
+                        abRefLine: [
+
+
+                        ]
+
+                        aRefFlag: Qt.vector3d(-5,5,0);
+                        bRefFlag: Qt.vector3d(5,5,0);
+                        showRefFlags: true
+
+                    }
+
                     // Visibility settings
-                    showBoundary: true
                     showCoverage: true
                     showGuidance: true
 
@@ -1229,7 +1244,6 @@ Window {
                     // Vehicle color from settings
 
                     // Boundary and guidance colors (yellow and green)
-                    boundaryColor: Qt.rgba(1, 1, 0, 1)
                     guidanceColor: Qt.rgba(0, 1, 0, 1)
                 }
 

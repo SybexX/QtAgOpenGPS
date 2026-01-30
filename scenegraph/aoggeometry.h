@@ -27,6 +27,12 @@ struct ColorSizeVertex {
     float s; //dot size
 };
 
+struct ColorSizeVertexVectors {
+    QVector3D position;
+    QColor color;
+    float size;
+};
+
 struct PositionVertex {
     float x,y,z; // 3D position
 };
