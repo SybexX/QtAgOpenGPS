@@ -10,6 +10,7 @@
 #include "vehicleproperties.h"
 #include "toolsproperties.h"
 #include "boundariesproperties.h"
+#include "layersproperties.h"
 
 #include "fieldsurfacenode.h"
 #include "gridnode.h"
@@ -17,6 +18,7 @@
 #include "vehiclenode.h"
 #include "toolsnode.h"
 #include "tracksnode.h"
+#include "layersnode.h"
 
 #include "aogmaterial.h"
 #include "aoggeometry.h"
@@ -52,8 +54,8 @@ FieldViewNode::FieldViewNode()
     fieldSurfaceNode = new FieldSurfaceNode();
     gridNode = new GridNode();
     boundaryNode = new BoundariesNode();
-    coverageNode = new QSGNode();   // Not yet refactored
-    guidanceNode = new QSGNode();   // Not yet refactored
+    layersNode = new LayersNode();    // Coverage layers
+    guidanceNode = new QSGNode();     // Not yet refactored
     vehicleNode = new VehicleNode();
     toolsNode = new ToolsNode();
     uiNode = new QSGNode();
@@ -62,8 +64,8 @@ FieldViewNode::FieldViewNode()
     // Add children in render order (back to front)
     appendChildNode(fieldSurfaceNode);  // Field surface first (furthest back)
     appendChildNode(gridNode);          // Grid lines
+    appendChildNode(layersNode);        // Coverage layers (triangles)
     appendChildNode(boundaryNode);
-    appendChildNode(coverageNode);
     appendChildNode(tracksNode);
     appendChildNode(guidanceNode);
     appendChildNode(toolsNode);
@@ -94,6 +96,7 @@ FieldViewItem::FieldViewItem(QQuickItem *parent)
     m_tools = new ToolsProperties(this);
     m_boundaries = new BoundariesProperties(this);
     m_tracks = new TracksProperties(this);
+    // m_layers is null by default - set via QML: layers: LayerService.layers
 
     // Connect camera property changes to update()
     connect(m_camera, &CameraProperties::zoomChanged, this, &FieldViewItem::requestUpdate);
@@ -289,6 +292,38 @@ void FieldViewItem::setTracks(TracksProperties *tracks)
     }
 }
 
+LayersProperties* FieldViewItem::layers() const { return m_layers; }
+
+void FieldViewItem::setLayers(LayersProperties *layers)
+{
+    if (m_layers == layers)
+        return;
+
+    // Disconnect all signals from old layers to us
+    if (m_layers) {
+        disconnect(m_layers, nullptr, this, nullptr);
+
+        // Delete if we own it (created with us as parent)
+        if (m_layers->parent() == this)
+            delete m_layers;
+    }
+
+    m_layers = layers;
+
+    // Connect signals from new layers
+    if (m_layers) {
+        connect(m_layers, &LayersProperties::trianglesChanged, this, &FieldViewItem::markLayersDirty);
+        connect(m_layers, &LayersProperties::layerAdded, this, &FieldViewItem::markLayersDirty);
+        connect(m_layers, &LayersProperties::layerRemoved, this, &FieldViewItem::markLayersDirty);
+        connect(m_layers, &LayersProperties::layerVisibilityChanged, this, &FieldViewItem::requestUpdate);
+        connect(m_layers, &LayersProperties::layerAlphaChanged, this, &FieldViewItem::markLayersDirty);
+    }
+
+    m_layersDirty = true;
+    emit layersChanged();
+    requestUpdate();
+}
+
 // ============================================================================
 // Visibility Property Accessors
 // ============================================================================
@@ -356,12 +391,19 @@ void FieldViewItem::markGuidanceDirty()
     update();
 }
 
+void FieldViewItem::markLayersDirty()
+{
+    m_layersDirty = true;
+    update();
+}
+
 void FieldViewItem::markAllDirty()
 {
     m_boundaryDirty = true;
     m_coverageDirty = true;
     m_guidanceDirty = true;
     m_gridDirty = true;
+    m_layersDirty = true;
     update();
 }
 
@@ -550,6 +592,23 @@ QSGNode *FieldViewItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         m_renderData.lineWidth,
         m_boundaries
     );
+
+    // Update coverage layers
+    if (m_layersDirty) {
+        m_layersDirty = false;
+        rootNode->layersNode->clearChildren();
+    }
+
+    // Always update layers (updates MVP matrix and rebuilds geometry if needed)
+    if (m_layers && m_layers->visible()) {
+        rootNode->layersNode->update(
+            m_currentMv,
+            m_currentP,
+            m_currentNcd,
+            viewportSize,
+            m_layers
+        );
+    }
 
     // Update coverage and guidance (not yet refactored)
     if (m_showCoverage && m_coverageDirty) {

@@ -451,6 +451,12 @@ qt_add_qml_module(QtAgOpenGPS
     SOURCES scenegraph/tracksproperties.h scenegraph/tracksproperties.cpp
     SOURCES scenegraph/trackproperties.h scenegraph/trackproperties.cpp
 
+    # Coverage layer system
+    SOURCES scenegraph/layertypes.h
+    SOURCES scenegraph/layersproperties.h scenegraph/layersproperties.cpp
+    SOURCES scenegraph/layersnode.h scenegraph/layersnode.cpp
+    SOURCES backend/layerservice.h backend/layerservice.cpp
+
 )
 
 ###### End Script of Handling QML in module ######

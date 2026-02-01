@@ -1217,7 +1217,7 @@ Window {
 
                         ]
 
-                        abRefLine: [
+                        refLine: [
 
 
                         ]
@@ -1226,6 +1226,61 @@ Window {
                         bRefFlag: Qt.vector3d(5,5,0);
                         showRefFlags: true
 
+                    }
+
+                    // Demo coverage layer (QML-only, no LayerService connection)
+                    layers: Layers {
+                        id: demoLayers
+                        visible: true
+
+                        Component.onCompleted: {
+                            // Create demo layer
+                            addLayer(0, "Demo Layer")
+
+                            // Add demo triangles within 50m radius of origin
+                            // Create a grid of colored patches
+                            var colors = [
+                                Qt.rgba(1, 0, 0, 0.6),    // Red
+                                Qt.rgba(0, 1, 0, 0.6),    // Green
+                                Qt.rgba(0, 0, 1, 0.6),    // Blue
+                                Qt.rgba(1, 1, 0, 0.6),    // Yellow
+                                Qt.rgba(1, 0, 1, 0.6),    // Magenta
+                                Qt.rgba(0, 1, 1, 0.6)     // Cyan
+                            ]
+
+                            var patchSize = 8  // metres per patch
+                            var colorIndex = 0
+
+                            // Create patches from -40 to +40 metres
+                            for (var x = -40; x < 40; x += patchSize) {
+                                for (var y = -40; y < 40; y += patchSize) {
+                                    // Check if within 50m radius
+                                    var cx = x + patchSize / 2
+                                    var cy = y + patchSize / 2
+                                    if (Math.sqrt(cx*cx + cy*cy) > 45) continue
+
+                                    var color = colors[colorIndex % colors.length]
+                                    colorIndex++
+
+                                    // Two triangles forming a quad
+                                    // Triangle 1: bottom-left, bottom-right, top-left
+                                    addTriangle(0,
+                                        Qt.vector3d(x, y, 0),
+                                        Qt.vector3d(x + patchSize, y, 0),
+                                        Qt.vector3d(x, y + patchSize, 0),
+                                        color)
+
+                                    // Triangle 2: top-left, bottom-right, top-right
+                                    addTriangle(0,
+                                        Qt.vector3d(x, y + patchSize, 0),
+                                        Qt.vector3d(x + patchSize, y, 0),
+                                        Qt.vector3d(x + patchSize, y + patchSize, 0),
+                                        color)
+                                }
+                            }
+
+                            console.log("Demo layer created with", triangleCount(0), "triangles")
+                        }
                     }
 
                     // Visibility settings
