@@ -38,7 +38,7 @@ private:
     float m_pointSize = 1.0f;
 };
 
-class AOGFlatColorShader : public QSGMaterialShader
+class AOGFlatColorShader : public AOGMaterialShader
 {
 public:
     AOGFlatColorShader();
@@ -67,7 +67,7 @@ private:
     float m_pointSize = 1.0f;
 };
 
-class AOGVertexColorShader : public QSGMaterialShader
+class AOGVertexColorShader : public AOGMaterialShader
 {
 public:
     AOGVertexColorShader();
@@ -104,7 +104,7 @@ private:
     bool m_useColor = false;
 };
 
-class AOGTextureShader : public QSGMaterialShader
+class AOGTextureShader : public AOGMaterialShader
 {
 public:
     AOGTextureShader();

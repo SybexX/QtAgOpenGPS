@@ -1036,7 +1036,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
 
                 for (int v = 0; v < verts; v++)
                 {
-                    line = reader.readLine();
+                   line = reader.readLine();
                     // Phase 1.2: Parse without QStringList allocation (10,000+ iterations)
                     int comma1 = line.indexOf(',');
                     int comma2 = line.indexOf(',', comma1 + 1);
@@ -1045,10 +1045,12 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
                     vecFix.setZ(QStringView(line).mid(comma2 + 1).toDouble());
                     triangleList->append(vecFix);
 
-                    if (vecFix.x() < (*boundingbox).minx) (*boundingbox).minx = vecFix.x();
-                    if (vecFix.x() > (*boundingbox).maxx) (*boundingbox).maxx = vecFix.x();
-                    if (vecFix.y() < (*boundingbox).miny) (*boundingbox).miny = vecFix.y();
-                    if (vecFix.y() > (*boundingbox).maxy) (*boundingbox).maxy = vecFix.y();
+                    if (v > 0) {
+                        if (vecFix.x() < (*boundingbox).minx) (*boundingbox).minx = vecFix.x();
+                        if (vecFix.x() > (*boundingbox).maxx) (*boundingbox).maxx = vecFix.x();
+                        if (vecFix.y() < (*boundingbox).miny) (*boundingbox).miny = vecFix.y();
+                        if (vecFix.y() > (*boundingbox).maxy) (*boundingbox).maxy = vecFix.y();
+                    }
                 }
 
                 //calculate area of this patch - AbsoluteValue of (Ax(By-Cy) + Bx(Cy-Ay) + Cx(Ay-By)/2)
@@ -1107,7 +1109,15 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
 
                 // First element is color encoded as QVector3D(r, g, b)
                 const QVector3D &colorVec = (*triList)[0];
-                QColor color = QColor::fromRgbF(colorVec.x(), colorVec.y(), colorVec.z());
+                QColor color;
+                if (colorVec.x() > 1 || colorVec.y() > 1 || colorVec.z() > 1) {
+                    //use RGB byte values instead of float
+                    color = QColor::fromRgb(colorVec.x(), colorVec.y(), colorVec.z());
+                } else {
+                    //use float
+                    color = QColor::fromRgbF(colorVec.x(), colorVec.y(), colorVec.z());
+                }
+                color.setAlphaF(0.596);
 
                 // Convert triangle strip to individual triangles
                 // Vertices start at index 1 (after color)

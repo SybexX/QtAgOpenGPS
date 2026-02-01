@@ -39,7 +39,7 @@ private:
     float m_lineWidth = 2.0f;  // Width in screen pixels
 };
 
-class ThickLineMaterialShader : public QSGMaterialShader
+class ThickLineMaterialShader : public AOGMaterialShader
 {
 public:
     ThickLineMaterialShader();

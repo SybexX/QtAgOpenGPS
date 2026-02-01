@@ -1209,7 +1209,7 @@ Window {
                             Qt.vector3d(-15,-15,0)
                         ]
 
-                        markBoundary: 2 //metres left or right from pivot
+                        markBoundary: -5 //metres left or right from pivot
                     }
 
                     tracks:  TracksProperties {
@@ -1224,11 +1224,13 @@ Window {
 
                         aRefFlag: Qt.vector3d(-5,5,0);
                         bRefFlag: Qt.vector3d(5,5,0);
-                        showRefFlags: true
+                        showRefFlags: false
 
                     }
 
+                    layers: LayerService.layers
                     // Demo coverage layer (QML-only, no LayerService connection)
+                    /*
                     layers: Layers {
                         id: demoLayers
                         visible: true
@@ -1281,7 +1283,7 @@ Window {
 
                             console.log("Demo layer created with", triangleCount(0), "triangles")
                         }
-                    }
+                    }*/
 
                     // Visibility settings
                     showCoverage: true
