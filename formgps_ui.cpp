@@ -192,7 +192,7 @@ void FormGPS::on_qml_created(QObject *object, const QUrl &url)
         assert(root_context.length() > 0);
     }
 
-    mainWindow = root_context.first();
+    QObject *mainWindow = root_context.first();
 
     mainWindow->setProperty("visible",true);
 
@@ -625,14 +625,6 @@ void FormGPS::initializeQMLInterfaces()
 {
     QDEBUG << "🔄 Starting QML interface initialization...";
 
-    // ⚡ PHASE 6.3.0 SAFETY: Verify mainWindow is valid before accessing children
-    if (!mainWindow) {
-        qWarning() << "❌ mainWindow is NULL - cannot initialize QML interfaces";
-        return;
-    }
-
-    QDEBUG << "✅ mainWindow valid, proceeding with interface initialization";
-
     //no need to emit Backend::fixFrameChanged() here really.  it defaults
     //to 0 anyway
     Backend::instance()->m_fixFrame.sentenceCounter = 0;
@@ -678,40 +670,6 @@ void FormGPS::initializeQMLInterfaces()
         }
     }
 }
-
-// ===== SAFE QML OBJECT ACCESS - NULL PROTECTION WITH RETRIES =====
-QObject* FormGPS::safeQmlItem(const QString& objectName, int maxRetries)
-{
-    QObject* obj = nullptr;
-    int attempts = 0;
-
-    while (!obj && attempts < maxRetries) {
-        obj = qmlItem(mainWindow, objectName);
-
-        if (obj) {
-            QDEBUG << "✅ QML object found:" << objectName << "on attempt" << (attempts + 1);
-            return obj;
-        }
-
-        attempts++;
-        qWarning() << "⚠️ QML object not found:" << objectName << "- attempt" << attempts << "/" << maxRetries;
-
-        if (attempts < maxRetries) {
-            // Wait progressively longer between retries
-            QThread::msleep(50 * attempts);  // 50ms, 100ms, 150ms...
-        }
-    }
-
-    if (!obj) {
-        qCritical() << "🚨 CRITICAL: QML object" << objectName << "not found after" << maxRetries << "attempts!";
-        qCritical() << "🚨 This may be in a Drawer/Popup that's not loaded yet";
-        qCritical() << "🚨 Consider accessing this object only when UI is visible";
-    }
-
-    return obj;
-}
-
-// Phase 6.0.20: Qt 6.8 BINDABLE implementation moved to formgps.cpp:303-305
 
 // ===== AB LINES MANAGEMENT STUB IMPLEMENTATIONS =====
 // TODO: Implement these methods properly when AB Lines functionality is ready

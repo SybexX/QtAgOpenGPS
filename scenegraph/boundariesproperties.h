@@ -56,6 +56,8 @@ public:
 
     SIMPLE_BINDABLE_PROPERTY(QColor, colorInner)
     SIMPLE_BINDABLE_PROPERTY(QColor, colorOuter)
+    SIMPLE_BINDABLE_PROPERTY(QList<QVector3D>, beingMade)
+    SIMPLE_BINDABLE_PROPERTY(float, markBoundary)
 
 signals:
     void outerChanged();
@@ -77,8 +79,11 @@ private:
     static BoundaryProperties *innerAt(QQmlListProperty<BoundaryProperties> *list, qsizetype index);
     static void clearInner(QQmlListProperty<BoundaryProperties> *list);
 
+
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(BoundariesProperties, QColor, m_colorInner, QColor(1,1,0), &BoundariesProperties::colorInnerChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(BoundariesProperties, QColor, m_colorOuter, QColor(1,1,0), &BoundariesProperties::colorOuterChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(BoundariesProperties, QVector<QVector3D>, m_beingMade, &BoundariesProperties::beingMadeChanged)
+    Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(BoundariesProperties, double, m_markBoundary, 0, &BoundariesProperties::markBoundaryChanged)
 };
 
 #endif // BOUNDARIESPROPERTIES_H

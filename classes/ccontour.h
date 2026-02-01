@@ -70,13 +70,13 @@ public:
 
 
     explicit CContour(QObject *parent = 0);
-    void BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehicle, Vec3 pivot, QObject *mainWindow);
-    void DistanceFromContourLine(bool isBtnAutoSteerOn, CVehicle &vehicle, CYouTurn &yt, CAHRS &ahrs,  CNMEA &pn, Vec3 pivot, Vec3 steer, QObject *mainWindow);
+    void BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehicle, Vec3 pivot);
+    void DistanceFromContourLine(bool isBtnAutoSteerOn, CVehicle &vehicle, CYouTurn &yt, CAHRS &ahrs,  CNMEA &pn, Vec3 pivot, Vec3 steer);
     void StartContourLine();
     void AddPoint(Vec3 pivot);
     void StopContourLine(QVector<QSharedPointer<QVector<Vec3>>> &contourSaveList);
     void BuildFenceContours(CBoundary &bnd, double spacingInt, int patchCounter);
-    void DrawContourLine(QOpenGLFunctions *gl, const QMatrix4x4 &mvp, QObject *mainWindow, QElapsedTimer &swFrame);
+    void DrawContourLine(QOpenGLFunctions *gl, const QMatrix4x4 &mvp, QElapsedTimer &swFrame);
     void ResetContour();
 public slots:
     void setLockToLine();

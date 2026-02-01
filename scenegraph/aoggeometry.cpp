@@ -298,10 +298,11 @@ const QSGGeometry::AttributeSet &thickLineAttributes()
 
 const QSGGeometry::AttributeSet &thickLineColorsAttributes()
 {
-    // Attribute layout for thick line vertices:
-    // - attribute 0: pos (vec4) - current vertex position (with w=1)
-    // - attribute 1: nextPos (vec4) - neighbor position for direction calculation
-    // - attribute 2: side (float) - which side of line (-1 or +1)
+    // Attribute layout for thick line vertices with per-vertex color:
+    // - attribute 0: pos (vec3) - current vertex position
+    // - attribute 1: color (vec4) - vertex color (RGBA)
+    // - attribute 2: nextPos (vec3) - neighbor position for direction calculation
+    // - attribute 3: side (float) - which side of line (-1 or +1)
     // For vertices at endpoint A: pos=A, nextPos=B
     // For vertices at endpoint B: pos=B, nextPos=A (swapped so shader always uses pos)
 
@@ -309,7 +310,7 @@ const QSGGeometry::AttributeSet &thickLineColorsAttributes()
         QSGGeometry::Attribute::create(0, 3, QSGGeometry::FloatType, true),   // pos (vec3)
         QSGGeometry::Attribute::create(1, 4, QSGGeometry::FloatType, false),  // color (vec4)
         QSGGeometry::Attribute::create(2, 3, QSGGeometry::FloatType, false),  // nextPos (vec3)
-        QSGGeometry::Attribute::create(3, 1, QSGGeometry::FloatType, false),  // side
+        QSGGeometry::Attribute::create(3, 1, QSGGeometry::FloatType, false),  // side (float)
     };
 
     static QSGGeometry::AttributeSet attrSet = {
@@ -408,7 +409,15 @@ QSGGeometry *createThickLineGeometry(const QVector<QVector3D> &points)
     geometry->setDrawingMode(QSGGeometry::DrawTriangleStrip);
 
     ThickLineVertex *data = static_cast<ThickLineVertex *>(geometry->vertexData());
+    updateThickLineGeometry(data, points);
+
+    return geometry;
+}
+
+void updateThickLineGeometry(ThickLineVertex *data, const QVector<QVector3D> &points)
+{
     int idx = 0;
+    int numSegments = points.size() - 1;
 
     for (int seg = 0; seg < numSegments; ++seg) {
         const QVector3D &a = points[seg];
@@ -455,8 +464,6 @@ QSGGeometry *createThickLineGeometry(const QVector<QVector3D> &points)
             idx++;
         }
     }
-
-    return geometry;
 }
 
 QSGGeometry *createThickLinesGeometry(const QVector<QVector3D> &points)
@@ -569,7 +576,15 @@ QSGGeometry *createThickLineColorsGeometry(const QVector<ColorVertexVectors> &po
     geometry->setDrawingMode(QSGGeometry::DrawTriangleStrip);
 
     ThickLineColorsVertex *data = static_cast<ThickLineColorsVertex *>(geometry->vertexData());
+
+    updateThickLineColorsGeometry(data, points);
+
+    return geometry;
+}
+
+void updateThickLineColorsGeometry(ThickLineColorsVertex *data, const QVector<ColorVertexVectors> &points) {
     int idx = 0;
+    int numSegments = points.size() - 1;
 
     for (int seg = 0; seg < numSegments; ++seg) {
         const QVector3D &a = points[seg].vertex;
@@ -638,8 +653,6 @@ QSGGeometry *createThickLineColorsGeometry(const QVector<ColorVertexVectors> &po
             idx++;
         }
     }
-
-    return geometry;
 }
 
 QSGGeometry *createThickLinesColorsGeometry(const QVector<ColorVertexVectors> &points)
@@ -774,8 +787,16 @@ QSGGeometry *createDashedThickLineGeometry(const QVector<QVector3D> &points)
     geometry->setDrawingMode(QSGGeometry::DrawTriangleStrip);
 
     DashedThickLineVertex *data = static_cast<DashedThickLineVertex *>(geometry->vertexData());
+    updateDashedThickLineGeometry(data, points);
+
+    return geometry;
+}
+
+void updateDashedThickLineGeometry(DashedThickLineVertex *data, const QVector<QVector3D> &points)
+{
     int idx = 0;
     float cumulativeDistance = 0.0f;
+    int numSegments = points.size() - 1;
 
     for (int seg = 0; seg < numSegments; ++seg) {
         const QVector3D &a = points[seg];
@@ -834,7 +855,7 @@ QSGGeometry *createDashedThickLineGeometry(const QVector<QVector3D> &points)
         }
     }
 
-    return geometry;
+
 }
 
 QSGGeometry *createDashedThickLinesGeometry(const QVector<QVector3D> &points)

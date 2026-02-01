@@ -47,7 +47,7 @@ private:
     float m_gapLength = 5.0f;    // Gap length in screen pixels
 };
 
-class DashedThickLineMaterialShader : public QSGMaterialShader
+class DashedThickLineMaterialShader : public AOGMaterialShader
 {
 public:
     DashedThickLineMaterialShader();

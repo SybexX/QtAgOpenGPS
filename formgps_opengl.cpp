@@ -76,7 +76,7 @@ QOpenGLContext *getGLContext(QQuickWindow *window) {
     return nullptr; // Not using OpenGL
 }
 
-OpenGLViewport getOpenGLViewport(QObject* mainWindow) {
+OpenGLViewport getOpenGLViewport() {
     OpenGLViewport viewport;
     QObject *openglControl = Backend::instance()->aogRenderer;
 
@@ -127,7 +127,7 @@ QVector3D FormGPS::mouseClickToPan(int mouseX, int mouseY)
     QMatrix4x4 projection;
 
     // Safe access to OpenGL viewport properties
-    OpenGLViewport viewport = getOpenGLViewport(mainWindow);
+    OpenGLViewport viewport = getOpenGLViewport();
     int width = viewport.width;
     int height = viewport.height;
     double shiftX = viewport.shiftX;
@@ -184,7 +184,7 @@ QVector3D FormGPS::mouseClickToField(int mouseX, int mouseY)
     QMatrix4x4 projection;
 
     // Safe access to OpenGL viewport properties
-    OpenGLViewport viewport = getOpenGLViewport(mainWindow);
+    OpenGLViewport viewport = getOpenGLViewport();
     int width = viewport.width;
     int height = viewport.height;
     double shiftX = viewport.shiftX;
@@ -257,7 +257,7 @@ void FormGPS::render_main_fbo()
     projection.setToIdentity();
 
     // Safe access to OpenGL viewport properties
-    OpenGLViewport viewport = getOpenGLViewport(mainWindow);
+    OpenGLViewport viewport = getOpenGLViewport();
     int width = viewport.width;
     int height = viewport.height;
     double shiftX = viewport.shiftX;
@@ -298,7 +298,7 @@ void FormGPS::render_main_fbo()
 
 void FormGPS::oglMain_Paint()
 {
-    OpenGLViewport viewport = getOpenGLViewport(mainWindow);
+    OpenGLViewport viewport = getOpenGLViewport();
     BACKEND_TRACK(track);
     BACKEND_YT(yt);
     Camera &camera = *Camera::instance();
@@ -455,7 +455,7 @@ void FormGPS::oglMain_Paint()
             //draw contour line if button on
             if (MainWindowState::instance()->isContourBtnOn())
             {
-                ct.DrawContourLine(gl, projection*modelview, mainWindow, swFrame);
+                ct.DrawContourLine(gl, projection*modelview, swFrame);
             }
             else// draw the current and reference AB Lines or CurveAB Ref and line
             {
@@ -473,12 +473,12 @@ void FormGPS::oglMain_Paint()
             if (bnd.bndList.count() > 0 || BoundaryInterface::instance()->isBndBeingMade() == true)
             {
                 //draw Boundaries
-                bnd.DrawFenceLines(CVehicle::instance()->pivotAxlePos, gl, projection*modelview, mainWindow);
+                bnd.DrawFenceLines(CVehicle::instance()->pivotAxlePos, gl, projection*modelview);
 
                 //draw the turnLines
                 if (MainWindowState::instance()->isYouTurnBtnOn() && ! MainWindowState::instance()->isContourBtnOn())
                 {
-                    bnd.DrawFenceLines(CVehicle::instance()->pivotAxlePos, gl,projection*modelview, mainWindow);
+                    bnd.DrawFenceLines(CVehicle::instance()->pivotAxlePos, gl,projection*modelview);
 
                     color.setRgbF(0.3555f, 0.6232f, 0.20f); //TODO: not sure what color turnLines should actually be
 

@@ -35,4 +35,35 @@ protected:
     QSize m_viewportSize;
 };
 
+// ============================================================================
+// AOGMaterialShader - base class for all our shaders
+// Provides default blend function: glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+// ============================================================================
+
+class AOGMaterialShader : public QSGMaterialShader
+{
+public:
+    AOGMaterialShader()
+    {
+        setFlag(UpdatesGraphicsPipelineState, true);
+    }
+
+    bool updateGraphicsPipelineState(RenderState &state, GraphicsPipelineState *ps,
+                                     QSGMaterial *newMaterial, QSGMaterial *oldMaterial) override
+    {
+        Q_UNUSED(state);
+        Q_UNUSED(newMaterial);
+        Q_UNUSED(oldMaterial);
+
+        // Set blend function: glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        ps->blendEnable = true;
+        ps->srcColor = GraphicsPipelineState::SrcAlpha;
+        ps->dstColor = GraphicsPipelineState::OneMinusSrcAlpha;
+        ps->srcAlpha = GraphicsPipelineState::SrcAlpha;
+        ps->dstAlpha = GraphicsPipelineState::OneMinusSrcAlpha;
+
+        return true;
+    }
+};
+
 #endif // AOGMATERIAL_H

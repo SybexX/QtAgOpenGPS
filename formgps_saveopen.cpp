@@ -16,6 +16,8 @@
 #include "worldgrid.h"
 #include "siminterface.h"
 #include "camera.h"
+#include "backend/layerservice.h"
+#include "scenegraph/layertypes.h"
 
 enum OPEN_FLAGS {
     LOAD_MAPPING = 1,
@@ -1034,7 +1036,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
 
                 for (int v = 0; v < verts; v++)
                 {
-                    line = reader.readLine();
+                   line = reader.readLine();
                     // Phase 1.2: Parse without QStringList allocation (10,000+ iterations)
                     int comma1 = line.indexOf(',');
                     int comma2 = line.indexOf(',', comma1 + 1);
@@ -1043,10 +1045,12 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
                     vecFix.setZ(QStringView(line).mid(comma2 + 1).toDouble());
                     triangleList->append(vecFix);
 
-                    if (vecFix.x() < (*boundingbox).minx) (*boundingbox).minx = vecFix.x();
-                    if (vecFix.x() > (*boundingbox).maxx) (*boundingbox).maxx = vecFix.x();
-                    if (vecFix.y() < (*boundingbox).miny) (*boundingbox).miny = vecFix.y();
-                    if (vecFix.y() > (*boundingbox).maxy) (*boundingbox).maxy = vecFix.y();
+                    if (v > 0) {
+                        if (vecFix.x() < (*boundingbox).minx) (*boundingbox).minx = vecFix.x();
+                        if (vecFix.x() > (*boundingbox).maxx) (*boundingbox).maxx = vecFix.x();
+                        if (vecFix.y() < (*boundingbox).miny) (*boundingbox).miny = vecFix.y();
+                        if (vecFix.y() > (*boundingbox).maxy) (*boundingbox).maxy = vecFix.y();
+                    }
                 }
 
                 //calculate area of this patch - AbsoluteValue of (Ax(By-Cy) + Bx(Cy-Ay) + Cx(Ay-By)/2)
@@ -1082,6 +1086,67 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
             tool.patchesBufferDirty = true;
             Backend::instance()->currentField_addWorkedAreaTotal(localWorkedArea);
             lock.unlock();
+
+            // Convert triangle strips to individual triangles for Layers system
+            // This runs outside the lock since we're only reading localPatchList
+            LayerService *layerService = LayerService::instance();
+            layerService->clearAllLayers();
+
+            QVector<CoverageTriangle> layerTriangles;
+            // Estimate capacity: each patch has (count-3) triangles (count-1 vertices, minus 2 for strip)
+            int estimatedTriangles = 0;
+            for (const auto &triList : localPatchList) {
+                if (triList->count() > 3) {
+                    estimatedTriangles += triList->count() - 3;
+                }
+            }
+            layerTriangles.reserve(estimatedTriangles);
+
+            for (const auto &triList : localPatchList) {
+                int count = triList->count();
+                // Need at least color + 3 vertices for one triangle
+                if (count < 4) continue;
+
+                // First element is color encoded as QVector3D(r, g, b)
+                const QVector3D &colorVec = (*triList)[0];
+                QColor color;
+                if (colorVec.x() > 1 || colorVec.y() > 1 || colorVec.z() > 1) {
+                    //use RGB byte values instead of float
+                    color = QColor::fromRgb(colorVec.x(), colorVec.y(), colorVec.z());
+                } else {
+                    //use float
+                    color = QColor::fromRgbF(colorVec.x(), colorVec.y(), colorVec.z());
+                }
+                color.setAlphaF(0.596);
+
+                // Convert triangle strip to individual triangles
+                // Vertices start at index 1 (after color)
+                // For N vertices, we have N-2 triangles
+                int numVerts = count - 1;  // Subtract color
+                int numTris = numVerts - 2;
+
+                for (int i = 0; i < numTris; i++) {
+                    int idx0 = 1 + i;      // Base vertex (after color)
+                    int idx1 = 1 + i + 1;
+                    int idx2 = 1 + i + 2;
+
+                    // Alternate winding for triangle strip
+                    if (i % 2 == 0) {
+                        // Even triangle: (v0, v1, v2)
+                        layerTriangles.append(CoverageTriangle(
+                            (*triList)[idx0], (*triList)[idx1], (*triList)[idx2], color));
+                    } else {
+                        // Odd triangle: (v1, v0, v2) to maintain consistent winding
+                        layerTriangles.append(CoverageTriangle(
+                            (*triList)[idx1], (*triList)[idx0], (*triList)[idx2], color));
+                    }
+                }
+            }
+
+            // Add all triangles to the default layer
+            if (!layerTriangles.isEmpty()) {
+                layerService->addTrianglesToDefault(layerTriangles);
+            }
         }
     }
 

@@ -47,12 +47,32 @@ bool TextureFactory::isLoaded(TextureId id) const
     return m_textures.contains(id);
 }
 
+int TextureFactory::textureWidth(TextureId id)
+{
+    return textureSize(id).width();
+}
+
+int TextureFactory::textureHeight(TextureId id)
+{
+    return textureSize(id).height();
+}
+
+QSize TextureFactory::textureSize(TextureId id)
+{
+    // Load texture if not already loaded (which also stores the size)
+    if (!m_textureSizes.contains(id)) {
+        texture(id);
+    }
+    return m_textureSizes.value(id, QSize(0, 0));
+}
+
 void TextureFactory::clear()
 {
     for (QSGTexture *tex : std::as_const(m_textures)) {
         delete tex;
     }
     m_textures.clear();
+    m_textureSizes.clear();
 }
 
 void TextureFactory::setWindow(QQuickWindow *window)
@@ -83,6 +103,9 @@ QSGTexture *TextureFactory::loadTexture(TextureId id)
         image.format() != QImage::Format_RGBA8888_Premultiplied) {
         image = image.convertToFormat(QImage::Format_RGBA8888);
     }
+
+    // Store the image size before creating texture
+    m_textureSizes.insert(id, image.size());
 
     QSGTexture *tex = m_window->createTextureFromImage(image);
     if (tex) {

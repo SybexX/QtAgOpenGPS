@@ -58,6 +58,4 @@ signals:
 
 };
 
-extern MainWindowState *mainWindow;
-
 #endif // MAINWINDOWSTATE_H

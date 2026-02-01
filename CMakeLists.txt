@@ -6,7 +6,9 @@ cmake_minimum_required(VERSION 3.22)
 
 # Compiler cache for faster rebuilds (must be before project())
 # sccache supports GCC, Clang, and MSVC; ccache supports GCC and Clang
-find_program(SCCACHE_PROGRAM sccache)
+find_program(SCCACHE_PROGRAM sccache
+    HINTS "$ENV{HOME}/.cargo/bin" "$ENV{USERPROFILE}/.cargo/bin"
+)
 find_program(CCACHE_PROGRAM ccache)
 if(SCCACHE_PROGRAM)
     set(CMAKE_C_COMPILER_LAUNCHER ${SCCACHE_PROGRAM})
@@ -437,12 +439,23 @@ qt_add_qml_module(QtAgOpenGPS
     SOURCES scenegraph/thicklinecolorsmaterial.h scenegraph/thicklinecolorsmaterial.cpp
     SOURCES scenegraph/dashedthicklinematerial.h scenegraph/dashedthicklinematerial.cpp
     SOURCES scenegraph/texturefactory.h scenegraph/texturefactory.cpp
+    SOURCES scenegraph/textnode.h scenegraph/textnode.cpp
+    SOURCES scenegraph/dotsnode.h scenegraph/dotsnode.cpp
     SOURCES scenegraph/toolsproperties.h scenegraph/toolsproperties.cpp
     SOURCES scenegraph/boundaryproperties.h scenegraph/boundaryproperties.cpp
     SOURCES scenegraph/boundariesproperties.h scenegraph/boundariesproperties.cpp
     SOURCES scenegraph/toolsnode.h scenegraph/toolsnode.cpp
     SOURCES scenegraph/roundpointmaterial.h scenegraph/roundpointmaterial.cpp
     SOURCES scenegraph/roundpointsizematerial.h scenegraph/roundpointsizematerial.cpp
+    SOURCES scenegraph/tracksnode.h scenegraph/tracksnode.cpp
+    SOURCES scenegraph/tracksproperties.h scenegraph/tracksproperties.cpp
+    SOURCES scenegraph/trackproperties.h scenegraph/trackproperties.cpp
+
+    # Coverage layer system
+    SOURCES scenegraph/layertypes.h
+    SOURCES scenegraph/layersproperties.h scenegraph/layersproperties.cpp
+    SOURCES scenegraph/layersnode.h scenegraph/layersnode.cpp
+    SOURCES backend/layerservice.h backend/layerservice.cpp
 
 )
 

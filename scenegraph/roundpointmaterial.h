@@ -30,7 +30,7 @@ private:
     float m_softness = 0.2f;  // slight softness by default for anti-aliasing
 };
 
-class RoundPointShader : public QSGMaterialShader
+class RoundPointShader : public AOGMaterialShader
 {
 public:
     RoundPointShader();

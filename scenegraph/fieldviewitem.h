@@ -29,12 +29,17 @@ class GridNode;
 class BoundariesNode;
 class VehicleNode;
 class ToolsNode;
+class TracksNode;
+class LayersNode;
+
 class CameraProperties;
 class GridProperties;
 class FieldSurfaceProperties;
 class VehicleProperties;
 class ToolsProperties;
 class BoundariesProperties;
+class TracksProperties;
+class LayersProperties;
 class TextureFactory;
 
 Q_MOC_INCLUDE("cameraproperties.h")
@@ -43,6 +48,8 @@ Q_MOC_INCLUDE("fieldsurfaceproperties.h")
 Q_MOC_INCLUDE("vehicleproperties.h")
 Q_MOC_INCLUDE("toolsproperties.h")
 Q_MOC_INCLUDE("boundariesproperties.h")
+Q_MOC_INCLUDE("tracksproperties.h")
+Q_MOC_INCLUDE("layersproperties.h")
 
 // ============================================================================
 // FieldViewNode - Root node for the field view scene graph
@@ -57,8 +64,9 @@ public:
     // Child nodes for different render layers (rendered back to front)
     FieldSurfaceNode *fieldSurfaceNode = nullptr;
     GridNode *gridNode = nullptr;
+    TracksNode *tracksNode =nullptr;
     BoundariesNode *boundaryNode = nullptr;
-    QSGNode *coverageNode = nullptr;     // Coverage patches (not yet refactored)
+    LayersNode *layersNode = nullptr;     // Coverage layers (triangles)
     QSGNode *guidanceNode = nullptr;     // Guidance lines (not yet refactored)
     VehicleNode *vehicleNode = nullptr;
     ToolsNode *toolsNode = nullptr;
@@ -81,14 +89,14 @@ class FieldViewItem : public QQuickItem
     Q_PROPERTY(VehicleProperties* vehicle READ vehicle WRITE setVehicle NOTIFY vehicleChanged)
     Q_PROPERTY(ToolsProperties* tools READ tools WRITE setTools NOTIFY toolsChanged)
     Q_PROPERTY(BoundariesProperties* boundaries READ boundaries WRITE setBoundaries NOTIFY boundariesChanged)
+    Q_PROPERTY(TracksProperties* tracks READ tracks WRITE setTracks NOTIFY tracksChanged)
+    Q_PROPERTY(LayersProperties* layers READ layers WRITE setLayers NOTIFY layersChanged)
 
     // ===== Rendering State Properties =====
-    Q_PROPERTY(bool showBoundary READ showBoundary WRITE setShowBoundary NOTIFY showBoundaryChanged BINDABLE bindableShowBoundary)
     Q_PROPERTY(bool showCoverage READ showCoverage WRITE setShowCoverage NOTIFY showCoverageChanged BINDABLE bindableShowCoverage)
     Q_PROPERTY(bool showGuidance READ showGuidance WRITE setShowGuidance NOTIFY showGuidanceChanged BINDABLE bindableShowGuidance)
 
     // ===== Color Properties =====
-    Q_PROPERTY(QColor boundaryColor READ boundaryColor WRITE setBoundaryColor NOTIFY boundaryColorChanged BINDABLE bindableBoundaryColor)
     Q_PROPERTY(QColor guidanceColor READ guidanceColor WRITE setGuidanceColor NOTIFY guidanceColorChanged BINDABLE bindableGuidanceColor)
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged BINDABLE bindableBackgroundColor)
 
@@ -106,12 +114,13 @@ public:
     void setTools(ToolsProperties *tools);
     BoundariesProperties* boundaries() const;
     void setBoundaries(BoundariesProperties *boundaries);
+    TracksProperties* tracks() const;
+    void setTracks(TracksProperties *tracks);
+    LayersProperties* layers() const;
+    void setLayers(LayersProperties *layers);
+
 
     // ===== Visibility Property Accessors =====
-    bool showBoundary() const;
-    void setShowBoundary(bool value);
-    QBindable<bool> bindableShowBoundary();
-
     bool showCoverage() const;
     void setShowCoverage(bool value);
     QBindable<bool> bindableShowCoverage();
@@ -121,10 +130,6 @@ public:
     QBindable<bool> bindableShowGuidance();
 
     // ===== Color Property Accessors =====
-    QColor boundaryColor() const;
-    void setBoundaryColor(const QColor &color);
-    QBindable<QColor> bindableBoundaryColor();
-
     QColor guidanceColor() const;
     void setGuidanceColor(const QColor &color);
     QBindable<QColor> bindableGuidanceColor();
@@ -140,6 +145,7 @@ public:
     Q_INVOKABLE void markBoundaryDirty();
     Q_INVOKABLE void markCoverageDirty();
     Q_INVOKABLE void markGuidanceDirty();
+    Q_INVOKABLE void markLayersDirty();
     Q_INVOKABLE void markAllDirty();
 
 signals:
@@ -147,9 +153,10 @@ signals:
     void vehicleChanged();
     void toolsChanged();
     void boundariesChanged();
+    void tracksChanged();
+    void layersChanged();
 
     // Visibility signals
-    void showBoundaryChanged();
     void showCoverageChanged();
     void showGuidanceChanged();
 
@@ -182,6 +189,8 @@ private:
     bool m_coverageDirty = true;
     bool m_guidanceDirty = true;
     bool m_gridDirty = true;
+    bool m_tracksDirty = true;
+    bool m_layersDirty = true;
 
     // ===== Current MVP Matrix (set each frame for materials) =====
     QMatrix4x4 m_currentMv;
@@ -199,6 +208,8 @@ private:
         double vehicleY = 0;
         double vehicleHeading = 0;
         double steerAngle = 0;
+        bool isOutOfBounds = false;
+        int lineWidth = 1;
 
         // Boundary data
         QVector<QVector<QVector3D>> boundaries;
@@ -220,13 +231,13 @@ private:
     VehicleProperties *m_vehicle = nullptr;
     ToolsProperties *m_tools = nullptr;
     BoundariesProperties *m_boundaries = nullptr;
+    TracksProperties *m_tracks = nullptr;
+    LayersProperties *m_layers = nullptr;
 
     // ===== Qt 6.8 Q_OBJECT_BINDABLE_PROPERTY Members =====
-    Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(FieldViewItem, bool, m_showBoundary, true, &FieldViewItem::showBoundaryChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(FieldViewItem, bool, m_showCoverage, true, &FieldViewItem::showCoverageChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(FieldViewItem, bool, m_showGuidance, true, &FieldViewItem::showGuidanceChanged)
 
-    Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(FieldViewItem, QColor, m_boundaryColor, QColor(255, 255, 0), &FieldViewItem::boundaryColorChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(FieldViewItem, QColor, m_guidanceColor, QColor(0, 255, 0), &FieldViewItem::guidanceColorChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(FieldViewItem, QColor, m_backgroundColor, QColor(69, 102, 179), &FieldViewItem::backgroundColorChanged)  // Day sky blue
 };
