@@ -5,6 +5,7 @@
 
 #include "layerservice.h"
 #include "layersproperties.h"
+#include "settingsmanager.h"
 
 // Static members
 LayerService* LayerService::s_instance = nullptr;
@@ -18,6 +19,16 @@ LayerService::LayerService(QObject *parent)
 
     // Create default layer
     ensureDefaultLayer();
+
+    // Connect to day/night mode changes to update triangle alphas
+    connect(SettingsManager::instance(), &SettingsManager::display_isDayModeChanged,
+            this, [this]() {
+        float alpha = SettingsManager::instance()->display_isDayMode() ? 0.596f : 0.298f;
+        qWarning() << "Daymode change." << alpha;
+        for (int layerId : m_layersProperties->layerIds()) {
+            m_layersProperties->setTrianglesAlpha(layerId, alpha);
+        }
+    });
 }
 
 LayerService::~LayerService()

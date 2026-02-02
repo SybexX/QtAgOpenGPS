@@ -98,9 +98,12 @@ public:
     void setLayerVisible(int layerId, bool visible);
     bool isLayerVisible(int layerId) const;
 
-    // Set layer alpha
+    // Set layer alpha (multiplied with triangle alpha during rendering)
     void setLayerAlpha(int layerId, float alpha);
     float layerAlpha(int layerId) const;
+
+    // Set alpha on all triangles in a layer (e.g., for day/night mode switch)
+    void setTrianglesAlpha(int layerId, float alpha);
 
     // ===== Section Management =====
 
@@ -114,8 +117,14 @@ public:
                            const QVector3D &left, const QVector3D &right,
                            const QColor &color);
 
+    // Check if a section has pending vertices (is currently drawing)
+    bool isSectionPending(int layerId, int sectionIndex) const;
+
     // Flush pending sections for a layer (e.g., when lifting tool)
     void flushPendingSections(int layerId);
+
+    // Flush a single pending section for a layer (when one section turns off)
+    void flushPendingSection(int layerId, int sectionIndex);
 
     // Flush all pending sections across all layers
     void flushAllPendingSections();

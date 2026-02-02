@@ -55,11 +55,12 @@ public:
         Q_UNUSED(newMaterial);
         Q_UNUSED(oldMaterial);
 
-        // Set blend function: glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        // Premultiplied alpha blending:
+        // RGB is already multiplied by alpha, so use One for srcColor
         ps->blendEnable = true;
-        ps->srcColor = GraphicsPipelineState::SrcAlpha;
+        ps->srcColor = GraphicsPipelineState::One;
         ps->dstColor = GraphicsPipelineState::OneMinusSrcAlpha;
-        ps->srcAlpha = GraphicsPipelineState::SrcAlpha;
+        ps->srcAlpha = GraphicsPipelineState::One;
         ps->dstAlpha = GraphicsPipelineState::OneMinusSrcAlpha;
 
         return true;

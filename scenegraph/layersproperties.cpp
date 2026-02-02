@@ -184,6 +184,27 @@ float LayersProperties::layerAlpha(int layerId) const
     return 0.596f; // Default AOG alpha
 }
 
+void LayersProperties::setTrianglesAlpha(int layerId, float alpha)
+{
+    auto it = m_layers.find(layerId);
+    if (it == m_layers.end()) {
+        return;
+    }
+
+    // Clamp alpha to valid range
+    alpha = qBound(0.0f, alpha, 1.0f);
+
+    // Update alpha on all triangles in this layer
+    for (CoverageTriangle &tri : it->triangles) {
+        QColor c = tri.color;
+        c.setAlphaF(alpha);
+        tri.color = c;
+    }
+
+    // Signal that triangles changed so LayersNode will rebuild geometry
+    emit trianglesChanged(layerId);
+}
+
 void LayersProperties::setSectionCount(int count)
 {
     if (m_sectionCount == count) {
@@ -221,11 +242,30 @@ int LayersProperties::addSectionVertices(int layerId, int sectionIndex,
     return added;
 }
 
+bool LayersProperties::isSectionPending(int layerId, int sectionIndex) const
+{
+    auto it = m_layers.constFind(layerId);
+    if (it != m_layers.constEnd()) {
+        if (sectionIndex >= 0 && sectionIndex < it->pendingSections.size()) {
+            return it->pendingSections[sectionIndex].hasPrevious;
+        }
+    }
+    return false;
+}
+
 void LayersProperties::flushPendingSections(int layerId)
 {
     auto it = m_layers.find(layerId);
     if (it != m_layers.end()) {
         it->flushPendingSections();
+    }
+}
+
+void LayersProperties::flushPendingSection(int layerId, int sectionIndex)
+{
+    auto it = m_layers.find(layerId);
+    if (it != m_layers.end()) {
+        it->flushPendingSection(sectionIndex);
     }
 }
 
