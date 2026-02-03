@@ -837,12 +837,14 @@ void updateDashedThickLineGeometry(DashedThickLineVertex *data, const QVector<QV
         cumulativeDistance += segmentLength;
 
         // Add degenerate triangles between segments (repeat last vertex, then first of next)
+        // Use negative distance to mark degenerate vertices for discard in fragment shader
         if (seg < numSegments - 1) {
-            // Repeat last vertex
+            // Repeat last vertex with negative distance to mark as degenerate
             data[idx] = data[idx - 1];
+            data[idx].distance = -1.0f;  // Mark as degenerate
             idx++;
 
-            // Pre-duplicate first vertex of next segment
+            // Pre-duplicate first vertex of next segment with negative distance
             const QVector3D &nextA = points[seg + 1];
             const QVector3D &nextB = points[seg + 2];
             float nextSegmentLength = (nextB - nextA).length();
@@ -850,7 +852,7 @@ void updateDashedThickLineGeometry(DashedThickLineVertex *data, const QVector<QV
             data[idx].ax = nextA.x(); data[idx].ay = nextA.y(); data[idx].az = nextA.z();
             data[idx].bx = nextB.x(); data[idx].by = nextB.y(); data[idx].bz = nextB.z();
             data[idx].side = -1.0f;
-            data[idx].distance = cumulativeDistance;  // Distance at start of next segment
+            data[idx].distance = -1.0f;  // Mark as degenerate
             idx++;
         }
     }
@@ -918,18 +920,20 @@ QSGGeometry *createDashedThickLinesGeometry(const QVector<QVector3D> &points)
         idx++;
 
         // Add degenerate triangles between segments
+        // Use negative distance to mark degenerate vertices for discard in fragment shader
         if (seg < numSegments - 1) {
-            // Repeat last vertex
+            // Repeat last vertex with negative distance to mark as degenerate
             data[idx] = data[idx - 1];
+            data[idx].distance = -1.0f;  // Mark as degenerate
             idx++;
 
-            // Pre-duplicate first vertex of next segment
+            // Pre-duplicate first vertex of next segment with negative distance
             const QVector3D &nextA = points[(seg + 1) * 2];
             const QVector3D &nextB = points[(seg + 1) * 2 + 1];
             data[idx].ax = nextA.x(); data[idx].ay = nextA.y(); data[idx].az = nextA.z();
             data[idx].bx = nextB.x(); data[idx].by = nextB.y(); data[idx].bz = nextB.z();
             data[idx].side = -1.0f;
-            data[idx].distance = 0.0f;  // Reset distance for next segment
+            data[idx].distance = -1.0f;  // Mark as degenerate
             idx++;
         }
     }
