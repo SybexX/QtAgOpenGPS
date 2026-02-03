@@ -169,12 +169,12 @@ void FormGPS::setupGui()
         // mainWindow must be set before calling initializeQMLInterfaces()
         QDEBUG << "🔄 QML loaded - interface initialization will happen in on_qml_created()";
 
-        // Connect to the AgIOService instance created by QML factory
-        connectToAgIOFactoryInstance();
     }
 
     QDEBUG << "AgOpenGPS started successfully";
 #endif
+    // Connect to the AgIOService instance
+    connectToAgIOFactoryInstance();
 }
 
 void FormGPS::on_qml_created(QObject *object, const QUrl &url)
