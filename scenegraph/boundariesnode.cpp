@@ -129,8 +129,10 @@ void BoundariesNode::update(const QMatrix4x4 &mv,
             appendChildNode(m_bndBeingMadeNode);
 
         } else {
-            //update the geometry
-            int numVertices = beingMadePoints.count() * 4 + (beingMadePoints.count() - 1) * 2;
+            //update the geometry, have to allocate enough for all the extra vertices
+            //double wide lines need -- see createThickLineColorsGeometry()
+            int numVertices = (beingMadePoints.count()-1) * 4 + (beingMadePoints.count() - 2) * 2;
+
             geometry = m_bndBeingMadeNode->geometry();
             geometry->allocate(numVertices);
             m_bndBeingMadeNode->markDirty(QSGNode::DirtyGeometry);
@@ -166,7 +168,7 @@ void BoundariesNode::update(const QMatrix4x4 &mv,
                 }
             } else {
                 //update geometry
-                int numVertices = toPivot.count() * 4 + (toPivot.count() - 1) * 2;
+                int numVertices = (toPivot.count()-1) * 4 + (toPivot.count() - 2) * 2;
                 geometry = m_lastPointToPivotNode->geometry();
                 geometry->allocate(numVertices);
                 m_lastPointToPivotNode->markDirty(QSGNode::DirtyGeometry);
