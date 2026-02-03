@@ -9,10 +9,15 @@ layout(std140, binding = 0) uniform buf {
     float lineWidth;    // line width in pixels
 } ubuf;
 
+layout(location = 0) in float vSide;  // Side value from vertex shader (0 = degenerate)
 layout(location = 0) out vec4 fragColor;
 
 void main()
 {
-    //fragColor = vec4(1.0, 0.0, 0.0, 1.0);  // Debug: hardcoded red
+    // Discard fragments from degenerate triangles (marked with side = 0)
+    if (abs(vSide) < 0.001) {
+        discard;
+    }
+
     fragColor = ubuf.color;
 }

@@ -450,17 +450,19 @@ void updateThickLineGeometry(ThickLineVertex *data, const QVector<QVector3D> &po
         idx++;
 
         // Add degenerate triangles between segments (repeat last vertex, then first of next)
+        // Use side = 0 to mark degenerate vertices for discard in fragment shader
         if (seg < numSegments - 1) {
-            // Repeat last vertex
+            // Repeat last vertex with side = 0 to mark as degenerate
             data[idx] = data[idx - 1];
+            data[idx].side = 0.0f;  // Mark as degenerate
             idx++;
 
-            // Pre-duplicate first vertex of next segment
+            // Pre-duplicate first vertex of next segment with side = 0
             const QVector3D &nextA = points[seg + 1];
             const QVector3D &nextB = points[seg + 2];
             data[idx].ax = nextA.x(); data[idx].ay = nextA.y(); data[idx].az = nextA.z();
             data[idx].bx = nextB.x(); data[idx].by = nextB.y(); data[idx].bz = nextB.z();
-            data[idx].side = -1.0f;
+            data[idx].side = 0.0f;  // Mark as degenerate
             idx++;
         }
     }
@@ -519,17 +521,19 @@ QSGGeometry *createThickLinesGeometry(const QVector<QVector3D> &points)
         idx++;
 
         // Add degenerate triangles between segments
+        // Use side = 0 to mark degenerate vertices for discard in fragment shader
         if (seg < numSegments - 1) {
-            // Repeat last vertex
+            // Repeat last vertex with side = 0 to mark as degenerate
             data[idx] = data[idx - 1];
+            data[idx].side = 0.0f;  // Mark as degenerate
             idx++;
 
-            // Pre-duplicate first vertex of next segment
+            // Pre-duplicate first vertex of next segment with side = 0
             const QVector3D &nextA = points[(seg + 1) * 2];
             const QVector3D &nextB = points[(seg + 1) * 2 + 1];
             data[idx].ax = nextA.x(); data[idx].ay = nextA.y(); data[idx].az = nextA.z();
             data[idx].bx = nextB.x(); data[idx].by = nextB.y(); data[idx].bz = nextB.z();
-            data[idx].side = -1.0f;
+            data[idx].side = 0.0f;  // Mark as degenerate
             idx++;
         }
     }
@@ -634,18 +638,20 @@ void updateThickLineColorsGeometry(ThickLineColorsVertex *data, const QVector<Co
         idx++;
 
         // Add degenerate triangles between segments (repeat last vertex, then first of next)
+        // Use side = 0 to mark degenerate vertices for discard in fragment shader
         if (seg < numSegments - 1) {
-            // Repeat last vertex
+            // Repeat last vertex with side = 0 to mark as degenerate
             data[idx] = data[idx - 1];
+            data[idx].side = 0.0f;  // Mark as degenerate
             idx++;
 
-            // Pre-duplicate first vertex of next segment
+            // Pre-duplicate first vertex of next segment with side = 0
             const QVector3D &nextA = points[seg + 1].vertex;
             const QColor &color = points[seg + 1 ].color;
             const QVector3D &nextB = points[seg + 2].vertex;
             data[idx].ax = nextA.x(); data[idx].ay = nextA.y(); data[idx].az = nextA.z();
             data[idx].bx = nextB.x(); data[idx].by = nextB.y(); data[idx].bz = nextB.z();
-            data[idx].side = -1.0f;
+            data[idx].side = 0.0f;  // Mark as degenerate
             data[idx].r = color.redF();
             data[idx].g = color.greenF();
             data[idx].b = color.blueF();
@@ -725,18 +731,20 @@ QSGGeometry *createThickLinesColorsGeometry(const QVector<ColorVertexVectors> &p
         idx++;
 
         // Add degenerate triangles between segments
+        // Use side = 0 to mark degenerate vertices for discard in fragment shader
         if (seg < numSegments - 1) {
-            // Repeat last vertex
+            // Repeat last vertex with side = 0 to mark as degenerate
             data[idx] = data[idx - 1];
+            data[idx].side = 0.0f;  // Mark as degenerate
             idx++;
 
-            // Pre-duplicate first vertex of next segment
+            // Pre-duplicate first vertex of next segment with side = 0
             const QVector3D &nextA = points[(seg + 1) * 2].vertex;
             const QColor &color = points[(seg + 1) * 2].color;
             const QVector3D &nextB = points[(seg + 1) * 2 + 1].vertex;
             data[idx].ax = nextA.x(); data[idx].ay = nextA.y(); data[idx].az = nextA.z();
             data[idx].bx = nextB.x(); data[idx].by = nextB.y(); data[idx].bz = nextB.z();
-            data[idx].side = -1.0f;
+            data[idx].side = 0.0f;  // Mark as degenerate
             data[idx].r = color.redF();
             data[idx].g = color.greenF();
             data[idx].b = color.blueF();

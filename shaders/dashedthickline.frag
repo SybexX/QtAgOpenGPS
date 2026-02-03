@@ -17,6 +17,11 @@ layout(location = 0) out vec4 fragColor;
 
 void main()
 {
+    // Discard fragments from degenerate triangles (marked with negative distance)
+    if (vDistance < 0.0) {
+        discard;
+    }
+
     // Convert world-space distance to screen pixels using derivatives
     // fwidth(vDistance) gives us the rate of change of distance across a pixel
     // This is approximately how many world units span one screen pixel

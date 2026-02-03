@@ -18,6 +18,7 @@ layout(std140, binding = 0) uniform buf {
 } ubuf;
 
 layout(location = 0) out vec4 vColor;
+layout(location = 1) out float vSide;  // Pass side to fragment shader for degenerate detection
 
 out gl_PerVertex {
     vec4 gl_Position;
@@ -56,6 +57,8 @@ void main()
 
     gl_Position = currClip;
     vColor = color;
-
     gl_PointSize = 1;
+
+    // Pass side to fragment shader (0 = degenerate vertex)
+    vSide = side;
 }
