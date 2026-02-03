@@ -244,7 +244,223 @@ Window {
     }
 
 
-    AOGRenderer {
+    // FieldViewItem content area
+    FieldViewItem {
+        //id: testFieldView
+        //anchors.top: titleBar.bottom
+        //anchors.left: parent.left
+        //anchors.right: parent.right
+        //anchors.bottom: controlsRow.top
+        //anchors.margins: 4
+
+        camera {
+            x: Backend.fixFrame.easting
+            y: Backend.fixFrame.northing
+            rotation: Camera.camFollowing ? -Utils.radians_to_deg(VehicleInterface.fixHeading) : 0
+            zoom: Camera.camSetDistance
+            pitch: SettingsManager.display_camPitch
+            fov: 40
+        }
+
+        grid {
+            color: Qt.rgba(0,0,0,0.7)
+            //size: SettingsManager.window_gridSize
+            visible: false//SettingsManager.menu_isGridOn
+            thickness: 1
+        }
+
+        fieldSurface {
+            showTexture: SettingsManager.display_isTextureOn
+
+            // Field color: day/night from settings
+            color: SettingsManager.display_isDayMode ?
+                       SettingsManager.display_colorFieldDay :
+                       SettingsManager.display_colorFieldNight
+        }
+
+        vehicle: VehicleInterface.vehicleProperties
+
+        /*
+        vehicle {
+            color: SettingsManager.display_colorVehicle
+            opacity: 0.75 //only used for arrow vehicle
+            type: SettingsManager.vehicle_vehicleType
+            trackWidth: SettingsManager.vehicle_trackWidth
+            wheelBase: SettingsManager.vehicle_wheelbase
+            drawbarLength: ! SettingsManager.tool_isToolFront ? (SettingsManager.tool_isToolRearFixed ? 0 : SettingsManager.vehicle_hitchLength) : 0;
+            threePtLength: ! SettingsManager.tool_isToolFront ? (SettingsManager.tool_isToolRearFixed ? SettingsManager.vehicle_hitchLength:0 ) : 0;
+            frontHitchLength: 0
+            steerAngle: SimInterface.isRunning() ? SimInterface.steerAngleActual : ModuleComm.actualSteerAngleDegrees
+            antennaOffset: SettingsManager.vehicle_antennaOffset
+            antennaForward: SettingsManager.vehicle_antennaPivot
+            markBoundary: 0 //if nonzero, draws boundary marking line to this distance
+            svennArrow: true
+            firstHeadingSet: true
+        }
+        */
+
+        tools {
+            tools: Tools.toolsProperties.tools
+            /*
+            tools: [
+                Tool {
+                    trailing: true
+                    isTBTTank: true
+                    hitchLength: -2.5
+                    offset: 0.0
+                    heading: 20
+                },
+                Tool {
+                    trailing: true
+                    hitchLength: -3
+                    offset: 0.0
+                    heading: -15
+
+                    sections: [
+                        SectionProperties {
+                            leftPosition: -1
+                            rightPosition: 0
+                        },
+                        SectionProperties {
+                            leftPosition: 0
+                            rightPosition: 1
+                        }
+                    ]
+                }
+            ]*/
+            visible: true
+        }
+
+        boundaries: Boundaries {
+
+            colorInner: "yellow"
+
+            colorOuter: "red"
+
+            outer: [
+                BoundaryLine {
+                    points: [
+                        Qt.vector3d(20,20,0),
+                        Qt.vector3d(20,-20,0),
+                        Qt.vector3d(-20,-20,0),
+                        Qt.vector3d(-20,20,0)//,
+                        //Qt.vector3d(20,20,0)
+                    ]
+                    visible: true
+                }
+            ]
+
+            inner: [
+                BoundaryLine {
+                    points: [
+                        Qt.vector3d(10,10,0),
+                        Qt.vector3d(10,-10,0),
+                        Qt.vector3d(-10,-10,0),
+                        Qt.vector3d(-10,10,0)//,
+                    ]
+                    visible: true
+                }
+            ]
+
+            beingMade: [
+                Qt.vector3d(15,15,0),
+                Qt.vector3d(15,-15,0),
+                Qt.vector3d(-15,-15,0)
+            ]
+
+            markBoundary: -2 //metres left or right from pivot
+        }
+
+        tracks:  TracksProperties {
+            newTrack: [
+
+            ]
+
+            refLine: [
+
+
+            ]
+
+            aRefFlag: Qt.vector3d(-5,5,0);
+            bRefFlag: Qt.vector3d(5,5,0);
+            showRefFlags: false
+
+        }
+
+        layers: LayerService.layers
+        // Demo coverage layer (QML-only, no LayerService connection)
+        /*
+        layers: Layers {
+            id: demoLayers
+            visible: true
+
+            Component.onCompleted: {
+                // Create demo layer
+                addLayer(0, "Demo Layer")
+
+                // Add demo triangles within 50m radius of origin
+                // Create a grid of colored patches
+                var colors = [
+                    Qt.rgba(1, 0, 0, 0.6),    // Red
+                    Qt.rgba(0, 1, 0, 0.6),    // Green
+                    Qt.rgba(0, 0, 1, 0.6),    // Blue
+                    Qt.rgba(1, 1, 0, 0.6),    // Yellow
+                    Qt.rgba(1, 0, 1, 0.6),    // Magenta
+                    Qt.rgba(0, 1, 1, 0.6)     // Cyan
+                ]
+
+                var patchSize = 8  // metres per patch
+                var colorIndex = 0
+
+                // Create patches from -40 to +40 metres
+                for (var x = -40; x < 40; x += patchSize) {
+                    for (var y = -40; y < 40; y += patchSize) {
+                        // Check if within 50m radius
+                        var cx = x + patchSize / 2
+                        var cy = y + patchSize / 2
+                        if (Math.sqrt(cx*cx + cy*cy) > 45) continue
+
+                        var color = colors[colorIndex % colors.length]
+                        colorIndex++
+
+                        // Two triangles forming a quad
+                        // Triangle 1: bottom-left, bottom-right, top-left
+                        addTriangle(0,
+                            Qt.vector3d(x, y, 0),
+                            Qt.vector3d(x + patchSize, y, 0),
+                            Qt.vector3d(x, y + patchSize, 0),
+                            color)
+
+                        // Triangle 2: top-left, bottom-right, top-right
+                        addTriangle(0,
+                            Qt.vector3d(x, y + patchSize, 0),
+                            Qt.vector3d(x + patchSize, y, 0),
+                            Qt.vector3d(x + patchSize, y + patchSize, 0),
+                            color)
+                    }
+                }
+
+                console.log("Demo layer created with", triangleCount(0), "triangles")
+            }
+        }*/
+
+        // Visibility settings
+        showCoverage: true
+        showGuidance: true
+
+        // Field surface texture mode from settings
+
+        // Background color: sky blue for day, black for night
+        // Day: rgb(69, 102, 179) = rgba(0.27, 0.4, 0.7, 1)
+        // Night: black
+        backgroundColor: SettingsManager.display_isDayMode ?
+                             Qt.rgba(0.27, 0.4, 0.7, 1) :
+                             Qt.rgba(0, 0, 0, 1)
+
+        // Vehicle color from settings
+
+        // Boundary and guidance colors (yellow and green)
+        guidanceColor: Qt.rgba(0, 1, 0, 1)
         id: glcontrolrect
         objectName: "openglcontrol"
 
@@ -1085,223 +1301,7 @@ Window {
                     }
                 }
 
-                // FieldViewItem content area
-                FieldViewItem {
-                    id: testFieldView
-                    anchors.top: titleBar.bottom
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: controlsRow.top
-                    anchors.margins: 4
-
-                    camera {
-                        x: Backend.fixFrame.easting
-                        y: Backend.fixFrame.northing
-                        rotation: Camera.camFollowing ? -Utils.radians_to_deg(VehicleInterface.fixHeading) : 0
-                        zoom: Camera.camSetDistance
-                        pitch: SettingsManager.display_camPitch
-                        fov: 40
-                    }
-
-                    grid {
-                        color: Qt.rgba(0,0,0,0.7)
-                        //size: SettingsManager.window_gridSize
-                        visible: SettingsManager.menu_isGridOn
-                        thickness: 1
-                    }
-
-                    fieldSurface {
-                        showTexture: SettingsManager.display_isTextureOn
-
-                        // Field color: day/night from settings
-                        color: SettingsManager.display_isDayMode ?
-                                   SettingsManager.display_colorFieldDay :
-                                   SettingsManager.display_colorFieldNight
-                    }
-
-                    vehicle: VehicleInterface.vehicleProperties
-
-                    /*
-                    vehicle {
-                        color: SettingsManager.display_colorVehicle
-                        opacity: 0.75 //only used for arrow vehicle
-                        type: SettingsManager.vehicle_vehicleType
-                        trackWidth: SettingsManager.vehicle_trackWidth
-                        wheelBase: SettingsManager.vehicle_wheelbase
-                        drawbarLength: ! SettingsManager.tool_isToolFront ? (SettingsManager.tool_isToolRearFixed ? 0 : SettingsManager.vehicle_hitchLength) : 0;
-                        threePtLength: ! SettingsManager.tool_isToolFront ? (SettingsManager.tool_isToolRearFixed ? SettingsManager.vehicle_hitchLength:0 ) : 0;
-                        frontHitchLength: 0
-                        steerAngle: SimInterface.isRunning() ? SimInterface.steerAngleActual : ModuleComm.actualSteerAngleDegrees
-                        antennaOffset: SettingsManager.vehicle_antennaOffset
-                        antennaForward: SettingsManager.vehicle_antennaPivot
-                        markBoundary: 0 //if nonzero, draws boundary marking line to this distance
-                        svennArrow: true
-                        firstHeadingSet: true
-                    }
-                    */
-
-                    tools {
-                        tools: Tools.toolsProperties.tools
-                        /*
-                        tools: [
-                            Tool {
-                                trailing: true
-                                isTBTTank: true
-                                hitchLength: -2.5
-                                offset: 0.0
-                                heading: 20
-                            },
-                            Tool {
-                                trailing: true
-                                hitchLength: -3
-                                offset: 0.0
-                                heading: -15
-
-                                sections: [
-                                    SectionProperties {
-                                        leftPosition: -1
-                                        rightPosition: 0
-                                    },
-                                    SectionProperties {
-                                        leftPosition: 0
-                                        rightPosition: 1
-                                    }
-                                ]
-                            }
-                        ]*/
-                        visible: true
-                    }
-
-                    boundaries: Boundaries {
-
-                        colorInner: "yellow"
-
-                        colorOuter: "red"
-
-                        outer: [
-                            BoundaryLine {
-                                points: [
-                                    Qt.vector3d(20,20,0),
-                                    Qt.vector3d(20,-20,0),
-                                    Qt.vector3d(-20,-20,0),
-                                    Qt.vector3d(-20,20,0)//,
-                                    //Qt.vector3d(20,20,0)
-                                ]
-                                visible: true
-                            }
-                        ]
-
-                        inner: [
-                            BoundaryLine {
-                                points: [
-                                    Qt.vector3d(10,10,0),
-                                    Qt.vector3d(10,-10,0),
-                                    Qt.vector3d(-10,-10,0),
-                                    Qt.vector3d(-10,10,0)//,
-                                ]
-                                visible: true
-                            }
-                        ]
-
-                        beingMade: [
-                            Qt.vector3d(15,15,0),
-                            Qt.vector3d(15,-15,0),
-                            Qt.vector3d(-15,-15,0)
-                        ]
-
-                        markBoundary: -5 //metres left or right from pivot
-                    }
-
-                    tracks:  TracksProperties {
-                        newTrack: [
-
-                        ]
-
-                        refLine: [
-
-
-                        ]
-
-                        aRefFlag: Qt.vector3d(-5,5,0);
-                        bRefFlag: Qt.vector3d(5,5,0);
-                        showRefFlags: false
-
-                    }
-
-                    layers: LayerService.layers
-                    // Demo coverage layer (QML-only, no LayerService connection)
-                    /*
-                    layers: Layers {
-                        id: demoLayers
-                        visible: true
-
-                        Component.onCompleted: {
-                            // Create demo layer
-                            addLayer(0, "Demo Layer")
-
-                            // Add demo triangles within 50m radius of origin
-                            // Create a grid of colored patches
-                            var colors = [
-                                Qt.rgba(1, 0, 0, 0.6),    // Red
-                                Qt.rgba(0, 1, 0, 0.6),    // Green
-                                Qt.rgba(0, 0, 1, 0.6),    // Blue
-                                Qt.rgba(1, 1, 0, 0.6),    // Yellow
-                                Qt.rgba(1, 0, 1, 0.6),    // Magenta
-                                Qt.rgba(0, 1, 1, 0.6)     // Cyan
-                            ]
-
-                            var patchSize = 8  // metres per patch
-                            var colorIndex = 0
-
-                            // Create patches from -40 to +40 metres
-                            for (var x = -40; x < 40; x += patchSize) {
-                                for (var y = -40; y < 40; y += patchSize) {
-                                    // Check if within 50m radius
-                                    var cx = x + patchSize / 2
-                                    var cy = y + patchSize / 2
-                                    if (Math.sqrt(cx*cx + cy*cy) > 45) continue
-
-                                    var color = colors[colorIndex % colors.length]
-                                    colorIndex++
-
-                                    // Two triangles forming a quad
-                                    // Triangle 1: bottom-left, bottom-right, top-left
-                                    addTriangle(0,
-                                        Qt.vector3d(x, y, 0),
-                                        Qt.vector3d(x + patchSize, y, 0),
-                                        Qt.vector3d(x, y + patchSize, 0),
-                                        color)
-
-                                    // Triangle 2: top-left, bottom-right, top-right
-                                    addTriangle(0,
-                                        Qt.vector3d(x, y + patchSize, 0),
-                                        Qt.vector3d(x + patchSize, y, 0),
-                                        Qt.vector3d(x + patchSize, y + patchSize, 0),
-                                        color)
-                                }
-                            }
-
-                            console.log("Demo layer created with", triangleCount(0), "triangles")
-                        }
-                    }*/
-
-                    // Visibility settings
-                    showCoverage: true
-                    showGuidance: true
-
-                    // Field surface texture mode from settings
-
-                    // Background color: sky blue for day, black for night
-                    // Day: rgb(69, 102, 179) = rgba(0.27, 0.4, 0.7, 1)
-                    // Night: black
-                    backgroundColor: SettingsManager.display_isDayMode ?
-                                         Qt.rgba(0.27, 0.4, 0.7, 1) :
-                                         Qt.rgba(0, 0, 0, 1)
-
-                    // Vehicle color from settings
-
-                    // Boundary and guidance colors (yellow and green)
-                    guidanceColor: Qt.rgba(0, 1, 0, 1)
+                Rectangle {
                 }
 
                 // Controls column at bottom
