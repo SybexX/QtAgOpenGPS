@@ -1139,53 +1139,12 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
                             //qDebug(formgps_saveopen_log) << "Converted fan with" << outerVertices.count()
                             //                             << "outer vertices to proper strip with" << cleanedList.count() << "total vertices";
                         }
-                    } else {
-                        // Standard triangle strip cleaning - remove consecutive duplicates
-                        int degenerateCount = 0;
-
-                        // Start with first vertex (after color)
-                        cleanedList.append((*triangleList)[1]);
-
-                        // Process remaining vertices
-                        for (int i = 2; i < triangleList->count(); ++i) {
-                            const QVector3D& current = (*triangleList)[i];
-                            const QVector3D& prev1 = cleanedList[cleanedList.count() - 1];
-
-                            // Skip if duplicate of previous vertex
-                            if (current == prev1) {
-                                degenerateCount++;
-                                continue;
-                            }
-
-                            // Check if this would create a degenerate triangle
-                            if (cleanedList.count() >= 3) {
-                                const QVector3D& prev2 = cleanedList[cleanedList.count() - 2];
-                                QVector3D edge1 = prev1 - prev2;
-                                QVector3D edge2 = current - prev2;
-                                QVector3D cross = QVector3D::crossProduct(edge1, edge2);
-
-                                if (cross.length() < 1e-6f) {
-                                    // Collinear - skip this vertex
-                                    degenerateCount++;
-                                    continue;
-                                }
-                            }
-
-                            cleanedList.append(current);
-                        }
-
-                        //if (degenerateCount > 0) {
-                        //    qDebug(formgps_saveopen_log) << "Cleaned triangle strip: removed" << degenerateCount
-                        //                                 << "degenerate vertices from" << originalCount << "total vertices";
-                        //}
                     }
 
                     // Only use cleaned list if we have enough vertices for at least one triangle
                     if (cleanedList.count() >= 4) {
                         *triangleList = cleanedList;
-                    } //else {
-                        //qDebug(formgps_saveopen_log) << "Triangle strip had too few valid vertices after cleaning, keeping original";
-                    //}
+                    }
                     verts = triangleList->count();
                 }
 
