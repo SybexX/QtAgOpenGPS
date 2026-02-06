@@ -115,9 +115,9 @@ FieldViewItem::FieldViewItem(QQuickItem *parent)
     });
 
     //Connect grid property changes to update()
-    connect(m_grid, &GridProperties::sizeChanged, this, &FieldViewItem::requestUpdate);
-    connect(m_grid, &GridProperties::colorChanged, this, &FieldViewItem::requestUpdate);
-    connect(m_grid, &GridProperties::visibleChanged, this, &FieldViewItem::requestUpdate);
+    connect(m_grid, &GridProperties::sizeChanged, this, &FieldViewItem::updateGrid);
+    connect(m_grid, &GridProperties::colorChanged, this, &FieldViewItem::updateGrid);
+    connect(m_grid, &GridProperties::visibleChanged, this, &FieldViewItem::updateGrid);
 
     //Connect field surface property changes to update()
     connect(m_fieldSurface, &FieldSurfaceProperties::visibleChanged, this, &FieldViewItem::requestUpdate);
@@ -370,7 +370,13 @@ void FieldViewItem::updateTools()
     m_toolsDirty = true;
     polish();
     update();
+}
 
+void FieldViewItem::updateGrid()
+{
+    m_gridDirty = true;
+    polish();
+    update();
 }
 
 void FieldViewItem::markBoundaryDirty()

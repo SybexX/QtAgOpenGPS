@@ -6,7 +6,7 @@
 #include "gridnode.h"
 #include "materials.h"
 #include "aoggeometry.h"
-// #include "thicklinematerial.h"  // Not used - thick lines disabled for grid
+#include "thicklinematerial.h"
 
 #include <QtMath>
 #include <QVector3D>
@@ -60,6 +60,15 @@ bool GridNode::needsRebuild(double vehicleX, double vehicleY, double camDistance
         return true;
     }
 
+    // Check if camera distance changed significantly (affects grid extent)
+    // Rebuild if distance changed by more than 20%
+    if (m_lastCamDistance > 0) {
+        double distanceRatio = camDistance / m_lastCamDistance;
+        if (distanceRatio < 0.8 || distanceRatio > 1.25) {
+            return true;
+        }
+    }
+
     // Calculate grid half-size (distance from center to edge)
     double halfSize = m_gridSize;
 
@@ -87,8 +96,19 @@ void GridNode::update(const QMatrix4x4 &mvMatrix,
                       const QColor &gridColor,
                       double lineWidth)
 {
+    Q_UNUSED(gridSize)  // We calculate our own extent based on camera distance
+
     double camDistance = qAbs(cameraZoom);
-    m_gridSize = gridSize;
+
+    // Calculate visible grid extent based on camera distance
+    // Use 2x camera distance to ensure grid covers visible area with margin
+    double visibleExtent = camDistance * 2.0;
+
+    // Clamp to reasonable limits
+    if (visibleExtent < 50) visibleExtent = 50;
+    if (visibleExtent > 2000) visibleExtent = 2000;
+
+    m_gridSize = visibleExtent;
 
     // Check if we need to rebuild geometry
     if (needsRebuild(vehicleX, vehicleY, camDistance)) {
@@ -98,11 +118,11 @@ void GridNode::update(const QMatrix4x4 &mvMatrix,
         m_lastVehicleY = vehicleY;
         m_lastCamDistance = camDistance;
 
-        // Grid bounds: vehicle position +/- gridSize
-        m_eastingMin = vehicleX - gridSize;
-        m_eastingMax = vehicleX + gridSize;
-        m_northingMin = vehicleY - gridSize;
-        m_northingMax = vehicleY + gridSize;
+        // Grid bounds: vehicle position +/- visibleExtent
+        m_eastingMin = vehicleX - visibleExtent;
+        m_eastingMax = vehicleX + visibleExtent;
+        m_northingMin = vehicleY - visibleExtent;
+        m_northingMax = vehicleY + visibleExtent;
 
         // Store material properties for potential future MVP-only updates
         m_gridColor = gridColor;
@@ -123,9 +143,6 @@ void GridNode::rebuildGeometry(const QMatrix4x4 &mvMatrix,
                                 const QColor &gridColor,
                                 double lineWidth)
 {
-    Q_UNUSED(viewportSize)
-    Q_UNUSED(lineWidth)
-
     // Clear existing geometry
     clearChildren();
 
@@ -158,47 +175,45 @@ void GridNode::rebuildGeometry(const QMatrix4x4 &mvMatrix,
     if (gridLines.isEmpty())
         return;
 
+    Q_UNUSED(viewportSize)
+    Q_UNUSED(lineWidth)
+
     QMatrix4x4 mvp = ndcMatrix * pMatrix * mvMatrix;
 
-    // Always use native 1-pixel lines for grid
-    // Thick lines require per-frame clipping which defeats the optimization
-    // TODO: Consider geometry shader approach for thick grid lines in the future
-    //if (lineWidth <= 0.2) {
-        // Use normal lines
-        auto *geometry = AOGGeometry::createLinesGeometry(gridLines);
-        if (!geometry)
-            return;
+    // Use native GL_LINES - grid extent is now limited to visible area
+    // so line count is small enough for acceptable performance
+    auto *geometry = AOGGeometry::createLinesGeometry(gridLines);
+    if (!geometry)
+        return;
 
-        m_geomNode = new QSGGeometryNode();
-        m_geomNode->setGeometry(geometry);
-        m_geomNode->setFlag(QSGNode::OwnsGeometry);
+    m_geomNode = new QSGGeometryNode();
+    m_geomNode->setGeometry(geometry);
+    m_geomNode->setFlag(QSGNode::OwnsGeometry);
 
-        auto *material = new AOGFlatColorMaterial();
-        material->setColor(gridColor);
-        material->setMvpMatrix(mvp);
+    auto *material = new AOGFlatColorMaterial();
+    material->setColor(gridColor);
+    material->setMvpMatrix(mvp);
 
-        m_geomNode->setMaterial(material);
-        m_geomNode->setFlag(QSGNode::OwnsMaterial);
+    m_geomNode->setMaterial(material);
+    m_geomNode->setFlag(QSGNode::OwnsMaterial);
 
-    //} else {
-    //    // Use thick lines
-    //    auto *geometry = AOGGeometry::createThickLinesGeometry(gridLines);
-    //    if (!geometry)
-    //        return;
+    // Thick lines commented out - rendering issues (angled verticals, dashed horizontals)
+    //auto *geometry = AOGGeometry::createThickLinesGeometry(gridLines);
+    //if (!geometry)
+    //    return;
     //
-    //    m_geomNode = new QSGGeometryNode();
-    //    m_geomNode->setGeometry(geometry);
-    //    m_geomNode->setFlag(QSGNode::OwnsGeometry);
+    //m_geomNode = new QSGGeometryNode();
+    //m_geomNode->setGeometry(geometry);
+    //m_geomNode->setFlag(QSGNode::OwnsGeometry);
     //
-    //    auto *material = new ThickLineMaterial();
-    //    material->setColor(gridColor);
-    //    material->setLineWidth(lineWidth);
-    //    material->setMvpMatrix(mvp);
-    //    material->setViewportSize(viewportSize);
+    //auto *material = new ThickLineMaterial();
+    //material->setColor(gridColor);
+    //material->setLineWidth(static_cast<float>(lineWidth));
+    //material->setMvpMatrix(mvp);
+    //material->setViewportSize(viewportSize);
     //
-    //    m_geomNode->setMaterial(material);
-    //    m_geomNode->setFlag(QSGNode::OwnsMaterial);
-    //}
+    //m_geomNode->setMaterial(material);
+    //m_geomNode->setFlag(QSGNode::OwnsMaterial);
 
     appendChildNode(m_geomNode);
     m_hasGeometry = true;
@@ -216,22 +231,11 @@ void GridNode::updateMvp(const QMatrix4x4 &mvMatrix,
 
     QMatrix4x4 mvp = ndcMatrix * pMatrix * mvMatrix;
 
-    // Update the material's MVP matrix (always flat color material now)
+    // Update the material's MVP matrix
+    // No need to call markDirty() - Qt's scene graph automatically calls
+    // the material shader's updateUniformData() during rendering
     auto *material = static_cast<AOGFlatColorMaterial*>(m_geomNode->material());
     if (material) {
         material->setMvpMatrix(mvp);
     }
-
-    // Thick lines disabled - would need per-frame clipping
-    //if (m_lineWidth <= 0.2) {
-    //    ...
-    //} else {
-    //    auto *material = static_cast<ThickLineMaterial*>(m_geomNode->material());
-    //    if (material) {
-    //        material->setMvpMatrix(mvp);
-    //        material->setViewportSize(viewportSize);
-    //    }
-    //}
-
-    m_geomNode->markDirty(QSGNode::DirtyMaterial);
 }

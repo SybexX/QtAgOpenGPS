@@ -265,8 +265,8 @@ Window {
         grid {
             color: Qt.rgba(0,0,0,0.7)
             //size: SettingsManager.window_gridSize
-            visible: false//SettingsManager.menu_isGridOn
-            thickness: 1
+            visible: SettingsManager.menu_isGridOn
+            thickness: 1.5
         }
 
         fieldSurface {
