@@ -877,16 +877,16 @@ void FormGPS::oglBack_Paint()
     //read the whole block of pixels up to max lookahead, one read only
     //we'll use Qt's QImage function to grab it.
 #if QT_VERSION < QT_VERSION_CHECK(6,9,0)
-    tool.grnPix = backFBO->toImage().mirrored(false, true).convertToFormat(QImage::Format_RGBX8888);
+    tool.grnPixWindow = backFBO->toImage().mirrored(false, true).convertToFormat(QImage::Format_RGBX8888);
 #else
-    tool.grnPix = backFBO->toImage().flipped().convertToFormat(QImage::Format_RGBX8888);
+    tool.grnPixWindow = backFBO->toImage().flipped().convertToFormat(QImage::Format_RGBX8888);
 #endif
 
     qDebug(form_opengl_log) << "Time after glReadPixels: " << swFrame.elapsed();
     //qDebug(qgl) << grnPix.size();
     //QImage temp = grnPix.copy(tool.rpXPosition, 250, tool.rpWidth, 290 /*(int)rpHeight*/);
     //TODO: is thisn right?
-    QImage temp = tool.grnPix.copy(tool.rpXPosition, 0, tool.rpWidth, 290 /*(int)rpHeight*/);
+    QImage temp = tool.grnPixWindow.copy(tool.rpXPosition, 0, tool.rpWidth, 290 /*(int)rpHeight*/);
     temp.setPixelColor(0,0,QColor::fromRgb(255,128,0));
     //grnPix = temp; //only show clipped image
     memcpy(grnPixels, temp.constBits(), temp.size().width() * temp.size().height() * 4);

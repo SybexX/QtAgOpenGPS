@@ -980,6 +980,7 @@ void CTool::DrawPatchesBackQP(const CTram &tram,
 {
     QMatrix4x4 projection;
     QMatrix4x4 modelview;
+    QImage grnPix;
 
     //  Load the identity.
     projection.setToIdentity();
@@ -987,8 +988,7 @@ void CTool::DrawPatchesBackQP(const CTram &tram,
     //projection.perspective(6.0f,1,1,6000);
     projection.perspective(glm::toDegrees((double)0.06f), 1.666666666666f, 50.0f, 520.0f);
 
-    if (grnPix.isNull())
-        grnPix = QImage(QSize(500,300), QImage::Format_RGBX8888);
+    grnPix = QImage(QSize(500,300), QImage::Format_RGBX8888);
 
     grnPix.fill(0);
 
@@ -1190,7 +1190,9 @@ void CTool::DrawPatchesBackQP(const CTram &tram,
     QImage temp = grnPix.copy(rpXPosition, 0, rpWidth, 290 /*(int)rpHeight*/);
     temp.setPixelColor(0,0,QColor::fromRgb(255,128,0));
     //grnPix = temp; //only show clipped image
+    //TODO: should be guarded with a lock
     memcpy(grnPixels, temp.constBits(), temp.size().width() * temp.size().height() * 4);
+    grnPixWindow = grnPix.copy();
 }
 
 

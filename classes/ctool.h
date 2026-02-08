@@ -109,8 +109,7 @@ public:
     QVector<CPatches> triStrip = QVector<CPatches>( { CPatches() } );
 
     bool patchesBufferDirty = true;
-
-    QImage grnPix;
+    QImage grnPixWindow;
 
     void sectionCalcWidths();
     void sectionCalcMulti();

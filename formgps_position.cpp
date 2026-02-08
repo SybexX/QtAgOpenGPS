@@ -1206,10 +1206,10 @@ void FormGPS::UpdateFixPosition()
     //Both the framebuffer and the qquickitem renderer share the same interface here.
     QQuickItem *renderer = qobject_cast<QQuickItem *>(Backend::instance()->aogRenderer);
     // CRITICAL: Force OpenGL update in GUI thread to prevent threading violation
-    if (renderer) {
-        renderer->update();
-    }
-    qDebug(qpos) << "Time after painting field: " << (float)swFrame.nsecsElapsed() / 1000000;
+    //if (renderer) {
+    //    renderer->update();
+    //}
+    //qDebug(qpos) << "Time after painting field: " << (float)swFrame.nsecsElapsed() / 1000000;
 
     Backend::instance()->m_fixFrame.setFrameTime(swFrame.elapsed());
 
@@ -1394,9 +1394,9 @@ void FormGPS::processSectionLookahead() {
 
     if (SettingsManager::instance()->display_showBack()) {
 #if QT_VERSION < QT_VERSION_CHECK(6,9,0)
-        grnPixelsWindow->setPixmap(QPixmap::fromImage(tool.grnPix.mirrored(false, true)));
+        grnPixelsWindow->setPixmap(QPixmap::fromImage(tool.grnPixWindow.mirrored(false, true)));
 #else
-        grnPixelsWindow->setPixmap(QPixmap::fromImage(tool.grnPix.flipped()));
+        grnPixelsWindow->setPixmap(QPixmap::fromImage(tool.grnPixWindow.flipped()));
 #endif
         //overlapPixelsWindow->setPixmap(QPixmap::fromImage(overPix.mirrored()));
     }
