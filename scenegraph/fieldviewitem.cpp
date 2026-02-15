@@ -516,28 +516,17 @@ QSGNode *FieldViewItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 
     // Update grid if visible
     if (m_grid->visible()) {
-        // Calculate grid spacing based on zoom
-        double gridSpacing = 10.0;
-        if (camDistance <= 20000 && camDistance > 10000) gridSpacing = 2012;
-        else if (camDistance <= 10000 && camDistance > 5000) gridSpacing = 1006;
-        else if (camDistance <= 5000 && camDistance > 2000) gridSpacing = 503;
-        else if (camDistance <= 2000 && camDistance > 1000) gridSpacing = 201.2;
-        else if (camDistance <= 1000 && camDistance > 500) gridSpacing = 100.6;
-        else if (camDistance <= 500 && camDistance > 250) gridSpacing = 50.3;
-        else if (camDistance <= 250 && camDistance > 150) gridSpacing = 25.15;
-        else if (camDistance <= 150 && camDistance > 50) gridSpacing = 10.06;
-        else if (camDistance <= 50 && camDistance > 1) gridSpacing = 5.03;
-
         rootNode->gridNode->update(
             m_currentMv,
             m_currentP,
             m_currentNcd,
             viewportSize,
+            m_renderData.vehicleX,
+            m_renderData.vehicleY,
+            m_camera->zoom(),
+            m_grid->size(),
             m_grid->color(),
-            static_cast<float>(m_grid->thickness()),
-            eastingMin, eastingMax,
-            northingMin, northingMax,
-            gridSpacing
+            m_grid->thickness()
         );
         m_gridDirty = false;
     }

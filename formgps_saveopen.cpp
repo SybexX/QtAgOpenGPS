@@ -8,6 +8,7 @@
 #include "classes/settingsmanager.h"
 #include "qmlutil.h"
 #include <QString>
+#include <QLoggingCategory>
 #include "backend.h"
 #include "backendaccess.h"
 #include "mainwindowstate.h"
@@ -18,6 +19,8 @@
 #include "camera.h"
 #include "backend/layerservice.h"
 #include "scenegraph/layertypes.h"
+
+Q_LOGGING_CATEGORY (formgps_saveopen_log, "formgps_saveopen.qtagopengps")
 
 enum OPEN_FLAGS {
     LOAD_MAPPING = 1,
@@ -1117,7 +1120,10 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
                     //use float
                     color = QColor::fromRgbF(colorVec.x(), colorVec.y(), colorVec.z());
                 }
-                color.setAlphaF(0.596);
+                if (SettingsManager::instance()->display_isDayMode())
+                    color.setAlpha(152);
+                else
+                    color.setAlpha(76);
 
                 // Convert triangle strip to individual triangles
                 // Vertices start at index 1 (after color)

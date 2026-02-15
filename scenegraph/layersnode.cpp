@@ -156,14 +156,16 @@ void LayersNode::fillPatchData(QSGGeometryNode *patch, const QVector<CoverageTri
 
     ColorVertex *data = static_cast<ColorVertex*>(geometry->vertexData());
 
+    qWarning() << "filling geometry data";
     for (int i = 0; i < count; ++i) {
         const CoverageTriangle &tri = triangles[startIdx + i];
 
         // Apply layer alpha to the triangle color
-        float r = tri.color.redF();
-        float g = tri.color.greenF();
-        float b = tri.color.blueF();
         float a = tri.color.alphaF() * layerAlpha;
+        // Premultiply RGB by alpha for Qt scene graph blending
+        float r = tri.color.redF() * a;
+        float g = tri.color.greenF() * a;
+        float b = tri.color.blueF() * a;
 
         // Vertex 0
         data->x = tri.v0.x();

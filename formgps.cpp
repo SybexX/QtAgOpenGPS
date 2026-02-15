@@ -24,6 +24,7 @@
 #include "modulecomm.h"
 #include "camera.h"
 #include "vehicleproperties.h"
+#include "backend/layerservice.h"
 
 FormGPS::FormGPS(QWidget *parent) : QQmlApplicationEngine(parent)
 {
@@ -699,6 +700,9 @@ void FormGPS::JobClose()
 
     tool.triStrip.clear();
     tool.triStrip.append(CPatches());
+
+    //clear coverage layers
+    LayerService::instance()->clearAllLayers();
 
     //invalidate all GPU patch list buffers. Must be destroyed
     //in the OpenGL context, so deferred to the next drawing

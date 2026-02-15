@@ -17,6 +17,8 @@ layout(std140, binding = 0) uniform buf {
     float lineWidth;    // line width in pixels
 } ubuf;
 
+layout(location = 0) out float vSide;  // Pass side to fragment shader for degenerate detection
+
 out gl_PerVertex {
     vec4 gl_Position;
     float gl_PointSize;
@@ -53,6 +55,8 @@ void main()
     currClip.xy += clipOffset;
 
     gl_Position = currClip;
-
     gl_PointSize = 1;
+
+    // Pass side to fragment shader (0 = degenerate vertex)
+    vSide = side;
 }

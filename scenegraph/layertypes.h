@@ -64,7 +64,7 @@ struct CoverageLayer {
     QString name;                       // Human-readable layer name
     QVector<CoverageTriangle> triangles; // Committed triangle data
     QVector<SectionPending> pendingSections; // Per-section pending vertices
-    float alpha = 0.596f;               // Layer-level alpha (AOG default)
+    float alpha = 1.0f;               // Layer-level alpha (AOG default)
     bool visible = true;                // Layer visibility
     QRectF boundingBox;                 // Cached bounding box for spatial queries
 
@@ -90,6 +90,13 @@ struct CoverageLayer {
     void flushPendingSections() {
         for (SectionPending &section : pendingSections) {
             section.reset();
+        }
+    }
+
+    // Flush a single pending section (when one section turns off)
+    void flushPendingSection(int sectionIndex) {
+        if (sectionIndex >= 0 && sectionIndex < pendingSections.size()) {
+            pendingSections[sectionIndex].reset();
         }
     }
 
