@@ -1607,5 +1607,12 @@ Window {
     AgIOModule.AgIO {
           id: mainWindowAgIO
     }
+    AgIOModule.PortMenu{
+        id: gnssConfig
+        visible: false
+        portBaud: SettingsManager.gnss_BaudRate
+        portName: SettingsManager.gnss_SerialPort
+        moduleType: "Gnss"
+    }
 }
 
