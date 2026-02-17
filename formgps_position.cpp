@@ -1302,6 +1302,9 @@ void FormGPS::UpdateFixPosition()
         sectionProperties[i]->set_on(tool.section[i].isSectionOn);
     }
 
+    //update BoundaryInterface with latest boundary lines from bnd
+    bnd.updateInterface();
+
     //qDebug(qpos) << CVehicle::instance()->pivotAxlePos.easting << CVehicle::instance()->pivotAxlePos.northing << CVehicle::instance()->pivotAxlePos.heading;
 }
 
