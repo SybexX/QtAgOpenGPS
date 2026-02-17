@@ -38,6 +38,7 @@
 #include "camera.h"
 #include "vehicleproperties.h"
 #include "sectionproperties.h"
+#include "layerservice.h"
 #include <QtConcurrent/QtConcurrentRun>
 
 
@@ -45,6 +46,10 @@ Q_LOGGING_CATEGORY (qpos, "formgps_position.qtagopengps")
 
 extern QLabel *grnPixelsWindow;
 extern QLabel *overlapPixelsWindow;
+
+inline QColor QColorWithAlpha(const QColor &c, int a) {
+    return QColor(c.red(), c.green(), c.blue(), a);
+}
 
 //called for every new GPS or simulator position
 void FormGPS::UpdateFixPosition()
@@ -1783,6 +1788,12 @@ void FormGPS::AddSectionOrPathPoints()
 {
     CNMEA &pn = *Backend::instance()->pn();
     BACKEND_TRACK(track);
+    int alpha;
+
+    if (SettingsManager::instance()->display_isDayMode())
+        alpha=152;
+    else
+        alpha=76;
 
     if (recPath.isRecordOn)
     {
@@ -1802,6 +1813,22 @@ void FormGPS::AddSectionOrPathPoints()
 
     // if non zero, at least one section is on.
     patchCounter = 0;
+
+    for (int j=0; j < tool.numOfSections; j++) {
+        if (tool.section[j].isSectionOn) {
+            if(SettingsManager::instance()->color_isMultiColorSections())
+                LayerService::instance()->addSectionVertices(
+                        j,
+                        tool.section[j].leftPoint,
+                        tool.section[j].rightPoint,QColorWithAlpha(tool.secColors[j], alpha));
+            else
+                LayerService::instance()->addSectionVertices(
+                    j,
+                    tool.section[j].leftPoint,
+                    tool.section[j].rightPoint,
+                    QColorWithAlpha(SettingsManager::instance()->display_colorSectionsDay(), alpha));
+        }
+    }
 
     //send the current and previous GPS fore/aft corrected fix to each section
     for (int j = 0; j < tool.triStrip.count(); j++)

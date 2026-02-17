@@ -156,7 +156,7 @@ void LayersNode::fillPatchData(QSGGeometryNode *patch, const QVector<CoverageTri
 
     ColorVertex *data = static_cast<ColorVertex*>(geometry->vertexData());
 
-    qWarning() << "filling geometry data";
+    //qWarning() << "filling geometry data";
     for (int i = 0; i < count; ++i) {
         const CoverageTriangle &tri = triangles[startIdx + i];
 

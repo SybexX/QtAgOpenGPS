@@ -10,6 +10,7 @@
 #include "mainwindowstate.h"
 #include "modulecomm.h"
 #include "tools.h"
+#include "layerservice.h"
 
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
@@ -78,10 +79,12 @@ void CTool::loadSettings()
 
     isSectionsNotZones = SettingsManager::instance()->tool_isSectionsNotZones();
 
-    if (isSectionsNotZones)
+    if (isSectionsNotZones) {
         numOfSections = SettingsManager::instance()->vehicle_numSections();
-    else
+    } else {
         numOfSections = SettingsManager::instance()->tool_numSectionsMulti();
+    }
+    LayerService::instance()->layers()->setSectionCount(numOfSections);
 
     minCoverage = SettingsManager::instance()->vehicle_minCoverage();
     isMultiColoredSections = SettingsManager::instance()->color_isMultiColorSections();
@@ -1736,12 +1739,33 @@ void CTool::ProcessLookAhead(int gpsHz,
                                                section[triStrip[j].currentEndSectionNum].rightPoint,
                                                patchSaveList);
             }
+
+            LayerService::instance()->flushPendingSections();
         }
         else if (!isMultiColoredSections)
         {
+
+            QColor sectionColor = SettingsManager::instance()->display_colorSectionsDay();
+
             //set the start and end positions from section points
             for (int j = 0; j < numOfSections; j++)
             {
+                //LayerService has no concept of patches, just sections
+                //if the section was on but is now off, we need to add
+                //the current left/right points before we flush the section
+                //otherwise we'll miss a small area.
+                if (section[j].isMappingOn || LayerService::instance()->isSectionPending(j)) {
+                    LayerService::instance()->addSectionVertices(
+                        j,
+                        section[j].leftPoint,
+                        section[j].rightPoint,
+                        sectionColor);
+                }
+
+                if (!section[j].isMappingOn) {
+                   LayerService::instance()->flushPendingSection(j);
+                }
+
                 //skip till first mapping section
                 if (!section[j].isMappingOn) continue;
 
