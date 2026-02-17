@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include "boundaryinterface.h"
+#include "boundariesproperties.h"
 
 BoundaryInterface *BoundaryInterface::s_instance = nullptr;
 QMutex BoundaryInterface::s_mutex;
@@ -7,7 +8,20 @@ bool BoundaryInterface::s_cpp_created = false;
 
 BoundaryInterface::BoundaryInterface(QObject *parent)
     : QObject{parent}
-{}
+    , m_properties(new BoundariesProperties(this))
+{
+    auto updateBoundaryDrawing = [this]() {
+        if (this->m_isDrawRightSide) {
+            //positive distance
+            this->properties()->set_markBoundary(this->m_createBndOffset);
+        } else {
+            //negative distance
+            this->properties()->set_markBoundary(-this->m_createBndOffset);
+        }
+    };
+    connect(this, &BoundaryInterface::isDrawRightSideChanged, this, updateBoundaryDrawing);
+    connect(this, &BoundaryInterface::createBndOffsetChanged, this, updateBoundaryDrawing);
+}
 
 BoundaryInterface *BoundaryInterface::instance() {
     QMutexLocker locker(&s_mutex);
