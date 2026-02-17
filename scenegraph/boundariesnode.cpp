@@ -75,7 +75,7 @@ void BoundariesNode::update(const QMatrix4x4 &mv,
         }
 
         // Create line loop geometry
-        if(properties->hdLine() && properties->hdLine()->points().count()) {
+        if(properties->hdLine() && properties->hdLine()->visible() && properties->hdLine()->points().count()) {
             auto *geometry = AOGGeometry::createThickLineLoopGeometry(properties->hdLine()->points());
             if (geometry) {
                 auto *geomNode = new QSGGeometryNode();

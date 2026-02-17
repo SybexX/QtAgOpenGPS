@@ -663,7 +663,11 @@ void CBoundary::updateInterface() {
                     hdPoints.append(QVector3D(v.easting, v.northing, v.heading));
                 }
                 hd->set_points(hdPoints);
-                hd->set_visible(true);
+                if (MainWindowState::instance()->isHeadlandOn()) {
+                    hd->set_visible(true);
+                } else {
+                    hd->set_visible(false);
+                }
                 props->set_hdLine(hd);
             }
 
