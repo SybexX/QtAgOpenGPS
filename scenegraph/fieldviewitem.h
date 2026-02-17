@@ -143,7 +143,7 @@ public:
     Q_INVOKABLE void updateVehicle();
     Q_INVOKABLE void updateTools();
     Q_INVOKABLE void updateGrid();
-    Q_INVOKABLE void markBoundaryDirty();
+    Q_INVOKABLE void updateBoundary();
     Q_INVOKABLE void markCoverageDirty();
     Q_INVOKABLE void markGuidanceDirty();
     Q_INVOKABLE void markLayersDirty();

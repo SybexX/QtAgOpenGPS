@@ -236,8 +236,9 @@ void FieldViewItem::setBoundaries(BoundariesProperties *boundaries)
 
     // Connect signals from new boundaries
     if (m_boundaries) {
-        connect(m_boundaries, &BoundariesProperties::outerChanged, this, &FieldViewItem::markBoundaryDirty);
-        connect(m_boundaries, &BoundariesProperties::innerChanged, this, &FieldViewItem::markBoundaryDirty);
+        connect(m_boundaries, &BoundariesProperties::outerChanged, this, &FieldViewItem::updateBoundary);
+        connect(m_boundaries, &BoundariesProperties::innerChanged, this, &FieldViewItem::updateBoundary);
+        connect(m_boundaries, &BoundariesProperties::hdLineChanged, this, &FieldViewItem::updateBoundary);
     }
 
     m_boundaryDirty = true;
@@ -379,9 +380,10 @@ void FieldViewItem::updateGrid()
     update();
 }
 
-void FieldViewItem::markBoundaryDirty()
+void FieldViewItem::updateBoundary()
 {
     m_boundaryDirty = true;
+    polish();
     update();
 }
 
