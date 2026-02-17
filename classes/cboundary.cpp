@@ -7,6 +7,8 @@
 #include "glm.h"
 #include "cvehicle.h"
 #include "siminterface.h"
+#include "boundaryproperties.h"
+#include "boundariesproperties.h"
 #include "QLoggingCategory"
 
 Q_LOGGING_CATEGORY (cboundary_log, "cboundary.qtagopengps")
@@ -605,4 +607,82 @@ void CBoundary::addBoundaryOSMPoint(double latitude, double longitude) {
     Vec3 point(easting,northing,0);
     bndBeingMadePts.append(point);
     calculateArea();
+}
+
+quint64 CBoundary::calculateFingerprint() const {
+    quint64 hash = bndList.count();
+    for (const auto &bnd : bndList) {
+        hash = hash * 31 + static_cast<quint64>(bnd.fenceLine.count());
+        hash = hash * 31 + static_cast<quint64>(bnd.hdLine.count());
+        hash = hash * 31 + static_cast<quint64>(bnd.turnLine.count());
+    }
+    hash = hash * 31 + static_cast<quint64>(bndBeingMadePts.count());
+    return hash;
+}
+
+void CBoundary::updateInterface() {
+    quint64 currentFingerprint = calculateFingerprint();
+
+    if (currentFingerprint != m_lastFingerprint) {
+        BoundariesProperties *props = BoundaryInterface::instance()->properties();
+
+        props->clearAllOuter();
+        props->clearAllInner();
+
+        if (bndBeingMadePts.count() > 0) {
+            QVector<QVector3D> beingMadePoints;
+            beingMadePoints.reserve(bndBeingMadePts.count());
+            for (const Vec3 &v : bndBeingMadePts) {
+                beingMadePoints.append(QVector3D(v.easting, v.northing, 0));
+            }
+            props->set_beingMade(beingMadePoints);
+        } else {
+            props->set_beingMade(QVector<QVector3D>());
+        }
+
+        if (bndList.count() > 0) {
+            // bndList[0].fenceLine -> outer boundary
+            if (bndList[0].fenceLine.count() > 0) {
+                auto *outer = new BoundaryProperties(props);
+                QList<QVector3D> points;
+                points.reserve(bndList[0].fenceLine.count());
+                for (const Vec3 &v : bndList[0].fenceLine) {
+                    points.append(QVector3D(v.easting, v.northing, v.heading));
+                }
+                outer->set_points(points);
+                outer->set_visible(true);
+                props->addOuter(outer);
+            }
+
+            // bndList[0].hdLine -> hdLine
+            if (bndList[0].hdLine.count() > 0) {
+                auto *hd = new BoundaryProperties(props);
+                QList<QVector3D> hdPoints;
+                hdPoints.reserve(bndList[0].hdLine.count());
+                for (const Vec3 &v : bndList[0].hdLine) {
+                    hdPoints.append(QVector3D(v.easting, v.northing, v.heading));
+                }
+                hd->set_points(hdPoints);
+                hd->set_visible(true);
+                props->set_hdLine(hd);
+            }
+
+            // bndList[i].fenceLine (i > 0) -> inner boundaries
+            for (int i = 1; i < bndList.count(); i++) {
+                if (bndList[i].fenceLine.count() > 0) {
+                    auto *inner = new BoundaryProperties(props);
+                    QList<QVector3D> points;
+                    points.reserve(bndList[i].fenceLine.count());
+                    for (const Vec3 &v : bndList[i].fenceLine) {
+                        points.append(QVector3D(v.easting, v.northing, v.heading));
+                    }
+                    inner->set_points(points);
+                    inner->set_visible(true);
+                    props->addInner(inner);
+                }
+            }
+        }
+
+        m_lastFingerprint = currentFingerprint;
+    }
 }
