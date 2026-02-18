@@ -331,7 +331,8 @@ Window {
             visible: true
         }
 
-        boundaries: Boundaries {
+        boundaries: BoundaryInterface.properties
+        /*boundaries: Boundaries {
 
             colorInner: "yellow"
 
@@ -370,6 +371,7 @@ Window {
 
             markBoundary: -2 //metres left or right from pivot
         }
+        */
 
         tracks:  TracksProperties {
             newTrack: [

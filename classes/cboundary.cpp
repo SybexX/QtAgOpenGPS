@@ -626,8 +626,7 @@ void CBoundary::updateInterface() {
     if (currentFingerprint != m_lastFingerprint) {
         BoundariesProperties *props = BoundaryInterface::instance()->properties();
 
-        props->clearAllOuter();
-        props->clearAllInner();
+        props->clearAll();
 
         if (bndBeingMadePts.count() > 0) {
             QVector<QVector3D> beingMadePoints;

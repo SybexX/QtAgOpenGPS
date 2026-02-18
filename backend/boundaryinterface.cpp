@@ -1,6 +1,7 @@
 #include <QCoreApplication>
 #include "boundaryinterface.h"
 #include "boundariesproperties.h"
+#include "mainwindowstate.h"
 
 BoundaryInterface *BoundaryInterface::s_instance = nullptr;
 QMutex BoundaryInterface::s_mutex;
@@ -21,6 +22,13 @@ BoundaryInterface::BoundaryInterface(QObject *parent)
     };
     connect(this, &BoundaryInterface::isDrawRightSideChanged, this, updateBoundaryDrawing);
     connect(this, &BoundaryInterface::createBndOffsetChanged, this, updateBoundaryDrawing);
+    //headland should only show if button is pressed in the main window
+    connect(MainWindowState::instance(), &MainWindowState::isHeadlandOnChanged, this, [this]() {
+        if (properties()->hdLine()) {
+            properties()->hdLine()->set_visible(MainWindowState::instance()->isHeadlandOn());
+            emit properties()->hdLineChanged();
+        }
+    });
 }
 
 BoundaryInterface *BoundaryInterface::instance() {
