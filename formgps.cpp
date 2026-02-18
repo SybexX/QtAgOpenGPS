@@ -787,6 +787,7 @@ void FormGPS::JobNew()
     MainWindowState::instance()->set_autoBtnState(SectionState::Off);
     //btnSectionMasterAuto.Image = Properties.Resources.SectionMasterOff;
 
+    lock.lockForWrite();
     track.ABLine.abHeading = 0.00;
 
     Camera::instance()->SetZoom();
@@ -806,6 +807,8 @@ void FormGPS::JobNew()
     // Phase 6.0.29 initialized isRecordOn=false in constructor, which emptied the trail after JobNew()
     recPath.isRecordOn = true;
     tool.patchesBufferDirty = true;
+
+    lock.unlock();
 
 }
 

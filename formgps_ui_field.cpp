@@ -96,20 +96,12 @@ void FormGPS::field_open(QString field_name) {
 void FormGPS::field_new(QString field_name) {
     CNMEA &pn = *Backend::instance()->pn();
 
-    //assume the GUI will vet the name a little bit
-    lock.lockForWrite();
-
-    // CRITICAL DEADLOCK FIX: Save current field AFTER releasing lock (same as field_close fix)
-    // FileSaveEverythingBeforeClosingField() needs to acquire mutex but lock is already held
-    lock.unlock();
-    qDebug() << "Lock released, calling FileSaveEverythingBeforeClosingField(false)";
     FileSaveEverythingBeforeClosingField(false);  // Don't save vehicle to avoid async deadlock
-    qDebug() << "FileSaveEverythingBeforeClosingField() completed, no async ops - re-acquiring lock";
-    lock.lockForWrite();
 
     currentFieldDirectory = field_name.trimmed();
     SettingsManager::instance()->setF_currentDir(currentFieldDirectory);
     JobNew();
+    lock.lockForWrite();
 
     // Phase 6.3.1: Use PropertyWrapper for safe property access
     pn.setLatStart(pn.latitude);
