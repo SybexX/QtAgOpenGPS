@@ -1343,6 +1343,23 @@ void CTrack::updateInterface()
 
     // Curve vertex dots flag
     props->set_showCurrentLineDots(!isABMode && !curve.curList.isEmpty());
+
+    // YouTurn points
+    {
+        QObject *ytObj = Backend::instance()->yt();
+        if (ytObj) {
+            CYouTurn *yt = qobject_cast<CYouTurn*>(ytObj);
+            if (yt && yt->ytList.count() >= 3) {
+                QVector<QVector3D> ytPts;
+                ytPts.reserve(yt->ytList.count());
+                for (const Vec3 &v : yt->ytList)
+                    ytPts.append(QVector3D(v.easting, v.northing, 0));
+                props->set_youTurnPoints(ytPts);
+            } else {
+                props->set_youTurnPoints({});
+            }
+        }
+    }
 }
 
 // Removed QML_SINGLETON factory function - using qmlRegisterSingletonInstance instead

@@ -144,6 +144,7 @@ void TracksNode::clearChildren()
     m_pursuitCircleNode = nullptr;
     m_smoothedCurveNode = nullptr;
     m_currentLineDotsNode = nullptr;
+    m_youTurnDotsNode = nullptr;
 }
 
 void TracksNode::update(const QMatrix4x4 &mv,
@@ -356,6 +357,16 @@ void TracksNode::update(const QMatrix4x4 &mv,
             m_currentLineDotsNode->build();
             appendChildNode(m_currentLineDotsNode);
         }
+
+        // YouTurn dots
+        if (properties->youTurnPoints().count() >= 3) {
+            m_youTurnDotsNode = new DotsNode();
+            for (const QVector3D &pt : properties->youTurnPoints())
+                m_youTurnDotsNode->addDot(pt, QColor::fromRgbF(0.95f, 0.5f, 0.95f, 1.0f),
+                                           glm::dp(3.0f));
+            m_youTurnDotsNode->build();
+            appendChildNode(m_youTurnDotsNode);
+        }
     }
 
     // ALWAYS update MVP / material uniforms every frame.
@@ -419,6 +430,9 @@ void TracksNode::update(const QMatrix4x4 &mv,
 
     if (m_currentLineDotsNode)
         m_currentLineDotsNode->updateUniforms(mvp, viewportSize);
+
+    if (m_youTurnDotsNode)
+        m_youTurnDotsNode->updateUniforms(mvp, viewportSize);
 }
 
 void TracksNode::updateThickLineNode(QSGGeometryNode *node,

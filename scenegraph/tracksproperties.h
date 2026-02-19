@@ -35,6 +35,7 @@ public:
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, pursuitCircle)
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, smoothedCurve)
     SIMPLE_BINDABLE_PROPERTY(bool, showCurrentLineDots)
+    SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, youTurnPoints)
 signals:
     void tracksPropertiesChanged();
 
@@ -52,6 +53,7 @@ private:
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_pursuitCircle, &TracksProperties::pursuitCircleChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_smoothedCurve, &TracksProperties::smoothedCurveChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(TracksProperties, bool, m_showCurrentLineDots, false, &TracksProperties::showCurrentLineDotsChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_youTurnPoints, &TracksProperties::youTurnPointsChanged)
 
 };
 

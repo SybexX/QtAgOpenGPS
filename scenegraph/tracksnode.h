@@ -41,6 +41,7 @@ private:
     QSGGeometryNode *m_pursuitCircleNode = nullptr;
     QSGGeometryNode *m_smoothedCurveNode = nullptr;
     DotsNode *m_currentLineDotsNode = nullptr;
+    DotsNode *m_youTurnDotsNode = nullptr;
 
     void updateThickLineNode(QSGGeometryNode *node,
                              const QMatrix4x4 &mvp,

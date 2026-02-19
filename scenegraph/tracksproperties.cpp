@@ -15,4 +15,5 @@ TracksProperties::TracksProperties(QObject *parent) : QObject(parent)
     connect(this, &TracksProperties::pursuitCircleChanged, this, &TracksProperties::tracksPropertiesChanged);
     connect(this, &TracksProperties::smoothedCurveChanged, this, &TracksProperties::tracksPropertiesChanged);
     connect(this, &TracksProperties::showCurrentLineDotsChanged, this, &TracksProperties::tracksPropertiesChanged);
+    connect(this, &TracksProperties::youTurnPointsChanged, this, &TracksProperties::tracksPropertiesChanged);
 }
