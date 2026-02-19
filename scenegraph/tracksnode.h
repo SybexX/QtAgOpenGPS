@@ -27,10 +27,26 @@ public:
     void clearChildren();
 
 private:
+    QSGGeometryNode *m_refLineNode = nullptr;
+    QSGGeometryNode *m_currentLineNode = nullptr;
     QSGGeometryNode *m_newTrack = nullptr;
     TextNode *m_aRefFlag = nullptr;
     TextNode *m_bRefFlag = nullptr;
     DotsNode *m_refDotsNode = nullptr;
+
+    QSGGeometryNode *m_shadowOutlineNode = nullptr;
+    QSGGeometryNode *m_shadowFillNode = nullptr;
+    QVector<QSGGeometryNode*> m_sideGuideNodes;
+    DotsNode *m_lookaheadNode = nullptr;
+    QSGGeometryNode *m_pursuitCircleNode = nullptr;
+    QSGGeometryNode *m_smoothedCurveNode = nullptr;
+    DotsNode *m_currentLineDotsNode = nullptr;
+
+    void updateThickLineNode(QSGGeometryNode *node,
+                             const QMatrix4x4 &mvp,
+                             const QSize &viewportSize,
+                             int lineWidth,
+                             const QColor &color);
 };
 
 #endif // TRACKSNODE_H

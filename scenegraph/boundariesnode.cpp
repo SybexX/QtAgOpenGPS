@@ -34,6 +34,7 @@ void BoundariesNode::clearChildren()
     m_bndBeingMadeNode = nullptr;
     m_lastPointToPivotNode = nullptr;
     m_beingMadeDotsNode = nullptr;
+    m_hdLineNode = nullptr;
 }
 
 void BoundariesNode::update(const QMatrix4x4 &mv,
@@ -71,6 +72,24 @@ void BoundariesNode::update(const QMatrix4x4 &mv,
 
             appendChildNode(geomNode);
             m_outerNodes.append(geomNode);
+        }
+
+        // Create line loop geometry
+        if(properties->hdLine() && properties->hdLine()->visible() && properties->hdLine()->points().count()) {
+            auto *geometry = AOGGeometry::createThickLineLoopGeometry(properties->hdLine()->points());
+            if (geometry) {
+                auto *geomNode = new QSGGeometryNode();
+                geomNode->setGeometry(geometry);
+                geomNode->setFlag(QSGNode::OwnsGeometry);
+
+                // Create material with MVP matrix
+                auto *material = new ThickLineMaterial();
+                geomNode->setMaterial(material);
+                geomNode->setFlag(QSGNode::OwnsMaterial);
+
+                appendChildNode(geomNode);
+                m_hdLineNode = geomNode;
+            }
         }
 
         // Create geometry for each boundary
@@ -221,6 +240,10 @@ void BoundariesNode::update(const QMatrix4x4 &mv,
     }
     for (QSGGeometryNode *node:m_innerNodes) {
         updateThickLineNode(node, ndc * p * mv, viewportSize, lineWidth2, properties->colorInner());
+    }
+
+    if (m_hdLineNode) {
+        updateThickLineNode(m_hdLineNode, ndc * p * mv, viewportSize, lineWidth2, properties->colorHeadline());
     }
 
     if (m_bndBeingMadeNode) {

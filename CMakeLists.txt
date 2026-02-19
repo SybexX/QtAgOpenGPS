@@ -81,7 +81,7 @@ endif()
 #find_package(Qt6 REQUIRED COMPONENTS Core)
  find_package(Qt6 6.8 REQUIRED COMPONENTS Widgets) #used only for opengl ?
  find_package(Qt6 REQUIRED COMPONENTS Gui)
- find_package(Qt6 REQUIRED COMPONENTS GuiPrivate)  # Required for QRhi (rhiresources.cpp)
+# find_package(Qt6 REQUIRED COMPONENTS GuiPrivate)  # Required for QRhi (rhiresources.cpp)
  find_package(Qt6 REQUIRED COMPONENTS SerialPort)
 # find_package(Qt6 REQUIRED COMPONENTS OpenGL)
 find_package(Qt6 REQUIRED COMPONENTS Quick)
@@ -163,8 +163,8 @@ qt_add_executable(QtAgOpenGPS
     formheadache.h formheadache.cpp
     formheadland.h formheadland.cpp
     glutils.h glutils.cpp
-    rhiresources.h rhiresources.cpp
-    rhihelpers.h rhihelpers.cpp
+    #rhiresources.h rhiresources.cpp
+    #rhihelpers.h rhihelpers.cpp
     qmlutil.h
     setter.h
 
@@ -411,6 +411,7 @@ qt_add_qml_module(QtAgOpenGPS
     SOURCES backend/camera.h backend/camera.cpp
     SOURCES backend/worldgrid.h backend/worldgrid.cpp
     SOURCES backend/sectionproperties.h backend/sectionproperties.cpp
+    SOURCES backend/layerservice.h backend/layerservice.cpp
     SOURCES models/recordedpathmodel.h models/recordedpathmodel.cpp
     SOURCES models/fencelinemodel.h models/fencelinemodel.cpp
     SOURCES models/flagmodel.h models/flagmodel.cpp
@@ -422,41 +423,45 @@ qt_add_qml_module(QtAgOpenGPS
     SOURCES models/rcmodel.h models/rcmodel.cpp
     SOURCES backendaccess.h
 
-    # Scene graph-based renderer (Phase: QSG Migration)
+    #scenegraph geometry and texture helpers and types
+    SOURCES scenegraph/aoggeometry.h scenegraph/aoggeometry.cpp
+    SOURCES scenegraph/texturefactory.h scenegraph/texturefactory.cpp
+    SOURCES scenegraph/layertypes.h
+
+    #scenegraph materials
     SOURCES scenegraph/aogmaterial.h scenegraph/aogmaterial.cpp
     SOURCES scenegraph/materials.h scenegraph/materials.cpp
-    SOURCES scenegraph/aoggeometry.h scenegraph/aoggeometry.cpp
+    SOURCES scenegraph/thicklinematerial.h scenegraph/thicklinematerial.cpp
+    SOURCES scenegraph/thicklinecolorsmaterial.h scenegraph/thicklinecolorsmaterial.cpp
+    SOURCES scenegraph/dashedthicklinematerial.h scenegraph/dashedthicklinematerial.cpp
+    SOURCES scenegraph/roundpointmaterial.h scenegraph/roundpointmaterial.cpp
+    SOURCES scenegraph/roundpointsizematerial.h scenegraph/roundpointsizematerial.cpp
+
+    #scenegraph QML properties objects
+    SOURCES scenegraph/cameraproperties.h scenegraph/cameraproperties.cpp
+    SOURCES scenegraph/gridproperties.h scenegraph/gridproperties.cpp
+    SOURCES scenegraph/fieldsurfaceproperties.h scenegraph/fieldsurfaceproperties.cpp
+    SOURCES scenegraph/vehicleproperties.h scenegraph/vehicleproperties.cpp
+    SOURCES scenegraph/toolsproperties.h scenegraph/toolsproperties.cpp
+    SOURCES scenegraph/boundaryproperties.h scenegraph/boundaryproperties.cpp
+    SOURCES scenegraph/boundariesproperties.h scenegraph/boundariesproperties.cpp
+    SOURCES scenegraph/tracksproperties.h scenegraph/tracksproperties.cpp
+    SOURCES scenegraph/trackproperties.h scenegraph/trackproperties.cpp
+    SOURCES scenegraph/lineproperties.h scenegraph/lineproperties.cpp
+    SOURCES scenegraph/layersproperties.h scenegraph/layersproperties.cpp
+
+    #scenegraph items and nodes
     SOURCES scenegraph/fieldviewitem.h scenegraph/fieldviewitem.cpp
     SOURCES scenegraph/fieldsurfacenode.h scenegraph/fieldsurfacenode.cpp
     SOURCES scenegraph/gridnode.h scenegraph/gridnode.cpp
     SOURCES scenegraph/vehiclenode.h scenegraph/vehiclenode.cpp
     SOURCES scenegraph/boundariesnode.h scenegraph/boundariesnode.cpp
-    SOURCES scenegraph/cameraproperties.h scenegraph/cameraproperties.cpp
-    SOURCES scenegraph/gridproperties.h scenegraph/gridproperties.cpp
-    SOURCES scenegraph/fieldsurfaceproperties.h scenegraph/fieldsurfaceproperties.cpp
-    SOURCES scenegraph/vehicleproperties.h scenegraph/vehicleproperties.cpp
-    SOURCES scenegraph/thicklinematerial.h scenegraph/thicklinematerial.cpp
-    SOURCES scenegraph/thicklinecolorsmaterial.h scenegraph/thicklinecolorsmaterial.cpp
-    SOURCES scenegraph/dashedthicklinematerial.h scenegraph/dashedthicklinematerial.cpp
-    SOURCES scenegraph/texturefactory.h scenegraph/texturefactory.cpp
     SOURCES scenegraph/textnode.h scenegraph/textnode.cpp
     SOURCES scenegraph/dotsnode.h scenegraph/dotsnode.cpp
-    SOURCES scenegraph/toolsproperties.h scenegraph/toolsproperties.cpp
-    SOURCES scenegraph/boundaryproperties.h scenegraph/boundaryproperties.cpp
-    SOURCES scenegraph/boundariesproperties.h scenegraph/boundariesproperties.cpp
     SOURCES scenegraph/toolsnode.h scenegraph/toolsnode.cpp
-    SOURCES scenegraph/roundpointmaterial.h scenegraph/roundpointmaterial.cpp
-    SOURCES scenegraph/roundpointsizematerial.h scenegraph/roundpointsizematerial.cpp
     SOURCES scenegraph/tracksnode.h scenegraph/tracksnode.cpp
-    SOURCES scenegraph/tracksproperties.h scenegraph/tracksproperties.cpp
-    SOURCES scenegraph/trackproperties.h scenegraph/trackproperties.cpp
-
-    # Coverage layer system
-    SOURCES scenegraph/layertypes.h
-    SOURCES scenegraph/layersproperties.h scenegraph/layersproperties.cpp
     SOURCES scenegraph/layersnode.h scenegraph/layersnode.cpp
-    SOURCES backend/layerservice.h backend/layerservice.cpp
-
+    SOURCES scenegraph/linenode.h scenegraph/linenode.cpp
 )
 
 ###### End Script of Handling QML in module ######
@@ -536,7 +541,7 @@ target_link_libraries(QtAgOpenGPS PRIVATE
     Qt6::Core
     Qt6::Widgets
     Qt6::Gui
-    Qt6::GuiPrivate  # Required for QRhi (rhiresources.cpp)
+#    Qt6::GuiPrivate  # Required for QRhi (rhiresources.cpp)
 #   Qt6::OpenGL
     Qt6::Quick
     Qt6::QuickWidgets

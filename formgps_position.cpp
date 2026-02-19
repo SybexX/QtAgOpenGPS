@@ -38,6 +38,7 @@
 #include "camera.h"
 #include "vehicleproperties.h"
 #include "sectionproperties.h"
+#include "layerservice.h"
 #include <QtConcurrent/QtConcurrentRun>
 
 
@@ -45,6 +46,10 @@ Q_LOGGING_CATEGORY (qpos, "formgps_position.qtagopengps")
 
 extern QLabel *grnPixelsWindow;
 extern QLabel *overlapPixelsWindow;
+
+inline QColor QColorWithAlpha(const QColor &c, int a) {
+    return QColor(c.red(), c.green(), c.blue(), a);
+}
 
 //called for every new GPS or simulator position
 void FormGPS::UpdateFixPosition()
@@ -1206,10 +1211,10 @@ void FormGPS::UpdateFixPosition()
     //Both the framebuffer and the qquickitem renderer share the same interface here.
     QQuickItem *renderer = qobject_cast<QQuickItem *>(Backend::instance()->aogRenderer);
     // CRITICAL: Force OpenGL update in GUI thread to prevent threading violation
-    if (renderer) {
-        renderer->update();
-    }
-    qDebug(qpos) << "Time after painting field: " << (float)swFrame.nsecsElapsed() / 1000000;
+    //if (renderer) {
+    //    renderer->update();
+    //}
+    //qDebug(qpos) << "Time after painting field: " << (float)swFrame.nsecsElapsed() / 1000000;
 
     Backend::instance()->m_fixFrame.setFrameTime(swFrame.elapsed());
 
@@ -1296,6 +1301,12 @@ void FormGPS::UpdateFixPosition()
         sectionProperties[i]->set_mapping(tool.section[i].isMappingOn);
         sectionProperties[i]->set_on(tool.section[i].isSectionOn);
     }
+
+    //update BoundaryInterface with latest boundary lines from bnd
+    bnd.updateInterface();
+
+    //update TracksProperties with latest track data
+    track.updateInterface();
 
     //qDebug(qpos) << CVehicle::instance()->pivotAxlePos.easting << CVehicle::instance()->pivotAxlePos.northing << CVehicle::instance()->pivotAxlePos.heading;
 }
@@ -1394,9 +1405,9 @@ void FormGPS::processSectionLookahead() {
 
     if (SettingsManager::instance()->display_showBack()) {
 #if QT_VERSION < QT_VERSION_CHECK(6,9,0)
-        grnPixelsWindow->setPixmap(QPixmap::fromImage(tool.grnPix.mirrored(false, true)));
+        grnPixelsWindow->setPixmap(QPixmap::fromImage(tool.grnPixWindow.mirrored(false, true)));
 #else
-        grnPixelsWindow->setPixmap(QPixmap::fromImage(tool.grnPix.flipped()));
+        grnPixelsWindow->setPixmap(QPixmap::fromImage(tool.grnPixWindow.flipped()));
 #endif
         //overlapPixelsWindow->setPixmap(QPixmap::fromImage(overPix.mirrored()));
     }
@@ -1783,6 +1794,12 @@ void FormGPS::AddSectionOrPathPoints()
 {
     CNMEA &pn = *Backend::instance()->pn();
     BACKEND_TRACK(track);
+    int alpha;
+
+    if (SettingsManager::instance()->display_isDayMode())
+        alpha=152;
+    else
+        alpha=76;
 
     if (recPath.isRecordOn)
     {
@@ -1802,6 +1819,22 @@ void FormGPS::AddSectionOrPathPoints()
 
     // if non zero, at least one section is on.
     patchCounter = 0;
+
+    for (int j=0; j < tool.numOfSections; j++) {
+        if (tool.section[j].isSectionOn) {
+            if(SettingsManager::instance()->color_isMultiColorSections())
+                LayerService::instance()->addSectionVertices(
+                        j,
+                        tool.section[j].leftPoint,
+                        tool.section[j].rightPoint,QColorWithAlpha(tool.secColors[j], alpha));
+            else
+                LayerService::instance()->addSectionVertices(
+                    j,
+                    tool.section[j].leftPoint,
+                    tool.section[j].rightPoint,
+                    QColorWithAlpha(SettingsManager::instance()->display_colorSectionsDay(), alpha));
+        }
+    }
 
     //send the current and previous GPS fore/aft corrected fix to each section
     for (int j = 0; j < tool.triStrip.count(); j++)

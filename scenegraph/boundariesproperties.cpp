@@ -210,3 +210,11 @@ BoundaryProperties* BoundariesProperties::innerAt(int index) const
         return nullptr;
     return m_inner.at(index);
 }
+
+void BoundariesProperties::clearAll() {
+    clearAllInner();
+    clearAllOuter();
+    auto *hd = new BoundaryProperties(this);
+    hd->set_visible(false);
+    set_hdLine(hd);
+}

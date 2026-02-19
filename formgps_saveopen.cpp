@@ -4,6 +4,7 @@
 // Main event loop save/load files from file manager to QtAOG
 #include "formgps.h"
 #include <QDir>
+#include <algorithm>
 #include "cboundarylist.h"
 #include "classes/settingsmanager.h"
 #include "qmlutil.h"
@@ -1056,6 +1057,97 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
                     }
                 }
 
+                // Validate and clean up triangle strip
+                // Detect and fix triangle fans stored as strips, remove degenerates
+                if (triangleList->count() >= 4) {  // Need color + at least 3 vertices
+                    int originalCount = triangleList->count();
+                    int numVerts = triangleList->count() - 1;  // Exclude color
+
+                    // First pass: check if this is a triangle fan pattern
+                    // Count frequency of each unique vertex (using indices as keys)
+                    QVector<int> vertexCounts(numVerts, 0);
+                    QVector<int> firstOccurrence(numVerts, -1);
+                    int uniqueCount = 0;
+
+                    for (int i = 0; i < numVerts; ++i) {
+                        const QVector3D& v = (*triangleList)[i + 1];
+                        // Check if we've seen this vertex before
+                        bool found = false;
+                        for (int j = 0; j < uniqueCount; ++j) {
+                            if ((*triangleList)[firstOccurrence[j] + 1] == v) {
+                                vertexCounts[j]++;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            firstOccurrence[uniqueCount] = i;
+                            vertexCounts[uniqueCount] = 1;
+                            uniqueCount++;
+                        }
+                    }
+
+                    // Find if there's a common center point (appears in >25% of vertices)
+                    int centerIndex = -1;
+                    bool isFanPattern = false;
+                    int threshold = numVerts / 4;  // 25% threshold
+
+                    for (int i = 0; i < uniqueCount; ++i) {
+                        if (vertexCounts[i] > threshold && vertexCounts[i] > 2) {
+                            centerIndex = firstOccurrence[i];
+                            isFanPattern = true;
+                            break;
+                        }
+                    }
+
+                    const QVector3D& centerPoint = (centerIndex >= 0) ? (*triangleList)[centerIndex + 1] : QVector3D();
+
+                    PatchTriangleList cleanedList;
+                    cleanedList.reserve(triangleList->count());
+                    cleanedList.append((*triangleList)[0]);  // Keep color
+
+                    if (isFanPattern) {
+                        // This is a triangle fan - extract unique outer vertices
+                        //qDebug(formgps_saveopen_log) << "Detected triangle fan pattern with center point, converting to proper strip";
+
+                        QVector<QVector3D> outerVertices;
+                        outerVertices.reserve(triangleList->count());
+
+                        // Collect unique outer vertices IN ORDER OF FIRST APPEARANCE
+                        // (excluding the center and duplicates)
+                        for (int i = 1; i < triangleList->count(); ++i) {
+                            const QVector3D& v = (*triangleList)[i];
+                            if (v != centerPoint && !outerVertices.contains(v)) {
+                                outerVertices.append(v);
+                            }
+                        }
+
+                        // Create proper triangle strip from fan
+                        // Pattern: center, v0, v1, center, v2, center, v3... creates triangles:
+                        // (center, v0, v1), (v0, v1, center), (v1, center, v2), (center, v2, center), (v2, center, v3)...
+                        // The key is that center must be repeated to keep it in every triangle
+                        if (outerVertices.count() >= 2) {
+                            cleanedList.append(centerPoint);       // C
+                            cleanedList.append(outerVertices[0]);  // v0
+                            cleanedList.append(outerVertices[1]);  // v1
+
+                            for (int i = 2; i < outerVertices.count(); ++i) {
+                                cleanedList.append(centerPoint);       // C (repeated)
+                                cleanedList.append(outerVertices[i]);  // vi
+                            }
+
+                            //qDebug(formgps_saveopen_log) << "Converted fan with" << outerVertices.count()
+                            //                             << "outer vertices to proper strip with" << cleanedList.count() << "total vertices";
+                        }
+                    }
+
+                    // Only use cleaned list if we have enough vertices for at least one triangle
+                    if (cleanedList.count() >= 4) {
+                        *triangleList = cleanedList;
+                    }
+                    verts = triangleList->count();
+                }
+
                 //calculate area of this patch - AbsoluteValue of (Ax(By-Cy) + Bx(Cy-Ay) + Cx(Ay-By)/2)
                 verts -= 2;
                 if (verts >= 2)
@@ -1136,15 +1228,17 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
                     int idx1 = 1 + i + 1;
                     int idx2 = 1 + i + 2;
 
+                    const QVector3D &v0 = (*triList)[idx0];
+                    const QVector3D &v1 = (*triList)[idx1];
+                    const QVector3D &v2 = (*triList)[idx2];
+
                     // Alternate winding for triangle strip
                     if (i % 2 == 0) {
                         // Even triangle: (v0, v1, v2)
-                        layerTriangles.append(CoverageTriangle(
-                            (*triList)[idx0], (*triList)[idx1], (*triList)[idx2], color));
+                        layerTriangles.append(CoverageTriangle(v0, v1, v2, color));
                     } else {
                         // Odd triangle: (v1, v0, v2) to maintain consistent winding
-                        layerTriangles.append(CoverageTriangle(
-                            (*triList)[idx1], (*triList)[idx0], (*triList)[idx2], color));
+                        layerTriangles.append(CoverageTriangle(v1, v0, v2, color));
                     }
                 }
             }

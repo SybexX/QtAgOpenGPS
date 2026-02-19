@@ -36,6 +36,7 @@ private:
     QSGGeometryNode *m_lastPointToPivotNode;
     QSGGeometryNode *m_bndBeingMadeNode;
     QSGGeometryNode *m_beingMadeDotsNode;
+    QSGGeometryNode *m_hdLineNode;
 
     void updateThickLineNode(QSGGeometryNode *node,
                         const QMatrix4x4 mvp,

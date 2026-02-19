@@ -109,8 +109,7 @@ public:
     QVector<CPatches> triStrip = QVector<CPatches>( { CPatches() } );
 
     bool patchesBufferDirty = true;
-
-    QImage grnPix;
+    QImage grnPixWindow;
 
     void sectionCalcWidths();
     void sectionCalcMulti();
@@ -164,6 +163,7 @@ private:
     QVector<PatchBuffer> patchBuffer;
     LookAheadPixels grnPixels[150001];
     LookAheadPixels *overPixels = new LookAheadPixels[160000]; //400x400
+
 public slots:
     void on_autoBtnChanged();
     void onSectionButtonStatechanged(int toolIndex, int sectionButtonNo, SectionState::State new_state);

@@ -34,6 +34,9 @@ private:
 
     Vec2 prevBoundaryPos;
 
+    quint64 m_lastFingerprint = 0;
+    quint64 calculateFingerprint() const;
+
 public:
     //area of boundaries
     QVector<CBoundaryList> bndList;
@@ -91,6 +94,8 @@ public:
     bool CalculateMinMax();
     bool loadBoundary(const QString &field_path);
     static double getSavedFieldArea(const QString &boundarytxt_path);
+
+    void updateInterface();
 
 
 public slots:

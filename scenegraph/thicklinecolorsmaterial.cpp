@@ -108,7 +108,7 @@ bool ThickLineColorsMaterialShader::updateUniformData(RenderState &state,
     };
     memcpy(buf->data() + 64, viewportSize, 8);
 
-    // Update line width (offset 216)
+    // Update line width (offset 72)
     float lineWidth = material->lineWidth();
     memcpy(buf->data() + 64+8 , &lineWidth, 4);
 

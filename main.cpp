@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("QtAgOpenGPS");
     QCoreApplication::setOrganizationDomain("qtagopengps");
     QCoreApplication::setApplicationName("QtAgOpenGPS");
-    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts, true);
+    //QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts, true);
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QSettings::setPath(QSettings::IniFormat,
                        QSettings::UserScope,
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
     // Phase 6.0.21: Register PGNParser::ParsedData for Qt::QueuedConnection signals
     qRegisterMetaType<PGNParser::ParsedData>("PGNParser::ParsedData");
 
-    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+    //QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
     // Explicit QML module registration (ensures static initializer runs)
     // qt_add_qml_module generates this function in qtagopengps_qmltyperegistrations.cpp

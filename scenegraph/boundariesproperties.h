@@ -54,9 +54,13 @@ public:
     int innerCount() const { return m_inner.count(); }
     BoundaryProperties* innerAt(int index) const;
 
+    void clearAll();
+
     SIMPLE_BINDABLE_PROPERTY(QColor, colorInner)
     SIMPLE_BINDABLE_PROPERTY(QColor, colorOuter)
+    SIMPLE_BINDABLE_PROPERTY(QColor, colorHeadline)
     SIMPLE_BINDABLE_PROPERTY(QList<QVector3D>, beingMade)
+    SIMPLE_BINDABLE_PROPERTY_PTR(BoundaryProperties*, hdLine)
     SIMPLE_BINDABLE_PROPERTY(float, markBoundary)
 
 signals:
@@ -80,9 +84,11 @@ private:
     static void clearInner(QQmlListProperty<BoundaryProperties> *list);
 
 
-    Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(BoundariesProperties, QColor, m_colorInner, QColor(1,1,0), &BoundariesProperties::colorInnerChanged)
-    Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(BoundariesProperties, QColor, m_colorOuter, QColor(1,1,0), &BoundariesProperties::colorOuterChanged)
+    Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(BoundariesProperties, QColor, m_colorInner, QColor::fromRgbF( 0.95f, 0.75f, 0.50f), &BoundariesProperties::colorInnerChanged)
+    Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(BoundariesProperties, QColor, m_colorOuter, QColor::fromRgbF( 0.95f, 0.75f, 0.50f), &BoundariesProperties::colorOuterChanged)
+    Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(BoundariesProperties, QColor, m_colorHeadline, QColor::fromRgbF(0.960f, 0.96232f, 0.30f), &BoundariesProperties::colorHeadlineChanged)
     Q_OBJECT_BINDABLE_PROPERTY(BoundariesProperties, QVector<QVector3D>, m_beingMade, &BoundariesProperties::beingMadeChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(BoundariesProperties, BoundaryProperties*, m_hdLine, &BoundariesProperties::hdLineChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(BoundariesProperties, double, m_markBoundary, 0, &BoundariesProperties::markBoundaryChanged)
 };
 

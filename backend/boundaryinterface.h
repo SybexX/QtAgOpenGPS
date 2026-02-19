@@ -6,6 +6,7 @@
 #include <QQmlEngine>
 #include <QMutex>
 #include "simpleproperty.h"
+#include "boundariesproperties.h"
 
 class BoundaryInterface : public QObject
 {
@@ -41,6 +42,8 @@ public:
 
     SIMPLE_BINDABLE_PROPERTY(QList<QVariant>, list)
 
+    SIMPLE_BINDABLE_PROPERTY_PTR(BoundariesProperties*, properties)
+
 signals:
     // QML can call these signals directly - no need for Q_INVOKABLE wrappers
     void calculateArea();
@@ -70,6 +73,7 @@ private:
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(BoundaryInterface, int, m_pointCount, false, &BoundaryInterface::pointCountChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(BoundaryInterface, int, m_count, false, &BoundaryInterface::countChanged)
     Q_OBJECT_BINDABLE_PROPERTY(BoundaryInterface, QList<QVariant>, m_list, &BoundaryInterface::listChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(BoundaryInterface, BoundariesProperties*, m_properties, &BoundaryInterface::propertiesChanged)
 };
 
 #endif // BOUNDARYINTERFACE_H

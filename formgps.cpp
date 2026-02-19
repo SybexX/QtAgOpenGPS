@@ -24,7 +24,8 @@
 #include "modulecomm.h"
 #include "camera.h"
 #include "vehicleproperties.h"
-#include "backend/layerservice.h"
+#include "layerservice.h"
+#include "boundaryinterface.h"
 
 FormGPS::FormGPS(QWidget *parent) : QQmlApplicationEngine(parent)
 {
@@ -704,6 +705,9 @@ void FormGPS::JobClose()
     //clear coverage layers
     LayerService::instance()->clearAllLayers();
 
+    //turn off all boundaries.
+    BoundaryInterface::instance()->properties()->clearAll();
+
     //invalidate all GPU patch list buffers. Must be destroyed
     //in the OpenGL context, so deferred to the next drawing
     //pass.
@@ -769,6 +773,10 @@ void FormGPS::JobClose()
 void FormGPS::JobNew()
 {
     BACKEND_TRACK(track);
+
+
+    JobClose();
+
     startCounter = 0;
 
     //btnSectionMasterManual.Enabled = true;
@@ -779,6 +787,7 @@ void FormGPS::JobNew()
     MainWindowState::instance()->set_autoBtnState(SectionState::Off);
     //btnSectionMasterAuto.Image = Properties.Resources.SectionMasterOff;
 
+    lock.lockForWrite();
     track.ABLine.abHeading = 0.00;
 
     Camera::instance()->SetZoom();
@@ -798,6 +807,9 @@ void FormGPS::JobNew()
     // Phase 6.0.29 initialized isRecordOn=false in constructor, which emptied the trail after JobNew()
     recPath.isRecordOn = true;
     tool.patchesBufferDirty = true;
+
+    lock.unlock();
+
 }
 
 void FormGPS::FileSaveEverythingBeforeClosingField(bool saveVehicle)

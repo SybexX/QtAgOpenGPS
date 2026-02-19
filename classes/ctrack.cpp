@@ -73,6 +73,8 @@ CTrack::CTrack(QObject* parent) : QAbstractListModel(parent)
     autoTrack3SecTimer = 0;
 
     setIdx(-1);
+
+    m_tracksProperties = new TracksProperties(this);
 }
 
 CTrack::~CTrack()
@@ -1156,6 +1158,188 @@ void CTrack::setNewRefSide(int which_side)
 
 
 
+
+void CTrack::updateInterface()
+{
+    TracksProperties *props = m_tracksProperties;
+
+    // Design preview: show when making a new track (even before idx is valid)
+    QVector<QVector3D> des;
+    if (ABLine.isMakingABLine) {
+        if (ABLine.isDesPtBSet) {
+            des = { QVector3D(ABLine.desLineEndA.easting, ABLine.desLineEndA.northing, 0),
+                    QVector3D(ABLine.desLineEndB.easting, ABLine.desLineEndB.northing, 0) };
+        }
+    } else if (curve.isMakingCurve) {
+        des.reserve(curve.desList.count());
+        for (const Vec3 &v : curve.desList)
+            des.append(QVector3D(v.easting, v.northing, 0));
+    }
+    props->set_newTrack(des);
+
+    // Current track: only show if a valid track is selected
+    int i = idx();
+    if (i < 0 || i >= gArr.count()) {
+        props->set_showRefFlags(false);
+        props->set_refLine({});
+        props->set_currentLine({});
+        return;
+    }
+
+    const CTrk &trk = gArr[i];
+    int trackMode = trk.mode;
+
+    // Reference line and A/B flag positions
+    QVector<QVector3D> ref;
+    if (trackMode == TrackMode::AB || trackMode == TrackMode::bndTrackOuter
+        || trackMode == TrackMode::bndTrackInner) {
+        ref = { QVector3D(trk.endPtA.easting, trk.endPtA.northing, 0),
+                QVector3D(trk.endPtB.easting, trk.endPtB.northing, 0) };
+        props->set_aRefFlag(QVector3D(trk.ptA.easting, trk.ptA.northing, 0));
+        props->set_bRefFlag(QVector3D(trk.ptB.easting, trk.ptB.northing, 0));
+        props->set_showRefFlags(ABLine.isABValid);
+    } else {
+        // Curve modes: curvePts are the reference
+        ref.reserve(trk.curvePts.count());
+        for (const Vec3 &v : trk.curvePts)
+            ref.append(QVector3D(v.easting, v.northing, 0));
+        if (!trk.curvePts.isEmpty()) {
+            props->set_aRefFlag(QVector3D(trk.curvePts.first().easting,
+                                          trk.curvePts.first().northing, 0));
+            props->set_bRefFlag(QVector3D(trk.curvePts.last().easting,
+                                          trk.curvePts.last().northing, 0));
+        }
+        props->set_showRefFlags(curve.isCurveValid);
+    }
+    props->set_refLine(ref);
+
+    // Current (active parallel) guidance line
+    QVector<QVector3D> cur;
+    if (trackMode == TrackMode::AB || trackMode == TrackMode::bndTrackOuter
+        || trackMode == TrackMode::bndTrackInner) {
+        if (ABLine.isABValid) {
+            cur = { QVector3D(ABLine.currentLinePtA.easting, ABLine.currentLinePtA.northing, 0),
+                    QVector3D(ABLine.currentLinePtB.easting, ABLine.currentLinePtB.northing, 0) };
+        }
+    } else {
+        cur.reserve(curve.curList.count());
+        for (const Vec3 &v : curve.curList)
+            cur.append(QVector3D(v.easting, v.northing, 0));
+    }
+    props->set_currentLine(cur);
+
+    bool isABMode = (trackMode == TrackMode::AB
+                     || trackMode == TrackMode::bndTrackOuter
+                     || trackMode == TrackMode::bndTrackInner);
+
+    // Shadow outline quad (AB modes only)
+    {
+        QVector<QVector3D> shadow;
+        if (isABMode && ABLine.isABValid) {
+            double toolWidth   = SettingsManager::instance()->vehicle_toolWidth();
+            double toolOverlap = SettingsManager::instance()->vehicle_toolOverlap();
+            double toolOffset  = SettingsManager::instance()->vehicle_toolOffset();
+            double wmo = toolWidth - toolOverlap;
+            double soff = ABLine.isHeadingSameWay ? toolOffset : -toolOffset;
+
+            double angle = ABLine.abHeading + glm::PIBy2;
+            double sinHR = sin(angle) * (wmo * 0.5 + soff);
+            double cosHR = cos(angle) * (wmo * 0.5 + soff);
+            double sinHL = sin(angle) * (wmo * 0.5 - soff);
+            double cosHL = cos(angle) * (wmo * 0.5 - soff);
+
+            shadow = {
+                QVector3D(ABLine.currentLinePtA.easting - sinHL,
+                          ABLine.currentLinePtA.northing - cosHL, 0),
+                QVector3D(ABLine.currentLinePtA.easting + sinHR,
+                          ABLine.currentLinePtA.northing + cosHR, 0),
+                QVector3D(ABLine.currentLinePtB.easting + sinHR,
+                          ABLine.currentLinePtB.northing + cosHR, 0),
+                QVector3D(ABLine.currentLinePtB.easting - sinHL,
+                          ABLine.currentLinePtB.northing - cosHL, 0),
+            };
+        }
+        props->set_shadowQuad(shadow);
+    }
+
+    // Side guide lines (AB modes only)
+    {
+        QVector<QVector3D> guides;
+        bool sideGuideOn = SettingsManager::instance()->menu_isSideGuideLines();
+        if (isABMode && ABLine.isABValid && sideGuideOn) {
+            double toolWidth   = SettingsManager::instance()->vehicle_toolWidth()
+                                 - SettingsManager::instance()->vehicle_toolOverlap();
+            double toolOffset  = SettingsManager::instance()->vehicle_toolOffset() * 2.0;
+
+            double cosH = cos(-ABLine.abHeading);
+            double sinH = sin(-ABLine.abHeading);
+
+            auto addLine = [&](double offsetX, double offsetZ) {
+                guides.append(QVector3D(
+                    cosH * offsetX - sinH * offsetZ + ABLine.currentLinePtA.easting,
+                    sinH * offsetX + cosH * offsetZ + ABLine.currentLinePtA.northing, 0));
+                guides.append(QVector3D(
+                    cosH * offsetX - sinH * offsetZ + ABLine.currentLinePtB.easting,
+                    sinH * offsetX + cosH * offsetZ + ABLine.currentLinePtB.northing, 0));
+            };
+
+            if (ABLine.isHeadingSameWay) {
+                addLine(toolWidth + toolOffset, 0);
+                addLine(-toolWidth + toolOffset, 0);
+                addLine(toolWidth * 2.0, 0);
+                addLine(-toolWidth * 2.0, 0);
+            } else {
+                addLine(toolWidth - toolOffset, 0);
+                addLine(-toolWidth - toolOffset, 0);
+                addLine(toolWidth * 2.0, 0);
+                addLine(-toolWidth * 2.0, 0);
+            }
+        }
+        props->set_sideGuideLines(guides);
+    }
+
+    // Lookahead / goal point
+    {
+        QVector<QVector3D> pts;
+        bool stanley = SettingsManager::instance()->vehicle_isStanleyUsed();
+        if (!stanley) {
+            if (isABMode && ABLine.isABValid)
+                pts.append(QVector3D(ABLine.goalPointAB.easting, ABLine.goalPointAB.northing, 0));
+            else if (curve.isCurveValid && !curve.curList.isEmpty())
+                pts.append(QVector3D(curve.goalPointCu.easting, curve.goalPointCu.northing, 0));
+        }
+        props->set_lookaheadPoints(pts);
+    }
+
+    // Pure pursuit radius circle
+    {
+        QVector<QVector3D> circle;
+        if (qAbs(ABLine.ppRadiusAB) < 50.0 && qAbs(ABLine.ppRadiusAB) > 0.1) {
+            const int segs = 100;
+            for (int j = 0; j <= segs; ++j) {
+                float a = j * 2.0f * static_cast<float>(M_PI) / segs;
+                circle.append(QVector3D(
+                    ABLine.radiusPointAB.easting + ABLine.ppRadiusAB * cos(a),
+                    ABLine.radiusPointAB.northing + ABLine.ppRadiusAB * sin(a), 0));
+            }
+        }
+        props->set_pursuitCircle(circle);
+    }
+
+    // Smoothed curve (curve modes only)
+    {
+        QVector<QVector3D> smoo;
+        if (!isABMode && curve.isSmoothWindowOpen) {
+            smoo.reserve(curve.smooList.count());
+            for (const Vec3 &v : curve.smooList)
+                smoo.append(QVector3D(v.easting, v.northing, 0));
+        }
+        props->set_smoothedCurve(smoo);
+    }
+
+    // Curve vertex dots flag
+    props->set_showCurrentLineDots(!isABMode && !curve.curList.isEmpty());
+}
 
 // Removed QML_SINGLETON factory function - using qmlRegisterSingletonInstance instead
 

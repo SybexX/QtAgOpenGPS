@@ -105,6 +105,13 @@ FieldViewItem::FieldViewItem(QQuickItem *parent)
     connect(m_camera, &CameraProperties::rotationChanged, this, &FieldViewItem::requestUpdate);
     connect(m_camera, &CameraProperties::pitchChanged, this, &FieldViewItem::requestUpdate);
     connect(m_camera, &CameraProperties::fovChanged, this, &FieldViewItem::requestUpdate);
+
+    // Track geometry depends on the view matrix (near-plane clipping and subdivision
+    // produce view-dependent vertices), so rebuild whenever zoom, pitch, or rotation
+    // changes.  requestUpdate() is already wired above; we just set the dirty flag.
+    connect(m_camera, &CameraProperties::zoomChanged,    [this]() { m_tracksDirty = true; });
+    connect(m_camera, &CameraProperties::pitchChanged,   [this]() { m_tracksDirty = true; });
+    connect(m_camera, &CameraProperties::rotationChanged,[this]() { m_tracksDirty = true; });
     connect(m_camera, &CameraProperties::zoomChanged, [&]() {
         if (m_vehicle->svennArrow() && m_camera->zoom() > -1000 ||
             m_vehicle->firstHeadingSet() && m_camera->zoom() > -75) {
@@ -115,9 +122,9 @@ FieldViewItem::FieldViewItem(QQuickItem *parent)
     });
 
     //Connect grid property changes to update()
-    connect(m_grid, &GridProperties::sizeChanged, this, &FieldViewItem::requestUpdate);
-    connect(m_grid, &GridProperties::colorChanged, this, &FieldViewItem::requestUpdate);
-    connect(m_grid, &GridProperties::visibleChanged, this, &FieldViewItem::requestUpdate);
+    connect(m_grid, &GridProperties::sizeChanged, this, &FieldViewItem::updateGrid);
+    connect(m_grid, &GridProperties::colorChanged, this, &FieldViewItem::updateGrid);
+    connect(m_grid, &GridProperties::visibleChanged, this, &FieldViewItem::updateGrid);
 
     //Connect field surface property changes to update()
     connect(m_fieldSurface, &FieldSurfaceProperties::visibleChanged, this, &FieldViewItem::requestUpdate);
@@ -236,8 +243,9 @@ void FieldViewItem::setBoundaries(BoundariesProperties *boundaries)
 
     // Connect signals from new boundaries
     if (m_boundaries) {
-        connect(m_boundaries, &BoundariesProperties::outerChanged, this, &FieldViewItem::markBoundaryDirty);
-        connect(m_boundaries, &BoundariesProperties::innerChanged, this, &FieldViewItem::markBoundaryDirty);
+        connect(m_boundaries, &BoundariesProperties::outerChanged, this, &FieldViewItem::updateBoundary);
+        connect(m_boundaries, &BoundariesProperties::innerChanged, this, &FieldViewItem::updateBoundary);
+        connect(m_boundaries, &BoundariesProperties::hdLineChanged, this, &FieldViewItem::updateBoundary);
     }
 
     m_boundaryDirty = true;
@@ -370,12 +378,19 @@ void FieldViewItem::updateTools()
     m_toolsDirty = true;
     polish();
     update();
-
 }
 
-void FieldViewItem::markBoundaryDirty()
+void FieldViewItem::updateGrid()
+{
+    m_gridDirty = true;
+    polish();
+    update();
+}
+
+void FieldViewItem::updateBoundary()
 {
     m_boundaryDirty = true;
+    polish();
     update();
 }
 
