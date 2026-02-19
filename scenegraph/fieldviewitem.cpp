@@ -105,6 +105,13 @@ FieldViewItem::FieldViewItem(QQuickItem *parent)
     connect(m_camera, &CameraProperties::rotationChanged, this, &FieldViewItem::requestUpdate);
     connect(m_camera, &CameraProperties::pitchChanged, this, &FieldViewItem::requestUpdate);
     connect(m_camera, &CameraProperties::fovChanged, this, &FieldViewItem::requestUpdate);
+
+    // Track geometry depends on the view matrix (near-plane clipping and subdivision
+    // produce view-dependent vertices), so rebuild whenever zoom, pitch, or rotation
+    // changes.  requestUpdate() is already wired above; we just set the dirty flag.
+    connect(m_camera, &CameraProperties::zoomChanged,    [this]() { m_tracksDirty = true; });
+    connect(m_camera, &CameraProperties::pitchChanged,   [this]() { m_tracksDirty = true; });
+    connect(m_camera, &CameraProperties::rotationChanged,[this]() { m_tracksDirty = true; });
     connect(m_camera, &CameraProperties::zoomChanged, [&]() {
         if (m_vehicle->svennArrow() && m_camera->zoom() > -1000 ||
             m_vehicle->firstHeadingSet() && m_camera->zoom() > -75) {

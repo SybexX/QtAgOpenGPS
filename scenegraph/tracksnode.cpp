@@ -5,6 +5,7 @@
 
 #include "tracksnode.h"
 #include <QVector4D>
+#include <cmath>
 #include "materials.h"
 #include "aoggeometry.h"
 #include "textnode.h"
@@ -32,6 +33,44 @@
 // affine, the parametric t at which a segment crosses view-space z=clipZ is
 // the same as in world space.
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Segment subdivision helper
+//
+// Inserts intermediate vertices so that no segment is longer than maxLen
+// world-space units.  This keeps the per-segment depth variation small,
+// which stabilises the thick-line shader's homogeneous direction vector:
+//   lineVec = nextClip.xy * currClip.w - currClip.xy * nextClip.w
+// When both endpoints are at similar depths their clip.w values match and
+// the direction is computed accurately.  For a 2000 m AB reference line
+// this turns one huge segment into ~40 × 50 m segments.
+// ---------------------------------------------------------------------------
+static QVector<QVector3D> subdividePolyline(const QVector<QVector3D> &points,
+                                            float maxLen = 50.0f)
+{
+    if (points.count() < 2)
+        return points;
+
+    QVector<QVector3D> result;
+    result.reserve(points.count() * 2);
+    result.append(points[0]);
+
+    for (int i = 1; i < points.count(); ++i) {
+        const QVector3D &a = points[i - 1];
+        const QVector3D &b = points[i];
+        float len = (b - a).length();
+        if (len > maxLen) {
+            int divisions = static_cast<int>(std::ceil(len / maxLen));
+            for (int j = 1; j < divisions; ++j) {
+                float t = static_cast<float>(j) / static_cast<float>(divisions);
+                result.append(a + t * (b - a));
+            }
+        }
+        result.append(b);
+    }
+
+    return result;
+}
+
 static QVector<QVector3D> clipLineToFront(const QVector<QVector3D> &worldPoints,
                                           const QMatrix4x4 &mv,
                                           float clipZ = -0.5f)
@@ -117,12 +156,15 @@ void TracksNode::update(const QMatrix4x4 &mv,
     Q_UNUSED(vehicleHeading)
     Q_UNUSED(isOutOfBounds)
 
-    // Clip all line collections to the camera front before building geometry.
-    // This prevents the shader's homogeneous-coordinate line-direction math
-    // from producing huge offsets when an endpoint is behind the near plane.
-    const QVector<QVector3D> refLine    = clipLineToFront(properties->refLine(),     mv);
-    const QVector<QVector3D> currentLine = clipLineToFront(properties->currentLine(), mv);
-    const QVector<QVector3D> newTrack   = clipLineToFront(properties->newTrack(),    mv);
+    // Subdivide then clip each line collection before building geometry.
+    // Subdivision keeps per-segment depth variation small so the shader's
+    // homogeneous direction vector is well-conditioned (AB lines can be
+    // 2000 m long with only two points; 50 m sub-segments fix this).
+    // Clipping removes vertices behind the near plane so that clip.w never
+    // goes negative, which would otherwise invert and amplify the offset.
+    const QVector<QVector3D> refLine    = clipLineToFront(subdividePolyline(properties->refLine()),     mv);
+    const QVector<QVector3D> currentLine = clipLineToFront(subdividePolyline(properties->currentLine()), mv);
+    const QVector<QVector3D> newTrack   = clipLineToFront(subdividePolyline(properties->newTrack()),    mv);
 
     const QMatrix4x4 mvp = ndc * p * mv;
 
