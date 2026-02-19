@@ -136,6 +136,13 @@ void TracksNode::clearChildren()
     m_aRefFlag = nullptr;
     m_bRefFlag = nullptr;
     m_refDotsNode = nullptr;
+
+    m_shadowOutlineNode = nullptr;
+    m_sideGuideNodes.clear();
+    m_lookaheadNode = nullptr;
+    m_pursuitCircleNode = nullptr;
+    m_smoothedCurveNode = nullptr;
+    m_currentLineDotsNode = nullptr;
 }
 
 void TracksNode::update(const QMatrix4x4 &mv,
@@ -165,6 +172,32 @@ void TracksNode::update(const QMatrix4x4 &mv,
     const QVector<QVector3D> refLine    = clipLineToFront(subdividePolyline(properties->refLine()),     mv);
     const QVector<QVector3D> currentLine = clipLineToFront(subdividePolyline(properties->currentLine()), mv);
     const QVector<QVector3D> newTrack   = clipLineToFront(subdividePolyline(properties->newTrack()),    mv);
+
+    // Shadow quad: close the loop (4 corners + first point) then clip/subdivide
+    QVector<QVector3D> shadowQuadClipped;
+    if (properties->shadowQuad().count() == 4) {
+        QVector<QVector3D> shadowLoop = properties->shadowQuad();
+        shadowLoop.append(shadowLoop[0]);
+        shadowQuadClipped = clipLineToFront(subdividePolyline(shadowLoop, 50.0f), mv);
+    }
+
+    // Side guide lines: process each 2-point segment individually
+    QVector<QVector<QVector3D>> sideGuideSegments;
+    const auto &sgLines = properties->sideGuideLines();
+    for (int i = 0; i + 1 < sgLines.count(); i += 2) {
+        QVector<QVector3D> seg = { sgLines[i], sgLines[i + 1] };
+        QVector<QVector3D> segClipped = clipLineToFront(subdividePolyline(seg, 50.0f), mv);
+        if (segClipped.count() >= 2)
+            sideGuideSegments.append(segClipped);
+    }
+
+    // Lookahead points: no line processing needed (dots only)
+
+    // Pursuit circle: already subdivided with 100 segments, just clip
+    const QVector<QVector3D> pursuitCircleClipped = clipLineToFront(properties->pursuitCircle(), mv);
+
+    // Smoothed curve: clip/subdivide
+    const QVector<QVector3D> smoothedCurveClipped = clipLineToFront(subdividePolyline(properties->smoothedCurve(), 50.0f), mv);
 
     const QMatrix4x4 mvp = ndc * p * mv;
 
@@ -232,6 +265,82 @@ void TracksNode::update(const QMatrix4x4 &mv,
             m_bRefFlag = new TextNode(texture, "&B", textSize);
             appendChildNode(m_bRefFlag);
         }
+
+        // Shadow outline quad
+        if (shadowQuadClipped.count() >= 2) {
+            auto *geo = AOGGeometry::createThickLineGeometry(shadowQuadClipped);
+            if (geo) {
+                m_shadowOutlineNode = new QSGGeometryNode();
+                m_shadowOutlineNode->setGeometry(geo);
+                m_shadowOutlineNode->setFlag(QSGNode::OwnsGeometry);
+                auto *mat = new ThickLineMaterial();
+                m_shadowOutlineNode->setMaterial(mat);
+                m_shadowOutlineNode->setFlag(QSGNode::OwnsMaterial);
+                appendChildNode(m_shadowOutlineNode);
+            }
+        }
+
+        // Side guide lines
+        for (const auto &seg : sideGuideSegments) {
+            auto *geo = AOGGeometry::createThickLineGeometry(seg);
+            if (geo) {
+                auto *node = new QSGGeometryNode();
+                node->setGeometry(geo);
+                node->setFlag(QSGNode::OwnsGeometry);
+                auto *mat = new ThickLineMaterial();
+                node->setMaterial(mat);
+                node->setFlag(QSGNode::OwnsMaterial);
+                appendChildNode(node);
+                m_sideGuideNodes.append(node);
+            }
+        }
+
+        // Lookahead dots
+        if (!properties->lookaheadPoints().isEmpty()) {
+            m_lookaheadNode = new DotsNode();
+            for (const QVector3D &pt : properties->lookaheadPoints())
+                m_lookaheadNode->addDot(pt, QColor::fromRgbF(1.0f, 1.0f, 0.0f, 1.0f), glm::dp(8.0f));
+            m_lookaheadNode->build();
+            appendChildNode(m_lookaheadNode);
+        }
+
+        // Pure pursuit circle
+        if (pursuitCircleClipped.count() >= 2) {
+            auto *geo = AOGGeometry::createThickLineGeometry(pursuitCircleClipped);
+            if (geo) {
+                m_pursuitCircleNode = new QSGGeometryNode();
+                m_pursuitCircleNode->setGeometry(geo);
+                m_pursuitCircleNode->setFlag(QSGNode::OwnsGeometry);
+                auto *mat = new ThickLineMaterial();
+                m_pursuitCircleNode->setMaterial(mat);
+                m_pursuitCircleNode->setFlag(QSGNode::OwnsMaterial);
+                appendChildNode(m_pursuitCircleNode);
+            }
+        }
+
+        // Smoothed curve
+        if (smoothedCurveClipped.count() >= 2) {
+            auto *geo = AOGGeometry::createThickLineGeometry(smoothedCurveClipped);
+            if (geo) {
+                m_smoothedCurveNode = new QSGGeometryNode();
+                m_smoothedCurveNode->setGeometry(geo);
+                m_smoothedCurveNode->setFlag(QSGNode::OwnsGeometry);
+                auto *mat = new ThickLineMaterial();
+                m_smoothedCurveNode->setMaterial(mat);
+                m_smoothedCurveNode->setFlag(QSGNode::OwnsMaterial);
+                appendChildNode(m_smoothedCurveNode);
+            }
+        }
+
+        // Curve vertex dots
+        if (properties->showCurrentLineDots() && properties->currentLine().count() >= 1) {
+            m_currentLineDotsNode = new DotsNode();
+            for (const QVector3D &pt : properties->currentLine())
+                m_currentLineDotsNode->addDot(pt, QColor::fromRgbF(0.92f, 0.6f, 0.95f, 1.0f),
+                                              glm::dp(3.0f));
+            m_currentLineDotsNode->build();
+            appendChildNode(m_currentLineDotsNode);
+        }
     }
 
     // ALWAYS update MVP / material uniforms every frame.
@@ -264,6 +373,28 @@ void TracksNode::update(const QMatrix4x4 &mv,
 
     if (m_refDotsNode)
         m_refDotsNode->updateUniforms(mvp, viewportSize);
+
+    if (m_shadowOutlineNode)
+        updateThickLineNode(m_shadowOutlineNode, mvp, viewportSize, 1,
+                            QColor::fromRgbF(0.55f, 0.55f, 0.55f, 0.3f));
+
+    for (QSGGeometryNode *node : m_sideGuideNodes)
+        updateThickLineNode(node, mvp, viewportSize, 1,
+                            QColor::fromRgbF(0.756f, 0.765f, 0.765f));
+
+    if (m_lookaheadNode)
+        m_lookaheadNode->updateUniforms(mvp, viewportSize);
+
+    if (m_pursuitCircleNode)
+        updateThickLineNode(m_pursuitCircleNode, mvp, viewportSize, lineWidth,
+                            QColor::fromRgbF(0.53f, 0.53f, 0.95f));
+
+    if (m_smoothedCurveNode)
+        updateThickLineNode(m_smoothedCurveNode, mvp, viewportSize, lineWidth,
+                            QColor::fromRgbF(0.93f, 0.92f, 0.26f));
+
+    if (m_currentLineDotsNode)
+        m_currentLineDotsNode->updateUniforms(mvp, viewportSize);
 }
 
 void TracksNode::updateThickLineNode(QSGGeometryNode *node,

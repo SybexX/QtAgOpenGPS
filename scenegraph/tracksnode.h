@@ -34,6 +34,13 @@ private:
     TextNode *m_bRefFlag = nullptr;
     DotsNode *m_refDotsNode = nullptr;
 
+    QSGGeometryNode *m_shadowOutlineNode = nullptr;
+    QVector<QSGGeometryNode*> m_sideGuideNodes;
+    DotsNode *m_lookaheadNode = nullptr;
+    QSGGeometryNode *m_pursuitCircleNode = nullptr;
+    QSGGeometryNode *m_smoothedCurveNode = nullptr;
+    DotsNode *m_currentLineDotsNode = nullptr;
+
     void updateThickLineNode(QSGGeometryNode *node,
                              const QMatrix4x4 &mvp,
                              const QSize &viewportSize,

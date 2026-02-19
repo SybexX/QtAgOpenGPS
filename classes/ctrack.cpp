@@ -1227,6 +1227,118 @@ void CTrack::updateInterface()
             cur.append(QVector3D(v.easting, v.northing, 0));
     }
     props->set_currentLine(cur);
+
+    bool isABMode = (trackMode == TrackMode::AB
+                     || trackMode == TrackMode::bndTrackOuter
+                     || trackMode == TrackMode::bndTrackInner);
+
+    // Shadow outline quad (AB modes only)
+    {
+        QVector<QVector3D> shadow;
+        if (isABMode && ABLine.isABValid) {
+            double toolWidth   = SettingsManager::instance()->vehicle_toolWidth();
+            double toolOverlap = SettingsManager::instance()->vehicle_toolOverlap();
+            double toolOffset  = SettingsManager::instance()->vehicle_toolOffset();
+            double wmo = toolWidth - toolOverlap;
+            double soff = ABLine.isHeadingSameWay ? toolOffset : -toolOffset;
+
+            double angle = ABLine.abHeading + glm::PIBy2;
+            double sinHR = sin(angle) * (wmo * 0.5 + soff);
+            double cosHR = cos(angle) * (wmo * 0.5 + soff);
+            double sinHL = sin(angle) * (wmo * 0.5 - soff);
+            double cosHL = cos(angle) * (wmo * 0.5 - soff);
+
+            shadow = {
+                QVector3D(ABLine.currentLinePtA.easting - sinHL,
+                          ABLine.currentLinePtA.northing - cosHL, 0),
+                QVector3D(ABLine.currentLinePtA.easting + sinHR,
+                          ABLine.currentLinePtA.northing + cosHR, 0),
+                QVector3D(ABLine.currentLinePtB.easting + sinHR,
+                          ABLine.currentLinePtB.northing + cosHR, 0),
+                QVector3D(ABLine.currentLinePtB.easting - sinHL,
+                          ABLine.currentLinePtB.northing - cosHL, 0),
+            };
+        }
+        props->set_shadowQuad(shadow);
+    }
+
+    // Side guide lines (AB modes only)
+    {
+        QVector<QVector3D> guides;
+        bool sideGuideOn = SettingsManager::instance()->menu_isSideGuideLines();
+        if (isABMode && ABLine.isABValid && sideGuideOn) {
+            double toolWidth   = SettingsManager::instance()->vehicle_toolWidth()
+                                 - SettingsManager::instance()->vehicle_toolOverlap();
+            double toolOffset  = SettingsManager::instance()->vehicle_toolOffset() * 2.0;
+
+            double cosH = cos(-ABLine.abHeading);
+            double sinH = sin(-ABLine.abHeading);
+
+            auto addLine = [&](double offsetX, double offsetZ) {
+                guides.append(QVector3D(
+                    cosH * offsetX - sinH * offsetZ + ABLine.currentLinePtA.easting,
+                    sinH * offsetX + cosH * offsetZ + ABLine.currentLinePtA.northing, 0));
+                guides.append(QVector3D(
+                    cosH * offsetX - sinH * offsetZ + ABLine.currentLinePtB.easting,
+                    sinH * offsetX + cosH * offsetZ + ABLine.currentLinePtB.northing, 0));
+            };
+
+            if (ABLine.isHeadingSameWay) {
+                addLine(toolWidth + toolOffset, 0);
+                addLine(-toolWidth + toolOffset, 0);
+                addLine(toolWidth * 2.0, 0);
+                addLine(-toolWidth * 2.0, 0);
+            } else {
+                addLine(toolWidth - toolOffset, 0);
+                addLine(-toolWidth - toolOffset, 0);
+                addLine(toolWidth * 2.0, 0);
+                addLine(-toolWidth * 2.0, 0);
+            }
+        }
+        props->set_sideGuideLines(guides);
+    }
+
+    // Lookahead / goal point
+    {
+        QVector<QVector3D> pts;
+        bool stanley = SettingsManager::instance()->vehicle_isStanleyUsed();
+        if (!stanley) {
+            if (isABMode && ABLine.isABValid)
+                pts.append(QVector3D(ABLine.goalPointAB.easting, ABLine.goalPointAB.northing, 0));
+            else if (curve.isCurveValid && !curve.curList.isEmpty())
+                pts.append(QVector3D(curve.goalPointCu.easting, curve.goalPointCu.northing, 0));
+        }
+        props->set_lookaheadPoints(pts);
+    }
+
+    // Pure pursuit radius circle
+    {
+        QVector<QVector3D> circle;
+        if (qAbs(ABLine.ppRadiusAB) < 50.0 && qAbs(ABLine.ppRadiusAB) > 0.1) {
+            const int segs = 100;
+            for (int j = 0; j <= segs; ++j) {
+                float a = j * 2.0f * static_cast<float>(M_PI) / segs;
+                circle.append(QVector3D(
+                    ABLine.radiusPointAB.easting + ABLine.ppRadiusAB * cos(a),
+                    ABLine.radiusPointAB.northing + ABLine.ppRadiusAB * sin(a), 0));
+            }
+        }
+        props->set_pursuitCircle(circle);
+    }
+
+    // Smoothed curve (curve modes only)
+    {
+        QVector<QVector3D> smoo;
+        if (!isABMode && curve.isSmoothWindowOpen) {
+            smoo.reserve(curve.smooList.count());
+            for (const Vec3 &v : curve.smooList)
+                smoo.append(QVector3D(v.easting, v.northing, 0));
+        }
+        props->set_smoothedCurve(smoo);
+    }
+
+    // Curve vertex dots flag
+    props->set_showCurrentLineDots(!isABMode && !curve.curList.isEmpty());
 }
 
 // Removed QML_SINGLETON factory function - using qmlRegisterSingletonInstance instead
