@@ -38,7 +38,6 @@
 #include "cfielddata.h"
 #include "cahrs.h"
 #include "crecordedpath.h"
-#include "cguidance.h"
 #include "cheadline.h"
 #include "ctrack.h"
 #include "formheadland.h"
@@ -279,8 +278,6 @@ public:
 
     //used to update the screen status bar etc
     int statusUpdateCounter = 1;
-
-    CGuidance gyd;
 
     CTram tram;
 

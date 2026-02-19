@@ -15,7 +15,7 @@
 #include "cboundary.h"
 #include "ctram.h"
 #include "cahrs.h"
-#include "cguidance.h"
+#include "backend/backend.h"
 
 // Approche SomcoSoftware : Qt gère le singleton automatiquement
 
@@ -418,12 +418,11 @@ void CTrack::DrawTrack(QOpenGLFunctions *gl,
                        const QMatrix4x4 &mvp,
                        bool isFontOn, bool isRateMapOn,
                        double camSetDistance,
-                       CYouTurn &yt,
-                       const CGuidance &gyd)
+                       CYouTurn &yt)
 {
     if (idx() >= 0) {
         if (gArr[idx()].mode == TrackMode::AB)
-            ABLine.DrawABLines(gl, mvp, isFontOn, isRateMapOn, camSetDistance, gArr[idx()], yt, gyd);
+            ABLine.DrawABLines(gl, mvp, isFontOn, isRateMapOn, camSetDistance, gArr[idx()], yt);
         else if (gArr[idx()].mode == TrackMode::Curve)
             curve.DrawCurve(gl, mvp, isFontOn, camSetDistance, gArr[idx()], yt);
     }
@@ -455,7 +454,6 @@ void CTrack::BuildCurrentLine(Vec3 pivot, double secondsSinceStart,
                               CVehicle &vehicle,
                               const CBoundary &bnd,
                               const CAHRS &ahrs,
-                              CGuidance &gyd,
                               CNMEA &pn)
 {
     if (gArr.count() > 0 && idx() > -1)
@@ -464,7 +462,7 @@ void CTrack::BuildCurrentLine(Vec3 pivot, double secondsSinceStart,
         {
             ABLine.BuildCurrentABLineList(pivot,secondsSinceStart,gArr[idx()],yt,*CVehicle::instance());
 
-            ABLine.GetCurrentABLine(pivot, CVehicle::instance()->steerAxlePos,isBtnAutoSteerOn,*CVehicle::instance(),yt,ahrs,gyd,pn);
+            ABLine.GetCurrentABLine(pivot, CVehicle::instance()->steerAxlePos,isBtnAutoSteerOn,*CVehicle::instance(),yt,ahrs,pn);
 
             // Update QML property for parallel line number display
             setHowManyPathsAway(ABLine.howManyPathsAway);
@@ -474,7 +472,7 @@ void CTrack::BuildCurrentLine(Vec3 pivot, double secondsSinceStart,
             //build new current ref line if required
             curve.BuildCurveCurrentList(pivot, secondsSinceStart,*CVehicle::instance(),gArr[idx()],bnd,yt);
 
-            curve.GetCurrentCurveLine(pivot, CVehicle::instance()->steerAxlePos,isBtnAutoSteerOn,*CVehicle::instance(),gArr[idx()],yt,ahrs,gyd,pn);
+            curve.GetCurrentCurveLine(pivot, CVehicle::instance()->steerAxlePos,isBtnAutoSteerOn,*CVehicle::instance(),gArr[idx()],yt,ahrs,pn);
 
             // Update QML property for parallel line number display
             setHowManyPathsAway(curve.howManyPathsAway);
@@ -1303,10 +1301,16 @@ void CTrack::updateInterface()
         QVector<QVector3D> pts;
         bool stanley = SettingsManager::instance()->vehicle_isStanleyUsed();
         if (!stanley) {
-            if (isABMode && ABLine.isABValid)
+            if (isABMode && ABLine.isABValid) {
                 pts.append(QVector3D(ABLine.goalPointAB.easting, ABLine.goalPointAB.northing, 0));
-            else if (curve.isCurveValid && !curve.curList.isEmpty())
+                pts.append(QVector3D(Backend::instance()->gyd().rEastSteer, Backend::instance()->gyd().rNorthSteer, 0));
+                pts.append(QVector3D(Backend::instance()->gyd().rEastPivot, Backend::instance()->gyd().rNorthPivot, 0));
+            }
+            else if (curve.isCurveValid && !curve.curList.isEmpty()) {
                 pts.append(QVector3D(curve.goalPointCu.easting, curve.goalPointCu.northing, 0));
+                pts.append(QVector3D(Backend::instance()->gyd().rEastSteer, Backend::instance()->gyd().rNorthSteer, 0));
+                pts.append(QVector3D(Backend::instance()->gyd().rEastPivot, Backend::instance()->gyd().rNorthPivot, 0));
+            }
         }
         props->set_lookaheadPoints(pts);
     }

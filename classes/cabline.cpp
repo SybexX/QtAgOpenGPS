@@ -6,8 +6,8 @@
 #include "cyouturn.h"
 #include "ctram.h"
 #include "cahrs.h"
-#include "cguidance.h"
 #include "ctrack.h"
+#include "backend/backend.h"
 #include <QOpenGLFunctions>
 #include <QColor>
 #include "glutils.h"
@@ -147,7 +147,6 @@ void CABLine::GetCurrentABLine(Vec3 pivot, Vec3 steer,
                                CVehicle &vehicle,
                                CYouTurn &yt,
                                const CAHRS &ahrs,
-                               CGuidance &gyd,
                                CNMEA &pn
                                )
 {
@@ -176,7 +175,7 @@ void CABLine::GetCurrentABLine(Vec3 pivot, Vec3 steer,
 
     //Stanley
     else if (vehicle_isStanleyUsed)
-        gyd.StanleyGuidanceABLine(currentLinePtA, currentLinePtB, pivot, steer, isBtnAutoSteerOn, *CVehicle::instance(),*this, ahrs,yt);
+        Backend::instance()->gyd().StanleyGuidanceABLine(currentLinePtA, currentLinePtB, pivot, steer, isBtnAutoSteerOn, *CVehicle::instance(),*this, ahrs,yt);
 
     //Pure Pursuit
     else
@@ -363,8 +362,7 @@ void CABLine::DrawABLines(QOpenGLFunctions *gl, const QMatrix4x4 &mvp,
                           bool isRateMapOn,
                           double camSetDistance,
                           const CTrk &track,
-                          CYouTurn &yt,
-                          const CGuidance &gyd)
+                          CYouTurn &yt)
 {
     double tool_toolWidth = SettingsManager::instance()->vehicle_toolWidth();
     double tool_toolOverlap = SettingsManager::instance()->vehicle_toolOverlap();
@@ -505,8 +503,8 @@ void CABLine::DrawABLines(QOpenGLFunctions *gl, const QMatrix4x4 &mvp,
         gldraw.clear();
         color.setRgbF(1.0f, 1.0f, 0.0f);
         gldraw.append(QVector3D(goalPointAB.easting, goalPointAB.northing, 0.0));
-        gldraw.append(QVector3D(gyd.rEastSteer, gyd.rNorthSteer, 0.0));
-        gldraw.append(QVector3D(gyd.rEastPivot, gyd.rNorthPivot, 0.0));
+        gldraw.append(QVector3D(Backend::instance()->gyd().rEastSteer, Backend::instance()->gyd().rNorthSteer, 0.0));
+        gldraw.append(QVector3D(Backend::instance()->gyd().rEastPivot, Backend::instance()->gyd().rNorthPivot, 0.0));
         gldraw.draw(gl,mvp,color,GL_POINTS,8.0f);
 
         if (ppRadiusAB < 50 && ppRadiusAB > -50)

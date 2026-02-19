@@ -1,4 +1,4 @@
-#include "cguidance.h"
+#include "guidance.h"
 #include "cvehicle.h"
 #include "cahrs.h"
 #include "cyouturn.h"
@@ -7,9 +7,9 @@
 #include "glm.h"
 #include "classes/settingsmanager.h"
 
-CGuidance::CGuidance() {}
+Guidance::Guidance() {}
 
-void CGuidance::DoSteerAngleCalc(bool isBtnAutoSteerOn,
+void Guidance::DoSteerAngleCalc(bool isBtnAutoSteerOn,
                                  CVehicle &vehicle,
                                  const CAHRS &ahrs
                                  )
@@ -96,7 +96,7 @@ void CGuidance::DoSteerAngleCalc(bool isBtnAutoSteerOn,
 /// <param name="pivot"></param>
 /// <param name="steer"></param>
 /// <param name="isValid"></param>
-void CGuidance::StanleyGuidanceABLine(Vec3 curPtA, Vec3 curPtB,
+void Guidance::StanleyGuidanceABLine(Vec3 curPtA, Vec3 curPtB,
                                       Vec3 pivot, Vec3 steer,
                                       bool isBtnAutoSteerOn,
                                       CVehicle &vehicle,
@@ -187,7 +187,7 @@ void CGuidance::StanleyGuidanceABLine(Vec3 curPtA, Vec3 curPtB,
 /// <param name="pivot">Pivot position vector</param>
 /// <param name="steer">Steer position vector</param>
 /// <param name="curList">the current list of guidance points</param>
-void CGuidance::StanleyGuidanceCurve(Vec3 pivot, Vec3 steer,
+void Guidance::StanleyGuidanceCurve(Vec3 pivot, Vec3 steer,
                                      QVector<Vec3> &curList,
                                      bool isBtnAutoSteerOn,
                                      CVehicle &vehicle,

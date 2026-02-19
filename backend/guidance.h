@@ -1,6 +1,7 @@
-#ifndef CGUIDANCE_H
-#define CGUIDANCE_H
+#ifndef GUIDANCE_H
+#define GUIDANCE_H
 
+#include <QObject>
 #include <QVector>
 #include "vec3.h"
 
@@ -10,14 +11,20 @@ class CYouTurn;
 class CABLine;
 class CABCurve;
 
-class CGuidance
+class Guidance
 {
-private:
-    int sA, sB, C, pA, pB;
+    Q_GADGET
 
 public:
+    int sA, sB, C, pA, pB;
+
     double distanceFromCurrentLineSteer, distanceFromCurrentLinePivot;
-    double steerAngleGu, rEastSteer, rNorthSteer, rEastPivot, rNorthPivot;
+    double steerAngleGu;
+    Q_PROPERTY(double rEastSteer MEMBER rEastSteer)
+    Q_PROPERTY(double rNorthSteer MEMBER rNorthSteer)
+    Q_PROPERTY(double rEastPivot MEMBER rEastPivot)
+    Q_PROPERTY(double rNorthPivot MEMBER rNorthPivot)
+    double rEastSteer, rNorthSteer, rEastPivot, rNorthPivot;
 
     double inty, xTrackSteerCorrection = 0;
     double steerHeadingError, steerHeadingErrorDegrees;
@@ -26,17 +33,9 @@ public:
 
     double pivotDistanceError, stanleyModeMultiplier;
 
-    //public int modeTimeCounter = 0;
-
-    //for adding steering angle based on side slope hill
-    /*property_setAS_sideHillComp
-    double sideHillCompFactor;
-    */
-
-    //derivative counter
     int counter;
 
-    CGuidance();
+    Guidance();
 
     void DoSteerAngleCalc(bool isBtnAutoSteerOn,
                           CVehicle &vehicle,
@@ -60,4 +59,4 @@ public:
                               const CAHRS &ahrs);
 };
 
-#endif // CGUIDANCE_H
+#endif // GUIDANCE_H

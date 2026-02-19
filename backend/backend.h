@@ -8,6 +8,7 @@
 
 #include "fieldinfo.h"
 #include "fixframe.h"
+#include "guidance.h"
 #include "vec2.h"
 #include "simpleproperty.h"
 #include "cnmea.h"
@@ -23,6 +24,9 @@ class Backend : public QObject
     Q_PROPERTY(QObject* aogRenderer MEMBER aogRenderer NOTIFY aogRendererChanged) //only ever written to by QML
 
     Q_PROPERTY(CNMEA *pn READ pn CONSTANT)
+
+    // Guidance data - exposed as Q_GADGET for QML access
+    Q_PROPERTY(Guidance gyd READ gyd)
 
     //experimental host some of the core backend objects that FormGPS held
     //use QObject * for faster compiling and less dependencies
@@ -48,6 +52,7 @@ public:
     CNMEA *m_pn;
     QObject *m_track;
     QObject *m_yt;
+    Guidance m_gyd;
 
     QObject *aogRenderer = nullptr;
 
@@ -60,6 +65,7 @@ public:
     CNMEA *pn() const { return m_pn; }
     QObject *track() const { return m_track; }
     QObject *yt() const { return m_yt; }
+    Guidance &gyd() { return m_gyd; }
 
     //mutation methods for currentField
     Q_INVOKABLE void currentField_setDistanceUser(double newdist) {

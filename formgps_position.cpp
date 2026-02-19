@@ -890,7 +890,7 @@ void FormGPS::UpdateFixPosition()
         }
 
         bool autoSteerState = MainWindowState::instance()->isBtnAutoSteerOn();
-        track.BuildCurrentLine(CVehicle::instance()->pivotAxlePos,secondsSinceStart,autoSteerState,yt,*CVehicle::instance(),bnd,ahrs,gyd,pn);
+        track.BuildCurrentLine(CVehicle::instance()->pivotAxlePos,secondsSinceStart,autoSteerState,yt,*CVehicle::instance(),bnd,ahrs,pn);
     }
 
     // autosteer at full speed of updates

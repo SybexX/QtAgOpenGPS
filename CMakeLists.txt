@@ -180,7 +180,6 @@ qt_add_executable(QtAgOpenGPS
     classes/cfence.cpp
     classes/cfielddata.h classes/cfielddata.cpp
     classes/cflag.h classes/cflag.cpp
-    classes/cguidance.h classes/cguidance.cpp
     classes/chead.cpp
     classes/cheadline.h classes/cheadline.cpp
     classes/cnmea.h classes/cnmea.cpp
@@ -388,6 +387,7 @@ qt_add_qml_module(QtAgOpenGPS
     RESOURCES android/AndroidManifest.xml android/build.gradle android/res/values/libs.xml android/res/xml/qtprovider_paths.xml android/gradle/wrapper/gradle-wrapper.jar android/gradle/wrapper/gradle-wrapper.properties android/gradle.properties android/gradlew android/gradlew.bat
     SOURCES rendering.h
     SOURCES backend/backend.h backend/backend.cpp
+    SOURCES backend/guidance.h backend/guidance.cpp
     SOURCES simpleproperty.h
     #SOURCES globals.h globals.cpp
 

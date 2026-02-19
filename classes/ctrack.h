@@ -23,7 +23,6 @@ class CABCurve;
 class CBoundary;
 class CYouTurn;
 class CAHRS;
-class CGuidance;
 class CNMEA;
 class CCamera;
 class CTram;
@@ -103,7 +102,6 @@ public:
                           CVehicle &vehicle,
                           const CBoundary &bnd,
                           const CAHRS &ahrs,
-                          CGuidance &gyd,
                           CNMEA &pn);
     void ResetCurveLine();
     void AddPathPoint(Vec3 point);
@@ -112,8 +110,7 @@ public:
                    bool isFontOn,
                    bool isRateMapOn,
                    double camSetDistance,
-                   CYouTurn &yt,
-                   const CGuidance &gyd);
+                   CYouTurn &yt);
     void DrawTrackGoalPoint(QOpenGLFunctions *gl, const QMatrix4x4 &mvp);
     int getHowManyPathsAway();
     int getMode() { if (idx() >=0) return gArr[idx()].mode; else return 0; }

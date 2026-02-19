@@ -460,7 +460,7 @@ void FormGPS::oglMain_Paint()
             else// draw the current and reference AB Lines or CurveAB Ref and line
             {
                 //when switching lines, draw the ghost
-                track.DrawTrack(gl, projection*modelview, isFontOn, false, camera.camSetDistance(), yt, gyd);
+                track.DrawTrack(gl, projection*modelview, isFontOn, false, camera.camSetDistance(), yt);
             }
 
             track.DrawTrackNew(gl, projection*modelview);

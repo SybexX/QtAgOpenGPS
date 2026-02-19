@@ -16,8 +16,8 @@
 #include "ctram.h"
 #include "cnmea.h"
 #include "cahrs.h"
-#include "cguidance.h"
 #include "ctrack.h"
+#include "backend/backend.h"
 #include "classes/settingsmanager.h"
 #include "backend.h"
 
@@ -686,7 +686,6 @@ void CABCurve::GetCurrentCurveLine(Vec3 pivot,
                                    CTrk &track,
                                    CYouTurn &yt,
                                    const CAHRS &ahrs,
-                                   CGuidance &gyd,
                                    CNMEA &pn)
 {
     double purePursuitGain = SettingsManager::instance()->vehicle_purePursuitIntegralGainAB();
@@ -723,7 +722,7 @@ void CABCurve::GetCurrentCurveLine(Vec3 pivot,
         }
         else if (vehicle_isStanleyUsed)//Stanley
         {
-            gyd.StanleyGuidanceCurve(pivot, steer, curList, isBtnAutoSteerOn, *CVehicle::instance(), *this, ahrs);
+            Backend::instance()->gyd().StanleyGuidanceCurve(pivot, steer, curList, isBtnAutoSteerOn, *CVehicle::instance(), *this, ahrs);
         }
         else// Pure Pursuit ------------------------------------------
         {

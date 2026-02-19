@@ -15,7 +15,6 @@ class CCamera;
 class CBoundary;
 class CNMEA;
 class CAHRS;
-class CGuidance;
 class CTrk;
 
 class CCurveLines
@@ -108,7 +107,6 @@ public:
                              CTrk &track,
                              CYouTurn &yt,
                              const CAHRS &ahrs,
-                             CGuidance &gyd,
                              CNMEA &pn);
 
 

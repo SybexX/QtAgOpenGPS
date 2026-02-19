@@ -18,7 +18,6 @@ class CNMEA;
 class CTram;
 class CCamera;
 class CAHRS;
-class CGuidance;
 class CTrk;
 class CWorldGrid;
 
@@ -109,15 +108,13 @@ public:
                           CVehicle &vehicle,
                           CYouTurn &yt,
                           const CAHRS &ahrs,
-                          CGuidance &gyd,
                           CNMEA &pn);
     void DrawABLineNew(QOpenGLFunctions *gl, const QMatrix4x4 &mvp);
 
     void DrawABLines(QOpenGLFunctions *gl, const QMatrix4x4 &mvp,
                      bool isFontOn, bool isRateMapOn, double camSetDistance,
                      const CTrk &track,
-                     CYouTurn &yt,
-                     const CGuidance &gyd);
+                     CYouTurn &yt);
     void BuildTram(const CTrk &track, CBoundary &bnd, CTram &tram);
 
     CABLine &operator= (CABLine &src)
