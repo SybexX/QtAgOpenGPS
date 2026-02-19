@@ -35,6 +35,7 @@ private:
     DotsNode *m_refDotsNode = nullptr;
 
     QSGGeometryNode *m_shadowOutlineNode = nullptr;
+    QSGGeometryNode *m_shadowFillNode = nullptr;
     QVector<QSGGeometryNode*> m_sideGuideNodes;
     DotsNode *m_lookaheadNode = nullptr;
     QSGGeometryNode *m_pursuitCircleNode = nullptr;

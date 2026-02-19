@@ -138,6 +138,7 @@ void TracksNode::clearChildren()
     m_refDotsNode = nullptr;
 
     m_shadowOutlineNode = nullptr;
+    m_shadowFillNode = nullptr;
     m_sideGuideNodes.clear();
     m_lookaheadNode = nullptr;
     m_pursuitCircleNode = nullptr;
@@ -280,6 +281,20 @@ void TracksNode::update(const QMatrix4x4 &mv,
             }
         }
 
+        // Shadow fill (semi-transparent quad)
+        if (properties->shadowQuad().count() == 4) {
+            auto *geo = AOGGeometry::createTriangleFanGeometry(properties->shadowQuad());
+            if (geo) {
+                m_shadowFillNode = new QSGGeometryNode();
+                m_shadowFillNode->setGeometry(geo);
+                m_shadowFillNode->setFlag(QSGNode::OwnsGeometry);
+                auto *mat = new AOGFlatColorMaterial();
+                m_shadowFillNode->setMaterial(mat);
+                m_shadowFillNode->setFlag(QSGNode::OwnsMaterial);
+                appendChildNode(m_shadowFillNode);
+            }
+        }
+
         // Side guide lines
         for (const auto &seg : sideGuideSegments) {
             auto *geo = AOGGeometry::createThickLineGeometry(seg);
@@ -377,6 +392,15 @@ void TracksNode::update(const QMatrix4x4 &mv,
     if (m_shadowOutlineNode)
         updateThickLineNode(m_shadowOutlineNode, mvp, viewportSize, 1,
                             QColor::fromRgbF(0.55f, 0.55f, 0.55f, 0.3f));
+
+    if (m_shadowFillNode) {
+        auto *mat = static_cast<AOGFlatColorMaterial *>(m_shadowFillNode->material());
+        mat->setMvpMatrix(mvp);
+        mat->setViewportSize(viewportSize);
+        // Premultiply alpha for Qt scene graph blending
+        float a = 0.3f;
+        mat->setColor(QColor::fromRgbF(0.5f * a, 0.5f * a, 0.5f * a, a));
+    }
 
     for (QSGGeometryNode *node : m_sideGuideNodes)
         updateThickLineNode(node, mvp, viewportSize, 1,
