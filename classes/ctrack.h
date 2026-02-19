@@ -14,6 +14,7 @@
 #include "setter.h"
 #include "cabcurve.h"
 #include "cabline.h"
+#include "tracksproperties.h"
 
 class QOpenGLFunctions;
 class CVehicle;
@@ -61,6 +62,7 @@ class CTrack : public QAbstractListModel
     Q_OBJECT
     // QML registration handled manually in main.cpp
        // ===== QML PROPERTIES - Qt 6.8 Unified Rectangle Pattern =====
+    Q_PROPERTY(TracksProperties* properties READ properties NOTIFY propertiesChanged)
     Q_PROPERTY(int idx READ idx WRITE setIdx NOTIFY idxChanged BINDABLE bindableIdx)
     Q_PROPERTY(QObject* model READ getModel CONSTANT)
     Q_PROPERTY(int newRefSide READ newRefSide WRITE setNewRefSide NOTIFY newRefSideChanged BINDABLE bindableNewRefSide)
@@ -90,6 +92,9 @@ public:
     QVector<Vec2> designRefLine;
 
     // CTrack interface (publiques pour accès via singleton)
+    TracksProperties *properties() const { return m_tracksProperties; }
+    void updateInterface();
+
     int FindClosestRefTrack(Vec3 pivot, const CVehicle &vehicle);
     void SwitchToClosestRefTrack(Vec3 pivot, const CVehicle &vehicle);
     void BuildCurrentLine(Vec3 pivot,
@@ -218,6 +223,7 @@ public:
     
 
 signals:
+    void propertiesChanged();
     void resetCreatedYouTurn();
     void saveTracks();
 
@@ -266,6 +272,7 @@ public slots:
 private:
     // Used by QML model interface
     QHash<int, QByteArray> m_roleNames;
+    TracksProperties *m_tracksProperties = nullptr;
 
 
     // ===== Qt 6.8 Q_OBJECT_BINDABLE_PROPERTY Private Members =====

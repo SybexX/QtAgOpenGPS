@@ -73,6 +73,8 @@ CTrack::CTrack(QObject* parent) : QAbstractListModel(parent)
     autoTrack3SecTimer = 0;
 
     setIdx(-1);
+
+    m_tracksProperties = new TracksProperties(this);
 }
 
 CTrack::~CTrack()
@@ -1156,6 +1158,76 @@ void CTrack::setNewRefSide(int which_side)
 
 
 
+
+void CTrack::updateInterface()
+{
+    TracksProperties *props = m_tracksProperties;
+
+    // Design preview: show when making a new track (even before idx is valid)
+    QVector<QVector3D> des;
+    if (ABLine.isMakingABLine) {
+        if (ABLine.isDesPtBSet) {
+            des = { QVector3D(ABLine.desLineEndA.easting, ABLine.desLineEndA.northing, 0),
+                    QVector3D(ABLine.desLineEndB.easting, ABLine.desLineEndB.northing, 0) };
+        }
+    } else if (curve.isMakingCurve) {
+        des.reserve(curve.desList.count());
+        for (const Vec3 &v : curve.desList)
+            des.append(QVector3D(v.easting, v.northing, 0));
+    }
+    props->set_newTrack(des);
+
+    // Current track: only show if a valid track is selected
+    int i = idx();
+    if (i < 0 || i >= gArr.count()) {
+        props->set_showRefFlags(false);
+        props->set_refLine({});
+        props->set_currentLine({});
+        return;
+    }
+
+    const CTrk &trk = gArr[i];
+    int trackMode = trk.mode;
+
+    // Reference line and A/B flag positions
+    QVector<QVector3D> ref;
+    if (trackMode == TrackMode::AB || trackMode == TrackMode::bndTrackOuter
+        || trackMode == TrackMode::bndTrackInner) {
+        ref = { QVector3D(trk.endPtA.easting, trk.endPtA.northing, 0),
+                QVector3D(trk.endPtB.easting, trk.endPtB.northing, 0) };
+        props->set_aRefFlag(QVector3D(trk.ptA.easting, trk.ptA.northing, 0));
+        props->set_bRefFlag(QVector3D(trk.ptB.easting, trk.ptB.northing, 0));
+        props->set_showRefFlags(ABLine.isABValid);
+    } else {
+        // Curve modes: curvePts are the reference
+        ref.reserve(trk.curvePts.count());
+        for (const Vec3 &v : trk.curvePts)
+            ref.append(QVector3D(v.easting, v.northing, 0));
+        if (!trk.curvePts.isEmpty()) {
+            props->set_aRefFlag(QVector3D(trk.curvePts.first().easting,
+                                          trk.curvePts.first().northing, 0));
+            props->set_bRefFlag(QVector3D(trk.curvePts.last().easting,
+                                          trk.curvePts.last().northing, 0));
+        }
+        props->set_showRefFlags(curve.isCurveValid);
+    }
+    props->set_refLine(ref);
+
+    // Current (active parallel) guidance line
+    QVector<QVector3D> cur;
+    if (trackMode == TrackMode::AB || trackMode == TrackMode::bndTrackOuter
+        || trackMode == TrackMode::bndTrackInner) {
+        if (ABLine.isABValid) {
+            cur = { QVector3D(ABLine.currentLinePtA.easting, ABLine.currentLinePtA.northing, 0),
+                    QVector3D(ABLine.currentLinePtB.easting, ABLine.currentLinePtB.northing, 0) };
+        }
+    } else {
+        cur.reserve(curve.curList.count());
+        for (const Vec3 &v : curve.curList)
+            cur.append(QVector3D(v.easting, v.northing, 0));
+    }
+    props->set_currentLine(cur);
+}
 
 // Removed QML_SINGLETON factory function - using qmlRegisterSingletonInstance instead
 

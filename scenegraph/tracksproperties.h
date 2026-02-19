@@ -24,6 +24,7 @@ public:
 
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, newTrack)
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, refLine)
+    SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, currentLine)
     SIMPLE_BINDABLE_PROPERTY(bool, showRefFlags)
     SIMPLE_BINDABLE_PROPERTY(QVector3D, aRefFlag)
     SIMPLE_BINDABLE_PROPERTY(QVector3D, bRefFlag)
@@ -33,6 +34,7 @@ signals:
 private:
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_newTrack, &TracksProperties::newTrackChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_refLine, &TracksProperties::refLineChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_currentLine, &TracksProperties::currentLineChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(TracksProperties, bool, m_showRefFlags, &TracksProperties::showRefFlagsChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector3D, m_aRefFlag, &TracksProperties::aRefFlagChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector3D, m_bRefFlag, &TracksProperties::bRefFlagChanged)

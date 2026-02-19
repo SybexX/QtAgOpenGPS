@@ -373,21 +373,7 @@ Window {
         }
         */
 
-        tracks:  TracksProperties {
-            newTrack: [
-
-            ]
-
-            refLine: [
-
-
-            ]
-
-            aRefFlag: Qt.vector3d(-5,5,0);
-            bRefFlag: Qt.vector3d(5,5,0);
-            showRefFlags: false
-
-        }
+        tracks: TracksInterface.properties
 
         layers: LayerService.layers
         // Demo coverage layer (QML-only, no LayerService connection)
