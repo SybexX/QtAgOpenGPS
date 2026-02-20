@@ -268,6 +268,7 @@ void TracksNode::update(const QMatrix4x4 &mv,
             appendChildNode(m_bRefFlag);
         }
 
+        /*
         // Shadow outline quad
         if (shadowQuadClipped.count() >= 2) {
             auto *geo = AOGGeometry::createThickLineGeometry(shadowQuadClipped);
@@ -280,7 +281,7 @@ void TracksNode::update(const QMatrix4x4 &mv,
                 m_shadowOutlineNode->setFlag(QSGNode::OwnsMaterial);
                 appendChildNode(m_shadowOutlineNode);
             }
-        }
+        }*/
 
         // Shadow fill (semi-transparent quad)
         if (properties->shadowQuad().count() == 4) {

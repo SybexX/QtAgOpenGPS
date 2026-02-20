@@ -39,68 +39,47 @@ void CABLine::BuildCurrentABLineList(Vec3 pivot,
 
     abHeading = track.heading;
 
-    widthMinusOverlap = tool_width - tool_overlap;
-
-    // ✅ PHASE 6.0.43: C# CONDITION 1 - Update timeout (used for other purposes)
-    // C# CABLine.cs line 92: if (!isABValid || ((secondsSinceStart - lastSecond) > 0.66 && (!isBtnAutoSteerOn || steerSwitchHigh)))
-    // The ENTIRE block (endPtA/B, RefDist, howManyPathsAway) should be inside this condition!
+    // ✅ CONDITION 1: C# CABLine.cs line 92
     if (!isABValid || ((secondsSinceStart - lastSecond) > 0.66 && (!MainWindowState::instance()->isBtnAutoSteerOn() || ModuleComm::instance()->steerSwitchHigh())))
     {
         lastSecond = secondsSinceStart;
 
-        // Extend AB line points (needed every frame for howManyPathsAway calculation)
+        double dx, dy;
+
+        // Extend AB line points
         track.endPtA.easting = track.ptA.easting - (sin(abHeading) * abLength);
         track.endPtA.northing = track.ptA.northing - (cos(abHeading) * abLength);
 
         track.endPtB.easting = track.ptB.easting + (sin(abHeading) * abLength);
         track.endPtB.northing = track.ptB.northing + (cos(abHeading) * abLength);
 
-        refNudgePtA = track.endPtA; refNudgePtB = track.endPtB;
+        //move the ABLine over based on the overlap amount set in
+        widthMinusOverlap = tool_width - tool_overlap;
 
-        if (track.nudgeDistance != 0)
-        {
-            refNudgePtA.easting += (sin(abHeading + glm::PIBy2) * track.nudgeDistance);
-            refNudgePtA.northing += (cos(abHeading + glm::PIBy2) * track.nudgeDistance);
-
-            refNudgePtB.easting += (sin(abHeading + glm::PIBy2) * track.nudgeDistance);
-            refNudgePtB.northing += (cos(abHeading + glm::PIBy2) * track.nudgeDistance);
-        }
-
-        // PHASE 6.0.43 CRITICAL FIX: Use UN-NUDGED track.endPtA/B for distance calculation
-        // The nudge is applied ONLY in RefDist calculation below
-        // Using nudged points here causes double-nudge bug!
+        //x2-x1
         dx = track.endPtB.easting - track.endPtA.easting;
+        //z2-z1
         dy = track.endPtB.northing - track.endPtA.northing;
 
-        distanceFromRefLine = ((dy * CVehicle::instance()->guidanceLookPos.easting) - (dx * CVehicle::instance()->guidanceLookPos.northing) +
-                               (track.endPtB.easting * track.endPtA.northing) -
-                               (track.endPtB.northing * track.endPtA.easting)) /
-                              sqrt((dy * dy) + (dx * dx));
+        distanceFromRefLine = ((dy * CVehicle::instance()->guidanceLookPos.easting) - (dx * CVehicle::instance()->guidanceLookPos.northing) + (track.endPtB.easting
+                                * track.endPtA.northing) - (track.endPtB.northing * track.endPtA.easting))
+                                    / sqrt((dy * dy) + (dx * dx));
 
         distanceFromRefLine -= (0.5 * widthMinusOverlap);
 
         isHeadingSameWay = M_PI - fabs(fabs(pivot.heading - abHeading) - M_PI) < glm::PIBy2;
 
-        if (yt.isYouTurnTriggered && !yt.isGoingStraightThrough) isHeadingSameWay = !isHeadingSameWay;
+        //if (yt.isYouTurnTriggered && !yt.isGoingStraightThrough) isHeadingSameWay = !isHeadingSameWay;
 
-        // Calculate which parallel line the vehicle is on (Phase 6.0.43: includes nudgeDistance)
-        // THIS MUST BE CALCULATED EVERY FRAME FOR AUTO-SNAP TO WORK!
-        double RefDist = (distanceFromRefLine
-                          + (isHeadingSameWay ? tool_offset : -tool_offset)
-                          - track.nudgeDistance) / widthMinusOverlap;
+        //Which ABLine is the vehicle on, negative is left and positive is right side
+        double RefDist = (distanceFromRefLine + (isHeadingSameWay ? tool_offset : -tool_offset) - track.nudgeDistance) / widthMinusOverlap;
 
-        if (RefDist < 0)
-            howManyPathsAway = (int)(RefDist - 0.5);
-        else
-            howManyPathsAway = (int)(RefDist + 0.5);
+        if (RefDist < 0) howManyPathsAway = (int)(RefDist - 0.5);
+        else howManyPathsAway = (int)(RefDist + 0.5);
     }
 
-    // ✅ PHASE 6.0.43: C# CONDITION 2 - Reconstruct line if howManyPathsAway or direction changed
-    // C# CABLine.cs line 124: if (!isABValid || howManyPathsAway != lastHowManyPathsAway ||
-    //                             (isHeadingSameWay != lastIsHeadingSameWay && tool.offset != 0))
-    if (!isABValid ||
-        howManyPathsAway != lastHowManyPathsAway ||
-        (isHeadingSameWay != lastIsHeadingSameWay && tool_offset != 0))
+    // ✅ CONDITION 2: C# CABLine.cs line 132
+    if (!isABValid || howManyPathsAway != lastHowManyPathsAway || (isHeadingSameWay != lastIsHeadingSameWay && tool_offset != 0))
     {
         isABValid = true;
         lastHowManyPathsAway = howManyPathsAway;
@@ -108,21 +87,22 @@ void CABLine::BuildCurrentABLineList(Vec3 pivot,
 
         widthMinusOverlap = tool_width - tool_overlap;
 
-        // Calculate distance to parallel line (Phase 6.0.43: includes nudgeDistance)
-        double distAway = widthMinusOverlap * howManyPathsAway;
-        distAway += (isHeadingSameWay ? -tool_offset : tool_offset);
-        distAway += track.nudgeDistance;
+        double distAway = widthMinusOverlap * howManyPathsAway + (isHeadingSameWay ? -tool_offset : tool_offset) + track.nudgeDistance;
+
         distAway += (0.5 * widthMinusOverlap);
 
-        shadowOffset = isHeadingSameWay ? tool_offset : -tool_offset;
+        //move the curline as well.
+        Vec2 nudgePtA(track.ptA.easting, track.ptA.northing);
+        Vec2 nudgePtB(track.ptB.easting, track.ptB.northing);
 
-        // Points on original AB line (without nudge for reconstruction)
-        Vec2 point1((cos(-abHeading) * distAway) + track.ptA.easting,
-                    (sin(-abHeading) * distAway) + track.ptA.northing);
-        Vec2 point2((cos(-abHeading) * distAway) + track.ptB.easting,
-                    (sin(-abHeading) * distAway) + track.ptB.northing);
+        //depending which way you are going, the offset can be either side
+        Vec2 point1((cos(-abHeading) * distAway) + nudgePtA.easting,
+                    (sin(-abHeading) * distAway) + nudgePtA.northing);
 
-        // Create the new current line extent points based on parallel offset
+        Vec2 point2((cos(-abHeading) * distAway) + nudgePtB.easting,
+                    (sin(-abHeading) * distAway) + nudgePtB.northing);
+
+        //create the new line extent points for current ABLine based on original heading of AB line
         currentLinePtA.easting = point1.easting - (sin(abHeading) * abLength);
         currentLinePtA.northing = point1.northing - (cos(abHeading) * abLength);
 

@@ -60,7 +60,7 @@ CTrack::CTrack(QObject* parent) : QAbstractListModel(parent)
     m_mode = 0;
     m_count = 0;
     m_isAutoTrack = false;
-    m_isAutoSnapToPivot = true;
+    m_isAutoSnapToPivot = false;  // Match C# default
     m_isAutoSnapped = false;
     m_newHeading = 0.0;
     m_newName = "";
