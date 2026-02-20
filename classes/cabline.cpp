@@ -7,12 +7,14 @@
 #include "ctram.h"
 #include "cahrs.h"
 #include "ctrack.h"
-#include "backend/backend.h"
+#include "backend.h"
 #include <QOpenGLFunctions>
 #include <QColor>
 #include "glutils.h"
 #include "cnmea.h"
-#include "classes/settingsmanager.h"
+#include "settingsmanager.h"
+#include "modulecomm.h"
+#include "mainwindowstate.h"
 
 //??? why does CABLine refer to mf.ABLine? Isn't there only one instance and
 //thus was can just use "this."  If this is wrong, we'll remove this and fix it.
@@ -37,66 +39,60 @@ void CABLine::BuildCurrentABLineList(Vec3 pivot,
 
     abHeading = track.heading;
 
-    // ═════════════════════════════════════════════════════════════════════════════════
-    // PHASE 6.0.43 BUG FIX: Calculate howManyPathsAway EVERY FRAME (not just on timeout)
-    // Original bug: Calculation was trapped inside CONDITION 1, preventing real-time updates
-    // ═════════════════════════════════════════════════════════════════════════════════
-
-    // Extend AB line points (needed every frame for howManyPathsAway calculation)
-    track.endPtA.easting = track.ptA.easting - (sin(abHeading) * abLength);
-    track.endPtA.northing = track.ptA.northing - (cos(abHeading) * abLength);
-
-    track.endPtB.easting = track.ptB.easting + (sin(abHeading) * abLength);
-    track.endPtB.northing = track.ptB.northing + (cos(abHeading) * abLength);
-
-    refNudgePtA = track.endPtA; refNudgePtB = track.endPtB;
-
-    if (track.nudgeDistance != 0)
-    {
-        refNudgePtA.easting += (sin(abHeading + glm::PIBy2) * track.nudgeDistance);
-        refNudgePtA.northing += (cos(abHeading + glm::PIBy2) * track.nudgeDistance);
-
-        refNudgePtB.easting += (sin(abHeading + glm::PIBy2) * track.nudgeDistance);
-        refNudgePtB.northing += (cos(abHeading + glm::PIBy2) * track.nudgeDistance);
-    }
-
     widthMinusOverlap = tool_width - tool_overlap;
 
-    // PHASE 6.0.43 CRITICAL FIX: Use UN-NUDGED track.endPtA/B for distance calculation
-    // The nudge is applied ONLY in RefDist calculation below (line 87)
-    // Using nudged points here causes double-nudge bug!
-    dx = track.endPtB.easting - track.endPtA.easting;
-    dy = track.endPtB.northing - track.endPtA.northing;
-
-    distanceFromRefLine = ((dy * CVehicle::instance()->guidanceLookPos.easting) - (dx * CVehicle::instance()->guidanceLookPos.northing) +
-                           (track.endPtB.easting * track.endPtA.northing) -
-                           (track.endPtB.northing * track.endPtA.easting)) /
-                          sqrt((dy * dy) + (dx * dx));
-
-    distanceFromRefLine -= (0.5 * widthMinusOverlap);
-
-    isLateralTriggered = false;
-
-    isHeadingSameWay = M_PI - fabs(fabs(pivot.heading - abHeading) - M_PI) < glm::PIBy2;
-
-    if (yt.isYouTurnTriggered && !yt.isGoingStraightThrough) isHeadingSameWay = !isHeadingSameWay;
-
-    // Calculate which parallel line the vehicle is on (Phase 6.0.43: includes nudgeDistance)
-    // THIS MUST BE CALCULATED EVERY FRAME FOR AUTO-SNAP TO WORK!
-    double RefDist = (distanceFromRefLine
-                      + (isHeadingSameWay ? tool_offset : -tool_offset)
-                      - track.nudgeDistance) / widthMinusOverlap;
-
-    if (RefDist < 0)
-        howManyPathsAway = (int)(RefDist - 0.5);
-    else
-        howManyPathsAway = (int)(RefDist + 0.5);
-
     // ✅ PHASE 6.0.43: C# CONDITION 1 - Update timeout (used for other purposes)
-    // C# CABLine.cs line 84: if (!isABValid || ((secondsSinceStart - lastSecond) > 0.66))
-    if (!isABValid || ((secondsSinceStart - lastSecond) > 0.66))
+    // C# CABLine.cs line 92: if (!isABValid || ((secondsSinceStart - lastSecond) > 0.66 && (!isBtnAutoSteerOn || steerSwitchHigh)))
+    // The ENTIRE block (endPtA/B, RefDist, howManyPathsAway) should be inside this condition!
+    if (!isABValid || ((secondsSinceStart - lastSecond) > 0.66 && (!MainWindowState::instance()->isBtnAutoSteerOn() || ModuleComm::instance()->steerSwitchHigh())))
     {
         lastSecond = secondsSinceStart;
+
+        // Extend AB line points (needed every frame for howManyPathsAway calculation)
+        track.endPtA.easting = track.ptA.easting - (sin(abHeading) * abLength);
+        track.endPtA.northing = track.ptA.northing - (cos(abHeading) * abLength);
+
+        track.endPtB.easting = track.ptB.easting + (sin(abHeading) * abLength);
+        track.endPtB.northing = track.ptB.northing + (cos(abHeading) * abLength);
+
+        refNudgePtA = track.endPtA; refNudgePtB = track.endPtB;
+
+        if (track.nudgeDistance != 0)
+        {
+            refNudgePtA.easting += (sin(abHeading + glm::PIBy2) * track.nudgeDistance);
+            refNudgePtA.northing += (cos(abHeading + glm::PIBy2) * track.nudgeDistance);
+
+            refNudgePtB.easting += (sin(abHeading + glm::PIBy2) * track.nudgeDistance);
+            refNudgePtB.northing += (cos(abHeading + glm::PIBy2) * track.nudgeDistance);
+        }
+
+        // PHASE 6.0.43 CRITICAL FIX: Use UN-NUDGED track.endPtA/B for distance calculation
+        // The nudge is applied ONLY in RefDist calculation below
+        // Using nudged points here causes double-nudge bug!
+        dx = track.endPtB.easting - track.endPtA.easting;
+        dy = track.endPtB.northing - track.endPtA.northing;
+
+        distanceFromRefLine = ((dy * CVehicle::instance()->guidanceLookPos.easting) - (dx * CVehicle::instance()->guidanceLookPos.northing) +
+                               (track.endPtB.easting * track.endPtA.northing) -
+                               (track.endPtB.northing * track.endPtA.easting)) /
+                              sqrt((dy * dy) + (dx * dx));
+
+        distanceFromRefLine -= (0.5 * widthMinusOverlap);
+
+        isHeadingSameWay = M_PI - fabs(fabs(pivot.heading - abHeading) - M_PI) < glm::PIBy2;
+
+        if (yt.isYouTurnTriggered && !yt.isGoingStraightThrough) isHeadingSameWay = !isHeadingSameWay;
+
+        // Calculate which parallel line the vehicle is on (Phase 6.0.43: includes nudgeDistance)
+        // THIS MUST BE CALCULATED EVERY FRAME FOR AUTO-SNAP TO WORK!
+        double RefDist = (distanceFromRefLine
+                          + (isHeadingSameWay ? tool_offset : -tool_offset)
+                          - track.nudgeDistance) / widthMinusOverlap;
+
+        if (RefDist < 0)
+            howManyPathsAway = (int)(RefDist - 0.5);
+        else
+            howManyPathsAway = (int)(RefDist + 0.5);
     }
 
     // ✅ PHASE 6.0.43: C# CONDITION 2 - Reconstruct line if howManyPathsAway or direction changed
@@ -256,15 +252,15 @@ void CABLine::GetCurrentABLine(Vec3 pivot, Vec3 steer,
         //update base on autosteer settings and distance from line
         double goalPointDistance = CVehicle::instance()->UpdateGoalPointDistance();
 
-        if (CVehicle::instance()->isReverse() ? isHeadingSameWay : !isHeadingSameWay)
-        {
-            goalPointAB.easting = rEastAB - (sin(abHeading) * goalPointDistance);
-            goalPointAB.northing = rNorthAB - (cos(abHeading) * goalPointDistance);
-        }
-        else
+        if (CVehicle::instance()->isReverse() != isHeadingSameWay)
         {
             goalPointAB.easting = rEastAB + (sin(abHeading) * goalPointDistance);
             goalPointAB.northing = rNorthAB + (cos(abHeading) * goalPointDistance);
+        }
+        else
+        {
+            goalPointAB.easting = rEastAB - (sin(abHeading) * goalPointDistance);
+            goalPointAB.northing = rNorthAB - (cos(abHeading) * goalPointDistance);
         }
 
         //calc "D" the distance from pivot axle to lookahead point
