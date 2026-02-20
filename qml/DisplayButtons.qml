@@ -11,6 +11,17 @@ import "components" as Comp
 Comp.TimedRectangle{
     id: displayButtons
     color: aogInterface.backgroundColor
+
+    Connections {
+            target: mainWindow
+            function onZoomOutPressed() {
+                btnZoomOut.clicked()
+            }
+            function onZoomInPressed() {
+                btnZoomIn.clicked()
+            }
+        }
+
     Grid {
         id: tiltButtons
         anchors.leftMargin: 5

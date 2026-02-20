@@ -10,6 +10,16 @@ RowLayout{
     id:bottomButtons
     visible: Backend.isJobStarted && leftColumn.visible
 
+    Connections {
+            target: mainWindow
+            function onNudgeRightPressed() {
+                nudgeRight.clicked()
+            }
+            function onNudgeLeftPressed() {
+                nudgeLeft.clicked()
+            }
+        }
+
     onWidthChanged: {
         theme.btnSizes[1] = width / (children.length)
         theme.buttonSizesChanged()
@@ -136,6 +146,7 @@ RowLayout{
     }
 
     Comp.MainWindowBtns{
+        id: nudgeLeft
         icon.source: prefix + "/images/SnapLeft.png"
         onClicked: TracksInterface.nudge(SettingsManager.as_snapDistance/-100) //spinbox returns cm, convert to metres
         visible: SettingsManager.feature_isNudgeOn && TracksInterface.idx > -1
@@ -146,6 +157,7 @@ RowLayout{
         visible: SettingsManager.feature_isNudgeOn && TracksInterface.idx > -1
     }
     Comp.MainWindowBtns{
+        id: nudgeRight
         icon.source: prefix + "/images/SnapRight.png"
         onClicked: TracksInterface.nudge(SettingsManager.as_snapDistance/100) //spinbox returns cm, convert to metres
         visible: SettingsManager.feature_isNudgeOn && TracksInterface.idx > -1
