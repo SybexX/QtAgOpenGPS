@@ -37,9 +37,9 @@ void FormGPS::onSimNewPosition(double vtgSpeed,
     // PHASE 6.0.42: Check for GPS jump in simulation mode
     // Handles REAL→SIM mode switch with field open
     // If jump detected: closes field (if open), updates latStart/lonStart, resets flags
-    if (detectGPSJump(latitude, longitude)) {
-        handleGPSJump(latitude, longitude);
-    }
+    //if (detectGPSJump(latitude, longitude)) {
+    //    handleGPSJump(latitude, longitude);
+    //}
 
     pn.vtgSpeed = vtgSpeed;
 
