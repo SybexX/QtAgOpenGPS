@@ -911,7 +911,7 @@ Window {
                 anchors.bottom: parent.bottom
                 anchors.margins: 20
                 visible: false
-                z:1
+                z: 100
             }
             Comp.IconButtonTransparent{ //button on bottom left to show/hide the bottom and right buttons
                 id: toggleButtons
