@@ -29,16 +29,15 @@ RowLayout{
             height = 0
         else
             height = children.height
-        // Threading Phase 1: You-turn skip width configuration
-        cbYouSkipNumber.currentIndex = SettingsManager.youturn_skipWidth-1
-
     }
+
     ComboBox {
         id: cbYouSkipNumber
         editable: false
         Layout.alignment: Qt.AlignCenter
         implicitWidth: theme.buttonSize
         implicitHeight: theme.buttonSize
+
         model: ListModel {
             id: model
             ListElement {text: "0"}
@@ -53,14 +52,34 @@ RowLayout{
             ListElement {text: "9"}
             ListElement {text: "10"}
         }
-        onCurrentIndexChanged: {
-            if (cbYouSkipNumber.find(currentText) === -1){
-                model.append({text: editText})
-                currentIndex = cbYouSkipNumber.find(editText)
-            }
-            SettingsManager.youturn_skipWidth = cbYouSkipNumber.currentIndex+1
+
+        Component.onCompleted: {
+            cbYouSkipNumber.currentIndex = SettingsManager.youturn_skipWidth - 1
         }
 
+        background: Rectangle {
+            implicitWidth: theme.buttonSize
+            implicitHeight: theme.buttonSize
+            border.width: 2
+            border.color: "black"
+            radius: 10
+            color: "transparent"
+        }
+
+        contentItem: Text {
+            text: cbYouSkipNumber.displayText
+            font: cbYouSkipNumber.font
+            color: "black"
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignLeft
+            leftPadding: 8
+            elide: Text.ElideRight
+        }
+
+        onCurrentIndexChanged: {
+            if (visible) {
+            SettingsManager.youturn_skipWidth = cbYouSkipNumber.currentIndex + 1}
+        }
     }
     Comp.IconButton3State {
         id: btnYouSkip // the "Fancy Skip" button
