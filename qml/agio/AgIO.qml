@@ -33,19 +33,22 @@ Drawer {
                 ethernetConfig.load_settings()
         }
     }
-    Comp.SerialTerminalAgio {
-        id: gnssConfig
-        visible: false
-        portBaud: SettingsManager.gnss_BaudRate
-        portName: SettingsManager.gnss_SerialPort
-        saveConfig: false
-        enableMonitoring: true
-        moduleType: "GPS"
-        onSaveConfigChanged: {
-            SettingsManager.gnss_SerialPort = gnssConfig.portName
-            SettingsManager.gnss_BaudRate = gnssConfig.portBaud
-            }
-    }
+
+
+
+    // Comp.SerialTerminalAgio {
+    //     id: gnssConfig
+    //     visible: false
+    //     portBaud: SettingsManager.gnss_BaudRate
+    //     portName: SettingsManager.gnss_SerialPort
+    //     saveConfig: false
+    //     enableMonitoring: true
+    //     moduleType: "GPS"
+    //     onSaveConfigChanged: {
+    //         SettingsManager.gnss_SerialPort = gnssConfig.portName
+    //         SettingsManager.gnss_BaudRate = gnssConfig.portBaud
+    //         }
+    // }
     Comp.SerialTerminalAgio {
         id: imuConfig
         visible: false
@@ -180,7 +183,9 @@ Drawer {
                 text: qsTr("GPS")
                 icon.source: "../images/B_GPS.png"
                 color:  AgIOService.gpsConnected ? "green" : "red"
-                onClicked: gnssConfig.visible = !gnssConfig.visible
+                onClicked: {gnssConfig.visible = !gnssConfig.visible
+                            mainWindowAgIO.visible = false}
+
             }
             Comp.IconButtonTextBeside {
                 //objectName: btnModuleMachine

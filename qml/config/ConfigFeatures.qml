@@ -5,6 +5,7 @@
 import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
+import AOG
 //import Settings
 
 import ".."
@@ -15,22 +16,6 @@ Item {
     anchors.fill: parent
     objectName: "configFeatures"
 
-    // Qt 6.8 QProperty + BINDABLE: Simple properties to allow setProperty() updates from C++
-    property bool featureIsTramOn: true
-    property bool featureIsHeadlandOn: true
-    property bool featureIsBoundaryOn: true
-    property bool featureIsRecPathOn: true
-    property bool featureIsABSmoothOn: true
-    property bool featureIsHideContourOn: false
-    property bool featureIsWebCamOn: false
-    property bool featureIsOffsetFixOn: false
-    property bool featureIsYouTurnOn: true
-    property bool featureIsLateralOn: true
-    property bool featureIsNudgeOn: true
-    property bool featureIsAgIOOn: true
-    property bool soundAutoSteerSound: true
-    property bool soundIsUturnOn: true
-    property bool soundIsHydLiftOn: true
     Rectangle{
         anchors.fill: parent
         color: aogInterface.backgroundColor
@@ -53,26 +38,26 @@ Item {
                     id: tramAll
                     icon.source: prefix + "/images/TramAll.png"
                     text: qsTr("Tram Lines")
-                    isChecked: featureIsTramOn
-                    onCheckedChanged: featureIsTramOn = checked
+                    isChecked: SettingsManager.feature_isTramOn
+                    onCheckedChanged:  SettingsManager.feature_isTramOn = checked
                 }
                 DisplayAndFeaturesBtns{
                     icon.source: prefix + "/images/HeadlandOn.png"
                     text: qsTr("Headland")
-                    isChecked: featureIsHeadlandOn
-                    onCheckedChanged: featureIsHeadlandOn = checked
+                    isChecked: SettingsManager.feature_isHeadlandOn
+                    onCheckedChanged:  SettingsManager.feature_isHeadlandOn = checked
                 }
                 DisplayAndFeaturesBtns{
                     icon.source: prefix + "/images/BoundaryOuter.png"
                     text: qsTr("Boundary")
-                    isChecked: featureIsBoundaryOn
-                    onCheckedChanged: featureIsBoundaryOn = checked
+                    isChecked: SettingsManager.feature_isBoundaryOn
+                    onCheckedChanged: SettingsManager.feature_isBoundaryOn = checked
                 }
                 DisplayAndFeaturesBtns{
                     icon.source: prefix + "/images/RecPath.png"
                     text: qsTr("Rec Path")
-                    isChecked: featureIsRecPathOn
-                    onCheckedChanged: featureIsRecPathOn = checked
+                    isChecked: SettingsManager.feature_isRecPathOn
+                    onCheckedChanged:  SettingsManager.feature_isRecPathOn = checked
                 }
             }
         }
@@ -95,26 +80,26 @@ Item {
                 DisplayAndFeaturesBtns{
                     icon.source: prefix + "/images/ABSmooth.png"
                     text: qsTr("AB Smooth")
-                    isChecked: featureIsABSmoothOn
-                    onCheckedChanged: featureIsABSmoothOn = checked
+                    isChecked: SettingsManager.feature_isABSmoothOn
+                    onCheckedChanged:  SettingsManager.feature_isABSmoothOn = checked
                 }
                 DisplayAndFeaturesBtns{
                     icon.source: prefix + "/images/HideContour.png"
                     text: qsTr("Hide Contour")
-                    isChecked: featureIsHideContourOn
-                    onCheckedChanged: featureIsHideContourOn = checked
+                    isChecked: SettingsManager.feature_isHideContourOn
+                    onCheckedChanged:  SettingsManager.feature_isHideContourOn = checked
                 }
                 DisplayAndFeaturesBtns{
                     icon.source: prefix + "/images/Webcam.png"
                     text: qsTr("WebCam")
-                    isChecked: featureIsWebCamOn
-                    onCheckedChanged: featureIsWebCamOn = checked
+                    isChecked: SettingsManager.feature_isWebCamOn
+                    onCheckedChanged:  SettingsManager.feature_isWebCamOn = checked
                 }
                 DisplayAndFeaturesBtns{
                     icon.source: prefix + "/images/YouTurnReverse.png"
                     text: qsTr("Offset Fix")
-                    isChecked: featureIsOffsetFixOn
-                    onCheckedChanged: featureIsOffsetFixOn = checked
+                    isChecked: SettingsManager.feature_isOffsetFixOn
+                    onCheckedChanged:  SettingsManager.feature_isOffsetFixOn = checked
                 }
             }
         }
@@ -142,15 +127,15 @@ Item {
                     id: uturn
                     icon.source: prefix + "/images/Images/z_TurnManual.png"
                     text: qsTr("U-Turn")
-                    isChecked: featureIsYouTurnOn
-                    onCheckedChanged: featureIsYouTurnOn = checked
+                    isChecked: SettingsManager.feature_isYouTurnOn
+                    onCheckedChanged:  SettingsManager.feature_isYouTurnOn = checked
                 }
                 DisplayAndFeaturesBtns{
                     id: lateral
                     icon.source: prefix + "/images/Images/z_LateralManual.png"
                     text: qsTr("Lateral")
-                    isChecked: featureIsLateralOn
-                    onCheckedChanged: featureIsLateralOn = checked
+                    isChecked: SettingsManager.feature_isLateralOn
+                    onCheckedChanged:  SettingsManager.feature_isLateralOn = checked
                 }
             }
         }
@@ -163,14 +148,14 @@ Item {
             DisplayAndFeaturesBtns{
                 text: qsTr("Nudge Controls")
                 icon.source: prefix	+ "/images/SnapToPivot.png"
-                isChecked: featureIsNudgeOn
-                onCheckedChanged: featureIsNudgeOn = checked
+                isChecked: SettingsManager.feature_isNudgeOn
+                onCheckedChanged:  SettingsManager.feature_isNudgeOn = checked
             }
             DisplayAndFeaturesBtns{
                 text: qsTr("Auto Start AgIO")
                 icon.source: prefix	+ "/images/AgIO.png"
-                isChecked: featureIsAgIOOn
-                onCheckedChanged: featureIsAgIOOn = checked
+                isChecked: SettingsManager.feature_isAgIOOn
+                onCheckedChanged:  SettingsManager.feature_isAgIOOn = checked
             }
         }
 
@@ -193,23 +178,23 @@ Item {
                     id: autoSteerSound
                     text: qsTr("Auto Steer")
                     icon.source: prefix + "/images/Config/ConF_SteerSound.png"
-                    isChecked: soundAutoSteerSound
-                    onCheckedChanged: soundAutoSteerSound = checked
+                    isChecked: SettingsManager.sound_autoSteerSound
+                    onCheckedChanged: SettingsManager.sound_autoSteerSound = checked
                 }
                 DisplayAndFeaturesBtns{
                     id: youTurnSound
                     text: qsTr("You Turn")
                     icon.source: prefix + "/images/Config/ConF_SteerSound.png"
-                    isChecked: soundIsUturnOn
-                    onCheckedChanged: soundIsUturnOn = checked
+                    isChecked: SettingsManager.sound_isUturnOn
+                    onCheckedChanged: SettingsManager.sound_isUturnOn = checked
                 }
 
                 DisplayAndFeaturesBtns{
                     id: hydLiftSound
                     text: qsTr("Hyd Lift")
                     icon.source: prefix + "/images/Config/ConF_SteerSound.png"
-                    isChecked: soundIsHydLiftOn
-                    onCheckedChanged: soundIsHydLiftOn = checked
+                    isChecked: SettingsManager.sound_isHydLiftOn
+                    onCheckedChanged: SettingsManager.sound_isHydLiftOn = checked
                 }
                 /*DisplayAndFeaturesBtns{
                 id: boundaryApproachSound

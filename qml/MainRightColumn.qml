@@ -10,6 +10,17 @@ ColumnLayout {
 
     visible: Backend.isJobStarted
 
+    property bool statAutoSteer: false
+
+    Connections {
+            target: mainWindow
+            function onAutoSteerPressed() {
+                statAutoSteer = !statAutoSteer
+                btnAutoSteer.clicked()
+                btnAutoSteer.checked = statAutoSteer
+            }
+        }
+
 
     onHeightChanged: {
         theme.btnSizes[0] = height / (children.length)

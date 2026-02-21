@@ -31,7 +31,7 @@ Rectangle{
 
     function load_settings() {
         // Threading Phase 1: Refresh relay config from SettingsManager
-        relayPinConfig = SettingsManager.relay_pinConfig.split(',').map(function(x) { return parseInt(x) })
+        //relayPinConfig = SettingsManager.relay_pinConfig.split(',').map(function(x) { return parseInt(x) })
 
         // Ensure we have 24 pins configured
         if (relayPinConfig.length < 24) {
