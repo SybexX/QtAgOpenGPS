@@ -44,6 +44,8 @@ Window {
     signal nudgeLeftPressed()
     signal nudgeRightPressed()
     signal autoSteerPressed()
+    signal keyPressed(int val)
+    signal hotKeyPressed(int index)
 
 
     Item {
@@ -59,27 +61,14 @@ Window {
         }
 
         Keys.onPressed: function(event) {
+            console.log(qmlLog, "keyPressed: ", event.key)
+            keyPressed(event.key)
 
-            switch (event.key) {
-            case 16777264: // верх
-                zoomOutPressed()
-                break
-            case 16777265: // низ
-                zoomInPressed()
-                break
-            case 16777346: // лево
-                nudgeLeftPressed()
-                break
-            case 16777347: // право
-                nudgeRightPressed()
-                break
-            case 16777350: // середина
-                autoSteerPressed()
-                break
-            default:
-                return
+            var index = SettingsManager.key_hotKey.indexOf(event.key)
+            if (index !== -1) {
+                hotKeyPressed(index)
+                event.accepted = true
             }
-            event.accepted = true
         }
     }
 
@@ -1125,6 +1114,9 @@ Window {
         SetSimCoords{
             id: setSimCoords
             anchors.fill: parent
+        }
+        HotKeys{
+            id: hotKeySettings
         }
         ConfigSettings.SetColors{
             id: setColors

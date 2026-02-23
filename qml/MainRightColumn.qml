@@ -13,13 +13,21 @@ ColumnLayout {
     property bool statAutoSteer: false
 
     Connections {
-            target: mainWindow
-            function onAutoSteerPressed() {
-                statAutoSteer = !statAutoSteer
+        target: mainWindow
+        function onHotKeyPressed(index) {
+            switch (index) {
+            case 8: // верх
+            {   statAutoSteer = !statAutoSteer
                 btnAutoSteer.clicked()
                 btnAutoSteer.checked = statAutoSteer
             }
+            break
+            case 9: // верх
+                btnAutoTrack.isChecked = !btnAutoTrack.isChecked
+                break
+            }
         }
+    }
 
 
     onHeightChanged: {

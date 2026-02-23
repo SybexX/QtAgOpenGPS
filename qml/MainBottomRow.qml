@@ -12,11 +12,21 @@ RowLayout{
 
     Connections {
             target: mainWindow
-            function onNudgeRightPressed() {
-                nudgeRight.clicked()
-            }
-            function onNudgeLeftPressed() {
-                nudgeLeft.clicked()
+            function onHotKeyPressed(index) {
+                switch (index) {
+                case 10: // верх
+                    btnFlag.clicked()
+                    break
+                case 13: // верх
+                    snapToPivot.clicked()
+                    break
+                case 14: // верх
+                    nudgeRight.clicked()
+                    break
+                case 15: // низ
+                    nudgeLeft.clicked()
+                    break
+                }
             }
         }
 
@@ -171,6 +181,7 @@ RowLayout{
         visible: SettingsManager.feature_isNudgeOn && TracksInterface.idx > -1
     }
     Comp.MainWindowBtns{
+        id: snapToPivot
         icon.source: prefix + "/images/SnapToPivot.png"
         onClicked: TracksInterface.nudge_center()
         visible: SettingsManager.feature_isNudgeOn && TracksInterface.idx > -1
