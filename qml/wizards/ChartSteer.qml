@@ -313,7 +313,6 @@ MoveablePopup {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.centerIn: parent
-            height: btnPinsSave.height + 20 * theme.scaleHeight
             Text {
                 anchors.bottom: parent.bottom
                 text: qsTr(lineName1)
