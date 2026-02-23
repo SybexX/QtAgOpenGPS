@@ -262,7 +262,7 @@ Window{
 
             ModuleComm.modulesSend251()
 
-            unsaved.visible = false;
+            send.enabled = false;
         }
         function reset_all() {
             timedMessage.addMessage(2000, "Reset To Default", "Values Set to Inital Default");
@@ -354,7 +354,7 @@ Window{
                     checkable: true
                     buttonText: qsTr("Count Sensor")
                     Layout.alignment: Qt.AlignCenter
-                    onClicked: unsaved.visible = true
+                    onClicked: send.enabled = true
                     onCheckedChanged: nudMaxCounts.visible = checked
                 }
                 IconButtonColor{
@@ -363,7 +363,7 @@ Window{
                     checkable: true
                     buttonText: qsTr("Pressure Turn Sensor")
                     Layout.alignment: Qt.AlignCenter
-                    onClicked: unsaved.visible = true
+                    onClicked: send.enabled = true
                 }
                 IconButtonColor{
                     id: cboxCurrentSensor
@@ -371,7 +371,7 @@ Window{
                     checkable: true
                     buttonText: qsTr("Current Turn Sensor")
                     Layout.alignment: Qt.AlignCenter
-                    onClicked: unsaved.visible = true
+                    onClicked: send.enabled = true
                 }
             }
             Text{
@@ -403,7 +403,7 @@ Window{
                     to: 255
                     decimals: 0
                     editable: true
-                    onValueChanged: unsaved.visible = true
+                    onValueChanged: send.enabled = true
                 }
                 ProgressBar {
                     //id: pbarSensor
@@ -439,6 +439,7 @@ Window{
                         text: Math.round((hsbarSensor.value * 0.3921568627) * 100) / 100  + " %"
                         font.bold: true
                     }
+                    onValueChanged: send.enabled = true
                 }
             }
         }
@@ -460,7 +461,7 @@ Window{
                     checkable: true
                     buttonText: qsTr("Danfoss")
                     Layout.alignment: Qt.AlignCenter
-                    onClicked: unsaved.visible = true
+                    onClicked: send.enabled = true
                 }
                 IconButtonColor{
                     id: chkInvertWAS
@@ -468,7 +469,7 @@ Window{
                     checkable: true
                     Layout.alignment: Qt.AlignCenter
                     buttonText: "Invert WAS"
-                    onClicked: unsaved.visible = true
+                    onClicked: send.enabled = true
                 }
                 IconButtonColor{
                     id: chkInvertSteer
@@ -476,7 +477,7 @@ Window{
                     checkable: true
                     buttonText: qsTr("Invert Motor Dir")
                     Layout.alignment: Qt.AlignCenter
-                    onClicked: unsaved.visible = true
+                    onClicked: send.enabled = true
                 }
                 IconButtonColor{
                     id: chkSteerInvertRelays
@@ -484,7 +485,7 @@ Window{
                     checkable: true
                     buttonText: qsTr("Invert Relays")
                     Layout.alignment: Qt.AlignCenter
-                    onClicked: unsaved.visible = true
+                    onClicked: send.enabled = true
                 }
             }
             ColumnLayout{
@@ -507,7 +508,7 @@ Window{
                         ListElement {text: "IBT2"}
                     }
                     text: ("Motor Driver")
-                    onActivated: unsaved.visible = true
+                    onActivated: send.enabled = true
                 }
                 ComboBoxCustomized {
                     id: cboxConv
@@ -519,7 +520,7 @@ Window{
                         ListElement {text: qsTr("Differential")}
                     }
                     text: qsTr("A2D Converter")
-                    onActivated: unsaved.visible = true
+                    onActivated: send.enabled = true
                 }
                 ComboBoxCustomized {
                     id: cboxXY
@@ -531,7 +532,7 @@ Window{
                         ListElement {text: "Y"}
                     }
                     text: qsTr("IMU X or Y Axis")
-                    onActivated: unsaved.visible = true
+                    onActivated: send.enabled = true
                 }
 
                 ComboBoxCustomized {
@@ -550,7 +551,7 @@ Window{
                         ListElement {text: qsTr("Button")}
                     }
                     text: qsTr("Steer Enable")
-                    onActivated: unsaved.visible = true
+                    onActivated: send.enabled = true
                     Text{
                         anchors.top: cboxSteerEnable.bottom
                         anchors.left: cboxSteerEnable.left
@@ -943,10 +944,11 @@ Window{
     RowLayout{
         id: bottomRightButtons
         anchors.right: parent.right
-        anchors.rightMargin: unsaved.width + 20
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 10 * theme.scaleHeight
+        anchors.leftMargin: 10 * theme.scaleWidth
+        anchors.rightMargin: 10 * theme.scaleWidth
         height: wizard.height
         IconButtonText{
             id: wizard
@@ -955,11 +957,17 @@ Window{
             Layout.alignment: Qt.AlignCenter
             visible: false //TODO: because the wizard isn't implemented
         }
-        IconButtonText{
+
+        IconButtonTransparent{
             id: reset
-            text: qsTr("Reset All To Defaults")
-            icon.source: prefix + "/images/Reset_Default.png"
-            Layout.alignment: Qt.AlignCenter
+            icon.source: prefix + "/images/UpArrow64.png"
+            Layout.alignment: Qt.AlignLeft
+            Text {
+                text: qsTr("Reset All To Defaults")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.right
+                anchors.leftMargin: 5
+            }
             onClicked: {
                 steerMessageDialog.close()
                 steerMessageDialog.text = "Reset This Page to Defaults";
@@ -975,34 +983,32 @@ Window{
                 steerMessageDialog.visible = true;
             }
         }
-        Text {
-            text: qsTr("Send + Save")
-            Layout.alignment: Qt.AlignRight
-        }
-        IconButton{
+        IconButtonTransparent{
             id: send
-            Layout.alignment: Qt.AlignLeft
+            enabled: false
+            Layout.alignment: Qt.AlignRight
             icon.source: prefix + "/images/ToolAcceptChange.png"
             implicitWidth: 130
-            onClicked: { settingsArea.save_settings() ; unsaved.visible = false ;
+            anchors.right: ok.left
+            anchors.rightMargin: 10 * theme.scaleWidth
+            onClicked: { settingsArea.save_settings() ; send.enabled = false ;
             aog.settingsReload();} // Qt 6.8 MODERN: Direct Q_INVOKABLE call
+            Text {
+                text: qsTr("Send + Save")
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.left
+                anchors.rightMargin: 5
+            }
         }
         IconButtonTransparent{
-            icon.source: prefix + "/images/SwitchOff.png"
-            Layout.alignment: Qt.AlignCenter
+            id: ok
+            icon.source: prefix + "/images/OK64.png"
+            Layout.alignment: Qt.AlignRight
+            anchors.right: parent.right
             onClicked: {
                 steerConfig.visible = false
             }
         }
-    }
-    Image {
-        id: unsaved
-        width: 100 * theme.scaleWidth
-        anchors.right: parent.right
-        anchors.rightMargin: 10 * theme.scaleWidth
-        anchors.verticalCenter: bottomRightButtons.verticalCenter
-        visible: false
-        source: prefix + "/images/Config/ConSt_Mandatory.png"
     }
 
     MessageDialog{

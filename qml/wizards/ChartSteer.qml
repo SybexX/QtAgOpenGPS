@@ -16,29 +16,26 @@ MoveablePopup {
     visible: false
     modal: false
 
-    // Свойства для данных (аналогично оригиналу)
     property int yval: 0
     property int xval1: 0
     property int xval2: 0
-    property int axismin: 0
-    property int axismax: 0
+    property int axismin: -1
+    property int axismax: 1
     property string chartName
     property string lineName1
     property string lineName2
 
-    // Диапазоны осей (для Canvas)
     property real axisXmin: 0
     property real axisXmax: 50
 
-    // Хранилище истории точек
-    property var timeData: []      // значения по оси X (yval)
-    property var line1Data: []     // значения первой линии (xval1)
-    property var line2Data: []     // значения второй линии (xval2)
+    property var timeData: []
+    property var line1Data: []
+    property var line2Data: []
+    property int maxPoints: 100
 
-    // Таймер добавления точек (50 мс)
     Timer {
         id: txt
-        interval: 50
+        interval: 100
         running: chartSteer.visible
         repeat: true
         onTriggered: {
@@ -47,13 +44,18 @@ MoveablePopup {
             line1Data.push(xval1);
             line2Data.push(xval2);
 
-            // Автоматический сдвиг оси X при заполнении экрана
+            if (timeData.length > maxPoints) {
+                timeData.shift();
+                line1Data.shift();
+                line2Data.shift();
+            }
+
             if (yval > 20) {
                 axisXmin = yval - 50;
                 axisXmax = yval;
             }
 
-            canvas.requestPaint(); // перерисовать
+            canvas.requestPaint();
         }
     }
 
@@ -68,10 +70,9 @@ MoveablePopup {
         anchors.top: steerChartTopLine.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: legendRow.top
+        anchors.bottom: parent.bottom
         color: "black"
 
-        // Кнопки управления (справа)
         IconButtonTextBeside {
             id: btnChartplus
             color: "transparent"
@@ -82,7 +83,7 @@ MoveablePopup {
             height: 50 * theme.scaleHeight
             text: ""
             z: 2
-            Text{
+            Text {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
                 anchors.fill: parent
@@ -90,7 +91,6 @@ MoveablePopup {
                 color: "lightgray"
             }
             onClicked: {
-                // Сузить диапазон (приблизить)
                 if (axismin > -1) axismin = -1;
                 else axismin += 2;
                 if (axismax < 1) axismax = 1;
@@ -109,7 +109,7 @@ MoveablePopup {
             height: 50 * theme.scaleHeight
             text: ""
             z: 2
-            Text{
+            Text {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
                 anchors.fill: parent
@@ -117,7 +117,6 @@ MoveablePopup {
                 color: "lightgray"
             }
             onClicked: {
-                // Автоподбор оси Y по текущим значениям
                 var maxVal = Math.max(xval1, xval2);
                 var minVal = Math.min(xval1, xval2);
                 if (maxVal > axismax) axismax = maxVal + 2;
@@ -136,7 +135,7 @@ MoveablePopup {
             height: 50 * theme.scaleHeight
             text: ""
             z: 2
-            Text{
+            Text {
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignHCenter
                 anchors.fill: parent
@@ -144,14 +143,12 @@ MoveablePopup {
                 color: "lightgray"
             }
             onClicked: {
-                // Расширить диапазон (отдалить)
                 axismin -= 2;
                 axismax += 2;
                 canvas.requestPaint();
             }
         }
 
-        // Кастомный график на Canvas
         Canvas {
             id: canvas
             anchors.top: parent.top
@@ -161,31 +158,31 @@ MoveablePopup {
             anchors.margins: 5
             antialiasing: true
 
-            // Привязка к диапазонам осей из родителя
             property real axisYmin: axismin
             property real axisYmax: axismax
             property real axisXmin: chartSteer.axisXmin
             property real axisXmax: chartSteer.axisXmax
 
-            // Перерисовка при изменении любого диапазона
             onAxisYminChanged: requestPaint()
             onAxisYmaxChanged: requestPaint()
             onAxisXminChanged: requestPaint()
             onAxisXmaxChanged: requestPaint()
 
-            // Отступы для осей и подписей
             readonly property real leftMargin: 50
             readonly property real rightMargin: 30
             readonly property real topMargin: 20
             readonly property real bottomMargin: 30
 
-            // Преобразование координат данных в пиксели
             function mapX(x) {
-                return leftMargin + (x - axisXmin) / (axisXmax - axisXmin) * (width - leftMargin - rightMargin);
+                var range = axisXmax - axisXmin;
+                if (range === 0) return leftMargin;
+                return leftMargin + (x - axisXmin) / range * (width - leftMargin - rightMargin);
             }
 
             function mapY(y) {
-                return topMargin + (axisYmax - y) / (axisYmax - axisYmin) * (height - topMargin - bottomMargin);
+                var range = axisYmax - axisYmin;
+                if (range === 0) return topMargin;
+                return topMargin + (axisYmax - y) / range * (height - topMargin - bottomMargin);
             }
 
             onPaint: {
@@ -196,8 +193,8 @@ MoveablePopup {
                 ctx.fillStyle = "black";
                 ctx.fillRect(0, 0, width, height);
 
-                drawAxes(ctx);
                 drawGrid(ctx);
+                drawAxes(ctx);
                 drawLines(ctx);
             }
 
@@ -206,7 +203,6 @@ MoveablePopup {
                 ctx.strokeStyle = "white";
                 ctx.lineWidth = 1;
 
-                // Ось X (через y=0)
                 var yZero = mapY(0);
                 ctx.beginPath();
                 ctx.moveTo(leftMargin, yZero);
@@ -218,39 +214,37 @@ MoveablePopup {
 
             function drawGrid(ctx) {
                 ctx.save();
-                ctx.strokeStyle = "#88AAEE";   // голубая сетка
+                ctx.strokeStyle = "#88AAEE";
                 ctx.lineWidth = 0.5;
 
-                // Вертикальные линии (по X)
                 var stepX = (axisXmax - axisXmin) / 5;
                 if (stepX <= 0) stepX = 1;
                 for (var i = 0; i <= 5; i++) {
                     var xVal = axisXmin + i * stepX;
                     var xPos = mapX(xVal);
                     ctx.beginPath();
-                    ctx.moveTo(xPos, topMargin);
-                    ctx.lineTo(xPos, height - bottomMargin);
+                    ctx.moveTo(xPos, 0);
+                    ctx.lineTo(xPos, height);
                     ctx.stroke();
                 }
 
-                // Горизонтальные линии (по Y)
                 var stepY = (axisYmax - axisYmin) / 5;
                 if (stepY <= 0) stepY = 1;
                 for (i = 0; i <= 5; i++) {
                     var yVal = axisYmin + i * stepY;
                     var yPos = mapY(yVal);
                     ctx.beginPath();
-                    ctx.moveTo(leftMargin, yPos);
-                    ctx.lineTo(width - rightMargin, yPos);
+                    ctx.moveTo(0, yPos);
+                    ctx.lineTo(width, yPos);
                     ctx.stroke();
                 }
 
                 ctx.restore();
             }
+
             function drawLines(ctx) {
                 if (timeData.length < 2) return;
 
-                // Первая линия (зелёная)
                 ctx.save();
                 ctx.strokeStyle = "lime";
                 ctx.lineWidth = 2;
@@ -263,7 +257,6 @@ MoveablePopup {
                 }
                 ctx.stroke();
 
-                // Вторая линия (красная)
                 ctx.strokeStyle = "red";
                 ctx.beginPath();
                 for (i = 0; i < timeData.length; i++) {
@@ -276,7 +269,7 @@ MoveablePopup {
                 ctx.restore();
             }
         }
-        // после Canvas, но внутри steerChartWindow
+
         Text {
             id: maxYLabel
             anchors.right: canvas.right
@@ -285,7 +278,7 @@ MoveablePopup {
             anchors.topMargin: 5
             text: axismax.toFixed(1)
             font.pixelSize: 18 * theme.scaleHeight
-            color: "green"
+            color: "lime"
             z: 3
         }
         Text {
@@ -296,31 +289,30 @@ MoveablePopup {
             anchors.bottomMargin: 5
             text: axismin.toFixed(1)
             font.pixelSize: 18 * theme.scaleHeight
-            color: "green"
+            color: "lime"
             z: 3
         }
+
     }
+
     Rectangle {
         id: legendRow
-        Layout.preferredHeight: 40 * theme.scaleHeight
+        height: 40 * theme.scaleHeight
         color: "transparent"
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+
         Row {
-            spacing: 10 * theme.scaleWidth
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
             anchors.centerIn: parent
+            spacing: 10 * theme.scaleWidth
+
             Text {
-                anchors.bottom: parent.bottom
                 text: qsTr(lineName1)
                 font.pixelSize: 18 * theme.scaleHeight
-                color: "green"
+                color: "lime"
             }
             Text {
-                anchors.bottom: parent.bottom
                 text: qsTr(lineName2)
                 font.pixelSize: 18 * theme.scaleHeight
                 color: "red"
