@@ -1140,8 +1140,8 @@ Window {
             xval2: VehicleInterface.driveFreeSteerAngle
             axismin: -10
             axismax: 10
-            lineName1:"Actual"
-            lineName2: "SetPoint"
+            lineName1:"Actual " + Math.round(ModuleComm.actualSteerAngleDegrees *10) / 10
+            lineName2: "SetPoint " + Math.round(VehicleInterface.driveFreeSteerAngle *10) / 10
             chartName: qsTr("Steer Chart")
             visible: false
             function show(){
@@ -1157,8 +1157,8 @@ Window {
             xval2: Number(aog.dataSteerAngl)
             axismin: -100
             axismax: 100
-            lineName1:"XTE"
-            lineName2:"HE"
+            lineName1:"XTE " + Math.round(VehicleInterface.modeActualXTE *10) / 10
+            lineName2:"HE " + Math.round(Number(aog.dataSteerAngl) *10) / 10
             chartName: qsTr("XTE Chart")
             visible: false
             function show(){
@@ -1173,9 +1173,9 @@ Window {
             xval1: Backend.fixFrame.heading  // Rectangle Pattern: direct property access
             xval2: Backend.fixFrame.imuHeading > 360 ? 0 : Backend.fixFrame.imuHeading  // Show real IMU heading, 0 if invalid
             axismin: -10
-            axismax: 10
-            lineName1:"Fix2fix"
-            lineName2:"IMU"
+            axismax: 360
+            lineName1:"Fix2fix "+Math.round(Backend.fixFrame.heading *10) / 10
+            lineName2:"IMU "+ Math.round((Backend.fixFrame.imuHeading > 360 ? 0 : Backend.fixFrame.imuHeading) *10) / 10
             chartName: qsTr("Heading Chart")
             visible: false
             function show(){
