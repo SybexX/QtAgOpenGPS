@@ -16,10 +16,10 @@ Comp.TimedRectangle{
             target: mainWindow
             function onHotKeyPressed(index) {
                 switch (index) {
-                case 11: // верх
+                case 11:
                     btnZoomOut.clicked()
                     break
-                case 12: // низ
+                case 12:
                     btnZoomIn.clicked()
                     break
                 }

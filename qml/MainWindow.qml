@@ -39,11 +39,6 @@ Window {
         onActivated: toggleFieldViewTest()
     }
 
-    signal zoomOutPressed()
-    signal zoomInPressed()
-    signal nudgeLeftPressed()
-    signal nudgeRightPressed()
-    signal autoSteerPressed()
     signal keyPressed(int val)
     signal hotKeyPressed(int index)
 
@@ -61,7 +56,6 @@ Window {
         }
 
         Keys.onPressed: function(event) {
-            console.log(qmlLog, "keyPressed: ", event.key)
             keyPressed(event.key)
 
             var index = SettingsManager.key_hotKey.indexOf(event.key)

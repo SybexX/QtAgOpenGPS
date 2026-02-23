@@ -14,16 +14,16 @@ RowLayout{
             target: mainWindow
             function onHotKeyPressed(index) {
                 switch (index) {
-                case 10: // верх
+                case 10:
                     btnFlag.clicked()
                     break
-                case 13: // верх
+                case 13:
                     snapToPivot.clicked()
                     break
-                case 14: // верх
+                case 15:
                     nudgeRight.clicked()
                     break
-                case 15: // низ
+                case 14:
                     nudgeLeft.clicked()
                     break
                 }

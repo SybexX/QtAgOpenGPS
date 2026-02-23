@@ -16,13 +16,13 @@ ColumnLayout {
         target: mainWindow
         function onHotKeyPressed(index) {
             switch (index) {
-            case 8: // верх
-            {   statAutoSteer = !statAutoSteer
+            case 8:
+            {  // statAutoSteer = !statAutoSteer
                 btnAutoSteer.clicked()
-                btnAutoSteer.checked = statAutoSteer
+                //btnAutoSteer.checked = statAutoSteer
             }
             break
-            case 9: // верх
+            case 9:
                 btnAutoTrack.isChecked = !btnAutoTrack.isChecked
                 break
             }
