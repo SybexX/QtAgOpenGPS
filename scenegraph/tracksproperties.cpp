@@ -16,4 +16,11 @@ TracksProperties::TracksProperties(QObject *parent) : QObject(parent)
     connect(this, &TracksProperties::smoothedCurveChanged, this, &TracksProperties::tracksPropertiesChanged);
     connect(this, &TracksProperties::showCurrentLineDotsChanged, this, &TracksProperties::tracksPropertiesChanged);
     connect(this, &TracksProperties::youTurnPointsChanged, this, &TracksProperties::tracksPropertiesChanged);
+
+    // Contour properties
+    connect(this, &TracksProperties::contourLineChanged, this, &TracksProperties::tracksPropertiesChanged);
+    connect(this, &TracksProperties::stripPointsChanged, this, &TracksProperties::tracksPropertiesChanged);
+    connect(this, &TracksProperties::contourCurrentPointChanged, this, &TracksProperties::tracksPropertiesChanged);
+    connect(this, &TracksProperties::contourGoalPointChanged, this, &TracksProperties::tracksPropertiesChanged);
+    connect(this, &TracksProperties::isContourOnChanged, this, &TracksProperties::tracksPropertiesChanged);
 }

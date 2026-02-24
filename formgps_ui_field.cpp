@@ -19,7 +19,7 @@
 #include "fieldinterface.h"
 #include "siminterface.h"
 #include "backend.h"
-
+#include "backendaccess.h"
 
 void FormGPS::field_update_list() {
 
@@ -122,6 +122,9 @@ void FormGPS::field_new(QString field_name) {
 }
 
 void FormGPS::field_new_from(QString existing, QString field_name, int flags) {
+    BACKEND_TRACK(track);
+    CContour &ct = track.contour;
+
     qDebug() << "field_new_from - REFACTORED: save first, then create with single lock";
 
     // STEP 1: Save current field WITHOUT any lock (cleaner approach)

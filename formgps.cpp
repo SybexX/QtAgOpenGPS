@@ -595,6 +595,7 @@ void FormGPS::SwapDirection() {
 void FormGPS::JobClose()
 {
     BACKEND_TRACK(track);
+    CContour &ct = track.contour;
     BACKEND_YT(yt);
 
     lock.lockForWrite();
@@ -815,6 +816,9 @@ void FormGPS::JobNew()
 void FormGPS::FileSaveEverythingBeforeClosingField(bool saveVehicle)
 {
     qDebug() << "shutting down, saving field items.";
+
+    BACKEND_TRACK(track);
+    CContour &ct = track.contour;
 
     if (! Backend::instance()->isJobStarted()) return;
 

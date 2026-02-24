@@ -302,6 +302,8 @@ void FormGPS::oglMain_Paint()
     OpenGLViewport viewport = getOpenGLViewport();
     BACKEND_TRACK(track);
     BACKEND_YT(yt);
+    CContour &ct = track.contour;
+
     Camera &camera = *Camera::instance();
 
     QMatrix4x4 projection;

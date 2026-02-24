@@ -1360,6 +1360,39 @@ void CTrack::updateInterface()
             }
         }
     }
+
+    // Contour properties
+    {
+        // contourLine - the current contour line being recorded/played
+        QVector<QVector3D> ctLine;
+        ctLine.reserve(contour.ctList.count());
+        for (const Vec3 &v : contour.ctList)
+            ctLine.append(QVector3D(v.easting, v.northing, 0));
+        props->set_contourLine(ctLine);
+
+        // stripPoints - points on the current strip
+        QVector<QVector3D> stripPts;
+        if (contour.ptList) {
+            stripPts.reserve(contour.ptList->count());
+            for (const Vec3 &v : *contour.ptList)
+                stripPts.append(QVector3D(v.easting, v.northing, 0));
+        }
+        props->set_stripPoints(stripPts);
+
+        // contourCurrentPoint - current position on the strip (pt 0 or last)
+        QVector3D currentPt;
+        if (contour.ptList && !contour.ptList->isEmpty()) {
+            const Vec3 &v = contour.ptList->first();
+            currentPt = QVector3D(v.easting, v.northing, 0);
+        }
+        props->set_contourCurrentPoint(currentPt);
+
+        // contourGoalPoint - goal point for pure display
+        props->set_contourGoalPoint(QVector3D(contour.goalPointCT.easting, contour.goalPointCT.northing, 0));
+
+        // isContourOn - whether contour guidance is active
+        props->set_isContourOn(contour.isContourOn);
+    }
 }
 
 // Removed QML_SINGLETON factory function - using qmlRegisterSingletonInstance instead

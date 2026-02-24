@@ -846,6 +846,7 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
     CNMEA &pn = *Backend::instance()->pn();
     WorldGrid &worldGrid = *WorldGrid::instance();
     BACKEND_TRACK(track);
+    CContour &ct = track.contour;
     Camera &camera = *Camera::instance();
 
 #ifdef __ANDROID__

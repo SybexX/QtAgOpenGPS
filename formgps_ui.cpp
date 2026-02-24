@@ -466,6 +466,8 @@ void FormGPS::resetDirection(){
 
 void FormGPS::contourPriority(bool isRight) {
     COMPILER_WARNING ("ct.isRightPriority is never used anywhere.  bug?")
+    BACKEND_TRACK(track);
+    CContour &ct = track.contour;
     ct.set_isRightPriority (isRight);
     QDEBUG << "Contour isRight: " << isRight;
 }
@@ -591,6 +593,9 @@ void FormGPS::snapSideways(double distance) {
 }
 
 void FormGPS::deleteAppliedArea() {
+    BACKEND_TRACK(track);
+    CContour &ct = track.contour;
+
     if (Backend::instance()->isJobStarted())
     {
         //clear out the contour Lists

@@ -32,6 +32,7 @@ class ToolsNode;
 class TracksNode;
 class LayersNode;
 class RecordedPathNode;
+class ContourNode;
 
 class CameraProperties;
 class GridProperties;
@@ -42,6 +43,7 @@ class BoundariesProperties;
 class TracksProperties;
 class RecordedPathProperties;
 class LayersProperties;
+class ContourProperties;
 class TextureFactory;
 
 Q_MOC_INCLUDE("cameraproperties.h")

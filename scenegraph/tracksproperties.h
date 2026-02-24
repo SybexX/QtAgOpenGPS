@@ -36,6 +36,14 @@ public:
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, smoothedCurve)
     SIMPLE_BINDABLE_PROPERTY(bool, showCurrentLineDots)
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, youTurnPoints)
+
+    // Contour properties (merged from ContourProperties)
+    SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, contourLine)
+    SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, stripPoints)
+    SIMPLE_BINDABLE_PROPERTY(QVector3D, contourCurrentPoint)
+    SIMPLE_BINDABLE_PROPERTY(QVector3D, contourGoalPoint)
+    SIMPLE_BINDABLE_PROPERTY(bool, isContourOn)
+
 signals:
     void tracksPropertiesChanged();
 
@@ -54,6 +62,13 @@ private:
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_smoothedCurve, &TracksProperties::smoothedCurveChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(TracksProperties, bool, m_showCurrentLineDots, false, &TracksProperties::showCurrentLineDotsChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_youTurnPoints, &TracksProperties::youTurnPointsChanged)
+
+    // Contour properties (merged from ContourProperties)
+    Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_contourLine, &TracksProperties::contourLineChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_stripPoints, &TracksProperties::stripPointsChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector3D, m_contourCurrentPoint, &TracksProperties::contourCurrentPointChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector3D, m_contourGoalPoint, &TracksProperties::contourGoalPointChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, bool, m_isContourOn, &TracksProperties::isContourOnChanged)
 
 };
 

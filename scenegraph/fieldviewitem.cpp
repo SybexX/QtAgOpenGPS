@@ -12,6 +12,7 @@
 #include "boundariesproperties.h"
 #include "layersproperties.h"
 #include "recordedpathproperties.h"
+#include "tracksproperties.h"
 
 #include "fieldsurfacenode.h"
 #include "gridnode.h"
@@ -21,8 +22,6 @@
 #include "tracksnode.h"
 #include "recordedpathnode.h"
 #include "layersnode.h"
-
-#include "aogmaterial.h"
 #include "aoggeometry.h"
 #include "texturefactory.h"
 

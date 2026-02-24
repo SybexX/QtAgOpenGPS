@@ -43,6 +43,15 @@ private:
     DotsNode *m_currentLineDotsNode = nullptr;
     DotsNode *m_youTurnDotsNode = nullptr;
 
+    // Contour rendering
+    QSGGeometryNode *m_contourLineNode = nullptr;       // Contour line (simple line)
+    DotsNode *m_contourPointsNode = nullptr;           // Contour line points
+    QVector<DotsNode*> m_stripPointsNodes;            // Strip points
+    DotsNode *m_contourCurrentPointNode = nullptr;    // Current position on strip
+    DotsNode *m_contourGoalPointNode = nullptr;       // Goal point
+    int m_lastContourLineCount = 0;
+    int m_lastStripPointsCount = 0;
+
     void updateThickLineNode(QSGGeometryNode *node,
                              const QMatrix4x4 &mvp,
                              const QSize &viewportSize,

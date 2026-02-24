@@ -58,6 +58,7 @@ void FormGPS::UpdateFixPosition()
 
     CNMEA &pn = *Backend::instance()->pn();
     BACKEND_TRACK(track);  //bring in a reference "track"
+    CContour &ct = track.contour;
     BACKEND_YT(yt); //bring in a reference "yt"
     Camera &camera = *Camera::instance();
 
@@ -1762,6 +1763,9 @@ void FormGPS::CalculateSectionLookAhead(double northing, double easting, double 
 
 void FormGPS::AddContourPoints()
 {
+    BACKEND_TRACK(track);  //bring in a reference "track"
+    CContour &ct = track.contour;
+
     //if (isConstantContourOn)
     {
         //record contour all the time

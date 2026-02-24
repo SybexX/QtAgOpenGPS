@@ -14,6 +14,7 @@
 #include "setter.h"
 #include "cabcurve.h"
 #include "cabline.h"
+#include "ccontour.h"
 #include "tracksproperties.h"
 
 class QOpenGLFunctions;
@@ -83,6 +84,7 @@ public:
     QVector<CTrk> gArr;
     CABCurve curve;
     CABLine ABLine;
+    CContour contour;
     CTrk newTrack;
     int autoTrack3SecTimer;
 

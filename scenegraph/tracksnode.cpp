@@ -145,6 +145,13 @@ void TracksNode::clearChildren()
     m_smoothedCurveNode = nullptr;
     m_currentLineDotsNode = nullptr;
     m_youTurnDotsNode = nullptr;
+
+    // Contour nodes
+    m_contourLineNode = nullptr;
+    m_contourPointsNode = nullptr;
+    m_stripPointsNodes.clear();
+    m_contourCurrentPointNode = nullptr;
+    m_contourGoalPointNode = nullptr;
 }
 
 void TracksNode::update(const QMatrix4x4 &mv,
@@ -368,6 +375,63 @@ void TracksNode::update(const QMatrix4x4 &mv,
             m_youTurnDotsNode->build();
             appendChildNode(m_youTurnDotsNode);
         }
+
+        // === Contour rendering ===
+
+        // Contour line (LINE_STRIP) - purple - use flat color material for stability
+        const auto &contourLine = properties->contourLine();
+        if (contourLine.count() >= 2) {
+            auto *geo = AOGGeometry::createLinesGeometry(contourLine);
+            if (geo) {
+                m_contourLineNode = new QSGGeometryNode();
+                m_contourLineNode->setGeometry(geo);
+                m_contourLineNode->setFlag(QSGNode::OwnsGeometry);
+                auto *mat = new AOGFlatColorMaterial();
+                mat->setColor(QColor::fromRgbF(0.75f, 0.25f, 0.95f));
+                m_contourLineNode->setMaterial(mat);
+                m_contourLineNode->setFlag(QSGNode::OwnsMaterial);
+                appendChildNode(m_contourLineNode);
+            }
+        }
+
+        // Contour line points (POINTS) - greenish - use DotsNode
+        DotsNode *contourPointsNode = new DotsNode();
+        for (const QVector3D &pt : contourLine) {
+            contourPointsNode->addDot(pt, QColor::fromRgbF(0.87f, 0.87f, 0.25f, 1.0f), glm::dp(lineWidth));
+        }
+        contourPointsNode->build();
+        appendChildNode(contourPointsNode);
+        m_contourPointsNode = contourPointsNode;
+
+        // Strip points (POINTS) - yellow if locked, green if not - use DotsNode
+        const auto &stripPoints = properties->stripPoints();
+        DotsNode *stripPointsNode = new DotsNode();
+        QColor stripColor = properties->isContourOn()
+            ? QColor::fromRgbF(0.983f, 0.92f, 0.420f, 1.0f)  // yellow when locked
+            : QColor::fromRgbF(0.3f, 0.982f, 0.0f, 1.0f);   // green when not locked
+        for (const QVector3D &pt : stripPoints) {
+            stripPointsNode->addDot(pt, stripColor, glm::dp(lineWidth));
+        }
+        stripPointsNode->build();
+        appendChildNode(stripPointsNode);
+        m_stripPointsNodes.append(stripPointsNode);
+
+        // Current point on strip (POINTS) - blue
+        m_contourCurrentPointNode = new DotsNode();
+        m_contourCurrentPointNode->addDot(properties->contourCurrentPoint(),
+                                          QColor::fromRgbF(0.35f, 0.30f, 0.90f, 1.0f), glm::dp(6.0f));
+        m_contourCurrentPointNode->build();
+        appendChildNode(m_contourCurrentPointNode);
+
+        // Goal point (POINTS) - yellow
+        m_contourGoalPointNode = new DotsNode();
+        m_contourGoalPointNode->addDot(properties->contourGoalPoint(),
+                                       QColor::fromRgbF(1.0f, 0.95f, 0.095f, 1.0f), glm::dp(6.0f));
+        m_contourGoalPointNode->build();
+        appendChildNode(m_contourGoalPointNode);
+
+        m_lastContourLineCount = contourLine.count();
+        m_lastStripPointsCount = stripPoints.count();
     }
 
     // ALWAYS update MVP / material uniforms every frame.
@@ -434,6 +498,29 @@ void TracksNode::update(const QMatrix4x4 &mv,
 
     if (m_youTurnDotsNode)
         m_youTurnDotsNode->updateUniforms(mvp, viewportSize);
+
+    // Contour updates
+    if (m_contourLineNode) {
+        auto *mat = static_cast<AOGFlatColorMaterial *>(m_contourLineNode->material());
+        if (mat) {
+            mat->setMvpMatrix(mvp);
+            mat->setViewportSize(viewportSize);
+        }
+    }
+
+    if (m_contourPointsNode)
+        m_contourPointsNode->updateUniforms(mvp, viewportSize);
+
+    for (DotsNode *node : m_stripPointsNodes) {
+        if (node)
+            node->updateUniforms(mvp, viewportSize);
+    }
+
+    if (m_contourCurrentPointNode)
+        m_contourCurrentPointNode->updateUniforms(mvp, viewportSize);
+
+    if (m_contourGoalPointNode)
+        m_contourGoalPointNode->updateUniforms(mvp, viewportSize);
 }
 
 void TracksNode::updateThickLineNode(QSGGeometryNode *node,

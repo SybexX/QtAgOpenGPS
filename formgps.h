@@ -32,7 +32,6 @@
 #include "cboundary.h"
 #include "cabline.h"
 #include "ctram.h"
-#include "ccontour.h"
 #include "cabcurve.h"
 #include "cyouturn.h"
 #include "cfielddata.h"
@@ -280,11 +279,6 @@ public:
     int statusUpdateCounter = 1;
 
     CTram tram;
-
-    //Contour mode Instance
-    //QScopedPointer<CContour> ct;
-    CContour ct;
-    //CYouTurn yt;
 
     CTool tool;
 
