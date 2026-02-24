@@ -37,7 +37,7 @@
 #include "cyouturn.h"
 #include "cfielddata.h"
 #include "cahrs.h"
-#include "crecordedpath.h"
+// CRecordedPath merged into RecordedPath singleton - use RecordedPath::instance()
 #include "cheadline.h"
 #include "ctrack.h"
 #include "formheadland.h"
@@ -292,7 +292,6 @@ public:
     CBoundary bnd;
 
     CAHRS ahrs;
-    CRecordedPath recPath;
     CFieldData fd;
 
     CHeadLine hdl;

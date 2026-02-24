@@ -31,6 +31,7 @@ class VehicleNode;
 class ToolsNode;
 class TracksNode;
 class LayersNode;
+class RecordedPathNode;
 
 class CameraProperties;
 class GridProperties;
@@ -39,6 +40,7 @@ class VehicleProperties;
 class ToolsProperties;
 class BoundariesProperties;
 class TracksProperties;
+class RecordedPathProperties;
 class LayersProperties;
 class TextureFactory;
 
@@ -50,6 +52,7 @@ Q_MOC_INCLUDE("toolsproperties.h")
 Q_MOC_INCLUDE("boundariesproperties.h")
 Q_MOC_INCLUDE("tracksproperties.h")
 Q_MOC_INCLUDE("layersproperties.h")
+Q_MOC_INCLUDE("recordedpathproperties.h")
 
 // ============================================================================
 // FieldViewNode - Root node for the field view scene graph
@@ -65,6 +68,7 @@ public:
     FieldSurfaceNode *fieldSurfaceNode = nullptr;
     GridNode *gridNode = nullptr;
     TracksNode *tracksNode =nullptr;
+    RecordedPathNode *recordedPathNode = nullptr;
     BoundariesNode *boundaryNode = nullptr;
     LayersNode *layersNode = nullptr;     // Coverage layers (triangles)
     QSGNode *guidanceNode = nullptr;     // Guidance lines (not yet refactored)
@@ -91,6 +95,7 @@ class FieldViewItem : public QQuickItem
     Q_PROPERTY(BoundariesProperties* boundaries READ boundaries WRITE setBoundaries NOTIFY boundariesChanged)
     Q_PROPERTY(TracksProperties* tracks READ tracks WRITE setTracks NOTIFY tracksChanged)
     Q_PROPERTY(LayersProperties* layers READ layers WRITE setLayers NOTIFY layersChanged)
+    Q_PROPERTY(RecordedPathProperties* recordedPath READ recordedPath WRITE setRecordedPath NOTIFY recordedPathChanged)
 
     // ===== Rendering State Properties =====
     Q_PROPERTY(bool showCoverage READ showCoverage WRITE setShowCoverage NOTIFY showCoverageChanged BINDABLE bindableShowCoverage)
@@ -118,6 +123,8 @@ public:
     void setTracks(TracksProperties *tracks);
     LayersProperties* layers() const;
     void setLayers(LayersProperties *layers);
+    RecordedPathProperties* recordedPath() const;
+    void setRecordedPath(RecordedPathProperties* recordedPath);
 
 
     // ===== Visibility Property Accessors =====
@@ -147,6 +154,7 @@ public:
     Q_INVOKABLE void markCoverageDirty();
     Q_INVOKABLE void markGuidanceDirty();
     Q_INVOKABLE void markLayersDirty();
+    Q_INVOKABLE void markRecordedPathDirty();
     Q_INVOKABLE void markAllDirty();
 
 signals:
@@ -156,6 +164,7 @@ signals:
     void boundariesChanged();
     void tracksChanged();
     void layersChanged();
+    void recordedPathChanged();
 
     // Visibility signals
     void showCoverageChanged();
@@ -191,6 +200,7 @@ private:
     bool m_guidanceDirty = true;
     bool m_gridDirty = true;
     bool m_tracksDirty = true;
+    bool m_recordedPathDirty = true;
     bool m_layersDirty = true;
 
     // ===== Current MVP Matrix (set each frame for materials) =====
@@ -233,6 +243,7 @@ private:
     ToolsProperties *m_tools = nullptr;
     BoundariesProperties *m_boundaries = nullptr;
     TracksProperties *m_tracks = nullptr;
+    RecordedPathProperties *m_recordedPath = nullptr;
     LayersProperties *m_layers = nullptr;
 
     // ===== Qt 6.8 Q_OBJECT_BINDABLE_PROPERTY Members =====

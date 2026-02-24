@@ -896,7 +896,7 @@ void FormGPS::UpdateFixPosition()
     // autosteer at full speed of updates
 
     //if the whole path driving driving process is green
-    if (RecordedPath::instance()->isDrivingRecordedPath()) recPath.UpdatePosition(yt, MainWindowState::instance()->isBtnAutoSteerOn());
+    if (RecordedPath::instance()->isDrivingRecordedPath()) RecordedPath::instance()->UpdatePosition(yt, MainWindowState::instance()->isBtnAutoSteerOn());
 
     // If Drive button off - normal autosteer
     if (!CVehicle::instance()->isInFreeDriveMode())
@@ -918,7 +918,7 @@ void FormGPS::UpdateFixPosition()
 
         else p_254.pgn[CPGN_FE::status] = 1;  // PHASE 6.0.29: ON → send 1 (match C# original)
 
-        if (RecordedPath::instance()->isDrivingRecordedPath() || recPath.isFollowingDubinsToPath) p_254.pgn[CPGN_FE::status] = 1;  // PHASE 6.0.29: Force ON (match C# original)
+        if (RecordedPath::instance()->isDrivingRecordedPath() || RecordedPath::instance()->isFollowingDubinsToPath) p_254.pgn[CPGN_FE::status] = 1;  // PHASE 6.0.29: Force ON (match C# original)
 
         // PHASE 6.0.42.8: Auto-snap track to pivot when autosteer turns ON
         // C# original: OpenGL.Designer.cs:1858-1876
@@ -1307,6 +1307,9 @@ void FormGPS::UpdateFixPosition()
 
     //update TracksProperties with latest track data
     track.updateInterface();
+
+    //update RecordedPathProperties with latest recorded path data
+    RecordedPath::instance()->updateInterface();
 
     //qDebug(qpos) << CVehicle::instance()->pivotAxlePos.easting << CVehicle::instance()->pivotAxlePos.northing << CVehicle::instance()->pivotAxlePos.heading;
 }
@@ -1801,14 +1804,14 @@ void FormGPS::AddSectionOrPathPoints()
     else
         alpha=76;
 
-    if (recPath.isRecordOn)
+    if (RecordedPath::instance()->isRecordOn)
     {
         //keep minimum speed of 1.0
         double speed = CVehicle::instance()->avgSpeed();
         if (CVehicle::instance()->avgSpeed() < 1.0) speed = 1.0;
         bool autoBtn = (MainWindowState::instance()->autoBtnState() == SectionState::Auto);
 
-        recPath.recList.append(CRecPathPt(CVehicle::instance()->pivotAxlePos.easting, CVehicle::instance()->pivotAxlePos.northing, CVehicle::instance()->pivotAxlePos.heading, speed, autoBtn));
+        RecordedPath::instance()->recList.append(CRecPathPt(CVehicle::instance()->pivotAxlePos.easting, CVehicle::instance()->pivotAxlePos.northing, CVehicle::instance()->pivotAxlePos.heading, speed, autoBtn));
     }
 
     track.AddPathPoint(CVehicle::instance()->pivotAxlePos);

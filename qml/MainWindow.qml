@@ -419,6 +419,8 @@ Window {
 
         tracks: TracksInterface.properties
 
+        recordedPath: RecordedPath.properties
+
         layers: LayerService.layers
         // Demo coverage layer (QML-only, no LayerService connection)
         /*

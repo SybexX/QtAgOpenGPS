@@ -186,7 +186,6 @@ qt_add_executable(QtAgOpenGPS
     classes/cpatches.h classes/cpatches.cpp
     classes/cpgn.h classes/cpgn.cpp
     classes/headachedesigner.h classes/headachedesigner.cpp
-    classes/crecordedpath.h classes/crecordedpath.cpp
     classes/csection.h classes/csection.cpp
 
     classes/ctool.h classes/ctool.cpp
@@ -449,6 +448,7 @@ qt_add_qml_module(QtAgOpenGPS
     SOURCES scenegraph/trackproperties.h scenegraph/trackproperties.cpp
     SOURCES scenegraph/lineproperties.h scenegraph/lineproperties.cpp
     SOURCES scenegraph/layersproperties.h scenegraph/layersproperties.cpp
+    SOURCES scenegraph/recordedpathproperties.h scenegraph/recordedpathproperties.cpp
 
     #scenegraph items and nodes
     SOURCES scenegraph/fieldviewitem.h scenegraph/fieldviewitem.cpp
@@ -460,6 +460,7 @@ qt_add_qml_module(QtAgOpenGPS
     SOURCES scenegraph/dotsnode.h scenegraph/dotsnode.cpp
     SOURCES scenegraph/toolsnode.h scenegraph/toolsnode.cpp
     SOURCES scenegraph/tracksnode.h scenegraph/tracksnode.cpp
+    SOURCES scenegraph/recordedpathnode.h scenegraph/recordedpathnode.cpp
     SOURCES scenegraph/layersnode.h scenegraph/layersnode.cpp
     SOURCES scenegraph/linenode.h scenegraph/linenode.cpp
 )

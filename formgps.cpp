@@ -598,8 +598,8 @@ void FormGPS::JobClose()
     BACKEND_YT(yt);
 
     lock.lockForWrite();
-    recPath.resumeState = 0;
-    recPath.currentPositonIndex = 0;
+    RecordedPath::instance()->resumeState = 0;
+    RecordedPath::instance()->currentPositonIndex = 0;
 
     sbGrid.clear();
 
@@ -610,8 +610,8 @@ void FormGPS::JobClose()
     //turn off headland
     MainWindowState::instance()->set_isHeadlandOn(false); //this turns off the button
 
-    recPath.recList.clear();
-    recPath.StopDrivingRecordedPath();
+    RecordedPath::instance()->recList.clear();
+    RecordedPath::instance()->StopDrivingRecordedPath();
 
     //make sure hydraulic lift is off
     ModuleComm::instance()->p_239.pgn[CPGN_EF::hydLift] = 0;
@@ -759,9 +759,9 @@ void FormGPS::JobClose()
 
     displayFieldName = tr("None");
 
-    recPath.recList.clear();
-    recPath.shortestDubinsList.clear();
-    recPath.shuttleDubinsList.clear();
+    RecordedPath::instance()->recList.clear();
+    RecordedPath::instance()->shortestDubinsList.clear();
+    RecordedPath::instance()->shuttleDubinsList.clear();
 
     //FixPanelsAndMenus();
     Camera::instance()->SetZoom();
@@ -798,14 +798,14 @@ void FormGPS::JobNew()
     // PHASE 6.0.29: Reset recorded path flags when opening field
     // Prevents steer from activating due to garbage flag values (formgps_position.cpp:800)
     RecordedPath::instance()->set_isDrivingRecordedPath(false);
-    recPath.isFollowingDubinsToPath = false;
-    recPath.isFollowingRecPath = false;
-    recPath.isFollowingDubinsHome = false;
+    RecordedPath::instance()->isFollowingDubinsToPath = false;
+    RecordedPath::instance()->isFollowingRecPath = false;
+    RecordedPath::instance()->isFollowingDubinsHome = false;
 
     // PHASE 6.0.30: Auto-enable recording when job starts
     // Vehicle trail (yellow line) needs isRecordOn=true to populate recList (formgps_position.cpp:1821)
     // Phase 6.0.29 initialized isRecordOn=false in constructor, which emptied the trail after JobNew()
-    recPath.isRecordOn = true;
+    RecordedPath::instance()->isRecordOn = true;
     tool.patchesBufferDirty = true;
 
     lock.unlock();

@@ -11,6 +11,7 @@
 #include "toolsproperties.h"
 #include "boundariesproperties.h"
 #include "layersproperties.h"
+#include "recordedpathproperties.h"
 
 #include "fieldsurfacenode.h"
 #include "gridnode.h"
@@ -18,6 +19,7 @@
 #include "vehiclenode.h"
 #include "toolsnode.h"
 #include "tracksnode.h"
+#include "recordedpathnode.h"
 #include "layersnode.h"
 
 #include "aogmaterial.h"
@@ -60,6 +62,7 @@ FieldViewNode::FieldViewNode()
     toolsNode = new ToolsNode();
     uiNode = new QSGNode();
     tracksNode = new TracksNode();
+    recordedPathNode = new RecordedPathNode();
 
     // Add children in render order (back to front)
     appendChildNode(fieldSurfaceNode);  // Field surface first (furthest back)
@@ -67,6 +70,7 @@ FieldViewNode::FieldViewNode()
     appendChildNode(layersNode);        // Coverage layers (triangles)
     appendChildNode(boundaryNode);
     appendChildNode(tracksNode);
+    appendChildNode(recordedPathNode);
     appendChildNode(guidanceNode);
     appendChildNode(toolsNode);
     appendChildNode(vehicleNode);
@@ -96,6 +100,7 @@ FieldViewItem::FieldViewItem(QQuickItem *parent)
     m_tools = new ToolsProperties(this);
     m_boundaries = new BoundariesProperties(this);
     m_tracks = new TracksProperties(this);
+    m_recordedPath = new RecordedPathProperties(this);
     // m_layers is null by default - set via QML: layers: LayerService.layers
 
     // Connect camera property changes to update()
@@ -162,6 +167,11 @@ FieldViewItem::FieldViewItem(QQuickItem *parent)
         requestUpdate();
     });
 
+    connect(m_recordedPath, &RecordedPathProperties::recordedPathPropertiesChanged, [this]() {
+        m_recordedPathDirty = true;
+        requestUpdate();
+    });
+
     // Schedule initial polish to sync singleton data before first render
     polish();
 }
@@ -224,6 +234,10 @@ ToolsProperties* FieldViewItem::tools() const { return m_tools; }
 BoundariesProperties* FieldViewItem::boundaries() const { return m_boundaries; }
 
 TracksProperties *FieldViewItem::tracks() const { return m_tracks; }
+
+RecordedPathProperties* FieldViewItem::recordedPath() const { return m_recordedPath; }
+
+LayersProperties* FieldViewItem::layers() const { return m_layers; }
 
 void FieldViewItem::setBoundaries(BoundariesProperties *boundaries)
 {
@@ -300,8 +314,6 @@ void FieldViewItem::setTracks(TracksProperties *tracks)
     }
 }
 
-LayersProperties* FieldViewItem::layers() const { return m_layers; }
-
 void FieldViewItem::setLayers(LayersProperties *layers)
 {
     if (m_layers == layers)
@@ -329,6 +341,32 @@ void FieldViewItem::setLayers(LayersProperties *layers)
 
     m_layersDirty = true;
     emit layersChanged();
+    requestUpdate();
+}
+
+void FieldViewItem::setRecordedPath(RecordedPathProperties *recordedPath)
+{
+    if (m_recordedPath == recordedPath)
+        return;
+
+    //Disconnect all signals from old layers to this
+    if (m_recordedPath) {
+        disconnect(m_recordedPath, nullptr, this, nullptr);
+
+        //Delete if we own it (created with us as parent)
+        if (m_recordedPath->parent() == this)
+            delete m_recordedPath;
+    }
+
+    m_recordedPath = recordedPath;
+
+    //connect signals from new recordedPath
+    if (m_recordedPath) {
+        connect(m_recordedPath, &RecordedPathProperties::recordedPathPropertiesChanged, this, &FieldViewItem::markRecordedPathDirty);
+    }
+
+    m_recordedPathDirty = true;
+    emit recordedPathChanged();
     requestUpdate();
 }
 
@@ -412,13 +450,22 @@ void FieldViewItem::markLayersDirty()
     update();
 }
 
+void FieldViewItem::markRecordedPathDirty()
+{
+    m_recordedPathDirty = true;
+    update();
+}
+
 void FieldViewItem::markAllDirty()
 {
     m_boundaryDirty = true;
     m_coverageDirty = true;
     m_guidanceDirty = true;
     m_gridDirty = true;
+    m_tracksDirty = true;
+    m_recordedPathDirty = true;
     m_layersDirty = true;
+    m_recordedPathDirty = true;
     update();
 }
 
@@ -573,6 +620,18 @@ QSGNode *FieldViewItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
                                  textSize,
                                  m_textureFactory,
                                  m_tracks);
+
+    // Update recorded path trail and Dubins approach
+    if (m_recordedPathDirty) {
+        m_recordedPathDirty = false;
+        rootNode->recordedPathNode->clearChildren();
+    }
+
+    rootNode->recordedPathNode->update(m_currentMv,
+                                       m_currentP,
+                                       m_currentNcd,
+                                       viewportSize,
+                                       m_recordedPath);
 
     // Update boundary if visible and dirty
     if (m_boundaryDirty) {

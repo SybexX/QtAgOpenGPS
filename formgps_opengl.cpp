@@ -27,6 +27,7 @@
 #include "boundaryinterface.h"
 #include "mainwindowstate.h"
 #include "flagsinterface.h"
+#include "recordedpath.h"
 #include "siminterface.h"
 #include "modulecomm.h"
 #include "worldgrid.h"
@@ -465,9 +466,9 @@ void FormGPS::oglMain_Paint()
 
             track.DrawTrackNew(gl, projection*modelview);
 
-            if (recPath.isRecordOn) {
-                recPath.DrawRecordedLine(gl, projection*modelview);
-                recPath.DrawDubins(gl, projection*modelview);
+            if (RecordedPath::instance()->isRecordOn) {
+                RecordedPath::instance()->DrawRecordedLine(gl, projection*modelview);
+                RecordedPath::instance()->DrawDubins(gl, projection*modelview);
             }
 
             if (bnd.bndList.count() > 0 || BoundaryInterface::instance()->isBndBeingMade() == true)

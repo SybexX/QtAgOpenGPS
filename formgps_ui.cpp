@@ -282,7 +282,7 @@ void FormGPS::on_qml_created(QObject *object, const QUrl &url)
         }
     });
 
-    connect(&recPath, &CRecordedPath::stoppedDriving, this, &FormGPS::onStoppedDriving, Qt::QueuedConnection);
+    connect(RecordedPath::instance(), &RecordedPath::stoppedDriving, this, &FormGPS::onStoppedDriving, Qt::QueuedConnection);
 
     connect(&bnd, &CBoundary::saveBoundaryRequested, this, &FormGPS::FileSaveBoundary, Qt::DirectConnection);
 
@@ -408,7 +408,7 @@ void FormGPS::loadBoundaryFromKML(QString filename) {
 /*
  * put as methods in CRecPath
 void FormGPS::recordedPathDelete(const QString& pathName) {
-    // TODO: Backend implementation needed in CRecordedPath
+    // TODO: Backend implementation needed in RecordedPath
     // This would delete a recorded path file from disk
 
     // Reset if this was the active path
@@ -420,7 +420,7 @@ void FormGPS::recordedPathDelete(const QString& pathName) {
 
 void FormGPS::recordedPathStartDriving() {
     // Call existing backend method with required parameters
-    bool success = recPath.StartDrivingRecordedPath(*vehicle, yt);
+    bool success = RecordedPath::instance()->StartDrivingRecordedPath(*vehicle, yt);
 
     // Update property only if successfully started - automatic QML notification
     if (success) {
@@ -430,7 +430,7 @@ void FormGPS::recordedPathStartDriving() {
 
 void FormGPS::recordedPathStopDriving() {
     // Call existing backend method
-    recPath.StopDrivingRecordedPath();
+    RecordedPath::instance()->StopDrivingRecordedPath();
 
     // Automatic notification via Qt 6.8 binding
     setIsDrivingRecordedPath(false);
@@ -438,9 +438,9 @@ void FormGPS::recordedPathStopDriving() {
 
 void FormGPS::recordedPathClear() {
     // Clear the recorded path data
-    recPath.recList.clear();
-    recPath.recListCount = 0;
-    recPath.isFollowingRecPath = false;
+    RecordedPath::instance()->recList.clear();
+    RecordedPath::instance()->recListCount = 0;
+    RecordedPath::instance()->isFollowingRecPath = false;
 
     // Reset properties
     setRecordedPathName("");

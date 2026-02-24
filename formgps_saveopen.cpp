@@ -15,6 +15,7 @@
 #include "mainwindowstate.h"
 #include "boundaryinterface.h"
 #include "flagsinterface.h"
+#include "recordedpath.h"
 #include "worldgrid.h"
 #include "siminterface.h"
 #include "camera.h"
@@ -1682,8 +1683,8 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
         line = reader.readLine();
         line = reader.readLine();
         int numPoints = line.toInt();
-        recPath.recList.clear();
-        recPath.recList.reserve(numPoints);  // Phase 1.1: Pre-allocate memory
+        RecordedPath::instance()->recList.clear();
+        RecordedPath::instance()->recList.reserve(numPoints);  // Phase 1.1: Pre-allocate memory
 
         lock.lockForWrite();
 
@@ -1705,11 +1706,11 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
                     (QStringView(line).mid(comma4 + 1) == u"True") );
 
                 //add the point
-                recPath.recList.append(point);
+                RecordedPath::instance()->recList.append(point);
             }
         }
 
-        if (recPath.recList.count() > 0)
+        if (RecordedPath::instance()->recList.count() > 0)
         {
             //TODO: panelDrag.Visible = true;
         } else {
@@ -2423,18 +2424,18 @@ void FormGPS::FileSaveRecPath()
     writer.setRealNumberNotation(QTextStream::FixedNotation);
 
     writer << "$RecPath" << Qt::endl;
-    writer << recPath.recList.count() << Qt::endl;
+    writer << RecordedPath::instance()->recList.count() << Qt::endl;
 
-    if (recPath.recList.count() > 0)
+    if (RecordedPath::instance()->recList.count() > 0)
     {
-        for (int j = 0; j < recPath.recList.count(); j++)
+        for (int j = 0; j < RecordedPath::instance()->recList.count(); j++)
             writer << qSetRealNumberPrecision(3)
-                   << recPath.recList[j].easting << ","
-                   << recPath.recList[j].northing << ","
-                   << recPath.recList[j].heading << ","
+                   << RecordedPath::instance()->recList[j].easting << ","
+                   << RecordedPath::instance()->recList[j].northing << ","
+                   << RecordedPath::instance()->recList[j].heading << ","
                    << qSetRealNumberPrecision(1)
-                   << recPath.recList[j].speed << ","
-                   << recPath.recList[j].autoBtnState << Qt::endl;
+                   << RecordedPath::instance()->recList[j].speed << ","
+                   << RecordedPath::instance()->recList[j].autoBtnState << Qt::endl;
 
     }
 
@@ -2477,8 +2478,8 @@ void FormGPS::FileLoadRecPath()
     QString line = reader.readLine();
     line = reader.readLine();
     int numPoints = line.toInt();
-    recPath.recList.clear();
-    recPath.recList.reserve(numPoints);  // Phase 1.1: Pre-allocate
+    RecordedPath::instance()->recList.clear();
+    RecordedPath::instance()->recList.reserve(numPoints);  // Phase 1.1: Pre-allocate
 
     while (!reader.atEnd())
     {
@@ -2491,7 +2492,7 @@ void FormGPS::FileLoadRecPath()
             int comma3 = line.indexOf(',', comma2 + 1);
             int comma4 = line.indexOf(',', comma3 + 1);
             if (comma1 == -1 || comma2 == -1 || comma3 == -1 || comma4 == -1) {
-                recPath.recList.clear();
+                RecordedPath::instance()->recList.clear();
                 qWarning() << "Ignoring " << filename << " because it is corrupt and cannot be read.";
                 return;
             }
@@ -2504,7 +2505,7 @@ void FormGPS::FileLoadRecPath()
                 (QStringView(line).mid(comma4 + 1) == u"True"));
 
             //add the point
-            recPath.recList.append(point);
+            RecordedPath::instance()->recList.append(point);
         }
     }
 }
