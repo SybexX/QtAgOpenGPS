@@ -16,9 +16,9 @@ MoveablePopup {
     visible: false
     modal: false
 
-    property int yval: 0
-    property int xval1: 0
-    property int xval2: 0
+    property real yval: 0
+    property real xval1: 0
+    property real xval2: 0
     property int axismin: -1
     property int axismax: 1
     property string chartName
