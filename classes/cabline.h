@@ -58,7 +58,7 @@ public:
 
     int howManyPathsAway = 0;              // Phase 6.0.43 BUG FIX: Changed from double to int for type consistency
     int lastHowManyPathsAway = 98888;      // Phase 6.0.43: Track previous parallel line for conditional reconstruction
-    bool isMakingABLine;
+    bool isMakingABLine = false;
     bool isHeadingSameWay = true;
     bool lastIsHeadingSameWay = true;      // Phase 6.0.43: Track previous direction for conditional reconstruction
 

@@ -38,6 +38,9 @@ private:
     quint64 calculateFingerprint() const;
 
 public:
+    // Singleton access
+    static CBoundary *instance();
+
     //area of boundaries
     QVector<CBoundaryList> bndList;
 
@@ -65,7 +68,6 @@ public:
     bool isToolInHeadland, isToolOuterPointsInHeadland, isSectionControlledByHeadland;
 
 
-    CBoundary(QObject *parent = 0);
     void loadSettings();
 
     //CFence.cs
@@ -123,6 +125,15 @@ signals:
 
     void saveBoundaryRequested();
 
+private:
+    explicit CBoundary(QObject *parent = nullptr);
+    ~CBoundary() override = default;
+
+    // Prevent copying
+    CBoundary(const CBoundary &) = delete;
+    CBoundary &operator=(const CBoundary &) = delete;
+
+    static CBoundary *s_instance;
 };
 
 #endif // CBOUNDARY_H

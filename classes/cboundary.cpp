@@ -1,4 +1,5 @@
 #include "cboundary.h"
+#include <QCoreApplication>
 #include <QDir>
 #include <QString>
 #include "classes/settingsmanager.h"
@@ -17,6 +18,23 @@ Q_LOGGING_CATEGORY (cboundary_log, "cboundary.qtagopengps")
 
 //this is defined in formgps_saveopen.cpp currently.
 QString caseInsensitiveFilename(const QString &directory, const QString &filename);
+
+CBoundary *CBoundary::s_instance = nullptr;
+
+CBoundary *CBoundary::instance()
+{
+    if (!s_instance) {
+        s_instance = new CBoundary();
+
+        // Ensure cleanup on app exit
+        QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit,
+                         s_instance, []() {
+                             delete s_instance;
+                             s_instance = nullptr;
+                         });
+    }
+    return s_instance;
+}
 
 CBoundary::CBoundary(QObject *parent) : QObject(parent)
 {

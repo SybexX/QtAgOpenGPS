@@ -29,6 +29,9 @@ Backend::Backend(QObject *parent)
     connect(this, &Backend::resetCreatedYouTurn, qobject_cast<CYouTurn *>(m_yt), &CYouTurn::ResetCreatedYouTurn);
     connect(this, &Backend::toggleYouSkip, qobject_cast<CYouTurn *>(m_yt), &CYouTurn::toggleYouSkip);
 
+    //TODO when CTrack is its own singleton, move this to CTrack's constructor
+    connect(this, &Backend::contourLock, &(qobject_cast<CTrack *>(m_track)->contour), &CContour::setLockToLine);
+
     connect(qobject_cast<CTrack *>(m_track), &CTrack::resetCreatedYouTurn, qobject_cast<CYouTurn *>(m_yt), &CYouTurn::ResetCreatedYouTurn, Qt::QueuedConnection);
 }
 

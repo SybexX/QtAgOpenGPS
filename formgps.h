@@ -282,8 +282,8 @@ public:
 
     CTool tool;
 
-    //boundary instance
-    CBoundary bnd;
+    //boundary instance (singleton)
+    CBoundary &bnd = *CBoundary::instance();
 
     CAHRS ahrs;
     CFieldData fd;
