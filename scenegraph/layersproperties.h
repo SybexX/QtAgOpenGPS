@@ -134,7 +134,8 @@ signals:
     void sectionCountChanged();
     void layerAdded(int layerId);
     void layerRemoved(int layerId);
-    void trianglesChanged(int layerId);
+    void trianglesChanged(int layerId);       // Triangles appended (incremental update)
+    void trianglesInvalidated(int layerId);   // Triangles cleared/modified (full rebuild needed)
     void layerVisibilityChanged(int layerId, bool visible);
     void layerAlphaChanged(int layerId, float alpha);
 

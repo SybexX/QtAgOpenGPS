@@ -88,7 +88,7 @@ void LayersProperties::clearTriangles(int layerId)
 
     it->triangles.clear();
     it->boundingBox = QRectF();
-    emit trianglesChanged(layerId);
+    emit trianglesInvalidated(layerId);
 }
 
 int LayersProperties::triangleCount(int layerId) const
@@ -201,8 +201,8 @@ void LayersProperties::setTrianglesAlpha(int layerId, float alpha)
         tri.color = c;
     }
 
-    // Signal that triangles changed so LayersNode will rebuild geometry
-    emit trianglesChanged(layerId);
+    // Signal that existing triangles were modified so LayersNode will rebuild geometry
+    emit trianglesInvalidated(layerId);
 }
 
 void LayersProperties::setSectionCount(int count)

@@ -331,7 +331,8 @@ void FieldViewItem::setLayers(LayersProperties *layers)
 
     // Connect signals from new layers
     if (m_layers) {
-        connect(m_layers, &LayersProperties::trianglesChanged, this, &FieldViewItem::markLayersDirty);
+        connect(m_layers, &LayersProperties::trianglesChanged, this, &FieldViewItem::requestUpdate);
+        connect(m_layers, &LayersProperties::trianglesInvalidated, this, &FieldViewItem::markLayersDirty);
         connect(m_layers, &LayersProperties::layerAdded, this, &FieldViewItem::markLayersDirty);
         connect(m_layers, &LayersProperties::layerRemoved, this, &FieldViewItem::markLayersDirty);
         connect(m_layers, &LayersProperties::layerVisibilityChanged, this, &FieldViewItem::requestUpdate);
