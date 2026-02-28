@@ -803,10 +803,7 @@ void FormGPS::JobNew()
     RecordedPath::instance()->isFollowingRecPath = false;
     RecordedPath::instance()->isFollowingDubinsHome = false;
 
-    // PHASE 6.0.30: Auto-enable recording when job starts
-    // Vehicle trail (yellow line) needs isRecordOn=true to populate recList (formgps_position.cpp:1821)
-    // Phase 6.0.29 initialized isRecordOn=false in constructor, which emptied the trail after JobNew()
-    RecordedPath::instance()->isRecordOn = true;
+    RecordedPath::instance()->isRecordOn = false;
     tool.patchesBufferDirty = true;
 
     lock.unlock();
