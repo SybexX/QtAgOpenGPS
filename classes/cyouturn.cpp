@@ -2710,13 +2710,13 @@ void CYouTurn::BuildManualYouLateral(bool isTurnLeft,
 
         if (isHeadingSameWay == isTurnLeft)
         {
-            trk.curve.howManyPathsAway += 1;
-            trk.ABLine.howManyPathsAway += 1;
+            trk.curve.howManyPathsAway -= 1;
+            trk.ABLine.howManyPathsAway -= 1;
         }
         else
         {
-            trk.curve.howManyPathsAway -= 1;
-            trk.ABLine.howManyPathsAway -= 1;
+            trk.curve.howManyPathsAway += 1;
+            trk.ABLine.howManyPathsAway += 1;
         }
 
     }
