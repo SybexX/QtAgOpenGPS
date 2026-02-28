@@ -140,6 +140,7 @@ void TracksNode::clearChildren()
     m_shadowOutlineNode = nullptr;
     m_shadowFillNode = nullptr;
     m_sideGuideNodes.clear();
+    m_curveGuideNodes.clear();
     m_lookaheadNode = nullptr;
     m_pursuitCircleNode = nullptr;
     m_smoothedCurveNode = nullptr;
@@ -319,6 +320,25 @@ void TracksNode::update(const QMatrix4x4 &mv,
                 node->setFlag(QSGNode::OwnsMaterial);
                 appendChildNode(node);
                 m_sideGuideNodes.append(node);
+            }
+        }
+
+        // Curve side guide lines (1px lines)
+        const auto &curveGuides = properties->curveGuideLines();
+        for (const auto &guideLine : curveGuides) {
+            if (guideLine.count() >= 2) {
+                auto *geo = AOGGeometry::createLineStripGeometry(guideLine);
+                if (geo) {
+                    auto *node = new QSGGeometryNode();
+                    node->setGeometry(geo);
+                    node->setFlag(QSGNode::OwnsGeometry);
+                    auto *mat = new AOGFlatColorMaterial();
+                    mat->setColor(QColor::fromRgbF(0.567f, 0.650f, 0.567f));
+                    node->setMaterial(mat);
+                    node->setFlag(QSGNode::OwnsMaterial);
+                    appendChildNode(node);
+                    m_curveGuideNodes.append(node);
+                }
             }
         }
 
@@ -581,6 +601,14 @@ void TracksNode::update(const QMatrix4x4 &mv,
     for (QSGGeometryNode *node : m_sideGuideNodes)
         updateThickLineNode(node, mvp, viewportSize, 1,
                             QColor::fromRgbF(0.756f, 0.765f, 0.765f));
+
+    for (QSGGeometryNode *node : m_curveGuideNodes) {
+        auto *mat = static_cast<AOGFlatColorMaterial *>(node->material());
+        if (mat) {
+            mat->setMvpMatrix(mvp);
+            mat->setViewportSize(viewportSize);
+        }
+    }
 
     if (m_lookaheadNode)
         m_lookaheadNode->updateUniforms(mvp, viewportSize);

@@ -1362,6 +1362,21 @@ void CTrack::updateInterface()
             props->set_sideGuideLines(guides);
         }
 
+        // Curve side guide lines
+        {
+            CurveGuideList curveGuides;
+            if (!isABMode && curve.isCurveValid && !curve.guideArr.isEmpty()) {
+                for (const auto &guideLine : curve.guideArr) {
+                    QVector<QVector3D> line;
+                    line.reserve(guideLine.count());
+                    for (const auto &pt : guideLine)
+                        line.append(QVector3D(pt.easting, pt.northing, 0));
+                    curveGuides.append(line);
+                }
+            }
+            props->set_curveGuideLines(curveGuides);
+        }
+
         // Lookahead / goal point
         {
             QVector<QVector3D> pts;

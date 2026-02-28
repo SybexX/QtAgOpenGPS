@@ -10,6 +10,8 @@
 
 #include "simpleproperty.h"
 
+using CurveGuideList = QVector<QVector<QVector3D>>;
+
 class TracksProperties : public QObject
 {
     Q_OBJECT
@@ -31,6 +33,7 @@ public:
 
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, shadowQuad)
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, sideGuideLines)
+    SIMPLE_BINDABLE_PROPERTY(CurveGuideList, curveGuideLines)
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, lookaheadPoints)
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, pursuitCircle)
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, smoothedCurve)
@@ -58,6 +61,7 @@ private:
 
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_shadowQuad, &TracksProperties::shadowQuadChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_sideGuideLines, &TracksProperties::sideGuideLinesChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, CurveGuideList, m_curveGuideLines, &TracksProperties::curveGuideLinesChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_lookaheadPoints, &TracksProperties::lookaheadPointsChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_pursuitCircle, &TracksProperties::pursuitCircleChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_smoothedCurve, &TracksProperties::smoothedCurveChanged)
