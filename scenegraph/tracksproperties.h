@@ -39,7 +39,8 @@ public:
 
     // Contour properties (merged from ContourProperties)
     SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, contourLine)
-    SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, stripPoints)
+    SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, stripPointsNearby)   // Dense points near vehicle
+    SIMPLE_BINDABLE_PROPERTY(QVector<QVector3D>, stripPointsSparse)  // Sparse points for entire strip
     SIMPLE_BINDABLE_PROPERTY(QVector3D, contourCurrentPoint)
     SIMPLE_BINDABLE_PROPERTY(QVector3D, contourGoalPoint)
     SIMPLE_BINDABLE_PROPERTY(bool, isContourOn)
@@ -65,7 +66,8 @@ private:
 
     // Contour properties (merged from ContourProperties)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_contourLine, &TracksProperties::contourLineChanged)
-    Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_stripPoints, &TracksProperties::stripPointsChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_stripPointsNearby, &TracksProperties::stripPointsNearbyChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector<QVector3D>, m_stripPointsSparse, &TracksProperties::stripPointsSparseChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector3D, m_contourCurrentPoint, &TracksProperties::contourCurrentPointChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, QVector3D, m_contourGoalPoint, &TracksProperties::contourGoalPointChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TracksProperties, bool, m_isContourOn, &TracksProperties::isContourOnChanged)

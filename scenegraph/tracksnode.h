@@ -46,11 +46,14 @@ private:
     // Contour rendering
     QSGGeometryNode *m_contourLineNode = nullptr;       // Contour line (simple line)
     DotsNode *m_contourPointsNode = nullptr;           // Contour line points
-    QVector<DotsNode*> m_stripPointsNodes;            // Strip points
+    DotsNode *m_stripPointsNearbyNode = nullptr;       // Dense points near vehicle
+    QVector<DotsNode*> m_stripPointsSparseNodes;       // Sparse points (chunked)
+    QVector<QSGGeometryNode*> m_stripPointsSparseLineNodes;  // Thin line strips (chunked)
     DotsNode *m_contourCurrentPointNode = nullptr;    // Current position on strip
     DotsNode *m_contourGoalPointNode = nullptr;       // Goal point
     int m_lastContourLineCount = 0;
-    int m_lastStripPointsCount = 0;
+    int m_lastStripPointsNearbyCount = 0;
+    int m_lastStripChunks = 0;
 
     void updateThickLineNode(QSGGeometryNode *node,
                              const QMatrix4x4 &mvp,

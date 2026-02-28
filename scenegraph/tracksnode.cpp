@@ -149,7 +149,10 @@ void TracksNode::clearChildren()
     // Contour nodes
     m_contourLineNode = nullptr;
     m_contourPointsNode = nullptr;
-    m_stripPointsNodes.clear();
+    m_stripPointsNearbyNode = nullptr;
+    m_stripPointsSparseNodes.clear();
+    m_stripPointsSparseLineNodes.clear();
+    m_lastStripChunks = 0;
     m_contourCurrentPointNode = nullptr;
     m_contourGoalPointNode = nullptr;
 }
@@ -403,18 +406,69 @@ void TracksNode::update(const QMatrix4x4 &mv,
         appendChildNode(contourPointsNode);
         m_contourPointsNode = contourPointsNode;
 
-        // Strip points (POINTS) - yellow if locked, green if not - use DotsNode
-        const auto &stripPoints = properties->stripPoints();
-        DotsNode *stripPointsNode = new DotsNode();
+        // Strip points nearby (dense) - rebuilt every frame
+        const auto &stripPointsNearby = properties->stripPointsNearby();
         QColor stripColor = properties->isContourOn()
             ? QColor::fromRgbF(0.983f, 0.92f, 0.420f, 1.0f)  // yellow when locked
             : QColor::fromRgbF(0.3f, 0.982f, 0.0f, 1.0f);   // green when not locked
-        for (const QVector3D &pt : stripPoints) {
-            stripPointsNode->addDot(pt, stripColor, glm::dp(lineWidth));
+        if (!stripPointsNearby.isEmpty()) {
+            m_stripPointsNearbyNode = new DotsNode();
+            for (const QVector3D &pt : stripPointsNearby) {
+                m_stripPointsNearbyNode->addDot(pt, stripColor, glm::dp(lineWidth));
+            }
+            m_stripPointsNearbyNode->build();
+            appendChildNode(m_stripPointsNearbyNode);
         }
-        stripPointsNode->build();
-        appendChildNode(stripPointsNode);
-        m_stripPointsNodes.append(stripPointsNode);
+
+        // Strip points sparse (chunked) - grows as strip grows
+        const int STRIP_CHUNK_SIZE = 10000;
+        const auto &stripPointsSparse = properties->stripPointsSparse();
+        int numChunks = (stripPointsSparse.count() + STRIP_CHUNK_SIZE - 1) / STRIP_CHUNK_SIZE;
+        for (int c = 0; c < numChunks; c++) {
+            DotsNode *stripChunkNode = new DotsNode();
+            int start = c * STRIP_CHUNK_SIZE;
+            int end = qMin(start + STRIP_CHUNK_SIZE, stripPointsSparse.count());
+            for (int i = start; i < end; i++) {
+                stripChunkNode->addDot(stripPointsSparse[i], stripColor, glm::dp(lineWidth));
+            }
+            stripChunkNode->build();
+            appendChildNode(stripChunkNode);
+            m_stripPointsSparseNodes.append(stripChunkNode);
+        }
+        m_lastStripChunks = numChunks;
+
+        // Sparse line strips (thin 1px) - chunked for efficiency
+        // Copy last vertex to next chunk to make line appear continuous
+        for (int c = 0; c < numChunks; c++) {
+            int start = c * STRIP_CHUNK_SIZE;
+            int end = qMin(start + STRIP_CHUNK_SIZE, stripPointsSparse.count());
+            // Include one extra point from next chunk for continuity (except last chunk)
+            int count = end - start;
+            if (c < numChunks - 1) {
+                count = end - start + 1;
+            }
+
+            QVector<QVector3D> chunkPoints;
+            chunkPoints.reserve(count);
+            for (int i = start; i < start + count && i < stripPointsSparse.count(); i++) {
+                chunkPoints.append(stripPointsSparse[i]);
+            }
+
+            if (chunkPoints.count() >= 2) {
+                auto *geo = AOGGeometry::createLineStripGeometry(chunkPoints);
+                if (geo) {
+                    QSGGeometryNode *lineNode = new QSGGeometryNode();
+                    lineNode->setGeometry(geo);
+                    lineNode->setFlag(QSGNode::OwnsGeometry);
+                    auto *mat = new AOGFlatColorMaterial();
+                    mat->setColor(stripColor);
+                    lineNode->setMaterial(mat);
+                    lineNode->setFlag(QSGNode::OwnsMaterial);
+                    appendChildNode(lineNode);
+                    m_stripPointsSparseLineNodes.append(lineNode);
+                }
+            }
+        }
 
         // Current point on strip (POINTS) - blue
         m_contourCurrentPointNode = new DotsNode();
@@ -431,7 +485,53 @@ void TracksNode::update(const QMatrix4x4 &mv,
         appendChildNode(m_contourGoalPointNode);
 
         m_lastContourLineCount = contourLine.count();
-        m_lastStripPointsCount = stripPoints.count();
+        m_lastStripPointsNearbyCount = stripPointsNearby.count();
+    } else {
+        // Check if strip grew - add more sparse chunks
+        const int STRIP_CHUNK_SIZE = 10000;
+        const auto &stripPointsSparse = properties->stripPointsSparse();
+        int numChunks = (stripPointsSparse.count() + STRIP_CHUNK_SIZE - 1) / STRIP_CHUNK_SIZE;
+
+        if (numChunks > m_lastStripChunks) {
+            QColor stripColor = properties->isContourOn()
+                ? QColor::fromRgbF(0.983f, 0.92f, 0.420f, 1.0f)
+                : QColor::fromRgbF(0.3f, 0.982f, 0.0f, 1.0f);
+
+            for (int c = m_lastStripChunks; c < numChunks; c++) {
+                DotsNode *stripChunkNode = new DotsNode();
+                int start = c * STRIP_CHUNK_SIZE;
+                int end = qMin(start + STRIP_CHUNK_SIZE, stripPointsSparse.count());
+                for (int i = start; i < end; i++) {
+                    stripChunkNode->addDot(stripPointsSparse[i], stripColor, glm::dp(lineWidth));
+                }
+                stripChunkNode->build();
+                appendChildNode(stripChunkNode);
+                m_stripPointsSparseNodes.append(stripChunkNode);
+            }
+            m_lastStripChunks = numChunks;
+        }
+
+        // Update nearby points every frame (rebuild since vehicle moved)
+        const auto &stripPointsNearby = properties->stripPointsNearby();
+        if (m_stripPointsNearbyNode) {
+            // Remove old nearby node
+            removeChildNode(m_stripPointsNearbyNode);
+            delete m_stripPointsNearbyNode;
+        }
+        if (!stripPointsNearby.isEmpty()) {
+            QColor stripColor = properties->isContourOn()
+                ? QColor::fromRgbF(0.983f, 0.92f, 0.420f, 1.0f)
+                : QColor::fromRgbF(0.3f, 0.982f, 0.0f, 1.0f);
+            m_stripPointsNearbyNode = new DotsNode();
+            for (const QVector3D &pt : stripPointsNearby) {
+                m_stripPointsNearbyNode->addDot(pt, stripColor, glm::dp(lineWidth));
+            }
+            m_stripPointsNearbyNode->build();
+            appendChildNode(m_stripPointsNearbyNode);
+        }
+
+        m_lastContourLineCount = properties->contourLine().count();
+        m_lastStripPointsNearbyCount = stripPointsNearby.count();
     }
 
     // ALWAYS update MVP / material uniforms every frame.
@@ -508,10 +608,23 @@ void TracksNode::update(const QMatrix4x4 &mv,
         }
     }
 
+    for (QSGGeometryNode *lineNode : m_stripPointsSparseLineNodes) {
+        if (lineNode) {
+            auto *mat = static_cast<AOGFlatColorMaterial *>(lineNode->material());
+            if (mat) {
+                mat->setMvpMatrix(mvp);
+                mat->setViewportSize(viewportSize);
+            }
+        }
+    }
+
     if (m_contourPointsNode)
         m_contourPointsNode->updateUniforms(mvp, viewportSize);
 
-    for (DotsNode *node : m_stripPointsNodes) {
+    if (m_stripPointsNearbyNode)
+        m_stripPointsNearbyNode->updateUniforms(mvp, viewportSize);
+
+    for (DotsNode *node : m_stripPointsSparseNodes) {
         if (node)
             node->updateUniforms(mvp, viewportSize);
     }

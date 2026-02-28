@@ -65,8 +65,17 @@ public:
     //list of the list of individual Lines for entire field
     QVector<QSharedPointer<QVector<Vec3>>> stripList;
 
+    // Sparse points for the current guidance strip (incremental ~1m spacing)
+    QVector<Vec3> stripSparsePts;
+    int stripSparseLastCount = 0;
+
     //list of points for the new contour line
     QVector<Vec3> ctList;
+
+    int getStripNum() const { return stripNum; }
+    int getClosestPointIndex() const { return pt; }
+    QVector<Vec3> getStripSparsePoints() const { return stripSparsePts; }
+    void updateStripSparsePoints();
 
 
     explicit CContour(QObject *parent = 0);

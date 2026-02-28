@@ -19,7 +19,8 @@ TracksProperties::TracksProperties(QObject *parent) : QObject(parent)
 
     // Contour properties
     connect(this, &TracksProperties::contourLineChanged, this, &TracksProperties::tracksPropertiesChanged);
-    connect(this, &TracksProperties::stripPointsChanged, this, &TracksProperties::tracksPropertiesChanged);
+    connect(this, &TracksProperties::stripPointsNearbyChanged, this, &TracksProperties::tracksPropertiesChanged);
+    connect(this, &TracksProperties::stripPointsSparseChanged, this, &TracksProperties::tracksPropertiesChanged);
     connect(this, &TracksProperties::contourCurrentPointChanged, this, &TracksProperties::tracksPropertiesChanged);
     connect(this, &TracksProperties::contourGoalPointChanged, this, &TracksProperties::tracksPropertiesChanged);
     connect(this, &TracksProperties::isContourOnChanged, this, &TracksProperties::tracksPropertiesChanged);

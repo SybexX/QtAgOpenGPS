@@ -297,6 +297,7 @@ void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehi
         return;
     }
 
+    updateStripSparsePoints();
 
 }
 
@@ -604,6 +605,49 @@ void CContour::AddPoint(Vec3 pivot) {
     ptList->append(Vec3(pivot.easting + cos(pivot.heading) * tool_toolOffset,
                         pivot.northing - sin(pivot.heading) * tool_toolOffset,
                         pivot.heading));
+}
+
+void CContour::updateStripSparsePoints()
+{
+    if (stripNum < 0 || stripNum >= stripList.count())
+        return;
+
+    QSharedPointer<QVector<Vec3>> strip = stripList[stripNum];
+    if (!strip || strip->count() == 0)
+        return;
+
+    int currentCount = strip->count();
+
+    // If strip changed (new strip selected), reset sparse points
+    if (currentCount < stripSparseLastCount) {
+        stripSparsePts.clear();
+        stripSparseLastCount = 0;
+    }
+
+    // Check if strip grew
+    if (currentCount > stripSparseLastCount) {
+        // Process only new points
+        for (int i = stripSparseLastCount; i < currentCount; i++) {
+            const Vec3 &newPt = (*strip)[i];
+
+            // If sparse list is empty, add first point
+            if (stripSparsePts.isEmpty()) {
+                stripSparsePts.append(newPt);
+                continue;
+            }
+
+            // Check distance from last sparse point
+            const Vec3 &lastSparsePt = stripSparsePts.last();
+            double dist = glm::Distance(newPt.easting, newPt.northing,
+                                       lastSparsePt.easting, lastSparsePt.northing);
+
+            // Only add if at least 1m from last sparse point
+            if (dist >= 1.0) {
+                stripSparsePts.append(newPt);
+            }
+        }
+        stripSparseLastCount = currentCount;
+    }
 }
 
 //End the strip

@@ -1183,14 +1183,36 @@ void CTrack::updateInterface()
             ctLine.append(QVector3D(v.easting, v.northing, 0));
         props->set_contourLine(ctLine);
 
-        // stripPoints - points on the current strip
-        QVector<QVector3D> stripPts;
-        if (contour.ptList) {
-            stripPts.reserve(contour.ptList->count());
-            for (const Vec3 &v : *contour.ptList)
-                stripPts.append(QVector3D(v.easting, v.northing, 0));
+        // stripPointsNearby - dense points near vehicle (nearest point +/- 70 points)
+        QVector<QVector3D> stripPtsNearby;
+        // stripPointsSparse - sparse points (every ~1m) for entire strip - from CContour
+        QVector<QVector3D> stripPtsSparse;
+        int stripNum = contour.getStripNum();
+        if (stripNum >= 0 && stripNum < contour.stripList.count()) {
+            QSharedPointer<QVector<Vec3>> strip = contour.stripList[stripNum];
+            if (strip) {
+                int stripCount = strip->count();
+                int closestPt = contour.getClosestPointIndex();
+
+                // Nearby: closest point +/- 70 points
+                int nearbyStart = qMax(0, closestPt - 70);
+                int nearbyEnd = qMin(stripCount, closestPt + 70);
+                stripPtsNearby.reserve(nearbyEnd - nearbyStart);
+                for (int i = nearbyStart; i < nearbyEnd; i++) {
+                    const Vec3 &v = (*strip)[i];
+                    stripPtsNearby.append(QVector3D(v.easting, v.northing, 0));
+                }
+
+                // Sparse: get from CContour (updated incrementally, ~1m spacing)
+                const QVector<Vec3> &sparsePts = contour.getStripSparsePoints();
+                stripPtsSparse.reserve(sparsePts.count());
+                for (const Vec3 &v : sparsePts) {
+                    stripPtsSparse.append(QVector3D(v.easting, v.northing, 0));
+                }
+            }
         }
-        props->set_stripPoints(stripPts);
+        props->set_stripPointsNearby(stripPtsNearby);
+        props->set_stripPointsSparse(stripPtsSparse);
 
         // contourCurrentPoint - current position on the strip (pt 0 or last)
         QVector3D currentPt;
@@ -1214,7 +1236,8 @@ void CTrack::updateInterface()
         //clear out contour properties
         props->set_isContourOn(false);
         props->set_contourLine({});
-        props->set_stripPoints({});
+        props->set_stripPointsNearby({});
+        props->set_stripPointsSparse({});
         props->set_contourCurrentPoint(QVector3D());
         props->set_contourGoalPoint(QVector3D());
 
