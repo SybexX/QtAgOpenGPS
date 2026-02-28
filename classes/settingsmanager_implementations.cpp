@@ -6,7 +6,7 @@
 #include "settingsmanager.h"
 
 // Generated implementations with Qt6 + QSettings persistence
-// Total implementations: 395
+// Total implementations: 396
 
 
 // QString Implementations (50 properties)
@@ -418,7 +418,7 @@ SETTINGS_PROPERTY_RECT_IMPL(window_bingMapSize, window, "window/bingMapSize", QR
 SETTINGS_PROPERTY_RECT_IMPL(window_formNudgeLocation, window, "window/formNudgeLocation", QRect(0, 0, 200, 200), setWindow_formNudgeLocation)
 
 
-// QVector<int> Implementations (6 properties)
+// QVector<int> Implementations (7 properties)
 QVector<int> SettingsManager::relay_pinConfig() const {
     return m_relay_pinConfig.value();
 }
@@ -502,6 +502,20 @@ void SettingsManager::setRate_confProduct3(const QVector<int>& value) {
 }
 QBindable<QVector<int>> SettingsManager::bindablerate_confProduct3() {
     return &m_rate_confProduct3;
+}
+QVector<int> SettingsManager::key_hotKey() const {
+    return m_key_hotKey.value();
+}
+void SettingsManager::setKey_hotKey(const QVector<int>& value) {
+    QStringList strList;
+    for (int i : value) strList << QString::number(i);
+    m_key_hotKey.setValue(value);
+    m_qsettings->setValue("key/hotKey", strList);
+    m_qsettings->sync();
+    emit keyGroupChanged();
+}
+QBindable<QVector<int>> SettingsManager::bindablekey_hotKey() {
+    return &m_key_hotKey;
 }
 
 

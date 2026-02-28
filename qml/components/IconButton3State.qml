@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.0
-
+import QtQuick.Layouts
 import ".."
 import "../components"
 
@@ -8,6 +8,7 @@ Rectangle {
     id: buttonContainer
     implicitWidth: theme.buttonSize
     implicitHeight: theme.buttonSize
+    Layout.alignment: Qt.AlignCenter
     color: "transparent"
     border.color: "black"
     border.width: 2

@@ -149,7 +149,7 @@ Drawer {
             Comp.IconButtonTextBeside{
                 //objectName: bluetooth
                 text: qsTr("Bluetooth")
-                icon.source: "../images/BlueTooth.png"
+                icon.source: prefix + "/images/BlueTooth.png"
               //  color:  AgIOService.bluetoothConnected ? "green" : "red"
                 onClicked: {
                     settingsWindow.close()
@@ -165,7 +165,7 @@ Drawer {
                 //objectName: btnModuleIMU
                 isChecked: false
                 text: qsTr("IMU")
-                icon.source: "../images/B_IMU.png"
+                icon.source: prefix + "/images/B_IMU.png"
                // color:  AgIOService.imuConnected ? "green" : "red"
                 onClicked: imuConfig.visible = !imuConfig.visible
             }
@@ -173,7 +173,7 @@ Drawer {
                 //objectName: btnModuleSteer
                 isChecked: false
                 text: qsTr("Steer")
-                icon.source: "../images/Com_AutosteerModule.png"
+                icon.source: prefix + "/images/Com_AutosteerModule.png"
                 color:  AgIOService.steerConnected ? "green" : "red"
                 onClicked: autosteerConfig.visible = !autosteerConfig.visible
             }
@@ -181,7 +181,7 @@ Drawer {
                 //objectName: btnModuleGPS
                 isChecked: false
                 text: qsTr("GPS")
-                icon.source: "../images/B_GPS.png"
+                icon.source: prefix + "/images/B_GPS.png"
                 color:  AgIOService.gpsConnected ? "green" : "red"
                 onClicked: {gnssConfig.visible = !gnssConfig.visible
                             mainWindowAgIO.visible = false}
@@ -191,14 +191,14 @@ Drawer {
                 //objectName: btnModuleMachine
                 isChecked: false
                 text: qsTr("Machine")
-                icon.source: "../images/B_Machine.png"
+                icon.source: prefix + "/images/B_Machine.png"
                 color:  AgIOService.machineConnected ? "green" : "red"
             }
             Comp.IconButtonTextBeside {
                 //objectName: btnModuleBlockage
                 isChecked: false
                 text: qsTr("Blockage")
-                icon.source: "../images/B_Blockage.png"
+                icon.source: prefix + "/images/B_Blockage.png"
                 color:  AgIOService.blockageConnected ? "green" : "red"
                 // Threading Phase 1: Blockage visibility configuration
                 visible: SettingsManager.seed_blockageIsOn
@@ -208,7 +208,7 @@ Drawer {
             Comp.IconButtonTextBeside {
                 isChecked: false
                 text: qsTr("Module & GPS Info")
-                icon.source: "../images/Nmea.png"
+                icon.source: prefix + "/images/Nmea.png"
                 onClicked: gpsInfo.visible = !gpsInfo.visible
             }
 
@@ -216,7 +216,7 @@ Drawer {
                 //objectName: btnEthernetStatus
                 isChecked: false
                 text: qsTr("Ethernet")
-                icon.source: "../images/B_UDP.png"
+                icon.source: prefix + "/images/B_UDP.png"
                 color:  SettingsManager.ethernet_isOn ? "green" : "red"
                 onClicked: {
                     if (ethernetConfig.visible) {
@@ -245,7 +245,7 @@ Drawer {
                      AgIOService.ntripStatus === 5 ? "Wait GPS":
                     "Unknown")
 
-                icon.source: "../images/NtripSettings.png"
+                icon.source: prefix + "/images/NtripSettings.png"
                 color:  (SettingsManager.setNTRIP_isOn === false ? "red":
                      AgIOService.ntripStatus === 0 ? "red" :
                      AgIOService.ntripStatus === 1 ? "yellow" :
@@ -261,7 +261,7 @@ Drawer {
             Comp.IconButtonTextBeside {
                 isChecked: SettingsManager.feature_isAgIOOn
                 text: SettingsManager.feature_isAgIOOn ? qsTr("AgIO Service ON") : qsTr("AgIO Service OFF")
-                icon.source: "../images/AgIO.png"
+                icon.source: prefix + "/images/AgIO.png"
                 color: SettingsManager.feature_isAgIOOn ? "green" : "red"
                 onClicked: {
                     SettingsManager.feature_isAgIOOn = !SettingsManager.feature_isAgIOOn

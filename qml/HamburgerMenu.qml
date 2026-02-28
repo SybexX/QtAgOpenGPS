@@ -159,8 +159,11 @@ Drawer{
             }
             Comp.IconButtonTextBeside{
                 text: qsTr("HotKeys")
-                onClicked: console.log("")
-                visible: false//todo
+                visible: true
+                onClicked: {
+                    hamburgerMenuRoot.visible = false
+                    hotKeySettings.show()
+                }
             }
             Comp.IconButtonTextBeside{
                 text: qsTr("About...")

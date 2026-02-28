@@ -63,6 +63,24 @@ Rectangle {
         console.debug(qmlLog, "toolIndex is ", toolIndex);
     }
 
+    Connections {
+        target: mainWindow
+        function onHotKeyPressed(index) {
+            var model = Tools.toolsProperties.tools[toolIndex].sectionButtonsModel;
+            if (!model || index < 0 || index >= model.count) return;
+
+            var idx = model.index(index, 0);
+            if (!idx || !idx.valid) return;
+
+            // StateRole = Qt.UserRole + 2 = 0x0102
+            var currentState = model.data(idx, 0x0102);
+            if (currentState === undefined) return;
+
+            var newState = (currentState + 1) % 3;
+            Tools.setSectionButtonState(toolIndex, index, newState);
+        }
+    }
+
     Component {
         id: sectionViewDelegate
         SectionButton {

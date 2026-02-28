@@ -397,3 +397,4 @@ rate_productName0|rate/productName0|"0"|QString|
 rate_productName1|rate/productName1|"1"|QString|
 rate_productName2|rate/productName2|"2"|QString|
 rate_productName3|rate/productName3|"3"|QString|
+key_hotKey|key/hotKey|49, 50, 51, 52, 53, 54, 55, 56, 65, 67, 71, 77, 78, 80, 84, 89|QVector<int>|

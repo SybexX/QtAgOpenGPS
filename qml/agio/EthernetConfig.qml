@@ -501,7 +501,7 @@ Window {
             Comp.IconButtonTransparent {
                 id: btnOK
                 Layout.alignment: Qt.AlignCenter
-                icon.source: "../images/OK64.png"
+                icon.source: prefix + "/images/OK64.png"
                 onClicked: ethernetConfig.close()
             }
         }

@@ -4,7 +4,7 @@
 // File 3/3: Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS members for private: section
 
 // Generated property members with Qt6 bindable support
-// Total members: 395
+// Total members: 396
 
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_menu_language, "en", &SettingsManager::menu_languageChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_feature_isOffsetFixOn, false, &SettingsManager::feature_isOffsetFixOnChanged)
@@ -401,5 +401,6 @@ Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_rate_productNam
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_rate_productName1, "1", &SettingsManager::rate_productName1Changed)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_rate_productName2, "2", &SettingsManager::rate_productName2Changed)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_rate_productName3, "3", &SettingsManager::rate_productName3Changed)
+Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QVector<int>, m_key_hotKey, (QVector<int>{65, 67, 71, 77, 78, 80, 84, 89, 49, 50, 51, 52, 53, 54, 55, 56}), &SettingsManager::key_hotKeyChanged)
 
 // End of generated property members

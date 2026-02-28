@@ -14,11 +14,15 @@ Comp.TimedRectangle{
 
     Connections {
             target: mainWindow
-            function onZoomOutPressed() {
-                btnZoomOut.clicked()
-            }
-            function onZoomInPressed() {
-                btnZoomIn.clicked()
+            function onHotKeyPressed(index) {
+                switch (index) {
+                case 11:
+                    btnZoomOut.clicked()
+                    break
+                case 12:
+                    btnZoomIn.clicked()
+                    break
+                }
             }
         }
 
