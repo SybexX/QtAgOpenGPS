@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QVector>
+#include <QFuture>
+#include <QFutureWatcher>
 #include "vec2.h"
 #include "vec3.h"
 
@@ -67,10 +69,10 @@ public:
     //the list of points of curve to drive on
     QVector<Vec3> curList;
 
-    bool isReady = false, isBusyWorking = false;
-
-    //the list of points of curve new list from async
-    QVector<Vec3> newCurList;
+    QFutureWatcher<QVector<Vec3>> m_buildWatcher;
+    QFuture<QVector<Vec3>> m_buildFuture;
+    bool m_findGlobalNearestCurvePoint = true;
+    int m_lastClosestIndex = 0;
 
     //the current curve reference line.
     //CTrk refCurve;
@@ -95,10 +97,9 @@ public:
                                const CBoundary &bnd,
                                const CYouTurn &yt);
 
-    void BuildNewCurveAsync(double distAway,
-                            int refCount,
-                            const CTrk &track,
-                            const CBoundary &bnd);
+    static void BuildNewOffsetList(QPromise<QVector<Vec3>> &promise,
+                                   double distAway, CTrk track,
+                                   QVector<Vec2> fenceLineEar);
 
     void GetCurrentCurveLine(Vec3 pivot,
                              Vec3 steer,
@@ -128,6 +129,12 @@ public:
     void MoveABCurve(double dist);
     bool PointOnLine(Vec3 pt1, Vec3 pt2, Vec3 pt);
     void AddFirstLastPoints(QVector<Vec3> &xList);
+
+    static QVector<Vec3> ResampleCurveToUniformSpacing(
+        const QVector<Vec3> &originalList, double targetSpacing);
+    int findNearestGlobalCurvePoint(const Vec3 &refPoint, int increment = 1);
+    int findNearestLocalCurvePoint(const Vec3 &refPoint, int startIndex,
+        double minSearchDistance, bool reverseSearchDirection);
 
     CABCurve &operator=(CABCurve &src)
     {
@@ -171,10 +178,8 @@ public:
         smooList = src.smooList;
         curList = src.curList;
 
-        isReady = src.isReady;
-        isBusyWorking = src.isBusyWorking;
-
-        newCurList = src.newCurList;
+        m_findGlobalNearestCurvePoint = src.m_findGlobalNearestCurvePoint;
+        m_lastClosestIndex = src.m_lastClosestIndex;
 
         isCurveValid = src.isCurveValid;
         isLateralTriggered = src.isLateralTriggered;
@@ -198,6 +203,7 @@ public:
 signals:
 
 public slots:
+    void onBuildFinished();
 };
 
 #endif // CABCURVE_H

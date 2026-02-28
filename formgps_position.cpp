@@ -1524,7 +1524,6 @@ void FormGPS::CalculatePositionHeading()
 
     //guidance look ahead distance based on time or tool width at least
 
-    if (!track.ABLine.isLateralTriggered && !track.curve.isLateralTriggered)
     {
         double guidanceLookDist = (std::max(tool.width * 0.5, CVehicle::instance()->avgSpeed() * 0.277777 * Backend::instance()->guidanceLookAheadTime()));
         CVehicle::instance()->guidanceLookPos.easting = CVehicle::instance()->pivotAxlePos.easting + (sin(CVehicle::instance()->fixHeading()) * guidanceLookDist);

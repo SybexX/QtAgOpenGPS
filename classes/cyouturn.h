@@ -57,6 +57,7 @@ private:
     int A, B;
     bool isHeadingSameWay = true;
     int semiCircleIndex = -1;
+    int maxProgressIndexReached = 0;
 
     //how far should the distance between points on the uTurn be
     double pointSpacing;
