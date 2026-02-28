@@ -1379,40 +1379,6 @@ void CTrack::updateInterface()
             props->set_curveGuideLines(curveGuides);
         }
 
-        // Lookahead / goal point
-        {
-            QVector<QVector3D> pts;
-            bool stanley = SettingsManager::instance()->vehicle_isStanleyUsed();
-            if (!stanley) {
-                if (isABMode && ABLine.isABValid) {
-                    pts.append(QVector3D(ABLine.goalPointAB.easting, ABLine.goalPointAB.northing, 0));
-                    pts.append(QVector3D(Backend::instance()->gyd().rEastSteer, Backend::instance()->gyd().rNorthSteer, 0));
-                    pts.append(QVector3D(Backend::instance()->gyd().rEastPivot, Backend::instance()->gyd().rNorthPivot, 0));
-                }
-                else if (curve.isCurveValid && !curve.curList.isEmpty()) {
-                    pts.append(QVector3D(curve.goalPointCu.easting, curve.goalPointCu.northing, 0));
-                    pts.append(QVector3D(Backend::instance()->gyd().rEastSteer, Backend::instance()->gyd().rNorthSteer, 0));
-                    pts.append(QVector3D(Backend::instance()->gyd().rEastPivot, Backend::instance()->gyd().rNorthPivot, 0));
-                }
-            }
-            props->set_lookaheadPoints(pts);
-        }
-
-        // Pure pursuit radius circle
-        {
-            QVector<QVector3D> circle;
-            if (qAbs(ABLine.ppRadiusAB) < 50.0 && qAbs(ABLine.ppRadiusAB) > 0.1) {
-                const int segs = 100;
-                for (int j = 0; j <= segs; ++j) {
-                    float a = j * 2.0f * static_cast<float>(M_PI) / segs;
-                    circle.append(QVector3D(
-                        ABLine.radiusPointAB.easting + ABLine.ppRadiusAB * cos(a),
-                        ABLine.radiusPointAB.northing + ABLine.ppRadiusAB * sin(a), 0));
-                }
-            }
-            props->set_pursuitCircle(circle);
-        }
-
         // Smoothed curve (curve modes only)
         {
             QVector<QVector3D> smoo;

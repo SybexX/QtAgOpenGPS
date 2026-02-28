@@ -141,8 +141,6 @@ void TracksNode::clearChildren()
     m_shadowFillNode = nullptr;
     m_sideGuideNodes.clear();
     m_curveGuideNodes.clear();
-    m_lookaheadNode = nullptr;
-    m_pursuitCircleNode = nullptr;
     m_smoothedCurveNode = nullptr;
     m_currentLineDotsNode = nullptr;
     m_youTurnDotsNode = nullptr;
@@ -205,9 +203,6 @@ void TracksNode::update(const QMatrix4x4 &mv,
     }
 
     // Lookahead points: no line processing needed (dots only)
-
-    // Pursuit circle: already subdivided with 100 segments, just clip
-    const QVector<QVector3D> pursuitCircleClipped = clipLineToFront(properties->pursuitCircle(), mv);
 
     // Smoothed curve: clip/subdivide
     const QVector<QVector3D> smoothedCurveClipped = clipLineToFront(subdividePolyline(properties->smoothedCurve(), 50.0f), mv);
@@ -339,29 +334,6 @@ void TracksNode::update(const QMatrix4x4 &mv,
                     appendChildNode(node);
                     m_curveGuideNodes.append(node);
                 }
-            }
-        }
-
-        // Lookahead dots
-        if (!properties->lookaheadPoints().isEmpty()) {
-            m_lookaheadNode = new DotsNode();
-            for (const QVector3D &pt : properties->lookaheadPoints())
-                m_lookaheadNode->addDot(pt, QColor::fromRgbF(1.0f, 1.0f, 0.0f, 1.0f), glm::dp(8.0f));
-            m_lookaheadNode->build();
-            appendChildNode(m_lookaheadNode);
-        }
-
-        // Pure pursuit circle
-        if (pursuitCircleClipped.count() >= 2) {
-            auto *geo = AOGGeometry::createThickLineGeometry(pursuitCircleClipped);
-            if (geo) {
-                m_pursuitCircleNode = new QSGGeometryNode();
-                m_pursuitCircleNode->setGeometry(geo);
-                m_pursuitCircleNode->setFlag(QSGNode::OwnsGeometry);
-                auto *mat = new ThickLineMaterial();
-                m_pursuitCircleNode->setMaterial(mat);
-                m_pursuitCircleNode->setFlag(QSGNode::OwnsMaterial);
-                appendChildNode(m_pursuitCircleNode);
             }
         }
 
@@ -609,13 +581,6 @@ void TracksNode::update(const QMatrix4x4 &mv,
             mat->setViewportSize(viewportSize);
         }
     }
-
-    if (m_lookaheadNode)
-        m_lookaheadNode->updateUniforms(mvp, viewportSize);
-
-    if (m_pursuitCircleNode)
-        updateThickLineNode(m_pursuitCircleNode, mvp, viewportSize, lineWidth,
-                            QColor::fromRgbF(0.53f, 0.53f, 0.95f));
 
     if (m_smoothedCurveNode)
         updateThickLineNode(m_smoothedCurveNode, mvp, viewportSize, lineWidth,

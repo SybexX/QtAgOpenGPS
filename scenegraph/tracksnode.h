@@ -38,8 +38,6 @@ private:
     QSGGeometryNode *m_shadowFillNode = nullptr;
     QVector<QSGGeometryNode*> m_sideGuideNodes;
     QVector<QSGGeometryNode*> m_curveGuideNodes;
-    DotsNode *m_lookaheadNode = nullptr;
-    QSGGeometryNode *m_pursuitCircleNode = nullptr;
     QSGGeometryNode *m_smoothedCurveNode = nullptr;
     DotsNode *m_currentLineDotsNode = nullptr;
     DotsNode *m_youTurnDotsNode = nullptr;
