@@ -738,6 +738,8 @@ void CTrack::select(int index)
     setIdx(index);
     emit resetCreatedYouTurn();
     //yt.ResetCreatedYouTurn();
+
+    updateInterface();
 }
 
 void CTrack::next()

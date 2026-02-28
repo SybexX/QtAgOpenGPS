@@ -1749,6 +1749,10 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
 
     //update boundary list count in qml
     BoundaryInterface::instance()->set_count(bnd.bndList.count());
+
+    //update track scenegraph immediately so the selected track is visible
+    track.updateInterface();
+
     return true;
 }
 

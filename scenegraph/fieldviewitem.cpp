@@ -309,6 +309,7 @@ void FieldViewItem::setTracks(TracksProperties *tracks)
     if (m_tracks) {
         connect (m_tracks, &TracksProperties::tracksPropertiesChanged, [this]() {
             m_tracksDirty = true;
+            requestUpdate();
         });
     }
 }
