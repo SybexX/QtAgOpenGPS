@@ -20,11 +20,14 @@
 #include "backend/modulecomm.h"
 #include "mainwindowstate.h"
 #include "classes/settingsmanager.h"
+#include "backend/camera.h"
 
 CABCurve::CABCurve(QObject *parent) : QObject(parent)
 {
     connect(&m_buildWatcher, &QFutureWatcher<QVector<Vec3>>::finished,
             this, &CABCurve::onBuildFinished);
+    connect(&m_guideWatcher, &QFutureWatcher<QVector<QVector<Vec3>>>::finished,
+            this, &CABCurve::onGuideFinished);
 }
 
 void CABCurve::onBuildFinished()
@@ -33,6 +36,13 @@ void CABCurve::onBuildFinished()
         return;
     curList = m_buildWatcher.result();
     m_findGlobalNearestCurvePoint = true;
+}
+
+void CABCurve::onGuideFinished()
+{
+    if (m_guideWatcher.isCanceled())
+        return;
+    guideArr = m_guideWatcher.result();
 }
 
 void CABCurve::BuildCurveCurrentList(Vec3 pivot,
@@ -190,6 +200,35 @@ void CABCurve::BuildCurveCurrentList(Vec3 pivot,
         m_buildWatcher.setFuture(m_buildFuture);
 
         m_findGlobalNearestCurvePoint = true;
+
+        // Build side guidelines if enabled
+        bool isSideGuideLines = SettingsManager::instance()->menu_isSideGuideLines();
+        double camDist = Camera::instance()->camSetDistance();
+
+        if (isSideGuideLines && camDist > tool_width * -400)
+        {
+            int numPasses = SettingsManager::instance()->as_numGuideLines();
+
+            if (m_guideFuture.isRunning())
+            {
+                m_guideFuture.cancel();
+                m_guideFuture.waitForFinished();
+            }
+
+            m_guideFuture = QtConcurrent::run<QVector<QVector<Vec3>>>(
+                &CABCurve::BuildCurveGuidelines, distAway, numPasses,
+                isHeadingSameWay, tool_offset, CTrk(track), fenceLineEar);
+            m_guideWatcher.setFuture(m_guideFuture);
+        }
+        else
+        {
+            if (m_guideFuture.isRunning())
+            {
+                m_guideFuture.cancel();
+                m_guideFuture.waitForFinished();
+            }
+            guideArr.clear();
+        }
     }
 }
 
@@ -445,6 +484,208 @@ void CABCurve::BuildNewOffsetList(QPromise<QVector<Vec3>> &promise,
     }
 
     promise.addResult(newCurList);
+}
+
+void CABCurve::AddGuidelineExtensions(QVector<Vec3> &guideLine)
+{
+    if (guideLine.isEmpty())
+        return;
+
+    Vec3 startExt;
+    startExt.easting = guideLine[0].easting - (sin(guideLine[0].heading) * 2000.0);
+    startExt.northing = guideLine[0].northing - (cos(guideLine[0].heading) * 2000.0);
+    startExt.heading = guideLine[0].heading;
+    guideLine.prepend(startExt);
+
+    int last = guideLine.count() - 1;
+    Vec3 endExt;
+    endExt.easting = guideLine[last].easting + (sin(guideLine[last].heading) * 2000.0);
+    endExt.northing = guideLine[last].northing + (cos(guideLine[last].heading) * 2000.0);
+    endExt.heading = guideLine[last].heading;
+    guideLine.append(endExt);
+}
+
+void CABCurve::BuildCurveGuidelines(QPromise<QVector<QVector<Vec3>>> &promise,
+                                     double distAway, int numPasses,
+                                     bool isHeadingSameWay, double toolOffset,
+                                     CTrk track, QVector<Vec2> fenceLineEar)
+{
+    QVector<QVector<Vec3>> newGuideLL;
+
+    double tool_width = SettingsManager::instance()->vehicle_toolWidth();
+    double tool_overlap = SettingsManager::instance()->vehicle_toolOverlap();
+    double widthMinusOverlap = tool_width - tool_overlap;
+
+    bool isBndExist = fenceLineEar.count() > 0;
+
+    bool isSwitch = isHeadingSameWay;
+
+    int refCount = track.curvePts.count();
+    if (refCount < 2)
+    {
+        promise.addResult(newGuideLL);
+        return;
+    }
+
+    // Left side guidelines
+    for (int numGuides = -1; numGuides > -numPasses; numGuides--)
+    {
+        if (promise.isCanceled())
+            break;
+
+        QVector<Vec3> newGuideList;
+
+        double nextGuideDist = 0;
+        if (isHeadingSameWay)
+        {
+            nextGuideDist = widthMinusOverlap * numGuides + track.nudgeDistance;
+            nextGuideDist += (isSwitch ? toolOffset * 2 : 0);
+            isSwitch = !isSwitch;
+        }
+        else
+        {
+            nextGuideDist = widthMinusOverlap * -numGuides + track.nudgeDistance;
+            nextGuideDist += (isSwitch ? 0 : -toolOffset * 2);
+            isSwitch = !isSwitch;
+        }
+
+        nextGuideDist += distAway;
+
+        double step = widthMinusOverlap * 0.48;
+        if (step > 4) step = 4;
+        if (step < 1) step = 1;
+
+        double distSqAway = (nextGuideDist * nextGuideDist) - 0.01;
+
+        for (int i = 0; i < refCount; i++)
+        {
+            if (promise.isCanceled())
+                break;
+
+            Vec3 point(
+                track.curvePts[i].easting + (sin(glm::PIBy2 + track.curvePts[i].heading) * nextGuideDist),
+                track.curvePts[i].northing + (cos(glm::PIBy2 + track.curvePts[i].heading) * nextGuideDist),
+                track.curvePts[i].heading);
+            bool add = true;
+
+            for (int t = 0; t < refCount; t++)
+            {
+                double dist = ((point.easting - track.curvePts[t].easting) * (point.easting - track.curvePts[t].easting))
+                    + ((point.northing - track.curvePts[t].northing) * (point.northing - track.curvePts[t].northing));
+                if (dist < distSqAway)
+                {
+                    add = false;
+                    break;
+                }
+            }
+
+            if (add)
+            {
+                if (newGuideList.count() > 0)
+                {
+                    double dist = ((point.easting - newGuideList.last().easting) * (point.easting - newGuideList.last().easting))
+                        + ((point.northing - newGuideList.last().northing) * (point.northing - newGuideList.last().northing));
+                    if (dist > step)
+                    {
+                        if (!isBndExist || glm::IsPointInPolygon(fenceLineEar, point))
+                            newGuideList.append(point);
+                    }
+                }
+                else
+                {
+                    if (!isBndExist || glm::IsPointInPolygon(fenceLineEar, point))
+                        newGuideList.append(point);
+                }
+            }
+        }
+
+        if (newGuideList.isEmpty())
+            continue;
+
+        AddGuidelineExtensions(newGuideList);
+        newGuideLL.append(newGuideList);
+    }
+
+    // Right side guidelines
+    for (int numGuides = 1; numGuides < numPasses; numGuides++)
+    {
+        if (promise.isCanceled())
+            break;
+
+        QVector<Vec3> newGuideList;
+
+        double nextGuideDist = 0;
+        if (isHeadingSameWay)
+        {
+            nextGuideDist = widthMinusOverlap * numGuides + track.nudgeDistance;
+            nextGuideDist += (isSwitch ? toolOffset * 2 : 0);
+            isSwitch = !isSwitch;
+        }
+        else
+        {
+            nextGuideDist = widthMinusOverlap * -numGuides + track.nudgeDistance;
+            nextGuideDist += (isSwitch ? 0 : -toolOffset * 2);
+            isSwitch = !isSwitch;
+        }
+
+        nextGuideDist += distAway;
+
+        double step = widthMinusOverlap * 0.48;
+        if (step > 4) step = 4;
+        if (step < 1) step = 1;
+
+        double distSqAway = (nextGuideDist * nextGuideDist) - 0.01;
+
+        for (int i = 0; i < refCount; i++)
+        {
+            if (promise.isCanceled())
+                break;
+
+            Vec3 point(
+                track.curvePts[i].easting + (sin(glm::PIBy2 + track.curvePts[i].heading) * nextGuideDist),
+                track.curvePts[i].northing + (cos(glm::PIBy2 + track.curvePts[i].heading) * nextGuideDist),
+                track.curvePts[i].heading);
+            bool add = true;
+
+            for (int t = 0; t < refCount; t++)
+            {
+                double dist = ((point.easting - track.curvePts[t].easting) * (point.easting - track.curvePts[t].easting))
+                    + ((point.northing - track.curvePts[t].northing) * (point.northing - track.curvePts[t].northing));
+                if (dist < distSqAway)
+                {
+                    add = false;
+                    break;
+                }
+            }
+
+            if (add)
+            {
+                if (newGuideList.count() > 0)
+                {
+                    double dist = ((point.easting - newGuideList.last().easting) * (point.easting - newGuideList.last().easting))
+                        + ((point.northing - newGuideList.last().northing) * (point.northing - newGuideList.last().northing));
+                    if (dist > step)
+                    {
+                        if (!isBndExist || glm::IsPointInPolygon(fenceLineEar, point))
+                            newGuideList.append(point);
+                    }
+                }
+                else
+                {
+                    if (!isBndExist || glm::IsPointInPolygon(fenceLineEar, point))
+                        newGuideList.append(point);
+                }
+            }
+        }
+
+        if (newGuideList.isEmpty())
+            continue;
+
+        AddGuidelineExtensions(newGuideList);
+        newGuideLL.append(newGuideList);
+    }
+
+    promise.addResult(newGuideLL);
 }
 
 void CABCurve::GetCurrentCurveLine(Vec3 pivot,

@@ -74,6 +74,11 @@ public:
     bool m_findGlobalNearestCurvePoint = true;
     int m_lastClosestIndex = 0;
 
+    //side guidelines
+    QVector<QVector<Vec3>> guideArr;
+    QFutureWatcher<QVector<QVector<Vec3>>> m_guideWatcher;
+    QFuture<QVector<QVector<Vec3>>> m_guideFuture;
+
     //the current curve reference line.
     //CTrk refCurve;
 
@@ -129,6 +134,12 @@ public:
     void MoveABCurve(double dist);
     bool PointOnLine(Vec3 pt1, Vec3 pt2, Vec3 pt);
     void AddFirstLastPoints(QVector<Vec3> &xList);
+
+    static void BuildCurveGuidelines(QPromise<QVector<QVector<Vec3>>> &promise,
+                                      double distAway, int numPasses,
+                                      bool isHeadingSameWay, double toolOffset,
+                                      CTrk track, QVector<Vec2> fenceLineEar);
+    static void AddGuidelineExtensions(QVector<Vec3> &guideLine);
 
     static QVector<Vec3> ResampleCurveToUniformSpacing(
         const QVector<Vec3> &originalList, double targetSpacing);
@@ -204,6 +215,7 @@ signals:
 
 public slots:
     void onBuildFinished();
+    void onGuideFinished();
 };
 
 #endif // CABCURVE_H
