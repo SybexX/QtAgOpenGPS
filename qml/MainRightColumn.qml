@@ -185,22 +185,19 @@ ColumnLayout {
         icon.source: prefix + "/images/AutoSteerOff.png"
         iconChecked: prefix + "/images/AutoSteerOn.png"
         checkable: true
-        isChecked: MainWindowState.isBtnAutoSteerOn  // ⚡ PHASE 6.0.20 FIX: Use isChecked for bidirectional binding (sync with C++ protection)
-        // ⚡ PHASE 6.0.20 FIX: Require ACTIVE line (not just in memory) - currentABLine/Curve check mode === AB/Curve
-        enabled: ((aogInterface.currentABLine > -1 || aogInterface.currentABCurve > -1) || MainWindowState.isContourBtnOn) && Backend.isJobStarted
+        isChecked: MainWindowState.isBtnAutoSteerOn
+        enabled: (TracksInterface.idx > -1 || MainWindowState.isContourBtnOn) && Backend.isJobStarted
         //Is remote activation of autosteer enabled? //todo. Eliminated in 6.3.3
         // Threading Phase 1: Auto steer mode display
         buttonText: (SettingsManager.as_isAutoSteerAutoOn ? "R" : "M")
 
         onClicked: {
-            // ⚡ PHASE 6.0.20 FIX: Check ACTIVE line (not just in memory)
-            if (((aogInterface.currentABLine > -1 || aogInterface.currentABCurve > -1) || btnContour.isChecked) &&
+            if ((TracksInterface.idx > -1 || btnContour.isChecked) &&
                     (VehicleInterface.avgSpeed >= SettingsManager.as_minSteerSpeed &&
                      VehicleInterface.avgSpeed <= SettingsManager.as_maxSteerSpeed) ) {
-                MainWindowState.isBtnAutoSteerOn = !MainWindowState.isBtnAutoSteerOn; // Qt 6.8 MODERN: Q_PROPERTY assignment
+                MainWindowState.isBtnAutoSteerOn = !MainWindowState.isBtnAutoSteerOn
             } else {
-                // No active line or contour: don't allow AutoSteer
-                MainWindowState.isBtnAutoSteerOn = false; // Qt 6.8 MODERN: Q_PROPERTY assignment
+                MainWindowState.isBtnAutoSteerOn = false
             }
         }
     }
