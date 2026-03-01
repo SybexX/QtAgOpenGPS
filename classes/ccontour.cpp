@@ -228,16 +228,19 @@ void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehi
         //make the new guidance line list called guideList
         ptCount = stripList[stripNum]->count();
 
-        //shorter behind you
+        //shorter behind you, scale ahead with speed so goal point doesn't run off the end
+        int behind = 20;
+        int ahead = qMax(70, static_cast<int>(CVehicle::instance()->avgSpeed() * 10));
+
         if (isSameWay)
         {
-            start = pt - 20; if (start < 0) start = 0;
-            stop = pt + 70; if (stop > ptCount) stop = ptCount;
+            start = pt - behind; if (start < 0) start = 0;
+            stop = pt + ahead; if (stop > ptCount) stop = ptCount;
         }
         else
         {
-            start = pt - 70; if (start < 0) start = 0;
-            stop = pt + 20; if (stop > ptCount) stop = ptCount;
+            start = pt - ahead; if (start < 0) start = 0;
+            stop = pt + behind; if (stop > ptCount) stop = ptCount;
         }
 
         //if (howManyPathsAway != 0 && (mf.tool.halfToolWidth < (0.5*mf.tool.toolOffset)))
@@ -404,7 +407,7 @@ void CContour::DistanceFromContourLine(bool isBtnAutoSteerOn,
 
             steerAngleCT = glm::toDegrees((steerAngleCT + abFixHeadingDelta) * -1.0);
 
-            if (steerAngleCT < -maxSteerAngle) steerAngleCT = maxSteerAngle;
+            if (steerAngleCT < -maxSteerAngle) steerAngleCT = -maxSteerAngle;
             if (steerAngleCT > maxSteerAngle) steerAngleCT = maxSteerAngle;
         }
         else
@@ -569,8 +572,8 @@ void CContour::DistanceFromContourLine(bool isBtnAutoSteerOn,
     else
     {
         //invalid distance so tell AS module
-        distanceFromCurrentLinePivot = 32000; //???
-        CVehicle::instance()->set_guidanceLineDistanceOff (32000);
+        distanceFromCurrentLinePivot = 0;
+        CVehicle::instance()->set_guidanceLineDistanceOff(0);
     }
 
 }

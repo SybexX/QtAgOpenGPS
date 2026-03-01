@@ -1227,8 +1227,8 @@ void CTrack::updateInterface()
         // contourGoalPoint - goal point for pure display
         props->set_contourGoalPoint(QVector3D(contour.goalPointCT.easting, contour.goalPointCT.northing, 0));
 
-        // isContourOn - whether contour guidance is active
-        props->set_isContourOn(contour.isContourOn);
+        // isContourOn - contour button is on (used by renderer to guard goal/current point dots)
+        props->set_isContourOn(true);
 
         // clear out ABLine or Curve properties
         props->set_showRefFlags(false);

@@ -371,9 +371,9 @@ void TracksNode::update(const QMatrix4x4 &mv,
             appendChildNode(m_youTurnDotsNode);
         }
 
-        // === Contour rendering (only when contour mode is active) ===
-        if (properties->isContourOn()) {
-            // Contour line (LINE_STRIP) - purple - use flat color material for stability
+        // === Contour rendering ===
+        // Data is only populated when contour button is on (in CTrack::updateInterface)
+        {
             const auto &contourLine = properties->contourLine();
             if (contourLine.count() >= 2) {
                 auto *geo = AOGGeometry::createLinesGeometry(contourLine);
@@ -402,7 +402,9 @@ void TracksNode::update(const QMatrix4x4 &mv,
 
             // Strip points nearby (dense) - rebuilt every frame
             const auto &stripPointsNearby = properties->stripPointsNearby();
-            QColor stripColor = QColor::fromRgbF(0.983f, 0.92f, 0.420f, 1.0f);  // yellow when locked
+            QColor stripColor = properties->isContourOn()
+                ? QColor::fromRgbF(0.983f, 0.92f, 0.420f, 1.0f)  // yellow when locked
+                : QColor::fromRgbF(0.3f, 0.982f, 0.0f, 1.0f);   // green when not locked
             if (!stripPointsNearby.isEmpty()) {
                 m_stripPointsNearbyNode = new DotsNode();
                 for (const QVector3D &pt : stripPointsNearby) {
@@ -462,33 +464,38 @@ void TracksNode::update(const QMatrix4x4 &mv,
                 }
             }
 
-            // Current point on strip (POINTS) - blue
-            m_contourCurrentPointNode = new DotsNode();
-            m_contourCurrentPointNode->addDot(properties->contourCurrentPoint(),
-                                              QColor::fromRgbF(0.35f, 0.30f, 0.90f, 1.0f), glm::dp(6.0f));
-            m_contourCurrentPointNode->build();
-            appendChildNode(m_contourCurrentPointNode);
+            // Current point and goal point - only show when contour is actively recording
+            if (properties->isContourOn()) {
+                // Current point on strip (POINTS) - blue
+                m_contourCurrentPointNode = new DotsNode();
+                m_contourCurrentPointNode->addDot(properties->contourCurrentPoint(),
+                                                  QColor::fromRgbF(0.35f, 0.30f, 0.90f, 1.0f), glm::dp(6.0f));
+                m_contourCurrentPointNode->build();
+                appendChildNode(m_contourCurrentPointNode);
 
-            // Goal point (POINTS) - yellow
-            m_contourGoalPointNode = new DotsNode();
-            m_contourGoalPointNode->addDot(properties->contourGoalPoint(),
-                                           QColor::fromRgbF(1.0f, 0.95f, 0.095f, 1.0f), glm::dp(6.0f));
-            m_contourGoalPointNode->build();
-            appendChildNode(m_contourGoalPointNode);
+                // Goal point (POINTS) - yellow
+                m_contourGoalPointNode = new DotsNode();
+                m_contourGoalPointNode->addDot(properties->contourGoalPoint(),
+                                               QColor::fromRgbF(1.0f, 0.95f, 0.095f, 1.0f), glm::dp(6.0f));
+                m_contourGoalPointNode->build();
+                appendChildNode(m_contourGoalPointNode);
+            }
 
             m_lastContourLineCount = contourLine.count();
             m_lastStripPointsNearbyCount = stripPointsNearby.count();
         }
     } else {
-        // Contour incremental updates (only when contour mode is active)
-        if (properties->isContourOn()) {
+        // Contour incremental updates
+        {
             // Check if strip grew - add more sparse chunks
             const int STRIP_CHUNK_SIZE = 10000;
             const auto &stripPointsSparse = properties->stripPointsSparse();
             int numChunks = (stripPointsSparse.count() + STRIP_CHUNK_SIZE - 1) / STRIP_CHUNK_SIZE;
 
             if (numChunks > m_lastStripChunks) {
-                QColor stripColor = QColor::fromRgbF(0.983f, 0.92f, 0.420f, 1.0f);
+                QColor stripColor = properties->isContourOn()
+                    ? QColor::fromRgbF(0.983f, 0.92f, 0.420f, 1.0f)
+                    : QColor::fromRgbF(0.3f, 0.982f, 0.0f, 1.0f);
 
                 for (int c = m_lastStripChunks; c < numChunks; c++) {
                     DotsNode *stripChunkNode = new DotsNode();
@@ -513,7 +520,9 @@ void TracksNode::update(const QMatrix4x4 &mv,
                 m_stripPointsNearbyNode = nullptr;
             }
             if (!stripPointsNearby.isEmpty()) {
-                QColor stripColor = QColor::fromRgbF(0.983f, 0.92f, 0.420f, 1.0f);
+                QColor stripColor = properties->isContourOn()
+                    ? QColor::fromRgbF(0.983f, 0.92f, 0.420f, 1.0f)
+                    : QColor::fromRgbF(0.3f, 0.982f, 0.0f, 1.0f);
                 m_stripPointsNearbyNode = new DotsNode();
                 for (const QVector3D &pt : stripPointsNearby) {
                     m_stripPointsNearbyNode->addDot(pt, stripColor, glm::dp(lineWidth));
