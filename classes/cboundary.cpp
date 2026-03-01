@@ -664,7 +664,7 @@ void CBoundary::updateInterface() {
                 QList<QVector3D> points;
                 points.reserve(bndList[0].fenceLine.count());
                 for (const Vec3 &v : bndList[0].fenceLine) {
-                    points.append(QVector3D(v.easting, v.northing, v.heading));
+                    points.append(QVector3D(v.easting, v.northing, 0));
                 }
                 outer->set_points(points);
                 outer->set_visible(true);
@@ -677,7 +677,7 @@ void CBoundary::updateInterface() {
                 QList<QVector3D> hdPoints;
                 hdPoints.reserve(bndList[0].hdLine.count());
                 for (const Vec3 &v : bndList[0].hdLine) {
-                    hdPoints.append(QVector3D(v.easting, v.northing, v.heading));
+                    hdPoints.append(QVector3D(v.easting, v.northing, 0));
                 }
                 hd->set_points(hdPoints);
                 if (MainWindowState::instance()->isHeadlandOn()) {
@@ -695,7 +695,7 @@ void CBoundary::updateInterface() {
                     QList<QVector3D> points;
                     points.reserve(bndList[i].fenceLine.count());
                     for (const Vec3 &v : bndList[i].fenceLine) {
-                        points.append(QVector3D(v.easting, v.northing, v.heading));
+                        points.append(QVector3D(v.easting, v.northing, 0));
                     }
                     inner->set_points(points);
                     inner->set_visible(true);
