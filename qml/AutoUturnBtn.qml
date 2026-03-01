@@ -11,7 +11,7 @@ Item{
 
     Image{
         id: autoTurnImage
-        source: if(!Backend.isYouTurnRight)
+        source: if(Backend.isYouTurnRight)
                     prefix + "/images/Images/z_TurnRight.png"
                 else
                     prefix + "/images/Images/z_TurnLeft.png"

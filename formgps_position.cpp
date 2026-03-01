@@ -1106,12 +1106,12 @@ void FormGPS::UpdateFixPosition()
                     {
                         if (track.getMode() == TrackMode::AB)
                         {
-                            yt.BuildABLineDubinsYouTurn(yt.isYouTurnRight,bnd,
+                            yt.BuildABLineDubinsYouTurn(!yt.isYouTurnRight,bnd,
                                                         track,secondsSinceStart);
                         }
                         else
                         {
-                            yt.BuildCurveDubinsYouTurn(yt.isYouTurnRight, bnd,track,secondsSinceStart);
+                            yt.BuildCurveDubinsYouTurn(!yt.isYouTurnRight, bnd,track,secondsSinceStart);
                         }
                     }
 
