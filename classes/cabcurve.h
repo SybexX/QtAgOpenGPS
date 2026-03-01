@@ -41,7 +41,7 @@ private:
 
 public:
     //flag for starting stop adding points
-    bool isBtnTrackOn, isMakingCurve;
+    bool isBtnTrackOn = false, isMakingCurve = false;
 
     double distanceFromCurrentLinePivot;
     double distanceFromRefLine;
