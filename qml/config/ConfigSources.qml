@@ -16,27 +16,28 @@ Rectangle{
     color: aogInterface.backgroundColor
     TitleFrame {
         id:antennaType
-        width: 360 * theme.scaleWidth
+        //width: 360 * theme.scaleWidth
+        height:150 * theme.scaleHeight
         anchors.top: parent.top
-		anchors.left: parent.left
-		anchors.bottom: parent.verticalCenter
-		anchors.topMargin: 5 * theme.scaleHeight
-		anchors.leftMargin: 5 * theme.scaleWidth
-		anchors.rightMargin: 5 * theme.scaleWidth
-		anchors.bottomMargin: 5 * theme.scaleHeight
+        anchors.left: parent.left
+        anchors.right: parent.horizontalCenter
+        anchors.topMargin: 5 * theme.scaleHeight
+        anchors.leftMargin: 5 * theme.scaleWidth
+        anchors.rightMargin: 5 * theme.scaleWidth
+        anchors.bottomMargin: 5 * theme.scaleHeight
         color: aogInterface.backgroundColor
         border.color: aogInterface.blackDayWhiteNight
         visible: true
         title: qsTr("Antenna Type", "GPS Antenna type, fixed or dual")
-        font.pointSize: 16 
+        font.pointSize: 16
 
         Row{
             id: sourceRow
             anchors.top: parent.top
             anchors.topMargin: 10 * theme.scaleHeight
-			anchors.leftMargin: 10 * theme.scaleWidth
-			anchors.rightMargin: 10 * theme.scaleWidth
-			anchors.bottomMargin: 10 * theme.scaleHeight
+            anchors.leftMargin: 10 * theme.scaleWidth
+            anchors.rightMargin: 10 * theme.scaleWidth
+            anchors.bottomMargin: 10 * theme.scaleHeight
             anchors.horizontalCenter: parent.horizontalCenter
             height: childrenRect.height  + 25 * (theme.scaleHeight)
             spacing: 10 * theme.scaleWidth
@@ -59,12 +60,12 @@ Rectangle{
                 isChecked: (SettingsManager.gps_headingFromWhichSource === "Dual" ? true: false)
 
                 onCheckedChanged: {
-					if (checked){
-						SettingsManager.gps_headingFromWhichSource = "Dual"
-						if(SettingsManager.vehicle_antennaOffset < 0)
-						    timedMessage.addMessage(7000, qsTr("Antenna Offset error!"), qsTr('You have antenna offset set to "left". Dual requires it set to "right". Change it or you will have offset errors')) 
-					}
-				}
+                    if (checked){
+                        SettingsManager.gps_headingFromWhichSource = "Dual"
+                        if(SettingsManager.vehicle_antennaOffset < 0)
+                            timedMessage.addMessage(7000, qsTr("Antenna Offset error!"), qsTr('You have antenna offset set to "left". Dual requires it set to "right". Change it or you will have offset errors'))
+                    }
+                }
 
                 onHeadingSourceChanged: {
                     if(headingSource === "Dual"){
@@ -110,10 +111,10 @@ Rectangle{
         height: rtkAlarmRow.height + titleHeight + (10 * theme.scaleHeight)
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-		anchors.topMargin: 5 * theme.scaleHeight
-		anchors.leftMargin: 5 * theme.scaleWidth
-		anchors.rightMargin: 5 * theme.scaleWidth
-		anchors.bottomMargin: 5 * theme.scaleHeight
+        anchors.topMargin: 5 * theme.scaleHeight
+        anchors.leftMargin: 5 * theme.scaleWidth
+        anchors.rightMargin: 5 * theme.scaleWidth
+        anchors.bottomMargin: 5 * theme.scaleHeight
         color: aogInterface.backgroundColor
         visible: true
         title: qsTr("RTK Alarm")
@@ -160,18 +161,18 @@ Rectangle{
         }
     }
     TitleFrame{
-        id:singleAntennaSettings
+        id: singleAntennaSettings
         enabled: fixBtn.checked
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.left: parent.horizontalCenter
         anchors.top: parent.top
-		anchors.topMargin: 5 * theme.scaleHeight
-		anchors.leftMargin: 5 * theme.scaleWidth
-		anchors.rightMargin: 5 * theme.scaleWidth
-		anchors.bottomMargin: 5 * theme.scaleHeight
-		onEnabledChanged: visible = enabled
-        visible: fixBtn.checked
+        anchors.topMargin: 5 * theme.scaleHeight
+        anchors.leftMargin: 5 * theme.scaleWidth
+        anchors.rightMargin: 5 * theme.scaleWidth
+        anchors.bottomMargin: 5 * theme.scaleHeight
+        //onEnabledChanged: visible = enabled
+        visible: true
 
         border.color: enabled ? aogInterface.blackDayWhiteNight : "grey"
 
@@ -197,7 +198,7 @@ Rectangle{
                 width: 180 * theme.scaleWidth
                 height: 50 * theme.scaleHeight
                 checkable: true
-
+                isChecked: SettingsManager.f_minHeadingStepDistance === 1
                 color: "light blue"
 
                 onCheckedChanged: {
@@ -235,8 +236,9 @@ Rectangle{
 
         Rectangle{//fusion adjuster
             id: fusionRow
+            anchors.top: headingDistance.bottom
+            anchors.topMargin: 20 * theme.scaleHeight
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
             width: 360 * theme.scaleWidth
             height: 100 * theme.scaleHeight
             border.color: fixBtn.checked ? aogInterface.blackDayWhiteNight : "grey"
@@ -343,31 +345,31 @@ Rectangle{
         }
 
         ButtonColor{
+            id: reverseDet
             text: qsTr("Reverse Detection")
+            checkable: true
             anchors.top: reverseCompRow.bottom
             anchors.topMargin: 30 * theme.scaleHeight
             anchors.horizontalCenter: parent.horizontalCenter
             color: aogInterface.backgroundColor
             colorChecked: "green"
-            // Threading Phase 1: IMU reverse detection
-            isChecked: SettingsManager.imu_isReverseOn
-            onClicked: SettingsManager.imu_isReverseOn = checked
             width: 250*theme.scaleWidth
+            isChecked: SettingsManager.imu_isReverseOn
         }
     }
     TitleFrame {
         id: dualAntennaSettings
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        anchors.left: parent.horizontalCenter
-        anchors.top: parent.top
-		anchors.topMargin: 5 * theme.scaleHeight
-		anchors.leftMargin: 5 * theme.scaleWidth
-		anchors.rightMargin: 5 * theme.scaleWidth
-		anchors.bottomMargin: 5 * theme.scaleHeight
+        anchors.bottom: rtkAlarm.top
+        anchors.right: parent.horizontalCenter
+        anchors.left: parent.left
+        anchors.top: antennaType.bottom
+        anchors.topMargin: 5 * theme.scaleHeight
+        anchors.leftMargin: 5 * theme.scaleWidth
+        anchors.rightMargin: 5 * theme.scaleWidth
+        anchors.bottomMargin: 5 * theme.scaleHeight
         border.color: aogInterface.blackDayWhiteNight
-		visible: dualBtn.checked
-		onEnabledChanged: visible = enabled
+        visible: true
+        //onEnabledChanged: visible = enabled
         color: aogInterface.backgroundColor
         title: qsTr("Dual Antenna Settings")
         font.pointSize: 16
@@ -377,40 +379,25 @@ Rectangle{
             id: head
             source: prefix + "/images/Config/Con_SourcesHead.png"
             width: 100 * theme.scaleWidth
-			height: 100 * theme.scaleHeight
+            height: 100 * theme.scaleHeight
             anchors.top: parent.top
             anchors.topMargin: 40 * theme.scaleHeight
             anchors.left: parent.left
             anchors.leftMargin: 30 * theme.scaleWidth
         }
-        SpinBoxCustomized{
+        SpinBoxOneDecimal{
             id: headingOffSet
             anchors.left: head.right
-			anchors.verticalCenter: head.verticalCenter
+            anchors.verticalCenter: head.verticalCenter
             anchors.leftMargin: 10 * theme.scaleWidth
             decimals: 1
-            from: -100
+            from: -1800
+            to: 1800
             // Threading Phase 1: Dual antenna heading offset
             boundValue: SettingsManager.gps_dualHeadingOffset
             onValueChanged: SettingsManager.gps_dualHeadingOffset = value
-            to: 100
             editable: true
             text: qsTr("Heading Offset (Degrees)")
-        }
-        ButtonColor{
-            id: dualAsIMU
-            objectName: "dualAsIMU"
-            text: qsTr("Dual As IMU")
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 30 * theme.scaleHeight
-            anchors.horizontalCenter: parent.horizontalCenter
-            checkable: true
-            color: aogInterface.backgroundColor
-            colorChecked: "green"
-            // Threading Phase 1: Dual antenna as IMU setting
-            isChecked: SettingsManager.imu_isDualAsIMU
-            onClicked: SettingsManager.imu_isDualAsIMU = checked
-            width: 250*theme.scaleWidth
         }
     }
 }
