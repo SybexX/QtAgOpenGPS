@@ -46,7 +46,7 @@ Item {
             id: text_input
             text: spinner.textFromValue(spinner.value, spinner.locale)
             font: spinner.font
-            color: "black"
+            color: enabled ? "black" : "gray"
             horizontalAlignment: Qt.AlignHCenter
             verticalAlignment: Qt.AlignVCenter
             anchors.horizontalCenter: spinner.horizontalCenter
@@ -67,7 +67,7 @@ Item {
             Text {
                 text: "+"
                 font.pixelSize: spinner.font.pixelSize * 2
-                color: "black"
+                color: enabled ? "black" : "gray"
                 anchors.fill: parent
                 fontSizeMode: Text.Fit
                 horizontalAlignment: Text.AlignHCenter
@@ -86,7 +86,7 @@ Item {
             Text {
                 text: "–"
                 font.pixelSize: spinner.font.pixelSize * 2
-                color: "black"
+                color: enabled ? "black" : "gray"
                 anchors.fill: parent
                 fontSizeMode: Text.Fit
                 horizontalAlignment: Text.AlignHCenter
@@ -96,7 +96,7 @@ Item {
         background: Rectangle {
             implicitHeight: 40 * theme.scaleHeight
             implicitWidth: 150 * theme.scaleWidth
-            border.color: "darkgray"
+            border.color: enabled ? "black" : "gray"
         }
 
         onValueModified: {
@@ -131,6 +131,7 @@ Item {
         anchors.bottom: spinner.top
         anchors.left: spinner.left
         font.pixelSize: 15
+        color: enabled ? "black" : "gray"
     }
     Text {
         id: spin_message
