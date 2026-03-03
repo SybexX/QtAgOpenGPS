@@ -4,6 +4,7 @@
 // GPS heading source (dual/single)
 import QtQuick
 import QtQuick.Controls.Fusion
+import QtQuick.Layouts
 //import Settings
 
 import ".."
@@ -171,7 +172,6 @@ Rectangle{
         anchors.leftMargin: 5 * theme.scaleWidth
         anchors.rightMargin: 5 * theme.scaleWidth
         anchors.bottomMargin: 5 * theme.scaleHeight
-        //onEnabledChanged: visible = enabled
         visible: true
 
         border.color: enabled ? aogInterface.blackDayWhiteNight : "grey"
@@ -180,12 +180,15 @@ Rectangle{
 
         title: qsTr("Single Antenna Settings")
         font.pointSize: 16
+        ColumnLayout {
+            anchors.fill: parent
+            anchors.margins: 10 * theme.scaleHeight
+            spacing: 20 * theme.scaleHeight
 
         Row {
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.topMargin: 10 * theme.scaleHeight
-            anchors.leftMargin: 10 * theme.scaleWidth
+            Layout.fillWidth: true
+            Layout.preferredHeight: minGPSStepBtn.height
+            spacing: 10 * theme.scaleWidth
 
             id: minGPSStep
             Label {
@@ -216,10 +219,9 @@ Rectangle{
         }
         Row {
             id: headingDistance
-            anchors.top: minGPSStep.bottom
-            anchors.left: parent.left
-            anchors.topMargin: 10 * theme.scaleHeight
-            anchors.leftMargin: 10 * theme.scaleWidth
+            Layout.fillWidth: true
+            Layout.preferredHeight: headingDistanceText.height
+            spacing: 10 * theme.scaleWidth
 
             Label {
                 color: fixBtn.checked ? aogInterface.blackDayWhiteNight : "grey"
@@ -236,11 +238,8 @@ Rectangle{
 
         Rectangle{//fusion adjuster
             id: fusionRow
-            anchors.top: headingDistance.bottom
-            anchors.topMargin: 20 * theme.scaleHeight
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: 360 * theme.scaleWidth
-            height: 100 * theme.scaleHeight
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             border.color: fixBtn.checked ? aogInterface.blackDayWhiteNight : "grey"
             color: aogInterface.backgroundColor
             SliderCustomized{
@@ -268,25 +267,25 @@ Rectangle{
                 }
                 stepSize: 1
             }
-        }
-
-        Text{
-            anchors.left: fusionRow.left
-            anchors.top: fusionRow.bottom
-            anchors.topMargin: 15 * theme.scaleHeight
-            color: fixBtn.checked ? aogInterface.blackDayWhiteNight : "grey"
-            text: qsTr("Default: 70%")
+            Label {
+                anchors.left: fusionRow.left
+                anchors.verticalCenter: fusionRow.bottom
+                text: qsTr("Default: 70%")
+                color: fixBtn.checked ? aogInterface.blackDayWhiteNight : "grey"
+                background: Rectangle {
+                    color: aogInterface.backgroundColor
+                    implicitWidth: parent.implicitWidth + 10
+                    implicitHeight: parent.implicitHeight + 5
+                }
+            }
         }
 
         Rectangle{
             // PHASE 6.0.35: Forward compensation slider (wheel angle → heading correction)
             // Used to compensate GPS heading based on actual wheel angle during movement
             id: forwardCompRow
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: fusionRow.bottom
-            anchors.topMargin: 50 * theme.scaleHeight
-            width: 360 * theme.scaleWidth
-            height: 100 * theme.scaleHeight
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             border.color: fixBtn.checked ? aogInterface.blackDayWhiteNight : "grey"
             color: aogInterface.backgroundColor
             SliderCustomized{
@@ -301,25 +300,25 @@ Rectangle{
                 }
                 stepSize: 0.01
             }
-        }
-
-        Text{
-            anchors.left: forwardCompRow.left
-            anchors.top: forwardCompRow.bottom
-            anchors.topMargin: 5 * theme.scaleHeight
-            color: fixBtn.checked ? aogInterface.blackDayWhiteNight : "grey"
-            text: qsTr("Default: 15%")
+            Label {
+                anchors.left: forwardCompRow.left
+                anchors.verticalCenter: forwardCompRow.bottom
+                text: qsTr("Default: 15%")
+                color: fixBtn.checked ? aogInterface.blackDayWhiteNight : "grey"
+                background: Rectangle {
+                    color: aogInterface.backgroundColor
+                    implicitWidth: parent.implicitWidth + 10
+                    implicitHeight: parent.implicitHeight + 5
+                }
+            }
         }
 
         Rectangle{
             // PHASE 6.0.35: Reverse compensation slider (wheel angle → heading correction in reverse)
             // Higher value than forward due to different geometry when reversing
             id: reverseCompRow
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: forwardCompRow.bottom
-            anchors.topMargin: 30 * theme.scaleHeight
-            width: 360 * theme.scaleWidth
-            height: 100 * theme.scaleHeight
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             border.color: fixBtn.checked ? aogInterface.blackDayWhiteNight : "grey"
             color: aogInterface.backgroundColor
             SliderCustomized{
@@ -334,27 +333,34 @@ Rectangle{
                 }
                 stepSize: 0.01
             }
+
+            Label {
+                anchors.left: reverseCompRow.left
+                anchors.verticalCenter: reverseCompRow.bottom
+                text: qsTr("Default: 30%")
+                color: fixBtn.checked ? aogInterface.blackDayWhiteNight : "grey"
+                background: Rectangle {
+                    color: aogInterface.backgroundColor
+                    implicitWidth: parent.implicitWidth + 10
+                    implicitHeight: parent.implicitHeight + 5
+                }
+            }
         }
 
-        Text{
-            anchors.left: reverseCompRow.left
-            anchors.top: reverseCompRow.bottom
-            anchors.topMargin: 5 * theme.scaleHeight
-            color: fixBtn.checked ? aogInterface.blackDayWhiteNight : "grey"
-            text: qsTr("Default: 30%")
-        }
+
 
         ButtonColor{
             id: reverseDet
             text: qsTr("Reverse Detection")
             checkable: true
-            anchors.top: reverseCompRow.bottom
-            anchors.topMargin: 30 * theme.scaleHeight
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredWidth: 250 * theme.scaleWidth
+            Layout.preferredHeight: implicitHeight
             color: aogInterface.backgroundColor
             colorChecked: "green"
             width: 250*theme.scaleWidth
             isChecked: SettingsManager.imu_isReverseOn
+        }
         }
     }
     TitleFrame {
@@ -369,35 +375,41 @@ Rectangle{
         anchors.bottomMargin: 5 * theme.scaleHeight
         border.color: aogInterface.blackDayWhiteNight
         visible: true
-        //onEnabledChanged: visible = enabled
         color: aogInterface.backgroundColor
         title: qsTr("Dual Antenna Settings")
         font.pointSize: 16
         enabled: dualBtn.checked
 
-        Image {
-            id: head
-            source: prefix + "/images/Config/Con_SourcesHead.png"
-            width: 100 * theme.scaleWidth
-            height: 100 * theme.scaleHeight
-            anchors.top: parent.top
-            anchors.topMargin: 40 * theme.scaleHeight
-            anchors.left: parent.left
-            anchors.leftMargin: 30 * theme.scaleWidth
-        }
-        SpinBoxOneDecimal{
-            id: headingOffSet
-            anchors.left: head.right
-            anchors.verticalCenter: head.verticalCenter
-            anchors.leftMargin: 10 * theme.scaleWidth
-            decimals: 1
-            from: -1800
-            to: 1800
-            // Threading Phase 1: Dual antenna heading offset
-            boundValue: SettingsManager.gps_dualHeadingOffset
-            onValueChanged: SettingsManager.gps_dualHeadingOffset = value
-            editable: true
-            text: qsTr("Heading Offset (Degrees)")
+        RowLayout {
+            anchors.fill: parent
+            anchors.margins: 20 * theme.scaleWidth
+            spacing: 50 * theme.scaleWidth
+
+            Image {
+                id: head
+                source: prefix + "/images/Config/Con_SourcesHead.png"
+                width: 100 * theme.scaleWidth
+                height: 100 * theme.scaleHeight
+                Layout.preferredWidth: width
+                Layout.preferredHeight: height
+            }
+
+            SpinBoxOneDecimal{
+                id: headingOffSet
+                Layout.preferredWidth: 150 * theme.scaleWidth
+                Layout.preferredHeight: 60 * theme.scaleHeight
+                decimals: 1
+                from: -1800
+                to: 1800
+                boundValue: SettingsManager.gps_dualHeadingOffset
+                onValueChanged: SettingsManager.gps_dualHeadingOffset = value
+                editable: true
+                text: qsTr("Heading Offset (Degrees)")
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
         }
     }
 }
