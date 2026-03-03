@@ -1,7 +1,7 @@
 // Copyright (C) 2024 Michael Torrie and the QtAgOpenGPS Dev Team
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
 //
-// Pinout for hyd lift/sections
+// RateControl config page
 import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
@@ -26,7 +26,6 @@ Rectangle{
 
     property int prodID: 0;
 
-    // Массив продуктов для упрощения управления
     property var products: [
         {
             id: 0,
@@ -113,18 +112,14 @@ Rectangle{
     Connections {
         target: RateControl.rcModel
         onDataChanged: {
-            // Если изменились данные текущего продукта
             if (topLeft.row <= prodID && bottomRight.row >= prodID) {
-                // Обновляем PWM
                 manPWM.text = qsTr("Manual PWM: ") + getCurrentPWM();
             }
         }
 
-        // Обработка сигнала PWM
         onPwmChanged: {
-            if (index === prodID) {
-                manPWM.text = qsTr("Manual PWM: ") + getCurrentPWM();
-            }
+            manPWM.text = qsTr("Manual PWM: ") + getCurrentPWM();
+
         }
     }
 
@@ -137,19 +132,19 @@ Rectangle{
         text: qsTr("Rate Control");
     }
 
-    RowLayout{
+    RowLayout {
         id: topRateButtons
         anchors.right: parent.right
         anchors.rightMargin: 20 * theme.scaleWidth
-        anchors.leftMargin: 20 * theme.scaleWidth
         anchors.left: parent.left
+        anchors.leftMargin: 20 * theme.scaleWidth
         anchors.top: top.bottom
         anchors.bottomMargin: 10 * theme.scaleHeight
         height: children.height
 
-        IconButton{
+        IconButton {
             id: rateProductPrev
-            Layout.alignment: Qt.AlignLeft
+            Layout.alignment: Qt.AlignVCenter
             icon.source: prefix + "/images/ArrowLeft.png"
             onClicked: {
                 prodID = (prodID - 1 + products.length) % products.length;
@@ -157,265 +152,348 @@ Rectangle{
             }
         }
 
-        Repeater {
-            model: products.length
+        Item {
+            Layout.fillWidth: true
+        }
+
+        Item {
+            Layout.preferredWidth: parent.width * 0.5
+            Layout.alignment: Qt.AlignCenter
+            height: childrenRect.height
+
             Rectangle {
-                visible: index === prodID
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignCenter
-                height: productName.height
+                anchors.centerIn: parent
+                width: parent.width
+                height: productName.height + 8
                 color: "transparent"
 
                 TextField {
                     id: productName
-                    anchors.fill: parent
+                    anchors.centerIn: parent
+                    width: parent.width
                     selectByMouse: true
-                    placeholderText: qsTr("Product Name");
-                    text: products[index].name
-                    onTextChanged: if (index === prodID) products[index].name = text
+                    placeholderText: qsTr("Product Name")
+                    text: products[prodID].name
+                    onTextChanged: products[prodID].name = text
+                    horizontalAlignment: Text.AlignHCenter
                 }
             }
         }
 
-        IconButtonTransparent{
+        Item {
+            Layout.fillWidth: true
+        }
+
+        IconButtonTransparent {
             id: rateProductNext
+            Layout.alignment: Qt.AlignVCenter
             icon.source: prefix + "/images/ArrowRight.png"
-            Layout.alignment: Qt.AlignRight
             onClicked: {
                 prodID = (prodID + 1) % products.length;
                 loadCurrentProduct();
             }
         }
     }
-
-    GridLayout {
-        flow: Grid.LeftToRight
-        columns: 5
-        rows: 3
-        anchors.bottom: back.top
-        anchors.top: topRateButtons.bottom
+    Rectangle{
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.topMargin: 20 * theme.scaleHeight
-        anchors.bottomMargin: 20 * theme.scaleHeight
-        anchors.leftMargin: 50 * theme.scaleWidth
-        anchors.rightMargin: 20 * theme.scaleWidth
+        anchors.top: topRateButtons.bottom
+        anchors.bottom: btnPinsSave.top
+        anchors.margins: 20 * theme.scaleWidth
+        color: "transparent"
 
-        SpinBoxCustomized {
-            id: moduleID
-            from: 0
-            to: 255
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+    GridLayout {
+        id: mainGrid
+        anchors.fill: parent
+        columns: 5
+        rows: 4
+        columnSpacing: 10 * theme.scaleWidth
+        rowSpacing: 15 * theme.scaleHeight
+
+        Item {
+            Layout.row: 0
+            Layout.column: 0
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: moduleID
+                anchors.centerIn: parent
+                from: 0
+                to: 255
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("Module ID: ")
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("Module ID: ")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        SpinBoxCustomized {
-            id: prodDensityBox
-            from: 0
-            to: 255
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+        Item {
+            Layout.row: 0
+            Layout.column: 1
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: rateKP
+                anchors.centerIn: parent
+                from: 0
+                to: 255
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("PID KP: ")
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("ProdDensity: ")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        SpinBoxCustomized {
-            id: rateKP
-            from: 0
-            to: 255
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+        Item {
+            Layout.row: 0
+            Layout.column: 2
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: rateKI
+                anchors.centerIn: parent
+                from: 0
+                to: 255
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("PID KI: ")
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("PID KP: ")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        SpinBoxCustomized {
-            id: rateKI
-            from: 0
-            to: 255
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+        Item {
+            Layout.row: 0
+            Layout.column: 3
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: rateKD
+                anchors.centerIn: parent
+                from: 0
+                to: 255
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("PID KD: ")
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("PID KI: ")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        SpinBoxCustomized {
-            id: rateKD
-            from: 0
-            to: 255
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+        Item {
+            Layout.row: 0
+            Layout.column: 4
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            ComboBoxCustomized {
+                id: cboxRateControlType
+                anchors.centerIn: parent
+                enabled: cboxIsRateControlOn.checked
+                editable: false
+                model: ListModel {
+                    ListElement { text: qsTr("Standard"); }
+                    ListElement { text: qsTr("Combo Close"); }
+                    ListElement { text: qsTr("Motor"); }
+                    ListElement { text: qsTr("Combo Timed"); }
+                    ListElement { text: qsTr("Fan"); }
+                }
+                text: qsTr("Control Type")
+                onActivated: mandatory.visible = true
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("PID KD: ")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        SpinBoxCustomized {
-            id: rateMinPWM
-            from: 0
-            to: 255
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+        Item {
+            Layout.row: 1
+            Layout.column: 0
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: prodDensityBox
+                anchors.centerIn: parent
+                from: 0
+                to: 255
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("ProdDensity: ")
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("Minimum PWM")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        SpinBoxCustomized {
-            id: rateMaxPWM
-            from: 0
-            to: 255
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+        Item {
+            Layout.row: 1
+            Layout.column: 1
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: rateMinPWM
+                anchors.centerIn: parent
+                from: 0
+                to: 255
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("Min PWM")
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("Maximum PWM")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        SpinBoxCustomized {
-            id: ratePIDscale
-            from: 0
-            to: 255
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+        Item {
+            Layout.row: 1
+            Layout.column: 2
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: rateMaxPWM
+                anchors.centerIn: parent
+                from: 0
+                to: 255
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("Max PWM")
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("PID scale")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        SpinBoxCustomized {
-            id: setRate
-            from: 0
-            to: 1000
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+        Item {
+            Layout.row: 1
+            Layout.column: 3
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: ratePIDscale
+                anchors.centerIn: parent
+                from: 0
+                to: 255
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("PID scale")
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("Rate SET")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        SpinBoxCustomized {
-            id: rateSensor
-            from: 0
-            to: 1000
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+        Item {
+            Layout.row: 1
+            Layout.column: 4
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            ComboBoxCustomized {
+                id: cboxRateMode
+                anchors.centerIn: parent
+                enabled: cboxIsRateControlOn.checked
+                editable: false
+                model: ListModel {
+                    ListElement { text: qsTr("Section UPM"); }
+                    ListElement { text: qsTr("Constant UPM"); }
+                    ListElement { text: qsTr("Applied rate"); }
+                    ListElement { text: qsTr("Target rate"); }
+                }
+                text: qsTr("Mode")
+                onActivated: mandatory.visible = true
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("Sensor Count")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        SpinBoxCustomized {
-            id: minSpeed
-            from: 0
-            to: 10
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+        Item {
+            Layout.row: 2
+            Layout.column: 0
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: setRate
+                anchors.centerIn: parent
+                from: 0
+                to: 1000
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("Rate SET")
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("Min Speed")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        SpinBoxCustomized {
-            id: minUPM
-            from: 0
-            to: 100
-            editable: true
-            enabled: cboxIsRateControlOn.checked
-            onValueModified: {
-                mandatory.visible = true;
+        Item {
+            Layout.row: 2
+            Layout.column: 1
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: rateSensor
+                anchors.centerIn: parent
+                from: 0
+                to: 1000
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("Sensor Count")
             }
-            anchors.bottomMargin: 10 * theme.scaleHeight
-            text: qsTr("Min UPM")
-            Layout.alignment: Qt.AlignCenter
         }
 
-        ComboBoxCustomized {
-            id: cboxRateControlType
-            enabled: cboxIsRateControlOn.checked
-            editable: false
-            model: ListModel {
-                ListElement { text: qsTr("Standard"); }
-                ListElement { text: qsTr("Combo Close"); }
-                ListElement { text: qsTr("Motor"); }
-                ListElement { text: qsTr("Combo Timed"); }
-                ListElement { text: qsTr("Fan"); }
+        Item {
+            Layout.row: 2
+            Layout.column: 2
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: minSpeed
+                anchors.centerIn: parent
+                from: 0
+                to: 10
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("Min Speed")
             }
-            text: qsTr("Control Type")
-            onActivated: mandatory.visible = true;
-            Layout.alignment: Qt.AlignCenter
         }
 
-        ComboBoxCustomized {
-            id: cboxRateMode
-            enabled: cboxIsRateControlOn.checked
-            editable: false
-            model: ListModel {
-                ListElement { text: qsTr("Section UPM"); }
-                ListElement { text: qsTr("Constant UPM"); }
-                ListElement { text: qsTr("Applied rate"); }
-                ListElement { text: qsTr("Target rate"); }
+        Item {
+            Layout.row: 2
+            Layout.column: 3
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            SpinBoxCustomized {
+                id: minUPM
+                anchors.centerIn: parent
+                from: 0
+                to: 100
+                editable: true
+                enabled: cboxIsRateControlOn.checked
+                onValueModified: mandatory.visible = true
+                text: qsTr("Min UPM")
             }
-            text: qsTr("Mode")
-            onActivated: mandatory.visible = true;
-            Layout.alignment: Qt.AlignCenter
         }
 
-        ComboBoxCustomized {
-            id: cboxRateCoverageUnits
-            enabled: cboxIsRateControlOn.checked
-            editable: false
-            model: ListModel {
-                ListElement { text: qsTr("Acres"); }
-                ListElement { text: qsTr("Hectare"); }
-                ListElement { text: qsTr("Minutes"); }
-                ListElement { text: qsTr("Hours"); }
+        Item {
+            Layout.row: 2
+            Layout.column: 4
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            ComboBoxCustomized {
+                id: cboxRateCoverageUnits
+                anchors.centerIn: parent
+                enabled: cboxIsRateControlOn.checked
+                editable: false
+                model: ListModel {
+                    ListElement { text: qsTr("Acres"); }
+                    ListElement { text: qsTr("Hectare"); }
+                    ListElement { text: qsTr("Minutes"); }
+                    ListElement { text: qsTr("Hours"); }
+                }
+                text: qsTr("Coverage Units")
+                onActivated: mandatory.visible = true
             }
-            text: qsTr("Coverage Units")
-            onActivated: mandatory.visible = true;
-            Layout.alignment: Qt.AlignCenter
         }
     }
-
+}
 
     IconButtonTransparent{
         id: back
@@ -544,9 +622,10 @@ Rectangle{
         id: mandatory
         anchors.right: parent.right
         anchors.verticalCenter: btnPinsSave.verticalCenter
-        anchors.rightMargin: 20 * theme.scaleWidth
+        Layout.preferredWidth: 30 * theme.scaleWidth
+        Layout.preferredHeight: 30 * theme.scaleHeight
         visible: false
         source: prefix + "/images/Config/ConSt_Mandatory.png"
-        height: back.width
+        fillMode: Image.PreserveAspectFit
     }
 }
