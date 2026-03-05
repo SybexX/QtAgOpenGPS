@@ -25,6 +25,7 @@ Rectangle{
     }
 
     property int prodID: 0;
+    property bool notSaved: false
 
     property var products: [
         {
@@ -69,7 +70,7 @@ Rectangle{
         minSpeed.value = product.settings[14];
         minUPM.value = product.settings[15];
 
-        mandatory.visible = false;
+        notSaved = false;
     }
 
     function saveCurrentProduct() {
@@ -97,7 +98,7 @@ Rectangle{
         SettingsManager.rate_productName2 = products[2].name;
         SettingsManager.rate_productName3 = products[3].name;
 
-        mandatory.visible = false;
+        notSaved = false;
         ModuleComm.modulesSend242()
     }
 
@@ -223,7 +224,7 @@ Rectangle{
                 to: 255
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
+                onValueModified: notSaved = true
                 text: qsTr("Module ID: ")
             }
         }
@@ -241,7 +242,7 @@ Rectangle{
                 to: 255
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
+                onValueModified: notSaved = true
                 text: qsTr("PID KP: ")
             }
         }
@@ -259,7 +260,7 @@ Rectangle{
                 to: 255
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
+                onValueModified: notSaved = true
                 text: qsTr("PID KI: ")
             }
         }
@@ -277,7 +278,7 @@ Rectangle{
                 to: 255
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
+                onValueModified: notSaved = true
                 text: qsTr("PID KD: ")
             }
         }
@@ -301,7 +302,7 @@ Rectangle{
                     ListElement { text: qsTr("Fan"); }
                 }
                 text: qsTr("Control Type")
-                onActivated: mandatory.visible = true
+                onActivated: notSaved = true
             }
         }
 
@@ -318,7 +319,7 @@ Rectangle{
                 to: 255
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
+                onValueModified: notSaved = true
                 text: qsTr("ProdDensity: ")
             }
         }
@@ -336,7 +337,7 @@ Rectangle{
                 to: 255
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
+                onValueModified: notSaved = true
                 text: qsTr("Min PWM")
             }
         }
@@ -354,7 +355,7 @@ Rectangle{
                 to: 255
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
+                onValueModified: notSaved = true
                 text: qsTr("Max PWM")
             }
         }
@@ -372,7 +373,7 @@ Rectangle{
                 to: 255
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
+                onValueModified: notSaved = true
                 text: qsTr("PID scale")
             }
         }
@@ -395,7 +396,7 @@ Rectangle{
                     ListElement { text: qsTr("Target rate"); }
                 }
                 text: qsTr("Mode")
-                onActivated: mandatory.visible = true
+                onActivated: notSaved = true
             }
         }
 
@@ -412,7 +413,7 @@ Rectangle{
                 to: 1000
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
+                onValueModified: notSaved = true
                 text: qsTr("Rate SET")
             }
         }
@@ -430,7 +431,7 @@ Rectangle{
                 to: 1000
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
+                onValueModified: notSaved = true
                 text: qsTr("Sensor Count")
             }
         }
@@ -448,7 +449,7 @@ Rectangle{
                 to: 10
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
+                onValueModified: notSaved = true
                 text: qsTr("Min Speed")
             }
         }
@@ -459,15 +460,15 @@ Rectangle{
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            SpinBoxCustomized {
+            SpinBox {
                 id: minUPM
                 anchors.centerIn: parent
                 from: 0
                 to: 100
                 editable: true
                 enabled: cboxIsRateControlOn.checked
-                onValueModified: mandatory.visible = true
-                text: qsTr("Min UPM")
+                onValueModified: notSaved = true
+                //text: qsTr("Min UPM")
             }
         }
 
@@ -489,7 +490,7 @@ Rectangle{
                     ListElement { text: qsTr("Hours"); }
                 }
                 text: qsTr("Coverage Units")
-                onActivated: mandatory.visible = true
+                onActivated: notSaved = true
             }
         }
     }
@@ -520,7 +521,7 @@ Rectangle{
     }
 
     IconButtonTransparent{
-        id: loadSetBlockage
+        id: loadSetRC
         anchors.bottom: parent.bottom
         anchors.left: back.right
         anchors.topMargin: 20 * theme.scaleHeight
@@ -531,15 +532,15 @@ Rectangle{
         icon.source: prefix + "/images/UpArrow64.png"
         onClicked: {
             loadCurrentProduct();
-            mandatory.visible = true;
+            notSaved = true;
         }
     }
 
     IconButtonColor{
         id: cboxIsRateControlOn
-        height: loadSetBlockage.height
+        height: loadSetRC.height
         anchors.bottom: parent.bottom
-        anchors.left: loadSetBlockage.right
+        anchors.left: loadSetRC.right
         anchors.topMargin: 20 * theme.scaleHeight
         anchors.bottomMargin: 20 * theme.scaleHeight
         anchors.rightMargin: 20 * theme.scaleHeight
@@ -547,12 +548,12 @@ Rectangle{
         icon.source: prefix + "/images/SwitchOff.png"
         iconChecked: prefix + "/images/SwitchOn.png"
         checkable: true
-        onClicked: mandatory.visible = true
+        onClicked: notSaved = true
     }
 
     IconButtonTransparent{
         id: ratePWMauto
-        height: loadSetBlockage.height
+        height: loadSetRC.height
         anchors.bottom: parent.bottom
         anchors.left: cboxIsRateControlOn.right
         anchors.topMargin: 20 * theme.scaleHeight
@@ -566,7 +567,7 @@ Rectangle{
 
     IconButtonTransparent{
         id: ratePWMUP
-        height: loadSetBlockage.height
+        height: loadSetRC.height
         anchors.bottom: parent.bottom
         anchors.left: ratePWMauto.right
         anchors.topMargin: 20 * theme.scaleHeight
@@ -588,7 +589,7 @@ Rectangle{
 
     IconButtonTransparent{
         id: ratePWMDN
-        height: loadSetBlockage.height
+        height: loadSetRC.height
         anchors.bottom: parent.bottom
         anchors.left: ratePWMUP.right
         anchors.topMargin: 20 * theme.scaleHeight
@@ -602,13 +603,13 @@ Rectangle{
 
     IconButtonTransparent{
         id: btnPinsSave
-        anchors.right: mandatory.left
+        anchors.right: parent.right
         anchors.topMargin: 20 * theme.scaleHeight
         anchors.bottomMargin: 20 * theme.scaleHeight
         anchors.rightMargin: 20 * theme.scaleHeight
         anchors.leftMargin: 20 * theme.scaleHeight
         anchors.bottom: parent.bottom
-        icon.source: prefix + "/images/ToolAcceptChange.png"
+        icon.source: notSaved?prefix + "/images/ToolAcceptNotSaved.png":prefix + "/images/ToolAcceptChange.png"
         Text{
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.left
@@ -616,16 +617,5 @@ Rectangle{
             text: qsTr("Send + Save");
         }
         onClicked: saveCurrentProduct()
-    }
-
-    Image{
-        id: mandatory
-        anchors.right: parent.right
-        anchors.verticalCenter: btnPinsSave.verticalCenter
-        Layout.preferredWidth: 30 * theme.scaleWidth
-        Layout.preferredHeight: 30 * theme.scaleHeight
-        visible: false
-        source: prefix + "/images/Config/ConSt_Mandatory.png"
-        fillMode: Image.PreserveAspectFit
     }
 }

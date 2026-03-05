@@ -18,6 +18,7 @@ Rectangle{
 
     // Threading Phase 1: Array helper property for relay_pinConfig
     property var relayPinConfig: SettingsManager.relay_pinConfig
+    property bool notSaved: false
 
     // Helper function to save relay config array back to SettingsManager
     function saveRelayPinConfig() {
@@ -67,7 +68,7 @@ Rectangle{
         pin23.currentIndex = relayPinConfig[22]
         pin24.currentIndex = relayPinConfig[23]
 
-        mandatory.visible = false
+        notSaved = false
 
     }
 
@@ -101,7 +102,7 @@ Rectangle{
         // Save to SettingsManager
         saveRelayPinConfig()
 
-        mandatory.visible = false
+        notSaved = false
     }
 
     GridLayout{
@@ -119,129 +120,132 @@ Rectangle{
         PinButtons{
             id: pin1
             pinNumber: "Pin 1"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin2
             pinNumber: "Pin 2"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin3
             pinNumber: "Pin 3"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin4
             pinNumber: "Pin 4"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin5
             pinNumber: "Pin 5"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin6
             pinNumber: "Pin 6"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin7
             pinNumber: "Pin 7"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin8
             pinNumber: "Pin 8"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin9
             pinNumber: "Pin 9"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin10
             pinNumber: "Pin 10"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin11
             pinNumber: "Pin 11"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin12
             pinNumber: "Pin 12"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin13
             pinNumber: "Pin 13"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin14
             pinNumber: "Pin 14"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin15
             pinNumber: "Pin 15"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin16
             pinNumber: "Pin 16"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin17
             pinNumber: "Pin 17"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin18
             pinNumber: "Pin 18"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin19
             pinNumber: "Pin 19"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin20
             pinNumber: "Pin 20"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin21
             pinNumber: "Pin 21"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin22
             pinNumber: "Pin 22"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin23
             pinNumber: "Pin 23"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
         PinButtons{
             id: pin24
             pinNumber: "Pin 24"
-            onCurrentIndexChanged: mandatory.visible = true
+            onCurrentIndexChanged: notSaved = true
         }
     }
     IconButtonTransparent{
         id: back
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.margins: 20
+        anchors.topMargin: 20 * theme.scaleHeight
+        anchors.bottomMargin: 20 * theme.scaleHeight
+        anchors.rightMargin: 20 * theme.scaleHeight
+        anchors.leftMargin: 20 * theme.scaleHeight
         icon.source: prefix + "/images/back-button.png"
         onClicked: {
             pin1.currentIndex = 0
@@ -273,22 +277,22 @@ Rectangle{
     IconButtonTransparent{
         anchors.bottom: parent.bottom
         anchors.left: back.right
-		anchors.topMargin: 20 * theme.scaleHeight
-		anchors.bottomMargin: 20 * theme.scaleHeight
-		anchors.rightMargin: 20 * theme.scaleHeight
-		anchors.leftMargin: 20 * theme.scaleHeight
+        anchors.topMargin: 20 * theme.scaleHeight
+        anchors.bottomMargin: 20 * theme.scaleHeight
+        anchors.rightMargin: 20 * theme.scaleHeight
+        anchors.leftMargin: 20 * theme.scaleHeight
         icon.source: prefix + "/images/UpArrow64.png"
         onClicked: load_settings()
     }
     IconButtonTransparent{
         id: btnPinsSave
-        anchors.right: mandatory.left
+        anchors.right: parent.right
 		anchors.topMargin: 20 * theme.scaleHeight
 		anchors.bottomMargin: 20 * theme.scaleHeight
 		anchors.rightMargin: 20 * theme.scaleHeight
 		anchors.leftMargin: 20 * theme.scaleHeight
         anchors.bottom: parent.bottom
-        icon.source: prefix + "/images/ToolAcceptChange.png"
+        icon.source: notSaved?prefix + "/images/ToolAcceptNotSaved.png":prefix + "/images/ToolAcceptChange.png"
         Text{
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.left
@@ -296,15 +300,5 @@ Rectangle{
             text: qsTr("Send + Save")
         }
         onClicked: save_settings()
-    }
-
-    Image{
-        id: mandatory
-        anchors.right: parent.right
-        anchors.verticalCenter: btnPinsSave.verticalCenter
-        anchors.rightMargin: 20 * theme.scaleWidth
-        visible: false
-        source: prefix + "/images/Config/ConSt_Mandatory.png"
-        height: back.width
     }
 }

@@ -16,6 +16,8 @@ Rectangle{
     color: aogInterface.backgroundColor
     visible: false
 
+    property bool notSaved: false
+
     onVisibleChanged: {
         if (visible) load_settings()
     }
@@ -30,7 +32,7 @@ Rectangle{
         modulerows4.boundValue = SettingsManager.seed_blockRow4
         cboxIsBlockageOn.checked = SettingsManager.seed_blockageIsOn
 
-        mandatory.visible = false
+        notSaved = false
     }
 
     function save_settings() {
@@ -44,16 +46,18 @@ Rectangle{
         SettingsManager.seed_blockageIsOn = cboxIsBlockageOn.checked
         SettingsManager.seed_numRows = Number(SettingsManager.seed_blockRow1 + SettingsManager.seed_blockRow2 + SettingsManager.seed_blockRow3 + SettingsManager.seed_blockRow4)
         blockageRows.setSizes()
-        mandatory.visible = false
+        notSaved = false
 
         ModuleComm.modulesSend245()
     }
 
     ColumnLayout {
-        anchors.fill: parent
+        anchors.right: parent.right
+        anchors.left: parent.left
+        anchors.bottom: btnPinsSave.top
+        anchors.top: parent.top
         anchors.margins: 10 * theme.scaleWidth
 
-        // Заголовок
         Label {
             Layout.alignment: Qt.AlignHCenter
             Layout.topMargin: 10 * theme.scaleHeight
@@ -62,20 +66,17 @@ Rectangle{
             font.bold: true
         }
 
-        // Основная область настроек
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
             spacing: 20 * theme.scaleWidth
 
-            // Левая часть - настройки рядов модулей
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: parent.width * 0.5
                 spacing: 0
 
-                // Заголовок модулей
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.bottomMargin: 15 * theme.scaleHeight
@@ -85,13 +86,11 @@ Rectangle{
                     color: aogInterface.textColor
                 }
 
-                // Контейнер для равномерного распределения 4 групп
                 ColumnLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     spacing: 0
 
-                    // Первая группа - модуль 1
                     Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -110,7 +109,7 @@ Rectangle{
                                 boundValue: SettingsManager.seed_blockRow1
                                 onValueModified: {
                                     SettingsManager.seed_blockRow1 = value
-                                    mandatory.visible = true
+                                    notSaved = true
                                 }
 
                                 Text {
@@ -125,7 +124,6 @@ Rectangle{
                         }
                     }
 
-                    // Вторая группа - модуль 2
                     Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -144,7 +142,7 @@ Rectangle{
                                 boundValue: SettingsManager.seed_blockRow2
                                 onValueModified: {
                                     SettingsManager.seed_blockRow2 = value
-                                    mandatory.visible = true
+                                    notSaved = true
                                 }
                                 Text {
                                     text: qsTr("Rows on module 2")
@@ -158,7 +156,6 @@ Rectangle{
                         }
                     }
 
-                    // Третья группа - модуль 3
                     Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -177,7 +174,7 @@ Rectangle{
                                 boundValue: SettingsManager.seed_blockRow3
                                 onValueModified: {
                                     SettingsManager.seed_blockRow3 = value
-                                    mandatory.visible = true
+                                    notSaved = true
                                 }
                                 Text {
                                     text: qsTr("Rows on module 3")
@@ -191,7 +188,6 @@ Rectangle{
                         }
                     }
 
-                    // Четвертая группа - модуль 4
                     Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -210,7 +206,7 @@ Rectangle{
                                 boundValue: SettingsManager.seed_blockRow4
                                 onValueModified: {
                                     SettingsManager.seed_blockRow4 = value
-                                    mandatory.visible = true
+                                    notSaved = true
                                 }
                                 Text {
                                     text: qsTr("Rows on module 4")
@@ -226,21 +222,18 @@ Rectangle{
                 }
             }
 
-            // Разделительная линия
             Rectangle {
                 Layout.fillHeight: true
                 Layout.preferredWidth: 1
                 color: aogInterface.borderColor
             }
 
-            // Правая часть - настройки порогов зерен
             ColumnLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.preferredWidth: parent.width * 0.5
                 spacing: 0
 
-                // Заголовок порогов
                 Text {
                     Layout.alignment: Qt.AlignHCenter
                     Layout.bottomMargin: 15 * theme.scaleHeight
@@ -250,13 +243,11 @@ Rectangle{
                     color: aogInterface.textColor
                 }
 
-                // Контейнер для равномерного распределения 3 групп
                 ColumnLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     spacing: 0
 
-                    // Первая группа - минимум
                     Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -264,8 +255,6 @@ Rectangle{
                         ColumnLayout {
                             anchors.fill: parent
                             //spacing: 5 * theme.scaleHeight
-
-
 
                             SpinBoxCustomized {
                                 id: graincountMin
@@ -277,7 +266,7 @@ Rectangle{
                                 boundValue: SettingsManager.seed_blockCountMin
                                 onValueModified: {
                                     SettingsManager.seed_blockCountMin = value
-                                    mandatory.visible = true
+                                    notSaved = true
                                 }
                                 Text {
                                     text: qsTr("Minimum grain count " + Utils.per_unit())
@@ -291,7 +280,6 @@ Rectangle{
                         }
                     }
 
-                    // Вторая группа - максимум
                     Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
@@ -310,7 +298,7 @@ Rectangle{
                                 boundValue: SettingsManager.seed_blockCountMax
                                 onValueModified: {
                                     SettingsManager.seed_blockCountMax = value
-                                    mandatory.visible = true
+                                    notSaved = true
                                 }
 
                                 Text {
@@ -325,131 +313,92 @@ Rectangle{
                         }
                     }
 
-                    // Третья группа - включение мониторинга
                     Item {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
 
-                        RowLayout {
-                            anchors.fill: parent
-                            spacing: 10 * theme.scaleWidth
-                            // Оставлено пустым, так как переключатель перенесен вниз
-                        }
                     }
                 }
             }
         }
+        }
+    IconButtonTransparent {
+        id: back
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.topMargin: 20 * theme.scaleHeight
+        anchors.bottomMargin: 20 * theme.scaleHeight
+        anchors.rightMargin: 20 * theme.scaleHeight
+        anchors.leftMargin: 20 * theme.scaleHeight
+        enabled: cboxIsBlockageOn.checked
+        icon.source: prefix + "/images/back-button.png"
+        onClicked: {
+            graincountMin.boundValue = 0
+            graincountMax.boundValue = 0
+            modulerows1.boundValue = 0
+            modulerows2.boundValue = 0
+            modulerows3.boundValue = 0
+            modulerows4.boundValue = 0
+            crops.currentIndex[0] = 0
+            notSaved = true
+        }
+    }
 
-        // Нижняя панель с кнопками - ИСПРАВЛЕННАЯ ВЕРСИЯ
-        Item {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 100 * theme.scaleHeight
-            Layout.topMargin: 20 * theme.scaleHeight
-            Layout.bottomMargin: 10 * theme.scaleHeight
+    IconButtonTransparent {
+        id: loadSetBlockage
+        anchors.bottom: parent.bottom
+        anchors.left: back.right
+        anchors.topMargin: 20 * theme.scaleHeight
+        anchors.bottomMargin: 20 * theme.scaleHeight
+        anchors.rightMargin: 20 * theme.scaleHeight
+        anchors.leftMargin: 20 * theme.scaleHeight
+        enabled: cboxIsBlockageOn.checked
+        icon.source: prefix + "/images/UpArrow64.png"
+        onClicked: {
+            load_settings()
+            notSaved = true
+        }
+    }
 
-            // Левые кнопки - выровнены по левому краю
-            Row {
-                spacing: 10 * theme.scaleWidth
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
 
-                IconButtonTransparent {
-                    id: back
-                    width: 80 * theme.scaleWidth
-                    height: 60 * theme.scaleHeight
-                    anchors.verticalCenter: parent.verticalCenter
-                    enabled: cboxIsBlockageOn.checked
-                    icon.source: prefix + "/images/back-button.png"
-                    onClicked: {
-                        graincountMin.boundValue = 0
-                        graincountMax.boundValue = 0
-                        modulerows1.boundValue = 0
-                        modulerows2.boundValue = 0
-                        modulerows3.boundValue = 0
-                        modulerows4.boundValue = 0
-                        crops.currentIndex[0] = 0
-                        mandatory.visible = true
-                    }
-                }
+    IconButtonColor {
+        id: cboxIsBlockageOn
+        height: loadSetBlockage.height
+        anchors.bottom: parent.bottom
+        anchors.left: loadSetBlockage.right
+        anchors.topMargin: 20 * theme.scaleHeight
+        anchors.bottomMargin: 20 * theme.scaleHeight
+        anchors.rightMargin: 20 * theme.scaleHeight
+        anchors.leftMargin: 20 * theme.scaleHeight
+        icon.source: prefix + "/images/SwitchOff.png"
+        iconChecked: prefix + "/images/SwitchOn.png"
+        checkable: true
+        onClicked: notSaved = true
+        Text {
+            text: qsTr("Enable Blockage Monitoring")
+            font.bold: true
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.top
+            anchors.bottomMargin: 5 * theme.scaleWidth
+            color: aogInterface.textColor
+        }
+    }
 
-                IconButtonTransparent {
-                    id: loadSetBlockage
-                    width: 80 * theme.scaleWidth
-                    height: 60 * theme.scaleHeight
-                    anchors.verticalCenter: parent.verticalCenter
-                    enabled: cboxIsBlockageOn.checked
-                    icon.source: prefix + "/images/UpArrow64.png"
-                    onClicked: {
-                        load_settings()
-                        mandatory.visible = true
-                    }
-                }
-
-                // Кнопка включения мониторинга с текстом снизу
-                Column {
-                    //spacing: 5 * theme.scaleHeight
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    IconButtonColor {
-                        id: cboxIsBlockageOn
-                        width: 100 * theme.scaleWidth
-                        height: 60 * theme.scaleHeight
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        icon.source: prefix + "/images/SwitchOff.png"
-                        iconChecked: prefix + "/images/SwitchOn.png"
-                        checkable: true
-                        onClicked: mandatory.visible = true
-                        Text {
-                            text: qsTr("Enable Blockage Monitoring")
-                            font.bold: true
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.bottom: parent.top
-                            anchors.bottomMargin: 5 * theme.scaleWidth
-                            color: aogInterface.textColor
-                        }
-                    }
-                }
-            }
-
-            // Правые кнопки - выровнены по правому краю
-            Row {
-                spacing: 10 * theme.scaleWidth
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-
-                Image {
-                    id: mandatory
-                    width: 30 * theme.scaleWidth
-                    height: 30 * theme.scaleHeight
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: false
-                    source: prefix + "/images/Config/ConSt_Mandatory.png"
-                    fillMode: Image.PreserveAspectFit
-                }
-
-                // Кнопка сохранения с текстом снизу
-                Column {
-                    //spacing: 5 * theme.scaleHeight
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    IconButtonTransparent {
-                        id: btnPinsSave
-                        width: 150 * theme.scaleWidth
-                        height: 60 * theme.scaleHeight
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        icon.source: prefix + "/images/ToolAcceptChange.png"
-                        onClicked: save_settings()
-                        Text {
-                            text: qsTr("Send + Save")
-                            font.bold: true
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            anchors.bottom: parent.top
-                            anchors.bottomMargin: 5 * theme.scaleWidth
-                            color: aogInterface.textColor
-                        }
-                    }
-                }
-            }
+    IconButtonTransparent {
+        id: btnPinsSave
+        anchors.right: parent.right
+        anchors.topMargin: 20 * theme.scaleHeight
+        anchors.bottomMargin: 20 * theme.scaleHeight
+        anchors.rightMargin: 20 * theme.scaleHeight
+        anchors.leftMargin: 20 * theme.scaleHeight
+        anchors.bottom: parent.bottom
+        icon.source: notSaved?prefix + "/images/ToolAcceptNotSaved.png":prefix + "/images/ToolAcceptChange.png"
+        onClicked: save_settings()
+        Text{
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.left
+            anchors.rightMargin: 5
+            text: qsTr("Send + Save");
         }
     }
 }
