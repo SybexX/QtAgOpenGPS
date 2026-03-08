@@ -175,7 +175,7 @@ imu_rollFilter|imu/rollFilter|0|double|
 imu_rollZero|imu/rollZero|0|double|
 jobMenu_location|jobMenu/location|QPoint(200,200)|QPoint|
 jobMenu_size|jobMenu/size|"640,530"|QString|
-key_hotKeys|key/hotKeys|"ACFGMNPTYVW12345678"|QString|
+key_hotKeys|key/hotKeys|"1","2","3","4","5","6","7","8","Q","W","E","F1","F2","R","T","Y","U","I","O"|QVariantList|
 menu_isCompassOn|menu/isCompassOn|true|bool|
 menu_isGridOn|menu/isGridOn|true|bool|
 menu_isLightBarNotSteerBar|menu/isLightBarNotSteerBar|false|bool|
@@ -397,6 +397,5 @@ rate_productName0|rate/productName0|"0"|QString|
 rate_productName1|rate/productName1|"1"|QString|
 rate_productName2|rate/productName2|"2"|QString|
 rate_productName3|rate/productName3|"3"|QString|
-key_hotKey|key/hotKey|49, 50, 51, 52, 53, 54, 55, 56, 65, 67, 71, 77, 78, 80, 84, 89|QVector<int>|
 menu_isKeyboardOn|menu/isKeyboardOn|false|bool|
 

@@ -19,11 +19,22 @@ Dialog {
     property var awaitingButton: null
     property bool awaitingKey: false
     property string oldButtonText: ""
-    property var defaults: [ 49, 50, 51, 52, 53, 54, 55, 56, 65, 67, 71, 77, 78, 80, 84, 89]
-    property var key_hotKey: [ 49, 50, 51, 52, 53, 54, 55, 56, 65, 67, 71, 77, 78, 80, 84, 89]
+    property var defaults: ["1","2","3","4","5","6","7","8","A","C","G","M","N","P","T","Y"]
+    property var key_hotKeys: ["1","2","3","4","5","6","7","8","A","C","G","M","N","P","T","Y"]
 
     function show() {
-        key_hotKey = SettingsManager.key_hotKey.slice();
+        // Загружаем строки из настроек (если там ещё числа, можно преобразовать)
+        var loaded = SettingsManager.key_hotKeys;
+        if (loaded && loaded.length > 0) {
+            // Если loaded[0] – число, преобразуем все элементы в строки
+            if (typeof loaded[0] === "number") {
+                key_hotKeys = loaded.map(function(code) { return keyToText(code); });
+            } else {
+                key_hotKeys = loaded.slice(); // уже строки
+            }
+        } else {
+            key_hotKeys = defaults.slice();
+        }
         visible = true;
     }
 
@@ -45,8 +56,42 @@ Dialog {
         focus = true;
     }
 
-    Connections {
-        target: mainWindow
+    Item {
+        anchors.fill: parent
+        focus: true
+
+        Component.onCompleted: forceActiveFocus()
+
+        onActiveFocusChanged: {
+            if (!activeFocus) {
+                forceActiveFocus()
+            }
+        }
+
+        Keys.onPressed: function(event) {
+            keyPressed(event.key)
+            if (awaitingKey && awaitingButton) {
+                btnPinsSave.enabled = true
+
+                if (event.key === Qt.Key_Escape) {
+                    awaitingButton.isWaiting = false
+                    awaitingKey = false
+                    awaitingButton = null
+                    return
+                }
+
+                var newArray = key_hotKeys.slice()
+                newArray[awaitingButton.hotKeyIndex] = keyToText(event.key)
+                key_hotKeys = newArray
+
+                awaitingButton.isWaiting = false
+                awaitingKey = false
+                awaitingButton = null
+            }
+        }
+    }
+
+
         function onKeyPressed(code) {
             if (awaitingKey && awaitingButton) {
                 btnPinsSave.enabled = true
@@ -58,16 +103,16 @@ Dialog {
                     return
                 }
 
-                var newArray = key_hotKey.slice()
+                var newArray = key_hotKeys.slice()
                 newArray[awaitingButton.hotKeyIndex] = code
-                key_hotKey = newArray
+                key_hotKeys = newArray
 
                 awaitingButton.isWaiting = false
                 awaitingKey = false
                 awaitingButton = null
             }
         }
-    }
+
 
     function keyToDisplay(key) {
         if (key >= 0x20 && key <= 0x7E && key !== 0x20)
@@ -96,6 +141,75 @@ Dialog {
         case Qt.Key_Control: return "Ctrl"
         case Qt.Key_Alt: return "Alt"
         default: return "Key(" + key + ")"
+        }
+    }
+    function keyToText(key) {
+        // Для печатных символов (буквы, цифры) возвращаем сам символ
+        if (key >= Qt.Key_A && key <= Qt.Key_Z)
+            return String.fromCharCode(key);
+        if (key >= Qt.Key_0 && key <= Qt.Key_9)
+            return String.fromCharCode(key);
+
+        switch (key) {
+        case Qt.Key_Up: return "Up";
+        case Qt.Key_Down: return "Down";
+        case Qt.Key_Left: return "Left";
+        case Qt.Key_Right: return "Right";
+        case Qt.Key_Return: return "Enter";
+        case Qt.Key_Escape: return "Esc";
+        case Qt.Key_Space: return "Space";
+        case Qt.Key_F1: return "F1";
+        case Qt.Key_F2: return "F2";
+        case Qt.Key_F3: return "F3";
+        case Qt.Key_F4: return "F4";
+        case Qt.Key_F5: return "F5";
+        case Qt.Key_F6: return "F6";
+        case Qt.Key_F7: return "F7";
+        case Qt.Key_F8: return "F8";
+        case Qt.Key_F9: return "F9";
+        case Qt.Key_F10: return "F10";
+        case Qt.Key_F11: return "F11";
+        case Qt.Key_F12: return "F12";
+        case Qt.Key_Shift: return "Shift";
+        case Qt.Key_Control: return "Ctrl";
+        case Qt.Key_Alt: return "Alt";
+        default: return "Key(" + key + ")";
+        }
+    }
+
+    function textToKey(text) {
+        // Обратное преобразование: по строке получаем код клавиши
+        if (text.length === 1 && text.match(/[A-Z0-9]/i))
+            return text.charCodeAt(0); // Для одиночных букв/цифр
+
+        switch (text) {
+        case "Up": return Qt.Key_Up;
+        case "Down": return Qt.Key_Down;
+        case "Left": return Qt.Key_Left;
+        case "Right": return Qt.Key_Right;
+        case "Enter": return Qt.Key_Return;
+        case "Esc": return Qt.Key_Escape;
+        case "Space": return Qt.Key_Space;
+        case "F1": return Qt.Key_F1;
+        case "F2": return Qt.Key_F2;
+        case "F3": return Qt.Key_F3;
+        case "F4": return Qt.Key_F4;
+        case "F5": return Qt.Key_F5;
+        case "F6": return Qt.Key_F6;
+        case "F7": return Qt.Key_F7;
+        case "F8": return Qt.Key_F8;
+        case "F9": return Qt.Key_F9;
+        case "F10": return Qt.Key_F10;
+        case "F11": return Qt.Key_F11;
+        case "F12": return Qt.Key_F12;
+        case "Shift": return Qt.Key_Shift;
+        case "Ctrl": return Qt.Key_Control;
+        case "Alt": return Qt.Key_Alt;
+        default:
+            // Попытка извлечь число из "Key(123)"
+            var match = text.match(/^Key\((\d+)\)$/);
+            if (match) return parseInt(match[1], 10);
+            return 0; // Неизвестная клавиша
         }
     }
 
@@ -171,7 +285,7 @@ Dialog {
         Item {
             id: wrapper0
             property int hotKeyIndex: 8
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 1; Layout.column: 1
@@ -216,7 +330,7 @@ Dialog {
         Item {
             id: wrapper8
             property int hotKeyIndex: 0
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 1; Layout.column: 3
@@ -259,7 +373,7 @@ Dialog {
         Item {
             id: wrapper1
             property int hotKeyIndex: 9
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 2; Layout.column: 1
@@ -303,7 +417,7 @@ Dialog {
         Item {
             id: wrapper9
             property int hotKeyIndex: 1
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 2; Layout.column: 3
@@ -345,7 +459,7 @@ Dialog {
         Item {
             id: wrapper2
             property int hotKeyIndex: 10
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 3; Layout.column: 1
@@ -389,7 +503,7 @@ Dialog {
         Item {
             id: wrapper10
             property int hotKeyIndex: 2
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 3; Layout.column: 3
@@ -431,7 +545,7 @@ Dialog {
         Item {
             id: wrapper3
             property int hotKeyIndex: 11
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 4; Layout.column: 1
@@ -475,7 +589,7 @@ Dialog {
         Item {
             id: wrapper11
             property int hotKeyIndex: 3
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 4; Layout.column: 3
@@ -517,7 +631,7 @@ Dialog {
         Item {
             id: wrapper4
             property int hotKeyIndex: 12
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 5; Layout.column: 1
@@ -561,7 +675,7 @@ Dialog {
         Item {
             id: wrapper12
             property int hotKeyIndex: 4
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 5; Layout.column: 3
@@ -603,7 +717,7 @@ Dialog {
         Item {
             id: wrapper5
             property int hotKeyIndex: 13
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 6; Layout.column: 1
@@ -647,7 +761,7 @@ Dialog {
         Item {
             id: wrapper13
             property int hotKeyIndex: 5
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 6; Layout.column: 3
@@ -689,7 +803,7 @@ Dialog {
         Item {
             id: wrapper6
             property int hotKeyIndex: 14
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 7; Layout.column: 1
@@ -733,7 +847,7 @@ Dialog {
         Item {
             id: wrapper14
             property int hotKeyIndex: 6
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 7; Layout.column: 3
@@ -775,7 +889,7 @@ Dialog {
         Item {
             id: wrapper7
             property int hotKeyIndex: 15
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 8; Layout.column: 1
@@ -819,7 +933,7 @@ Dialog {
         Item {
             id: wrapper15
             property int hotKeyIndex: 7
-            property string buttonText: keyToDisplay(key_hotKey[hotKeyIndex])
+            property string buttonText: key_hotKeys[hotKeyIndex]
             property bool isWaiting: false
 
             Layout.row: 8; Layout.column: 3
@@ -861,7 +975,7 @@ Dialog {
             anchors.leftMargin: 20 * theme.scaleHeight
             icon.source: prefix + "/images/UpArrow64.png"
             onClicked: {
-                key_hotKey = defaults.slice();
+                key_hotKeys = defaults.slice();
                 btnPinsSave.enabled = true
             }
         }
@@ -891,7 +1005,7 @@ Dialog {
                 text: qsTr("Send + Save")
             }
             onClicked: {
-                SettingsManager.key_hotKey = key_hotKey
+                SettingsManager.key_hotKeys = key_hotKeys
                 btnPinsSave.enabled = false
             }
         }

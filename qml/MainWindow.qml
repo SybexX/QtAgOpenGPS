@@ -42,27 +42,13 @@ Window {
     signal keyPressed(int val)
     signal hotKeyPressed(int index)
 
-
-    Item {
-        anchors.fill: parent
-        focus: true
-
-        Component.onCompleted: forceActiveFocus()
-
-        onActiveFocusChanged: {
-            if (!activeFocus) {
-                forceActiveFocus()
-            }
-        }
-
-        Keys.onPressed: function(event) {
-            keyPressed(event.key)
-
-            var index = SettingsManager.key_hotKey.indexOf(event.key)
-            if (index !== -1) {
-                hotKeyPressed(index)
-                event.accepted = true
-            }
+    Instantiator {
+        model: SettingsManager.key_hotKeys
+        delegate: Shortcut {
+            enabled: !hotKeySettings.visible
+            sequence: modelData
+            context: Qt.ApplicationShortcut
+            onActivated: hotKeyPressed(index)
         }
     }
 

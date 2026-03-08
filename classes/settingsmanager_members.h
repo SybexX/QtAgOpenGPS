@@ -4,7 +4,7 @@
 // File 3/3: Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS members for private: section
 
 // Generated property members with Qt6 bindable support
-// Total members: 397
+// Total members: 396
 
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_menu_language, "en", &SettingsManager::menu_languageChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_feature_isOffsetFixOn, false, &SettingsManager::feature_isOffsetFixOnChanged)
@@ -179,7 +179,7 @@ Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, double, m_imu_rollFilter, 
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, double, m_imu_rollZero, 0, &SettingsManager::imu_rollZeroChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QPoint, m_jobMenu_location, QPoint(200, 200), &SettingsManager::jobMenu_locationChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_jobMenu_size, "640,530", &SettingsManager::jobMenu_sizeChanged)
-Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_key_hotKeys, "ACFGMNPTYVW12345678", &SettingsManager::key_hotKeysChanged)
+Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QVariantList, m_key_hotKeys, QVariantList(), &SettingsManager::key_hotKeysChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_menu_isCompassOn, true, &SettingsManager::menu_isCompassOnChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_menu_isGridOn, true, &SettingsManager::menu_isGridOnChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_menu_isLightBarNotSteerBar, false, &SettingsManager::menu_isLightBarNotSteerBarChanged)
@@ -401,7 +401,6 @@ Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_rate_productNam
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_rate_productName1, "1", &SettingsManager::rate_productName1Changed)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_rate_productName2, "2", &SettingsManager::rate_productName2Changed)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_rate_productName3, "3", &SettingsManager::rate_productName3Changed)
-Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QVector<int>, m_key_hotKey, (QVector<int>{49, 50, 51, 52, 53, 54, 55, 56, 65, 67, 71, 77, 78, 80, 84, 89}), &SettingsManager::key_hotKeyChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_menu_isKeyboardOn, false, &SettingsManager::menu_isKeyboardOnChanged)
 
 // End of generated property members

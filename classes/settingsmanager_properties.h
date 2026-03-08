@@ -6,10 +6,10 @@
 #include "settingsmanager_macros.h"
 
 // Generated Q_PROPERTY declarations with Qt6 bindable support
-// Total properties: 397
+// Total properties: 396
 
 
-// QString Properties (50 properties) - DECLARATIONS ONLY
+// QString Properties (49 properties) - DECLARATIONS ONLY
 SETTINGS_PROPERTY_STRING_DECLARATIONS(menu_language, setMenu_language)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(brand_HBrand, setBrand_HBrand)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(brand_TBrand, setBrand_TBrand)
@@ -23,7 +23,6 @@ SETTINGS_PROPERTY_STRING_DECLARATIONS(f_currentDir, setF_currentDir)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(gps_fixFromWhichSentence, setGps_fixFromWhichSentence)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(gps_headingFromWhichSource, setGps_headingFromWhichSource)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(jobMenu_size, setJobMenu_size)
-SETTINGS_PROPERTY_STRING_DECLARATIONS(key_hotKeys, setKey_hotKeys)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(vehicle_vehicleName, setVehicle_vehicleName)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(window_headAcheSize, setWindow_headAcheSize)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(window_headlineSize, setWindow_headlineSize)
@@ -407,21 +406,21 @@ SETTINGS_PROPERTY_POINT_DECLARATIONS(window_location, setWindow_location)
 SETTINGS_PROPERTY_POINT_DECLARATIONS(window_quickABLocation, setWindow_quickABLocation)
 SETTINGS_PROPERTY_POINT_DECLARATIONS(window_steerSettingsLocation, setWindow_steerSettingsLocation)
 
+// QVariantList Properties (2 properties) - DECLARATIONS ONLY
+SETTINGS_PROPERTY_DECLARATIONS(QVariantList, key_hotKeys, setKey_hotKeys)
+SETTINGS_PROPERTY_DECLARATIONS(QVariantList, bluetooth_deviceList, setBluetooth_deviceList)
+
 // QRect Properties (3 properties) - DECLARATIONS ONLY
 SETTINGS_PROPERTY_RECT_DECLARATIONS(window_abDrawLocation, setWindow_abDrawLocation)
 SETTINGS_PROPERTY_RECT_DECLARATIONS(window_bingMapSize, setWindow_bingMapSize)
 SETTINGS_PROPERTY_RECT_DECLARATIONS(window_formNudgeLocation, setWindow_formNudgeLocation)
 
-// QVector<int> Properties (7 properties) - DECLARATIONS ONLY
+// QVector<int> Properties (6 properties) - DECLARATIONS ONLY
 SETTINGS_PROPERTY_VECTOR_INT_DECLARATIONS(relay_pinConfig, setRelay_pinConfig)
 SETTINGS_PROPERTY_VECTOR_INT_DECLARATIONS(tool_zones, setTool_zones)
 SETTINGS_PROPERTY_VECTOR_INT_DECLARATIONS(rate_confProduct0, setRate_confProduct0)
 SETTINGS_PROPERTY_VECTOR_INT_DECLARATIONS(rate_confProduct1, setRate_confProduct1)
 SETTINGS_PROPERTY_VECTOR_INT_DECLARATIONS(rate_confProduct2, setRate_confProduct2)
 SETTINGS_PROPERTY_VECTOR_INT_DECLARATIONS(rate_confProduct3, setRate_confProduct3)
-SETTINGS_PROPERTY_VECTOR_INT_DECLARATIONS(key_hotKey, setKey_hotKey)
-
-// QVariantList Properties (1 properties) - DECLARATIONS ONLY
-SETTINGS_PROPERTY_DECLARATIONS(QVariantList, bluetooth_deviceList, setBluetooth_deviceList)
 
 // End of generated property declarations

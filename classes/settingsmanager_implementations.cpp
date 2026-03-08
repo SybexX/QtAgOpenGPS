@@ -6,10 +6,10 @@
 #include "settingsmanager.h"
 
 // Generated implementations with Qt6 + QSettings persistence
-// Total implementations: 397
+// Total implementations: 396
 
 
-// QString Implementations (50 properties)
+// QString Implementations (49 properties)
 SETTINGS_PROPERTY_STRING_IMPL(menu_language, menu, "menu/language", "en", setMenu_language)
 SETTINGS_PROPERTY_STRING_IMPL(brand_HBrand, brand, "brand/HBrand", "AgOpenGPS", setBrand_HBrand)
 SETTINGS_PROPERTY_STRING_IMPL(brand_TBrand, brand, "brand/TBrand", "AGOpenGPS", setBrand_TBrand)
@@ -23,7 +23,6 @@ SETTINGS_PROPERTY_STRING_IMPL(f_currentDir, f, "f/currentDir", "", setF_currentD
 SETTINGS_PROPERTY_STRING_IMPL(gps_fixFromWhichSentence, gps, "gps/fixFromWhichSentence", "GGA", setGps_fixFromWhichSentence)
 SETTINGS_PROPERTY_STRING_IMPL(gps_headingFromWhichSource, gps, "gps/headingFromWhichSource", "Fix", setGps_headingFromWhichSource)
 SETTINGS_PROPERTY_STRING_IMPL(jobMenu_size, jobMenu, "jobMenu/size", "640,530", setJobMenu_size)
-SETTINGS_PROPERTY_STRING_IMPL(key_hotKeys, key, "key/hotKeys", "ACFGMNPTYVW12345678", setKey_hotKeys)
 SETTINGS_PROPERTY_STRING_IMPL(vehicle_vehicleName, vehicle, "vehicle/vehicleName", "Default Vehicle", setVehicle_vehicleName)
 SETTINGS_PROPERTY_STRING_IMPL(window_headAcheSize, window, "window/headAcheSize", "1022,742", setWindow_headAcheSize)
 SETTINGS_PROPERTY_STRING_IMPL(window_headlineSize, window, "window/headlineSize", "1022,742", setWindow_headlineSize)
@@ -413,13 +412,18 @@ SETTINGS_PROPERTY_POINT_IMPL(window_quickABLocation, window, "window/quickABLoca
 SETTINGS_PROPERTY_POINT_IMPL(window_steerSettingsLocation, window, "window/steerSettingsLocation", QPoint(40, 40), setWindow_steerSettingsLocation)
 
 
+// QVariantList Implementations (2 properties)
+SETTINGS_PROPERTY_IMPL(QVariantList, key_hotKeys, key, "key/hotKeys", QVariantList(), setKey_hotKeys)
+SETTINGS_PROPERTY_IMPL(QVariantList, bluetooth_deviceList, bluetooth, "bluetooth/deviceList", QVariantList(), setBluetooth_deviceList)
+
+
 // QRect Implementations (3 properties)
 SETTINGS_PROPERTY_RECT_IMPL(window_abDrawLocation, window, "window/abDrawLocation", QRect(0, 0, 1022, 742), setWindow_abDrawLocation)
 SETTINGS_PROPERTY_RECT_IMPL(window_bingMapSize, window, "window/bingMapSize", QRect(0, 0, 965, 700), setWindow_bingMapSize)
 SETTINGS_PROPERTY_RECT_IMPL(window_formNudgeLocation, window, "window/formNudgeLocation", QRect(0, 0, 200, 200), setWindow_formNudgeLocation)
 
 
-// QVector<int> Implementations (7 properties)
+// QVector<int> Implementations (6 properties)
 QVector<int> SettingsManager::relay_pinConfig() const {
     return m_relay_pinConfig.value();
 }
@@ -504,24 +508,6 @@ void SettingsManager::setRate_confProduct3(const QVector<int>& value) {
 QBindable<QVector<int>> SettingsManager::bindablerate_confProduct3() {
     return &m_rate_confProduct3;
 }
-QVector<int> SettingsManager::key_hotKey() const {
-    return m_key_hotKey.value();
-}
-void SettingsManager::setKey_hotKey(const QVector<int>& value) {
-    QStringList strList;
-    for (int i : value) strList << QString::number(i);
-    m_key_hotKey.setValue(value);
-    m_qsettings->setValue("key/hotKey", strList);
-    m_qsettings->sync();
-    emit keyGroupChanged();
-}
-QBindable<QVector<int>> SettingsManager::bindablekey_hotKey() {
-    return &m_key_hotKey;
-}
-
-
-// QVariantList Implementations (1 properties)
-SETTINGS_PROPERTY_IMPL(QVariantList, bluetooth_deviceList, bluetooth, "bluetooth/deviceList", QVariantList(), setBluetooth_deviceList)
 
 
 // End of generated implementations

@@ -7,7 +7,7 @@
 
 void SettingsManager::initializeFromSettings()
 {
-    // Load all 397 properties from QSettings with default fallback
+    // Load all 396 properties from QSettings with default fallback
     // IMPORTANT: Uses QSettings second parameter for defaults (not hardcoded 0/false)
 
     m_menu_language.setValue(m_qsettings->value("menu/language", "en").toString());
@@ -183,7 +183,7 @@ void SettingsManager::initializeFromSettings()
     m_imu_rollZero.setValue(m_qsettings->value("imu/rollZero", 0).toDouble());
     m_jobMenu_location.setValue(m_qsettings->value("jobMenu/location", QPoint(200, 200)).toPoint());
     m_jobMenu_size.setValue(m_qsettings->value("jobMenu/size", "640,530").toString());
-    m_key_hotKeys.setValue(m_qsettings->value("key/hotKeys", "ACFGMNPTYVW12345678").toString());
+    m_key_hotKeys.setValue(m_qsettings->value("key/hotKeys", QVariantList()).toList());
     m_menu_isCompassOn.setValue(m_qsettings->value("menu/isCompassOn", true).toBool());
     m_menu_isGridOn.setValue(m_qsettings->value("menu/isGridOn", true).toBool());
     m_menu_isLightBarNotSteerBar.setValue(m_qsettings->value("menu/isLightBarNotSteerBar", false).toBool());
@@ -465,19 +465,8 @@ void SettingsManager::initializeFromSettings()
     m_rate_productName1.setValue(m_qsettings->value("rate/productName1", "1").toString());
     m_rate_productName2.setValue(m_qsettings->value("rate/productName2", "2").toString());
     m_rate_productName3.setValue(m_qsettings->value("rate/productName3", "3").toString());
-    {
-        QStringList defaultList({"49", "50", "51", "52", "53", "54", "55", "56", "65", "67", "71", "77", "78", "80", "84", "89"});
-        QStringList list = m_qsettings->value("key/hotKey", defaultList).toStringList();
-        QVector<int> vector;
-        for (const QString& str : std::as_const(list)) {
-            bool ok;
-            int val = str.toInt(&ok);
-            if (ok) vector.append(val);
-        }
-        m_key_hotKey.setValue(vector);
-    }
     m_menu_isKeyboardOn.setValue(m_qsettings->value("menu/isKeyboardOn", false).toBool());
 
     // All properties loaded with proper defaults
-    qDebug() << "SettingsManager: initialized" << 397 << "properties from" << m_qsettings->fileName();
+    qDebug() << "SettingsManager: initialized" << 396 << "properties from" << m_qsettings->fileName();
 }
