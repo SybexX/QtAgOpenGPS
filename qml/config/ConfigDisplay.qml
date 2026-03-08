@@ -102,6 +102,13 @@ Item {
                 isChecked: SettingsManager.menu_isCompassOn
                 onCheckedChanged: SettingsManager.menu_isCompassOn = checked
             }
+            DisplayAndFeaturesBtns{
+                id: keyboard
+                text: qsTr("Keyboard")
+                icon.source: prefix + "/images/Config/ConD_KeyBoard.png"
+                isChecked: SettingsManager.menu_isKeyboardOn
+                onCheckedChanged: SettingsManager.menu_isKeyboardOn = checked
+            }
             /*DisplayAndFeaturesBtns{ //appears there is no setting for this
                 id: speedo
                 text: qsTr("Speedometer")

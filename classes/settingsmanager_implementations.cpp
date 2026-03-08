@@ -6,7 +6,7 @@
 #include "settingsmanager.h"
 
 // Generated implementations with Qt6 + QSettings persistence
-// Total implementations: 396
+// Total implementations: 397
 
 
 // QString Implementations (50 properties)
@@ -62,7 +62,7 @@ SETTINGS_PROPERTY_STRING_IMPL(rate_productName2, rate, "rate/productName2", "2",
 SETTINGS_PROPERTY_STRING_IMPL(rate_productName3, rate, "rate/productName3", "3", setRate_productName3)
 
 
-// bool Implementations (131 properties)
+// bool Implementations (132 properties)
 SETTINGS_PROPERTY_IMPL(bool, feature_isOffsetFixOn, feature, "feature/isOffsetFixOn", false, setFeature_isOffsetFixOn)
 SETTINGS_PROPERTY_IMPL(bool, ardMac_isDanFoss, ardMac, "ardMac/isDanFoss", false, setArdMac_isDanFoss)
 SETTINGS_PROPERTY_IMPL(bool, ardMac_isHydEnabled, ardMac, "ardMac/isHydEnabled", 0, setArdMac_isHydEnabled)
@@ -194,6 +194,7 @@ SETTINGS_PROPERTY_IMPL(bool, mod_isIMUConnected, agio, "agio/isIMUConnected", fa
 SETTINGS_PROPERTY_IMPL(bool, mod_isSteerConnected, agio, "agio/isSteerConnected", false, setMod_isSteerConnected)
 SETTINGS_PROPERTY_IMPL(bool, mod_isMachineConnected, agio, "agio/isMachineConnected", false, setMod_isMachineConnected)
 SETTINGS_PROPERTY_IMPL(bool, udp_isSendNMEAToUDP, agio, "agio/sendNMEAToUDP", false, setUdp_isSendNMEAToUDP)
+SETTINGS_PROPERTY_IMPL(bool, menu_isKeyboardOn, menu, "menu/isKeyboardOn", false, setMenu_isKeyboardOn)
 
 
 // double Implementations (104 properties)

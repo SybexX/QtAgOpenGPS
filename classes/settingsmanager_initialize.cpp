@@ -7,7 +7,7 @@
 
 void SettingsManager::initializeFromSettings()
 {
-    // Load all 396 properties from QSettings with default fallback
+    // Load all 397 properties from QSettings with default fallback
     // IMPORTANT: Uses QSettings second parameter for defaults (not hardcoded 0/false)
 
     m_menu_language.setValue(m_qsettings->value("menu/language", "en").toString());
@@ -466,7 +466,7 @@ void SettingsManager::initializeFromSettings()
     m_rate_productName2.setValue(m_qsettings->value("rate/productName2", "2").toString());
     m_rate_productName3.setValue(m_qsettings->value("rate/productName3", "3").toString());
     {
-        QStringList defaultList({"65", "67", "71", "77", "78", "80", "84", "89", "49", "50", "51", "52", "53", "54", "55", "56"});
+        QStringList defaultList({"49", "50", "51", "52", "53", "54", "55", "56", "65", "67", "71", "77", "78", "80", "84", "89"});
         QStringList list = m_qsettings->value("key/hotKey", defaultList).toStringList();
         QVector<int> vector;
         for (const QString& str : std::as_const(list)) {
@@ -476,7 +476,8 @@ void SettingsManager::initializeFromSettings()
         }
         m_key_hotKey.setValue(vector);
     }
+    m_menu_isKeyboardOn.setValue(m_qsettings->value("menu/isKeyboardOn", false).toBool());
 
     // All properties loaded with proper defaults
-    qDebug() << "SettingsManager: initialized" << 396 << "properties from" << m_qsettings->fileName();
+    qDebug() << "SettingsManager: initialized" << 397 << "properties from" << m_qsettings->fileName();
 }
