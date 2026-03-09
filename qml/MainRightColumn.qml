@@ -5,12 +5,27 @@ import QtQuick.Layouts
 import AOG
 import "components" as Comp
 
-ColumnLayout {
-    id: rightColumn //buttons
-
+Item {
+    id: rightColumn
+    width: visible ? column.implicitWidth + 2 * padding : 0
+    height: parent.height
     visible: Backend.isJobStarted
 
+    readonly property real padding: 5 * theme.scaleWidth
     property bool statAutoSteer: false
+
+    Rectangle {
+        anchors.fill: parent
+        radius: 10
+        color: SettingsManager.display_isDayMode?SettingsManager.display_colorDayFrame:SettingsManager.display_colorNightFrame
+        opacity: 0.5
+    }
+
+    onHeightChanged: {
+        theme.btnSizes[0] = height / (column.children.length)
+        theme.buttonSizesChanged()
+    }
+
 
     Connections {
         target: mainWindow
@@ -29,15 +44,12 @@ ColumnLayout {
         }
     }
 
+ColumnLayout {
+    id:  column//buttons
+    anchors.fill: parent
+    anchors.leftMargin: padding
+    anchors.rightMargin: padding
 
-    onHeightChanged: {
-        theme.btnSizes[0] = height / (children.length)
-        theme.buttonSizesChanged()
-    }
-    onVisibleChanged: if(visible === false)
-                          width = 0
-                      else
-                          width = children.width
 
     Comp.MainWindowBtns {
         property bool isContourLockedByUser //store if user locked
@@ -201,4 +213,5 @@ ColumnLayout {
             }
         }
     }
+}
 }

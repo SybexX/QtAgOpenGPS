@@ -595,10 +595,11 @@ Window {
         MainLeftColumn {
             id: leftColumn
             anchors.top: parent.top
-            anchors.topMargin: topLine.height
+            anchors.topMargin: topLine.height + 6
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.leftMargin: 6
+            anchors.bottomMargin: 6
         }
 
         Speedometer {
@@ -633,6 +634,7 @@ Window {
             anchors.bottom: parent.bottom
             anchors.topMargin: topLine.height + 6
             anchors.rightMargin: 6
+            anchors.bottomMargin: 6
         }
 
 
@@ -654,9 +656,11 @@ Window {
             id: bottomButtons
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.leftMargin: leftColumn.width + 3
+            anchors.leftMargin: leftColumn.width + 10
             anchors.right: parent.right
-            anchors.rightMargin: rightColumn.width + 3
+            anchors.rightMargin: rightColumn.width + 10
+            anchors.bottomMargin: 6
+
         }
 
         //----------------inside buttons-----------------------

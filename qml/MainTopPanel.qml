@@ -7,7 +7,8 @@ import "components" as Comp
 
     Rectangle{
         id: topLine
-        color: aogInterface.backgroundColor
+        color: SettingsManager.display_isDayMode?SettingsManager.display_colorDayFrame:SettingsManager.display_colorNightFrame
+        //opacity: 0.5
         height: 50 *theme.scaleHeight
         visible: true
 
