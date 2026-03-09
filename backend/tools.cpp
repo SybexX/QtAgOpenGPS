@@ -43,6 +43,8 @@ Tools::Tools(QObject *parent)
             this, &Tools::generateToolFromSettings);
     connect(SettingsManager::instance(), &SettingsManager::tool_trailingToolToPivotLengthChanged,
             this, &Tools::generateToolFromSettings);
+    connect(SettingsManager::instance(), &SettingsManager::tool_isTBTChanged,
+            this, &Tools::generateToolFromSettings);
     connect(SettingsManager::instance(), &SettingsManager::vehicle_toolOffsetChanged, this, &Tools::generateToolFromSettings);
 
     connect(SettingsManager::instance(), &SettingsManager::tool_sectionWidthMultiChanged, this, &Tools::generateToolFromSettings);
