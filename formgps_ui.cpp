@@ -35,6 +35,7 @@
 #include "modulecomm.h"
 #include "camera.h"
 #include "vehicleproperties.h"
+#include "layerservice.h"
 
 Q_LOGGING_CATEGORY (formgps_ui, "formgps_ui.qtagopengps")
 #define QDEBUG qDebug(formgps_ui)
@@ -268,7 +269,7 @@ void FormGPS::on_qml_created(QObject *object, const QUrl &url)
     timerGPS.start(100);  // 100ms = 10 Hz (synchronized with NMEA data rate)
 
     connect(Backend::instance(), &Backend::resetDirection, this, &FormGPS::resetDirection);
-
+    connect(Backend::instance(), &Backend::deleteAppliedArea, this, &FormGPS::deleteAppliedArea);
     connect(Backend::instance(), &Backend::centerOgl, this, &FormGPS::centerOgl);
 
     connect(Backend::instance(), &Backend::contourPriority, this, &FormGPS::contourPriority);
@@ -598,6 +599,7 @@ void FormGPS::deleteAppliedArea() {
 
     if (Backend::instance()->isJobStarted())
     {
+        LayerService::instance()->clearAllLayers();
         //clear out the contour Lists
         ct.StopContourLine(contourSaveList);
         ct.ResetContour();

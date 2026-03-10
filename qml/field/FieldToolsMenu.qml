@@ -99,6 +99,7 @@ Drawer {
             }
             IconButtonTextBeside {
                 id: delAppliedArea
+                enabled: MainWindowState.manualBtnState == SectionState.Off && MainWindowState.autoBtnState == SectionState.Off
                 icon.source: prefix + "/images/TrashApplied.png"
                 text: qsTr("Delete Applied Area")
                 onClicked: {Backend.deleteAppliedArea() // Qt 6.8 MODERN: Direct Q_INVOKABLE call
