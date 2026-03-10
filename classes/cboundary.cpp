@@ -54,6 +54,7 @@ CBoundary::CBoundary(QObject *parent) : QObject(parent)
     connect(BoundaryInterface::instance(), &BoundaryInterface::setDriveThrough, this, &CBoundary::setDriveThrough);
     connect(BoundaryInterface::instance(), &BoundaryInterface::deleteAll, this, &CBoundary::deleteAll);
     connect(BoundaryInterface::instance(), &BoundaryInterface::loadBoundaryFromKML, this, &CBoundary::loadBoundaryFromKML);
+    connect(BoundaryInterface::instance(), &BoundaryInterface::addBoundaryOSMPoint, this, &CBoundary::addBoundaryOSMPoint);
 }
 
 void CBoundary::loadSettings() {
