@@ -17,7 +17,6 @@ Popup{
     property bool isInitialized: false
     property int currentPointsCount: 0
 
-    // OSM плагин со спутниковым слоями
     Plugin {
         id: osmSatellitePlugin
         name: "osm"
@@ -34,7 +33,7 @@ Popup{
 
     function show(){
         boundaryOSM.visible = true
-        // Инициализируем карту только при первом показе
+
         if (!isInitialized) {
             initializeMap()
             isInitialized = true
@@ -47,15 +46,12 @@ Popup{
     }
 
     function unloadMap() {
-        // Выгружаем карту
         mapLoader.sourceComponent = null
 
-        // Очищаем точки
         pointsModel.clear()
         currentPointsCount = 0
         perimeter = 0
 
-        // Сбрасываем состояние
         isInitialized = false;
         addBoundary.checked = false
     }
@@ -75,7 +71,6 @@ Popup{
         return coords;
     }
 
-    // Общая функция для обработки кликов по карте
     function handleMapClick(mouseX, mouseY, mapItem) {
         if (!addBoundary.checked || !mapItem) return;
 
@@ -89,8 +84,6 @@ Popup{
                            });
 
         currentPointsCount = pointsModel.count;
-
-        // Обновляем линию маршрута в текущей карте
         updateRouteLine(mapItem);
         calculatePerimeter();
     }
@@ -98,7 +91,6 @@ Popup{
     function updateRouteLine(mapItem) {
         if (!mapItem) return;
 
-        // Ищем MapPolyline в дочерних элементах карты
         for (var i in mapItem.children) {
             var child = mapItem.children[i];
             if (child.hasOwnProperty("line") && child.hasOwnProperty("path")) {
@@ -108,9 +100,8 @@ Popup{
         }
     }
 
-    property real perimeter: 0 // Периметр в метрах
+    property real perimeter: 0
 
-    // Функция для расчета периметра
     function calculatePerimeter() {
         if (pointsModel.count < 2) {
             perimeter = 0;
@@ -119,7 +110,6 @@ Popup{
 
         var totalDistance = 0;
 
-        // Суммируем расстояния между последовательными точками
         for (var i = 0; i < pointsModel.count - 1; i++) {
             var point1 = pointsModel.get(i);
             var point2 = pointsModel.get(i + 1);
@@ -130,7 +120,6 @@ Popup{
                         );
         }
 
-        // Если точек больше 2, добавляем расстояние от последней точки до первой
         if (pointsModel.count > 2) {
             var firstPoint = pointsModel.get(0);
             var lastPoint = pointsModel.get(pointsModel.count - 1);
@@ -145,17 +134,12 @@ Popup{
         return totalDistance;
     }
 
-    // Функция для расчета расстояния
     function calculateDistance(lat1, lon1, lat2, lon2) {
-        // Используем координаты из QtPositioning для более точного расчета
         var coord1 = QtPositioning.coordinate(lat1, lon1);
         var coord2 = QtPositioning.coordinate(lat2, lon2);
-
-        // distanceTo() возвращает расстояние в метрах
         return coord1.distanceTo(coord2);
     }
 
-    // Функция для форматирования расстояния
     function formatDistance(meters) {
         if (meters < 1) {
             return "0 м";
@@ -176,13 +160,11 @@ Popup{
         layer.enabled: true
         layer.samples: 8
 
-        // Загрузчик для карты
         Loader {
             id: mapLoader
             anchors.fill: parent
         }
 
-        // Компонент карты OSM
         Component {
             id: osmMapComponent
 
@@ -195,14 +177,19 @@ Popup{
                 copyrightsVisible: true
                 activeMapType: supportedMapTypes[supportedMapTypes.length - 1]
 
-                // Круг для текущей позиции
-                MapCircle {
-                    center: QtPositioning.coordinate(Backend.fixFrame.latitude, Backend.fixFrame.longitude)
-                    radius: 10
-                    color: "green"
+                MapQuickItem {
+                    coordinate: QtPositioning.coordinate(Backend.fixFrame.latitude, Backend.fixFrame.longitude)
+                    anchorPoint: Qt.point(8, 8)
+                    sourceItem: Rectangle {
+                        width: 12
+                        height: 12
+                        radius: 6
+                        color: "green"
+                        border.color: "white"
+                        border.width: 1
+                    }
                 }
 
-                // Линия между точками
                 MapPolyline {
                     id: osmRouteLine
                     line.width: 3
@@ -211,7 +198,6 @@ Popup{
                     path: buildPath()
                 }
 
-                // Маркеры точек
                 MapItemView {
                     model: pointsModel
                     delegate: MapQuickItem {
@@ -226,7 +212,6 @@ Popup{
                     }
                 }
 
-                // MouseArea для добавления точек
                 MouseArea {
                     anchors.fill: parent
                     enabled: addBoundary.checked
@@ -283,7 +268,7 @@ Popup{
 
         IconButtonColor{
             id: addBoundary
-            icon.source: prefix + "/images/BoundaryOuter"
+            icon.source: prefix + "/images/BoundaryOuter.png"
             checkable: true
             Layout.alignment: Qt.AlignCenter
             implicitWidth: deletePoint.width
@@ -299,7 +284,6 @@ Popup{
                 BoundaryInterface.reset();
                 currentPointsCount = 0;
 
-                // Обновляем линию маршрута в текущей карте
                 if (mapLoader.item) {
                     updateRouteLine(mapLoader.item);
                     calculatePerimeter();
@@ -329,7 +313,7 @@ Popup{
             Layout.alignment: Qt.AlignCenter
             font.bold: true
             font.pixelSize: 15
-            text: qsTr("Точки: \n") + " " + currentPointsCount
+            text: qsTr("Points: \n") + " " + currentPointsCount
         }
 
         IconButtonTransparent{
@@ -356,7 +340,7 @@ Popup{
             Layout.alignment: Qt.AlignCenter
             font.bold: true
             font.pixelSize: 15
-            text: qsTr("Площадь: \n") + " " + Utils.area_to_unit_string(BoundaryInterface.area,1) + " " + Utils.area_unit() + qsTr("\nПериметр: \n") + " " + formatDistance(perimeter)
+            text: qsTr("Area: \n") + " " + Utils.area_to_unit_string(BoundaryInterface.area,1) + " " + Utils.area_unit() + qsTr("\nПериметр: \n") + " " + formatDistance(perimeter)
         }
 
         IconButtonTransparent{
