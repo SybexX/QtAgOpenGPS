@@ -24,7 +24,7 @@ Window {
     //We draw native opengl to this root object
     id: mainWindow
     objectName: "mainWindow"
-
+    visibility: SettingsManager.display_isStartFullscreen ? Window.FullScreen : Window.Automatic
     // ⚡ Qt 6.8 Modern Pattern: Simple initialization notification
     // No complex property bindings or signal handlers needed
 
@@ -73,9 +73,9 @@ Window {
     color: "#0d0d0d"
     width: theme.defaultWidth
 
-    onVisibleChanged: if(SettingsManager.display_isStartFullscreen){
-                          mainWindow.showMaximized()
-                      }
+    // onVisibleChanged: if(SettingsManager.display_isStartFullscreen){
+    //                       mainWindow.showMaximized()
+    //                   }
 
     Component.onCompleted: {
         // Singletons created on first access. No need to check if they
