@@ -273,29 +273,32 @@ Item{
         clip: true
 
 
-        delegate:
-            SpinBoxCM {
-                text: qsTr("Section", "Refers to an implement section") +
-                      " " + Number(model.secNum+1).toLocaleString(Qt.locale(),"f",0)
+        delegate: Item {
+            width: GridView.view.cellWidth   // или явно: spinner_parent.width
+            height: GridView.view.cellHeight
 
-                id: spinner
+            SpinBoxCM {
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
                 from: 3
                 to: 7000
                 editable: true
                 value: model.width
+                text: qsTr("Section", "Refers to an implement section") +
+                              " " + Number(model.secNum+1).toLocaleString(Qt.locale(),"f",0)
                 onValueModified: {
                     model.width = value
                     saveModelToSettings()
-                    //debug_sections()
                 }
             }
+        }
     }
     Row{
         id: middleRow
-        anchors.top: parent.verticalCenter
+        anchors.bottom: parent.bottom
         anchors.right: parent.right
-        anchors.topMargin: 40 * theme.scaleHeight
-        anchors.bottomMargin: 40 * theme.scaleHeight
+        //anchors.topMargin: 40 * theme.scaleHeight
+        //anchors.bottomMargin: 40 * theme.scaleHeight
         anchors.leftMargin: 40 * theme.scaleWidth
         anchors.rightMargin: 40 * theme.scaleWidth
         width: children.width
@@ -304,8 +307,8 @@ Item{
 
         SpinBoxCM{
             id: defaultSectionWidth
-            implicitWidth: 150 * theme.scaleWidth
-            implicitHeight: 50 * theme.scaleHeight
+            // implicitWidth: 150 * theme.scaleWidth
+            // implicitHeight: 50 * theme.scaleHeight
             from: 10
             boundValue: SettingsManager.tool_defaultSectionWidth
             to: 7000
@@ -370,8 +373,8 @@ Item{
                 ListElement{text: qsTr("15")}
                 ListElement{text: qsTr("16")}
             }
-            implicitHeight:60 * theme.scaleHeight
-            implicitWidth: 90 * theme.scaleHeight
+            height:defaultSectionWidth.height
+            width: 90 * theme.scaleHeight
             Text{
                 anchors.bottom: parent.top
                 text: qsTr("Sections")

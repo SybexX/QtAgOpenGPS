@@ -460,7 +460,7 @@ Rectangle{
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            SpinBox {
+            SpinBoxCustomized {
                 id: minUPM
                 anchors.centerIn: parent
                 from: 0
@@ -468,7 +468,7 @@ Rectangle{
                 editable: true
                 enabled: cboxIsRateControlOn.checked
                 onValueModified: notSaved = true
-                //text: qsTr("Min UPM")
+                text: qsTr("Min UPM")
             }
         }
 

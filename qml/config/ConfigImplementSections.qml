@@ -108,13 +108,13 @@ Rectangle{
     ConfigImplementSectionsSection{
         id: configImplementSectionsSection
         anchors.top: parent.top
-        anchors.topMargin: 80 * theme.scaleHeight
+        //anchors.topMargin: 80 * theme.scaleHeight
         anchors.right: parent.right
 		anchors.rightMargin: 7 * theme.scaleWidth
         anchors.left: parent.left
 		anchors.leftMargin: 7 * theme.scaleWidth
         anchors.bottom: bottomRow.top
-        anchors.bottomMargin: 30 * theme.scaleHeight
+        //anchors.bottomMargin: 30 * theme.scaleHeight
         // Threading Phase 1: Show sections configuration
         visible: toolIsSectionsNotZones
     }
