@@ -70,7 +70,7 @@ void CTool::loadSettings()
     isToolTrailing = SettingsManager::instance()->tool_isToolTrailing();
     isToolTBT = SettingsManager::instance()->tool_isTBT();
     isToolFrontFixed = SettingsManager::instance()->tool_isToolFront();
-
+    isSectionControlledByHeadland = SettingsManager::instance()->headland_isSectionControlled();
     lookAheadOnSetting = SettingsManager::instance()->vehicle_toolLookAheadOn();
     lookAheadOffSetting = SettingsManager::instance()->vehicle_toolLookAheadOff();
     turnOffDelay = SettingsManager::instance()->vehicle_toolOffDelay();
