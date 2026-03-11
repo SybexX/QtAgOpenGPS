@@ -14,41 +14,50 @@ Item {
     readonly property real padding: 5 * theme.scaleWidth
     property bool statAutoSteer: false
 
+    onHeightChanged: {
+
+        if (column.children.length > 0) {
+            theme.btnSizes[0] = height / column.children.length
+            theme.buttonSizesChanged()
+        }
+        column.positionButtons();
+    }
+
     Rectangle {
-        anchors.fill: parent
-        radius: 10
+        id: backgroundRect
+        x: column.x - 3
+        y: column.y - 3
+        width: column.width + 6
+        height: column.height + 6
         color: SettingsManager.display_isDayMode?SettingsManager.display_colorDayFrame:SettingsManager.display_colorNightFrame
         opacity: 0.5
+        radius: 10
+        z: -1
     }
 
-    onHeightChanged: {
-        theme.btnSizes[0] = height / (column.children.length)
-        theme.buttonSizesChanged()
-    }
+    Column {
+        id: column
+        spacing: 10  * theme.scaleHeight
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        y: padding + 3
 
-
-    Connections {
-        target: mainWindow
-        function onHotKeyPressed(index) {
-            switch (index) {
-            case 8:
-            {  // statAutoSteer = !statAutoSteer
-                btnAutoSteer.clicked()
-                //btnAutoSteer.checked = statAutoSteer
+        function positionButtons() {
+            var totalHeight = 0;
+            var visibleCount = 0;
+            for (var i = 0; i < children.length; i++) {
+                if (children[i].visible) {
+                    totalHeight += children[i].height;
+                    visibleCount++;
+                }
             }
-            break
-            case 9:
-                btnAutoTrack.isChecked = !btnAutoTrack.isChecked
-                break
+            totalHeight += (visibleCount - 1) * spacing;
+            anchors.verticalCenterOffset = 0;
+            var availableHeight = parent.height;
+            if (totalHeight < availableHeight) {
+                anchors.horizontalCenterOffset = 0;
             }
         }
-    }
-
-ColumnLayout {
-    id:  column//buttons
-    anchors.fill: parent
-    anchors.leftMargin: padding
-    anchors.rightMargin: padding
 
 
     Comp.MainWindowBtns {

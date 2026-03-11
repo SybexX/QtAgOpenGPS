@@ -17,20 +17,48 @@ Item {
             theme.btnSizes[1] = width / row.children.length
             theme.buttonSizesChanged()
         }
+        row.positionButtons();
     }
 
     Rectangle {
-        anchors.fill: parent
+        id: backgroundRect
+        x: row.x - 3
+        y: row.y - 3
+        width: row.width + 6
+        height: row.height + 6
         color: SettingsManager.display_isDayMode?SettingsManager.display_colorDayFrame:SettingsManager.display_colorNightFrame
         opacity: 0.5
         radius: 10
+        z: -1
     }
 
-    RowLayout {
+    Row {
         id: row
-        anchors.fill: parent
-        anchors.topMargin: padding
-        anchors.bottomMargin: padding
+        spacing:  10 * theme.scaleWidth
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        y: padding + 3
+
+        function positionButtons() {
+            var totalWidth = 0;
+            var visibleCount = 0;
+
+            for (var i = 0; i < children.length; i++) {
+                if (children[i].visible) {
+                    totalWidth += children[i].width;
+                    visibleCount++;
+                }
+            }
+
+            totalWidth += (visibleCount - 1) * spacing;
+
+            anchors.horizontalCenterOffset = 0;
+
+            var availableWidth = parent.width;
+            if (totalWidth < availableWidth) {
+                anchors.horizontalCenterOffset = 0;
+            }
+        }
 
         Connections {
             target: mainWindow
@@ -135,8 +163,8 @@ Item {
             id: btnHydLift
             isChecked: VehicleInterface.isHydLiftOn
             checkable: true
-            disabled: btnHeadland.checked
-            visible: SettingsManager.ardMac_isHydEnabled && btnHeadland.visible
+            //disabled: btnHeadland.checked
+            //visible: SettingsManager.ardMac_isHydEnabled && btnHeadland.visible
             icon.source: prefix + "/images/HydraulicLiftOff.png"
             iconChecked: prefix + "/images/HydraulicLiftOn.png"
             buttonText: qsTr("HydLift")
@@ -150,7 +178,9 @@ Item {
             icon.source: prefix + "/images/HeadlandOff.png"
             iconChecked: prefix + "/images/HeadlandOn.png"
             buttonText: qsTr("Headland")
-            onClicked: Backend.toggleHeadlandOn()
+            onClicked: {Backend.toggleHeadlandOn()
+            btnHydLift.visible = !btnHydLift.visible && btnHeadland.visible && SettingsManager.ardMac_isHydEnabled
+            }
         }
 
         Comp.MainWindowBtns {

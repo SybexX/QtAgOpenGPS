@@ -44,6 +44,7 @@ Rectangle{
             nudUser2.value = SettingsManager.ardMac_user2
             nudUser3.value = SettingsManager.ardMac_user3
             nudUser4.value = SettingsManager.ardMac_user4
+            cboxIsHydOn.checked = SettingsManager.ardMac_isHydEnabled
 
             notSaved = false
         }
