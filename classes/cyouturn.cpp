@@ -835,6 +835,29 @@ bool CYouTurn::CreateABOmegaTurn(bool isTurnLeft,
             return false;
         }
 
+        // Check if all points are inside boundary
+        bool allInside = true;
+        for (const auto& pt : ytList)
+        {
+            if (bnd.IsPointInsideTurnArea(pt) != 0) // 0 = inside
+            {
+                allInside = false;
+                break;
+            }
+        }
+
+        if (!allInside)
+        {
+            // If not all points are inside, apply MoveTurnInsideTurnLine immediately
+            ytList = MoveTurnInsideTurnLine(ytList, head, false, false, bnd);
+
+            if (ytList.count() == 0)
+            {
+                FailCreate();
+                return false;
+            }
+        }
+
         youTurnPhase = 1;
 
         double distance;
@@ -852,7 +875,6 @@ bool CYouTurn::CreateABOmegaTurn(bool isTurnLeft,
         }
 
         return true;
-        break;
     }
     case 1:
     {
