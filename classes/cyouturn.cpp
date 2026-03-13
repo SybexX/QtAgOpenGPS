@@ -29,6 +29,7 @@ CYouTurn::CYouTurn(QObject *parent) : QObject(parent)
 {
     //how far before or after boundary line should turn happen
     loadSettings();
+    isYouTurnRight = false;
 }
 
 void CYouTurn::loadSettings()
