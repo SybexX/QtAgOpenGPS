@@ -1,5 +1,5 @@
 #include "cdubins.h"
-#include "aogproperty.h"
+#include "classes/settingsmanager.h"
 #include "glm.h"
 
 static const double driveDistance = 0.05;
@@ -185,7 +185,7 @@ CDubins::CDubins()
 
 void CDubins::loadSettings()
 {
-    CDubinsTurningRadius = property_setVehicle_minTurningRadius;
+    CDubinsTurningRadius = SettingsManager::instance()->vehicle_minTurningRadius();
 
 }
 

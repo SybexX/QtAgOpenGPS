@@ -1,5 +1,5 @@
 #include "cahrs.h"
-#include "aogproperty.h"
+#include "classes/settingsmanager.h"
 #include <QDebug>
 
 CAHRS::CAHRS(QObject *parent) : QObject(parent)
@@ -9,19 +9,19 @@ CAHRS::CAHRS(QObject *parent) : QObject(parent)
 
 void CAHRS::loadSettings()
 {
-    rollZero = property_setIMU_rollZero;
-    rollFilter = property_setIMU_rollFilter;
+    rollZero = SettingsManager::instance()->imu_rollZero();
+    rollFilter = SettingsManager::instance()->imu_rollFilter();
 
     //is the auto steer in auto turn on mode or not
-    isAutoSteerAuto = property_setAS_isAutoSteerAutoOn;
-    isRollInvert = property_setIMU_invertRoll;
-    isDualAsIMU = property_setIMU_isDualAsIMU;
-    isReverseOn = property_setIMU_isReverseOn;
+    isAutoSteerAuto = true; //SettingsManager::instance()->as_isAutoSteerAutoOn();
+    isRollInvert = SettingsManager::instance()->imu_invertRoll();
+    isDualAsIMU = SettingsManager::instance()->imu_isDualAsIMU();
+    isReverseOn = SettingsManager::instance()->imu_isReverseOn();
 
     //the factor for fusion of GPS and IMU
-    forwardComp = property_setGPS_forwardComp;
-    reverseComp = property_setGPS_reverseComp;
-    fusionWeight = property_setIMU_fusionWeight2;
+    forwardComp = SettingsManager::instance()->gps_forwardComp();
+    reverseComp = SettingsManager::instance()->gps_reverseComp();
+    fusionWeight = SettingsManager::instance()->imu_fusionWeight2();
 
 }
 

@@ -5,7 +5,11 @@
 import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
+//import Settings
+// Interface import removed - now QML_SINGLETON
 //import QtQuick.Extras 1.4
+import AOG
+
 
 import ".."
 import "../components"
@@ -19,14 +23,14 @@ Item {
 
     onVisibleChanged: {
         if(visible)
-            //ask backend to refresh our list of vehicles
-            vehicleInterface.vehicle_update_list()
+            //ask backend to refresh our list of vehicles - Phase 1 Thread-Safe
+            VehicleInterface.requestVehicleUpdateList()
     }
 
     Rectangle{
         id: configWhichVehicle
         anchors.fill: parent
-        color: aog.backgroundColor
+        color: aogInterface.backgroundColor
         Column{
             id: column
             anchors.top: parent.top
@@ -36,19 +40,19 @@ Item {
             anchors.margins: 10 * theme.scaleWidth
             anchors.topMargin: 130 * theme.scaleHeight
             spacing: 15 * theme.scaleHeight
-            TextLine{ text: qsTr("Units: ")+ (utils.isMetric() ? "Metric" : "Imperial")}
-            TextLine{ text: qsTr("Width: ")+ utils.m_to_ft_string(settings.setVehicle_toolWidth)}
-            TextLine{ text: qsTr("Sections: ")+ settings.setVehicle_numSections}
-            TextLine{ text: qsTr("Offset: ")+  utils.cm_to_unit_string(settings.setVehicle_toolOffset, 0)+ " "+ utils.cm_unit_abbrev()}
-            TextLine{ text: qsTr("Overlap: ")+  utils.cm_to_unit_string(settings.setVehicle_toolOverlap, 0)+ " "+ utils.cm_unit_abbrev()}
-            TextLine{ text: qsTr("LookAhead: ")+ settings.setVehicle_toolLookAheadOn}
-            TextLine{ text: qsTr("Nudge: ")+ utils.cm_to_unit_string(settings.setVehicle_setAS_snapDistance, 0)+ " "+ utils.cm_unit_abbrev()}
-            TextLine{ text: qsTr("Tram Width: ")+ utils.m_to_ft_string(settings.setTram_tramWidth )}
-            TextLine{ text: qsTr("Wheelbase: ")+ utils.cm_to_unit_string(settings.setVehicle_wheelbase, 0)+ " "+ utils.cm_unit_abbrev() }
+            TextLine{ text: qsTr("Units: ")+ (Utils.isMetric() ? "Metric" : "Imperial")}
+            TextLine{ text: qsTr("Width: ")+ Utils.m_to_ft_string(SettingsManager.vehicle_toolWidth)}
+            TextLine{ text: qsTr("Sections: ")+ SettingsManager.vehicle_numSections}
+            TextLine{ text: qsTr("Offset: ")+  Utils.cm_to_unit_string(SettingsManager.vehicle_toolOffset, 0)+ " "+ Utils.cm_unit_abbrev()}
+            TextLine{ text: qsTr("Overlap: ")+  Utils.cm_to_unit_string(SettingsManager.vehicle_toolOverlap, 0)+ " "+ Utils.cm_unit_abbrev()}
+            TextLine{ text: qsTr("LookAhead: ")+ SettingsManager.vehicle_toolLookAheadOn}
+            TextLine{ text: qsTr("Nudge: ")+ Utils.cm_to_unit_string(SettingsManager.as_snapDistance, 0)+ " "+ Utils.cm_unit_abbrev()}
+            TextLine{ text: qsTr("Tram Width: ")+ Utils.m_to_ft_string(SettingsManager.tram_width)}
+            TextLine{ text: qsTr("Wheelbase: ")+ Utils.cm_to_unit_string(SettingsManager.vehicle_wheelbase, 0)+ " "+ Utils.cm_unit_abbrev() }
         }
         Rectangle{
             id: vehicleListRect
-            border.color: aog.blackDayWhiteNight
+            border.color: aogInterface.blackDayWhiteNight
             color: "light gray"
             visible: true
             anchors.bottom:configWhichVehicle.bottom
@@ -59,16 +63,16 @@ Item {
 
             function refresh_model() {
                 vehicleList.clear()
-                for (var i=0; i < vehicleInterface.vehicle_list.length ; i++) {
-                    //console.debug(vehicleInterface.vehicle_list[i])
-                    vehicleList.append( { index: vehicleInterface.vehicle_list[i].index,
-                                           name: vehicleInterface.vehicle_list[i].name })
+                for (var i=0; i < VehicleInterface.vehicleList.length ; i++) {
+                    //console.debug(VehicleInterface.vehicleList[i])
+                    vehicleList.append( { index: VehicleInterface.vehicleList[i].index,
+                                           name: VehicleInterface.vehicleList[i].name })
                 }
             }
 
             Connections {
-                target: vehicleInterface
-                function onVehicle_listChanged() {
+                target: VehicleInterface
+                function onVehicleListChanged() {
                     vehicleListRect.refresh_model()
                 }
             }
@@ -94,7 +98,7 @@ Item {
                     indicator: Rectangle{
                         anchors.fill: parent
                         anchors.margins: 2
-                        color: control.down ? aog.backgroundColor : "blue"
+                        color: control.down ? aogInterface.backgroundColor : "blue"
                         visible: control.checked
                     }
 
@@ -116,7 +120,7 @@ Item {
                         text: model.name
                         font.pixelSize: 20
                         font.bold: true
-                        color: control.checked ? aog.backgroundColor : aog.blackDayWhiteNight
+                        color: control.checked ? aogInterface.backgroundColor : aogInterface.blackDayWhiteNight
                         z: 2
                     }
                 }
@@ -124,7 +128,7 @@ Item {
         }
         Label {
             id: currentVehicle
-            text: qsTr("Current vehicle is") + "<h2>" + settings.setVehicle_vehicleName + "</h2>"
+            text: qsTr("Current vehicle is") + "<h2>" + SettingsManager.vehicle_vehicleName + "</h2>"
             anchors.top: configWhichVehicle.top
             anchors.horizontalCenter: entryBox.horizontalCenter
             anchors.margins: 15 * theme.scaleWidth
@@ -147,11 +151,11 @@ Item {
                 onClicked: {
                     if (saveAsVehicle.text !== "") {
                         //console.debug("Going to save", saveAsVehicle.text)
-                        vehicleInterface.vehicle_saveas(saveAsVehicle.text)
+                        VehicleInterface.requestVehicleSaveas(saveAsVehicle.text)
                         //just setting the name is probably enough to get it to save the vehicle
-                        settings.setVehicle_vehicleName = saveAsVehicle.text
+                        SettingsManager.vehicle_vehicleName = saveAsVehicle.text
                         saveAsVehicle.text = ""
-                        vehicleInterface.vehicle_update_list()
+                        // vehicle_update_list() is now called automatically after save completes
                     }
                 }
             }
@@ -185,8 +189,9 @@ Item {
             border: 2
             onClicked: {
                 if (vehicleListView.selectedVehicle != "" ) {
-                    vehicleInterface.vehicle_load(vehicleListView.selectedVehicle)
-                    settings.setVehicle_vehicleName = vehicleListView.selectedVehicle
+                    VehicleInterface.requestVehicleLoad(vehicleListView.selectedVehicle)
+                    // REMOVED: SettingsManager.vehicle_vehicleName = vehicleListView.selectedVehicle
+                    // This was causing vehicleName corruption - the loaded profile already contains the correct vehicleName
                 }
             }
 
@@ -201,12 +206,12 @@ Item {
             color3: "white"
             border: 2
             onClicked: {
-                //settings.setMenu_isMetric = !utils.isTrue(settings.setMenu_isMetric)
-                //console.debug("qml says settings ismetric is",settings.setMenu_isMetric)
-                //vehicleInterface.vehicle_delete("testing123")
+                //Settings.menu_isMetric = !Utils.isTrue(Settings.menu_isMetric)
+                //console.debug("qml says settings ismetric is",Settings.menu_isMetric)
+                //VehicleInterface.vehicle_delete("testing123")
                 if (vehicleListView.selectedVehicle != "" ) {
-                    vehicleInterface.vehicle_delete(vehicleListView.selectedVehicle)
-                    vehicleInterface.vehicle_update_list()
+                    VehicleInterface.requestVehicleDelete(vehicleListView.selectedVehicle)
+                    VehicleInterface.requestVehicleUpdateList()
                 }
             }
         }

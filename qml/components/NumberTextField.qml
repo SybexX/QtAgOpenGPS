@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls.Fusion
 
 TextField {
 	id: root
@@ -12,7 +12,7 @@ TextField {
 	text: "0.0"
 	color: enabled ? "black" : "gray"
 
-	font.pointSize: 20
+	font.pixelSize: 20
 	background: Rectangle{
 		property bool isFocus: parent.focus
 		id: background

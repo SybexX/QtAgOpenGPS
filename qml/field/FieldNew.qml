@@ -5,6 +5,7 @@
 import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Controls.Material
+import AOG
 
 import ".."
 import "../components"
@@ -36,7 +37,7 @@ Dialog {
         anchors.top:parent.top
         anchors.topMargin: 50
         anchors.horizontalCenter: parent.horizontalCenter
-        color: aog.backgroundColor
+        color: aogInterface.backgroundColor
         border.color: "darkgray"
         border.width: 1
         Text {
@@ -52,11 +53,12 @@ Dialog {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: newFieldLabel.bottom
+            height: 49  * theme.scaleHeight
             selectByMouse: true
-            placeholderText: "New Field Name"
+            placeholderText: focus || text ? "" : qsTr("New Field Name")
             onTextChanged: {
-                for (var i=0; i < fieldInterface.field_list.length ; i++) {
-                    if (text === fieldInterface.field_list[i].name) {
+                for (var i=0; i < FieldInterface.field_list.length ; i++) {
+                    if (text === FieldInterface.field_list[i].name) {
                         errorMessage.visible = true
                         break
                     } else
@@ -83,13 +85,17 @@ Dialog {
             id: marker
             icon.source: prefix + "/images/JobNameCalendar.png"
             Text{
+                rightPadding: 10
                 anchors.right: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: "+"
             }
             onClicked: {
-                var time = new Date().toLocaleDateString(Qt.locale(), Locale.ShortFormat)
-                newField.text += " " + time
+                var date = new Date();
+                var year = date.getFullYear();
+                var month = String(date.getMonth() + 1).padStart(2, '0');
+                var day = String(date.getDate()).padStart(2, '0');
+                newField.text += " " + `${year}-${month}-${day}`
             }
 
         }
@@ -97,13 +103,16 @@ Dialog {
             objectName: "btnAddTime"
             icon.source: prefix + "/images/JobNameTime.png"
             Text{
+                rightPadding: 10
                 anchors.right: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: "+"
             }
             onClicked: {
-                var time = new Date().toLocaleTimeString(Qt.locale())
-                newField.text += " " + time
+                var date = new Date();
+                var hours = String(date.getHours()).padStart(2, '0');
+                var minutes = String(date.getMinutes()).padStart(2, '0');
+                newField.text += " " + `${hours}-${minutes}`
             }
         }
     }
@@ -130,7 +139,7 @@ Dialog {
 
             onClicked: {
                 fieldNew.visible = false
-                fieldInterface.field_new(newField.text)
+                aog.fieldNew(newField.text.trim()) // Qt 6.8 MODERN: Direct Q_INVOKABLE call
             }
         }
     }

@@ -1,0 +1,4 @@
+module AOG
+singleton Utils 1.0 Utils.qml
+singleton SettingsManager 1.0 SettingsManager
+AOGRenderer 1.0 AOG/MockAOGRenderer.qml

@@ -10,6 +10,8 @@ TODO
 - move guidanceLineDistanceOff, guidanceLineSteeringAngle to CVehicleo
 - perhaps as an optimization, add methods to various classes to refresh local copies of required property settings, rather than read them every time.
 
+14.08 добавил развороты в развал
+
 
 
 Noteso

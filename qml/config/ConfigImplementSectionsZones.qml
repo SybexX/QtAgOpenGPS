@@ -5,6 +5,9 @@
 import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
+//import Settings
+import AOG
+
 
 import ".."
 import "../components"
@@ -15,6 +18,13 @@ import "../components"
 Item {
     id: configImplementSectionsZones
 
+    // Threading Phase 1: Array helper property for tool_zones
+    property var toolZones: SettingsManager.tool_zones
+
+    // Helper function to save tool zones array back to SettingsManager
+    function saveToolZones() {
+        SettingsManager.tool_zones = toolZones
+    }
 
     ListModel {
         id: section_model
@@ -27,7 +37,8 @@ Item {
 
     function loadZonesFromSettings()
     {
-        var num_zones = Number(settings.setTool_zones[0])
+        // Threading Phase 1: Load from local array helper
+        var num_zones = Number(toolZones[0])
 
         var i=0
         var max_width=0
@@ -37,7 +48,7 @@ Item {
         //much room we have for making changes in the spinboxes
         var current_section = 1
         for (i=0; i < num_zones; i++) {
-            w = Number(settings.setTool_zones[i+1]) - current_section
+            w = Number(toolZones[i+1]) - current_section
             if (w > max_width) max_width = w
             current_section += w + 1
         }
@@ -48,21 +59,21 @@ Item {
             if (i == num_zones-1) {
                 section_model.append( {secNum: i,
                                          start_number: current_section,
-                                         min_number: Number(settings.setTool_zones[i+1]),
-                                         max_number: Number(settings.setTool_zones[i+1]),
-                                         end_number: Number(settings.setTool_zones[i+1])
+                                         min_number: Number(toolZones[i+1]),
+                                         max_number: Number(toolZones[i+1]),
+                                         end_number: Number(toolZones[i+1])
                                      } )
             } else {
                 section_model.append( { secNum: i,
                                          start_number: current_section,
                                          min_number: current_section,
-                                         end_number: Number(settings.setTool_zones[i+1]),
-                                         max_number: Number(settings.setTool_numSectionsMulti) -
-                                                     Number(settings.setTool_zones[0]) + i + 1
+                                         end_number: Number(toolZones[i+1]),
+                                         max_number: Number(SettingsManager.tool_numSectionsMulti) -
+                                                     Number(toolZones[0]) + i + 1
                                      } )
             }
 
-            current_section = Number(settings.setTool_zones[i+1]) + 1
+            current_section = Number(toolZones[i+1]) + 1
         }
     }
 
@@ -71,7 +82,7 @@ Item {
         var i = 0
         var current_section = 1
         var item
-        var num_zones = Number(settings.setTool_zones[0])
+        var num_zones = Number(toolZones[0])
         var max_width = 0
         var w = 0
         var widths = []
@@ -104,7 +115,7 @@ Item {
 
     function fixZoneMinMax() {
         var item
-        var num_zones = Number(settings.setTool_zones[0])
+        var num_zones = Number(toolZones[0])
         var current_section = 1
         for (var i = 0; i < num_zones; i++) {
             item = section_model.get(i)
@@ -113,8 +124,8 @@ Item {
                 item.max_number = item.end_number
             } else {
                 item.min_number = current_section
-                item.max_number = Number(settings.setTool_numSectionsMulti) -
-                                  Number(settings.setTool_zones[0]) + i + 1
+                item.max_number = Number(SettingsManager.tool_numSectionsMulti) -
+                                  Number(toolZones[0]) + i + 1
             }
             current_section = item.end_number + 1
         }
@@ -127,7 +138,7 @@ Item {
         var item
         var i = 0
 
-        var current_section = Number(settings.setTool_numSectionsMulti)
+        var current_section = Number(SettingsManager.tool_numSectionsMulti)
         for (i = section_model.count-1; i >= 0; i--) {
             item = section_model.get(i)
 
@@ -161,15 +172,15 @@ Item {
 
     function adjustZones(num_zones) {
         //deal with adding or removing zones
-        var zone = settings.setTool_zones
-        zone[0] = num_zones
-        settings.setTool_zones = zone
+        // Threading Phase 1: Update local array and save
+        toolZones[0] = num_zones
+        saveToolZones()
 
         if(num_zones < section_model.count) {
             //easy case. Add last zone's sections to previous zone
             while(num_zones < section_model.count)
                 section_model.remove(section_model.count - 1)
-            section_model.get(section_model.count - 1).end_number = Number(settings.setTool_numSectionsMulti)
+            section_model.get(section_model.count - 1).end_number = Number(SettingsManager.tool_numSectionsMulti)
             fixZoneMinMax()
         } else {
             //hard case, adding zones!  Have to take away sections from preceding zones
@@ -186,8 +197,8 @@ Item {
     }
 
     function layoutZones() {
-        var num_zones = Number(settings.setTool_zones[0])
-        var num_sections = Number(settings.setTool_numSectionsMulti)
+        var num_zones = Number(toolZones[0])
+        var num_sections = Number(SettingsManager.tool_numSectionsMulti)
         var sectionsPerZone = num_sections / num_zones
         var current_section = 1.0
         section_model.clear()
@@ -221,7 +232,8 @@ Item {
 
     function saveZonesToSettings() {
         var item
-        var zones = settings.setTool_zones
+        // Threading Phase 1: Update local array
+        var zones = toolZones
         //number of zones should be current.
 
         for( var i=0; i < section_model.count; i++) {
@@ -229,7 +241,8 @@ Item {
             zones[i+1] = item.end_number
         }
         //console.debug(zones)
-        settings.setTool_zones = zones
+        toolZones = zones
+        saveToolZones()
     }
 
     GridView {
@@ -294,15 +307,15 @@ Item {
             Layout.fillWidth: true
             id: numOfZones
             from: 1
-            boundValue: settings.setTool_zones[0]
-            to: settings.setTool_numSectionsMulti > 8 ? 8 : settings.setTool_numSectionsMulti
+            boundValue: toolZones[0]
+            to: SettingsManager.tool_numSectionsMulti > 8 ? 8 : SettingsManager.tool_numSectionsMulti
             text: qsTr("Zones", "Zones as in zones of sections")
             editable: true
             onValueModified: {
                 //adjustZones(value)
-                var zone = settings.setTool_zones
-                zone[0] = value
-                settings.setTool_zones = zone
+                // Threading Phase 1: Update local array
+                toolZones[0] = value
+                saveToolZones()
                 layoutZones()
             }
         }
@@ -325,10 +338,10 @@ Item {
             implicitWidth: 150 * theme.scaleWidth
             implicitHeight: 50 * theme.scaleHeight
             from: 10
-            boundValue: settings.setTool_sectionWidthMulti
+            boundValue: SettingsManager.tool_sectionWidthMulti
             to: 1000
             text: qsTr("Uniform Section Width")
-            onValueModified: settings.setTool_sectionWidthMulti = value
+            onValueModified: SettingsManager.tool_sectionWidthMulti = value
         }
 
         SpinBoxCustomized{
@@ -337,12 +350,12 @@ Item {
             implicitWidth: 150 * theme.scaleWidth
             implicitHeight: 50 * theme.scaleHeight
             from: numOfZones.value
-            boundValue: settings.setTool_numSectionsMulti
+            boundValue: SettingsManager.tool_numSectionsMulti
             to: 64
             text: qsTr("Sections")
             editable: true
             onValueModified: {
-                settings.setTool_numSectionsMulti = value
+                SettingsManager.tool_numSectionsMulti = value
                 //sectionsChanged() //adjust the model and save
                 layoutZones()
             }
@@ -352,10 +365,10 @@ Item {
             Layout.fillWidth: true
             spacing: 8 * theme.scaleHeight
             Text {
-                text: utils.cm_to_unit_string(Number(settings.setTool_numSectionsMulti) * Number(settings.setTool_sectionWidthMulti),0)
+                text: Utils.cm_to_unit_string(Number(SettingsManager.tool_numSectionsMulti) * Number(SettingsManager.tool_sectionWidthMulti),0)
             }
             Text {
-                text: utils.cm_unit()
+                text: Utils.cm_unit()
                 color: "green"
             }
         }

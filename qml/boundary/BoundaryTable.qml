@@ -4,6 +4,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls.Fusion
 import QtQuick.Controls.Material
+import AOG
 
 ListView {
     id: tableView
@@ -29,10 +30,10 @@ ListView {
         var distance = 0.0
 
         boundariesModel.clear()
-        for( var i=0; i < boundaryInterface.boundary_list.length ;i++)  {
+        for( var i=0; i < BoundaryInterface.list.length ;i++)  {
             boundariesModel.append( { index: i,
-                                      area: boundaryInterface.boundary_list[i].area,
-                                      drive_through: boundaryInterface.boundary_list[i].drive_through
+                                      area: BoundaryInterface.list[i].area,
+                                      drive_through: BoundaryInterface.list[i].drive_through
                               } )
         }
         //sort()
@@ -85,8 +86,8 @@ ListView {
     */
 
     Connections {
-        target: boundaryInterface
-        function onBoundary_listChanged() {
+        target: BoundaryInterface
+        function onListChanged() {
             update_model()
         }
     }
@@ -247,7 +248,7 @@ ListView {
             width: parent.width * 0.33
 
             id: bndArea
-            text: utils.area_to_unit_string(model.area,1)+ " " + utils.area_unit()
+            text: Utils.area_to_unit_string(model.area,1)+ " " + Utils.area_unit()
             font.pointSize: 16
         }
         Button {

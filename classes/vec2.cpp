@@ -38,7 +38,6 @@ Vec2 Vec2::operator *= (double rhs) {
     return temp;
 }
 
-
 double Vec2::headingXZ() {
     return atan2(easting,northing);
 }

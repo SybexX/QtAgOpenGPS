@@ -2,7 +2,11 @@
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
 //
 //
+#include <QApplication>
+#include <QWidget>
+#include <utility>
 #include "formheadache.h"
+#include "qmlutil.h"
 #include "cheadline.h"
 #include "cboundary.h"
 #include "cabcurve.h"
@@ -13,12 +17,13 @@
 #include <QMatrix4x4>
 #include <QOpenGLFunctions>
 #include "glutils.h"
-#include "aogproperty.h"
-#include "aogrenderer.h"
+#include "classes/settingsmanager.h"
 #include <QTime>
+#include "mainwindowstate.h"
+#include "backend.h"
+#include "headacheinterface.h"
 
-//here for now.  Put in another module for use in other places.
-
+//actually implemented in formheadland.cpp
 void CalculateHeadings(QVector<Vec3> &xList);
 void MakePointMinimumSpacing(QVector<Vec3> &xList, double minDistance);
 int GetLineIntersection(double p0x, double p0y, double p1x, double p1y,
@@ -28,45 +33,29 @@ int GetLineIntersection(double p0x, double p0y, double p1x, double p1y,
 
 FormHeadache::FormHeadache(QObject *parent)
     : QObject{parent}
-{}
-
-void FormHeadache::connect_ui(QObject *headache_designer_instance) {
+{
     isA = true;  //why is this not initialized?
-    this->headache_designer_instance = headache_designer_instance;
 
-    InterfaceProperty<HeadacheDesigner,int>::set_qml_root(headache_designer_instance);
-    InterfaceProperty<HeadacheDesigner,bool>::set_qml_root(headache_designer_instance);
-    InterfaceProperty<HeadacheDesigner,double>::set_qml_root(headache_designer_instance);
-    InterfaceProperty<HeadacheDesigner,QColor>::set_qml_root(headache_designer_instance);
-    InterfaceProperty<HeadacheDesigner,QPoint>::set_qml_root(headache_designer_instance);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::load,this,&FormHeadache::load_headline);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::updateLines,this,&FormHeadache::update_lines);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::mouseClicked,this,&FormHeadache::clicked);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::cycleForward,this,&FormHeadache::btnCycleForward_Click);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::cycleBackward,this,&FormHeadache::btnCycleBackward_Click);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::deleteCurve,this,&FormHeadache::btnDeleteCurve_Click);
 
-    //connect UI signals
-    connect(headache_designer_instance,SIGNAL(load()),this,SLOT(load_headline()));
-    connect(headache_designer_instance,SIGNAL(update_lines()),this,SLOT(update_lines()));
-    connect(headache_designer_instance,SIGNAL(mouseClicked(int, int)),this,SLOT(clicked(int,int)));
-    connect(headache_designer_instance,SIGNAL(cycleForward()),this,SLOT(btnCycleForward_Click()));
-    connect(headache_designer_instance,SIGNAL(cycleBackward()),this,SLOT(btnCycleBackward_Click()));
-    connect(headache_designer_instance,SIGNAL(deleteCurve()),this,SLOT(btnDeleteCurve_Click()));
+    connect(HeadacheInterface::instance(),&HeadacheInterface::deleteHeadland, this, &FormHeadache::btnDeleteHeadland_Click);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::createHeadland,this,&FormHeadache::btnBndLoop_Click);
+    //connect(HeadacheInterface::instance(),HeadacheInterface::deletePoints,this,&FormHeadache::btnDeletePoints_Click);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::ashrink,this,&FormHeadache::btnAShrink_Click);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::bshrink,this,&FormHeadache::btnBShrink_Click);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::alength,this,&FormHeadache::btnALength_Click);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::blength,this,&FormHeadache::btnBLength_Click);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::headlandOff,this,&FormHeadache::btnHeadlandOff_Click);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::cancelTouch,this,&FormHeadache::btnCancelTouch_Click);
 
-    connect(headache_designer_instance,SIGNAL(deleteHeadland()), this, SLOT(btnDeleteHeadland_Click()));
-    connect(headache_designer_instance,SIGNAL(createHeadland()),this,SLOT(btnBndLoop_Click()));
-    //connect(headache_designer_instance,SIGNAL(deletePoints()),this,SLOT(btnDeletePoints_Click()));
-    connect(headache_designer_instance,SIGNAL(ashrink()),this,SLOT(btnAShrink_Click()));
-    connect(headache_designer_instance,SIGNAL(bshrink()),this,SLOT(btnBShrink_Click()));
-    connect(headache_designer_instance,SIGNAL(alength()),this,SLOT(btnALength_Click()));
-    connect(headache_designer_instance,SIGNAL(blength()),this,SLOT(btnBLength_Click()));
-    connect(headache_designer_instance,SIGNAL(headlandOff()),this,SLOT(btnHeadlandOff_Click()));
-    connect(headache_designer_instance,SIGNAL(cancelTouch()),this,SLOT(btnCancelTouch_Click()));
+    connect(HeadacheInterface::instance(),&HeadacheInterface::isSectionControlled,this,&FormHeadache::isSectionControlled);
+    connect(HeadacheInterface::instance(),&HeadacheInterface::saveExit,this,&FormHeadache::btnExit_Click);
 
-
-    connect(headache_designer_instance,SIGNAL(isSectionControlled(bool)),this,SLOT(isSectionControlled(bool)));
-    connect(headache_designer_instance,SIGNAL(save_exit()),this,SLOT(btnExit_Click()));
-}
-
-void FormHeadache::setFieldInfo(double maxFieldDistance, double fieldCenterX, double fieldCenterY) {
-    this->maxFieldDistance = maxFieldDistance;
-    this->fieldCenterX = fieldCenterX;
-    this->fieldCenterY = fieldCenterY;
 }
 
 QVector3D FormHeadache::mouseClickToField(int mouseX, int mouseY) {
@@ -77,8 +66,8 @@ QVector3D FormHeadache::mouseClickToField(int mouseX, int mouseY) {
     QMatrix4x4 modelview;
     QMatrix4x4 projection;
 
-    int width = qmlItem(headache_designer_instance, "headacheRenderer")->property("width").toReal();
-    int height = qmlItem(headache_designer_instance, "headacheRenderer")->property("height").toReal();
+    int width = HeadacheInterface::instance()->viewportWidth();
+    int height = HeadacheInterface::instance()->viewportHeight();
 
     projection.setToIdentity();
 
@@ -89,11 +78,11 @@ QVector3D FormHeadache::mouseClickToField(int mouseX, int mouseY) {
 
     modelview.setToIdentity();
     //back the camera up
-    modelview.translate(0, 0, -(double)maxFieldDistance * (double)zoom);
+    modelview.translate(0, 0, -(double)Backend::instance()->m_currentField.maxDistance * (double)HeadacheInterface::instance()->zoom());
 
     //translate to that spot in the world
-    modelview.translate(-(double)fieldCenterX + (double)sX * (double)maxFieldDistance,
-                        -(double)fieldCenterY + (double)sY * (double)maxFieldDistance,
+    modelview.translate(-(double)Backend::instance()->m_currentField.centerX + (double)HeadacheInterface::instance()->sX() * (double)Backend::instance()->m_currentField.maxDistance,
+                        -(double)Backend::instance()->m_currentField.centerY + (double)HeadacheInterface::instance()->sY() * (double)Backend::instance()->m_currentField.maxDistance,
                         0);
 
     float x,y;
@@ -119,8 +108,8 @@ QVector3D FormHeadache::mouseClickToField(int mouseX, int mouseY) {
 
 void FormHeadache::load_headline() {
     hdl->idx = -1;
-    headache_designer_instance->setProperty("showa", false);
-    headache_designer_instance->setProperty("showb", false);
+    HeadacheInterface::instance()->set_showa(false);
+    HeadacheInterface::instance()->set_showb(false);
 
     emit loadHeadlines();
 
@@ -139,21 +128,19 @@ void FormHeadache::setup_matrices(QMatrix4x4 &modelview, QMatrix4x4 &projection)
 
     modelview.setToIdentity();
     //back the camera up
-    modelview.translate(0, 0, -(double)maxFieldDistance * (double)zoom);
+    modelview.translate(0, 0, -(double)Backend::instance()->m_currentField.maxDistance * (double)HeadacheInterface::instance()->zoom());
 
     //translate to that spot in the world
-    modelview.translate(-(double)fieldCenterX + (double)sX * (double)maxFieldDistance,
-                        -(double)fieldCenterY + (double)sY * (double)maxFieldDistance,
+    modelview.translate(-(double)Backend::instance()->m_currentField.centerX + (double)HeadacheInterface::instance()->sX() * (double)Backend::instance()->m_currentField.maxDistance,
+                        -(double)Backend::instance()->m_currentField.centerY + (double)HeadacheInterface::instance()->sY() * (double)Backend::instance()->m_currentField.maxDistance,
                         0);
 }
 
 
 void FormHeadache::update_lines() {
-    QVariantList lines;
-    QVariantMap linemap;
-    QVariantList linepoints;
-    QPoint linepoint;
-    QColor color;
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
+    QVector<FenceLineModel::FenceLine> boundaries;
     QMatrix4x4 modelview;
     QMatrix4x4 projection;
 
@@ -162,36 +149,36 @@ void FormHeadache::update_lines() {
 
     setup_matrices(modelview, projection);
 
-    int width = qmlItem(headache_designer_instance, "headacheRenderer")->property("width").toReal();
-    int height = qmlItem(headache_designer_instance, "headacheRenderer")->property("height").toReal();
+    int width = HeadacheInterface::instance()->viewportWidth();
+    int height = HeadacheInterface::instance()->viewportHeight();
 
     for (int j = 0; j < bnd->bndList.count(); j++)
     {
+        FenceLineModel::FenceLine line;
+        line.index = j;
+
         if (j == bndSelect)
-            color = QColor::fromRgbF(0.75f, 0.75f, 0.750f);
+            line.color = QColor::fromRgbF(0.75f, 0.75f, 0.750f);
         else
-            color = QColor::fromRgbF(0.0f, 0.25f, 0.10f);
+            line.color = QColor::fromRgbF(0.0f, 0.25f, 0.10f);
 
-        linemap.clear();
-        linemap["index"] = j;
-        linemap["color"] = color;
-        linemap["width"] = 4;
+        line.width = 4;
 
-        linepoints.clear();
+        QVariantList linepoints;
         for (int i = 0; i < bnd->bndList[j].fenceLine.count(); i++)
         {
             p = QVector3D (bnd->bndList[j].fenceLine[i].easting,
                            bnd->bndList[j].fenceLine[i].northing,
                            0);
             s = p.project(modelview, projection, QRect(0,0,width,height));
-            linepoint = QPoint(s.x(),height - s.y());
+            QPoint linepoint = QPoint(s.x(),height - s.y());
             linepoints.append(linepoint);
         }
-        linemap["points"] = linepoints;
+        line.points = linepoints;
 
-        lines.append(linemap);
+        boundaries.append(line);
     }
-    headache_designer_instance->setProperty("boundaryLines", lines);
+    HeadacheInterface::instance()->boundaryLineModel()->setFenceLines(boundaries);
 
     update_headlines();
 
@@ -201,33 +188,36 @@ void FormHeadache::update_lines() {
 }
 
 void FormHeadache::update_ab() {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     QMatrix4x4 modelview, projection;
     QVector3D p, s;
 
     setup_matrices(modelview, projection);
 
-    int width = qmlItem(headache_designer_instance, "headacheRenderer")->property("width").toReal();
-    int height = qmlItem(headache_designer_instance, "headacheRenderer")->property("height").toReal();
+    int width = HeadacheInterface::instance()->viewportWidth();
+    int height = HeadacheInterface::instance()->viewportHeight();
 
     //draw A and B points
     if (start != 99999) {
         p = QVector3D(bnd->bndList[bndSelect].fenceLine[start].easting, bnd->bndList[bndSelect].fenceLine[start].northing, 0);
         s = p.project(modelview, projection, QRect(0,0,width,height));
-        showa = true;
-        apoint = QPoint(s.x(), height - s.y());
+        HeadacheInterface::instance()->set_showa(true);
+        HeadacheInterface::instance()->set_apoint(QPoint(s.x(), height - s.y()));
     } //else {
-        //showa = false;
     //}
     if (end != 99999) {
         p = QVector3D(bnd->bndList[bndSelect].fenceLine[end].easting, bnd->bndList[bndSelect].fenceLine[end].northing, 0);
         s = p.project(modelview, projection, QRect(0,0,width,height));
-        bpoint = QPoint(s.x(), height - s.y());
-        showb = true;
+        HeadacheInterface::instance()->set_bpoint(QPoint(s.x(), height - s.y()));
+        HeadacheInterface::instance()->set_showb(true);
     }
 
 }
 
 void FormHeadache::update_headland() {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     QMatrix4x4 modelview, projection;
     QVector3D p, s;
 
@@ -236,11 +226,11 @@ void FormHeadache::update_headland() {
 
     setup_matrices(modelview, projection);
 
-    int width = qmlItem(headache_designer_instance, "headacheRenderer")->property("width").toReal();
-    int height = qmlItem(headache_designer_instance, "headacheRenderer")->property("height").toReal();
+    int width = HeadacheInterface::instance()->viewportWidth();
+    int height = HeadacheInterface::instance()->viewportHeight();
 
      //draw headland line if exists
-    if (bnd->bndList[0].hdLine.count()) {
+    if (bnd->bndList.count() > 0 && bnd->bndList[0].hdLine.count()) {
         //color is set in QML
 
         for (int i = 0; i < bnd->bndList[0].hdLine.count(); i++)
@@ -254,110 +244,108 @@ void FormHeadache::update_headland() {
             line.append(linepoint);
         }
     }
-    headache_designer_instance->setProperty("headlandLine", line);
+    HeadacheInterface::instance()->set_headlandLine(line);
 }
 
 void FormHeadache::update_headlines()
 {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
+    QVector<FenceLineModel::FenceLine> headlines;
     QMatrix4x4 modelview, projection;
     QVector3D p, s;
 
-    QVariantList lines;
-    QVariantMap linemap;
-    QVariantList linepoints;
     QPoint linepoint;
     QColor color;
 
     setup_matrices(modelview, projection);
 
-    int width = qmlItem(headache_designer_instance, "headacheRenderer")->property("width").toReal();
-    int height = qmlItem(headache_designer_instance, "headacheRenderer")->property("height").toReal();
+    int width = HeadacheInterface::instance()->viewportWidth();
+    int height = HeadacheInterface::instance()->viewportHeight();
 
-    lines.clear();
-    showa = false;
-    showb = false;
+    HeadacheInterface::instance()->set_showa(false);
+    HeadacheInterface::instance()->set_showb(false);
 
     if (isLinesVisible && hdl->tracksArr.count() > 0)
     {
-        //GL.Enable(EnableCap.LineStipple);
-        //GL.LineStipple(1, 0x7070);
-        //GL.PointSize(3);
-
 
         for (int i = 0; i < hdl->tracksArr.count(); i++)
         {
-            linemap.clear();
+            FenceLineModel::FenceLine line;
+            line.index = 0; //unused here
+
             if (hdl->tracksArr[i].mode == (int)TrackMode::AB)
             {
-                color = QColor::fromRgbF(0.973f, 0.9f, 0.10f);
+                line.color = QColor::fromRgbF(0.973f, 0.9f, 0.10f);
             }
             else
             {
-                color = QColor::fromRgbF(0.3f, 0.99f, 0.20f);
+                line.color = QColor::fromRgbF(0.3f, 0.99f, 0.20f);
             }
-            linemap["color"] = color;
 
-            linepoints.clear();
-            for (Vec3 item: hdl->tracksArr[i].trackPts)
+            QVariantList linepoints;
+            for (const Vec3 &item: std::as_const(hdl->tracksArr[i].trackPts))
             {
                 p = QVector3D(item.easting, item.northing, 0);
                 s = p.project(modelview, projection, QRect(0,0,width,height));
                 linepoint = QPoint(s.x(), height - s.y());
                 linepoints.append(linepoint);
             }
-            linemap["points"] = linepoints;
-            linemap["dashed"] = true;
-            linemap["width"] = 3;
-            linemap["index"] = 0; //unused
-            lines.append(linemap);
+            line.points = linepoints;
+            line.dashed = true;
+            line.width = 3;
+            headlines.append(line);
         }
 
         //GL.Disable(EnableCap.LineStipple);
 
         if (hdl->idx > -1)
         {
-            linemap.clear();
-            linemap["width"] = 6;
-            //GL.LineWidth(6);
-            linemap["color"] = QColor::fromRgbF(1.0f, 0.0f, 1.0f);
-            linemap["dashed"] = false;
+            FenceLineModel::FenceLine line;
+            line.index = 0; //unused here
+            line.width = 5;
+            line.color = QColor::fromRgbF(1.0f, 0.0f, 1.0f);
+            line.dashed = false;
 
-            linepoints.clear();
+            QVariantList linepoints;
 
-            //GL.Begin(PrimitiveType.LineStrip);
-            for (Vec3 item: hdl->tracksArr[hdl->idx].trackPts)
+            for (const Vec3 &item: std::as_const(hdl->tracksArr[hdl->idx].trackPts))
             {
                 p = QVector3D(item.easting, item.northing, 0);
                 s = p.project(modelview, projection, QRect(0,0,width,height));
                 linepoint = QPoint(s.x(), height - s.y());
                 linepoints.append(linepoint);
             }
-            linemap["points"] = linepoints;
-            lines.append(linemap);
+            line.points = linepoints;
+
+            headlines.append(line);
 
             int cnt = hdl->tracksArr[hdl->idx].trackPts.count() - 1;
 
             p = QVector3D(hdl->tracksArr[hdl->idx].trackPts[0].easting, hdl->tracksArr[hdl->idx].trackPts[0].northing,0);
             s = p.project(modelview, projection, QRect(0,0,width,height));
-            apoint = QPoint(s.x(), height - s.y());
-            showa = true;
+            HeadacheInterface::instance()->set_apoint(QPoint(s.x(), height - s.y()));
+            HeadacheInterface::instance()->set_showa(true);
 
             p = QVector3D(hdl->tracksArr[hdl->idx].trackPts[cnt].easting, hdl->tracksArr[hdl->idx].trackPts[cnt].northing,0);
             s = p.project(modelview, projection, QRect(0,0,width,height));
-            bpoint = QPoint(s.x(), height - s.y());
-            showb = true;
+            HeadacheInterface::instance()->set_bpoint(QPoint(s.x(), height - s.y()));
+            HeadacheInterface::instance()->set_showb(true);
         }
     }
-    headache_designer_instance->setProperty("headacheLines", lines);
+
+    HeadacheInterface::instance()->headacheLineModel()->setFenceLines(headlines);
 }
 
 void FormHeadache::FormHeadLine_FormClosing()
 {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     //hdl
     if (hdl->idx == -1)
     {
-        isBtnAutoSteerOn = false;
-        isYouTurnBtnOn = false;
+        MainWindowState::instance()->set_isYouTurnBtnOn(false);
+        MainWindowState::instance()->set_isBtnAutoSteerOn(false);
     }
 
     emit saveHeadlines();
@@ -371,6 +359,8 @@ void FormHeadache::FormHeadLine_FormClosing()
 
 void FormHeadache::btnCycleBackward_Click()
 {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     bnd->bndList[0].hdLine.clear();
 
     if (hdl->tracksArr.count() > 0)
@@ -387,6 +377,8 @@ void FormHeadache::btnCycleBackward_Click()
 
 void FormHeadache::btnCycleForward_Click()
 {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     bnd->bndList[0].hdLine.clear();
 
     if (hdl->tracksArr.count() > 0)
@@ -402,6 +394,8 @@ void FormHeadache::btnCycleForward_Click()
 }
 
 void FormHeadache::clicked(int mouseX, int mouseY) {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     QVector3D fieldCoords = mouseClickToField(mouseX, mouseY);
 
     pint.easting = fieldCoords.x();
@@ -409,8 +403,8 @@ void FormHeadache::clicked(int mouseX, int mouseY) {
 
     bnd->bndList[0].hdLine.clear();
     hdl->idx = -1;
-    headache_designer_instance->setProperty("showa", false);
-    headache_designer_instance->setProperty("showb", false);
+    HeadacheInterface::instance()->set_showa(false);
+    HeadacheInterface::instance()->set_showb(false);
 
     if (isA)
     {
@@ -456,12 +450,12 @@ void FormHeadache::clicked(int mouseX, int mouseY) {
         if (start == end)
         {
             start = 99999; end = 99999;
-            emit timedMessageBox(3000, tr("Line Error"), tr("Start Point = End Point"));
+            emit Backend::instance()->timedMessage(3000, tr("Line Error"), tr("Start Point = End Point"));
             return;
         }
 
         //build the lines
-        if ((bool)curveLine)
+        if (HeadacheInterface::instance()->curveLine())
         {
             hdl->tracksArr.append(CHeadPath());
             hdl->idx = hdl->tracksArr.count() - 1;
@@ -669,7 +663,7 @@ void FormHeadache::clicked(int mouseX, int mouseY) {
 
         if (hdl->tracksArr.count() < 1 || hdl->idx == -1) return;
 
-        double distAway = (double)lineDistance;
+        double distAway = HeadacheInterface::instance()->lineDistance();
         hdl->tracksArr[hdl->idx].moveDistance += distAway;
 
         double distSqAway = (distAway * distAway) - 0.01;
@@ -722,6 +716,8 @@ void FormHeadache::clicked(int mouseX, int mouseY) {
 
 void FormHeadache::btnDeleteCurve_Click()
 {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     //bnd->bndList[0].hdLine.clear();
 
     if (hdl->tracksArr.count() > 0 && hdl->idx > -1)
@@ -748,11 +744,16 @@ void FormHeadache::btnExit_Click() {
 }
 
 void FormHeadache::isSectionControlled(bool wellIsIt) {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     bnd->isSectionControlledByHeadland = wellIsIt;
-    property_setHeadland_isSectionControlled = wellIsIt;
+    qDebug() << "isSectionControlledByHeadland" << wellIsIt;
+    SettingsManager::instance()->setHeadland_isSectionControlled(wellIsIt);
 }
 
 void FormHeadache::btnBndLoop_Click() {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     //sort the lines using CHeadPath::operator<
     std::sort(hdl->tracksArr.begin(), hdl->tracksArr.end());
     emit saveHeadlines();
@@ -775,7 +776,7 @@ void FormHeadache::btnBndLoop_Click() {
 
         if (nextLine == lineNum)
         {
-            emit timedMessageBox(2000, tr("Create Error"), tr("Is there maybe only one line?"));
+            emit Backend::instance()->timedMessage(2000, tr("Create Error"), tr("Is there maybe only one line?"));
             return;
         }
 
@@ -813,7 +814,7 @@ void FormHeadache::btnBndLoop_Click() {
 
     if (crossings.count() != hdl->tracksArr.count() * 2)
     {
-        emit timedMessageBox(2000, tr("Crosings Error"), tr("Make sure all ends cross only once"));
+        emit Backend::instance()->timedMessage(2000, tr("Crosings Error"), tr("Make sure all ends cross only once"));
         bnd->bndList[0].hdLine.clear();
         return;
     }
@@ -849,7 +850,7 @@ void FormHeadache::btnBndLoop_Click() {
 
     QVector<Vec3> hdArr;
 
-    if (bnd->bndList[0].hdLine.count() > 0)
+    if (bnd->bndList.count() > 0 && bnd->bndList[0].hdLine.count() > 0)
     {
         hdArr = bnd->bndList[0].hdLine;
     }
@@ -880,7 +881,7 @@ void FormHeadache::btnBndLoop_Click() {
         {
             Vec3 pt(hdArr[i].easting, hdArr[i].northing, hdArr[i].heading);
 
-            bnd->bndList[0].hdLine.append(pt);
+            //bnd->bndList[0].hdLine.append(pt);  //???????
             delta = 0;
         }
     }
@@ -889,6 +890,8 @@ void FormHeadache::btnBndLoop_Click() {
 }
 
 void FormHeadache::btnSlice_Click() {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     int startBnd = 0, endBnd = 0, startLine = 0, endLine = 0;
     int isStart = 0;
 
@@ -896,7 +899,7 @@ void FormHeadache::btnSlice_Click() {
 
     //save a backup
     backupList.clear();
-    for (auto item: bnd->bndList[0].hdLine)
+    for (const auto &item: std::as_const(bnd->bndList[0].hdLine))
     {
         backupList.append(item);
     }
@@ -935,7 +938,7 @@ void FormHeadache::btnSlice_Click() {
 
     if (isStart < 2)
     {
-        emit timedMessageBox(2000, tr("Error"), tr("Crossings not Found"));
+        emit Backend::instance()->timedMessage(2000, tr("Error"), tr("Crossings not Found"));
         return;
     }
 
@@ -965,7 +968,7 @@ void FormHeadache::btnSlice_Click() {
         //build headline from desList
         bnd->bndList[0].hdLine.clear();
 
-        for (auto item: hdl->desList)
+        for (const auto &item: std::as_const(hdl->desList))
         {
             bnd->bndList[0].hdLine.append(item);
         }
@@ -1003,7 +1006,7 @@ void FormHeadache::btnSlice_Click() {
         //build headline from desList
         bnd->bndList[0].hdLine.clear();
 
-        for (auto item: hdl->desList)
+        for (const auto &item: std::as_const(hdl->desList))
         {
             bnd->bndList[0].hdLine.append(item);
         }
@@ -1015,6 +1018,8 @@ void FormHeadache::btnSlice_Click() {
 
 void FormHeadache::btnDeleteHeadland_Click()
 {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     start = 99999; end = 99999;
     isA = true;
     hdl->desList.clear();
@@ -1032,6 +1037,8 @@ void FormHeadache::btnDeletePoints_Click() {
 */
 
 void FormHeadache::btnALength_Click() {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     if (hdl->idx > -1)
     {
         //and the beginning
@@ -1049,6 +1056,8 @@ void FormHeadache::btnALength_Click() {
 
 void FormHeadache::btnBLength_Click()
 {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     if (hdl->idx > -1)
     {
         int ptCnt = hdl->tracksArr[hdl->idx].trackPts.count() - 1;
@@ -1066,6 +1075,8 @@ void FormHeadache::btnBLength_Click()
 
 void FormHeadache::btnBShrink_Click()
 {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     if (hdl->idx > -1)
     {
         if (hdl->tracksArr[hdl->idx].trackPts.count() > 8)
@@ -1076,6 +1087,8 @@ void FormHeadache::btnBShrink_Click()
 
 void FormHeadache::btnAShrink_Click()
 {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     if (hdl->idx > -1)
     {
         if (hdl->tracksArr[hdl->idx].trackPts.count() > 8)
@@ -1086,11 +1099,13 @@ void FormHeadache::btnAShrink_Click()
 
 void FormHeadache::btnHeadlandOff_Click()
 {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     bnd->bndList[0].hdLine.clear();
     update_headland();
     emit saveHeadland();
-    bnd->isHeadlandOn = false;
-    vehicle->isHydLiftOn = false;
+    MainWindowState::instance()->set_isHeadlandOn(false);
+    CVehicle::instance()->setIsHydLiftOn(false);
     update_ab();
     update_headland();
 }

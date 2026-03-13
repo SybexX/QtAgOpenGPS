@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
 //
 // Recorded path display buttons
-import QtQuick 2.0
+import QtQuick
 import QtQuick.Controls.Fusion
 
 import "components" as Comp

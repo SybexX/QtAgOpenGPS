@@ -22,7 +22,7 @@ Rectangle {
     Timer {
         id: timer
         interval: 100
-        running: true
+        running: timerR.visible
         repeat: true
         onTriggered: {
             timerR.timeout = timerR.timeout - interval

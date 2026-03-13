@@ -199,7 +199,7 @@ Button {
                 }
             },
             State {
-                when: ! icon_button_text_beside.down && icon_button_text_beside.checked
+                when: ! icon_button_text_beside.down && icon_button_text_beside.checked && ! icon_button_text_beside.hovered
                 name: "checked"
                 PropertyChanges {
                     target: gradientStop1
@@ -251,7 +251,7 @@ Button {
                 */
            },
             State {
-                when: icon_button_text_beside.hovered
+                when: icon_button_text_beside.hovered && ! icon_button_text_beside.checked && ! icon_button_text_beside.down
                 name: "hovered"
                /* PropertyChanges {
                     target: icon_button_background
@@ -275,6 +275,22 @@ Button {
                     source: icon_button_text_beside.icon.source
                 }
                 */
+            },
+            State {
+                when: icon_button_text_beside.hovered && icon_button_text_beside.checked && ! icon_button_text_beside.down
+                name: "hoveredChecked"
+                PropertyChanges {
+                    target: gradientStop1
+                    color: icon_button_text_beside.colorHover1
+                }
+                PropertyChanges {
+                    target: gradientStop2
+                    color: icon_button_text_beside.colorHover2
+                }
+                PropertyChanges {
+                    target: gradientStop3
+                    color: icon_button_text_beside.colorChecked3
+                }
             }
         ]
 

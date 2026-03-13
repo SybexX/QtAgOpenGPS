@@ -10,26 +10,34 @@
 #include "cboundary.h"
 #include "cyouturn.h"
 #include "cahrs.h"
-#include "aogproperty.h"
+#include "classes/settingsmanager.h"
 #include "cnmea.h"
-//#include "common.h"
+#include "qmlutil.h"
+#include "mainwindowstate.h"
+#include "backend.h"
+#include <QElapsedTimer>
 
 CContour::CContour(QObject *parent)
     : QObject(parent)
 {
     ptList = QSharedPointer<QVector<Vec3>>(new QVector<Vec3>());
+
+    //connect(Backend::instance(), &Backend::contourLock, this, &CContour::setLockToLine);
 }
 
-void CContour::SetLockToLine()
+void CContour::setLockToLine()
 {
-    if (ctList.count() > 5) isLocked = !isLocked;
+    if (ctList.count() > 5) {
+        bool currentLocked = MainWindowState::instance()->btnIsContourLocked();
+        MainWindowState::instance()->set_btnIsContourLocked(!currentLocked);
+    }
 }
 
 void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehicle, Vec3 pivot)
 {
-    double tool_toolWidth = property_setVehicle_toolWidth;
-    double tool_toolOverlap = property_setVehicle_toolOverlap;
-    double tool_toolOffset = property_setVehicle_toolOffset;
+    double tool_toolWidth = SettingsManager::instance()->vehicle_toolWidth();
+    double tool_toolOverlap = SettingsManager::instance()->vehicle_toolOverlap();
+    double tool_toolOffset = SettingsManager::instance()->vehicle_toolOffset();
     double tool_toolHalfWidth = (tool_toolWidth - tool_toolOverlap) / 2;
 
     if (ctList.count() == 0)
@@ -67,7 +75,7 @@ void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehi
     boxB.easting = pivot.easting + sin2HL + sinH;
     boxB.northing = pivot.northing + cos2HL + cosH;
 
-    if (!isLocked)
+    if (!MainWindowState::instance()->btnIsContourLocked())
     {
         stripNum = -1;
         for (int s = 0; s < stripCount; s++)
@@ -93,6 +101,11 @@ void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehi
                 {
                     minDistance = dist;
                     stripNum = s;
+                    if (oldStripNum != stripNum) {
+                        //invalidate our GPU buffers since the active strip has changed
+                        stripListBuffersDirty = true;
+                        oldStripNum = stripNum;
+                    }
                     pt = lastLockPt = p;
                     //B = p;
                 }
@@ -104,7 +117,7 @@ void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehi
         {
             //no points in the box, exit
             ctList.clear();
-            isLocked = false;
+            MainWindowState::instance()->set_btnIsContourLocked(false);
             return;
         }
     }
@@ -118,7 +131,7 @@ void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehi
         if (ptCount < 2)
         {
             ctList.clear();
-            isLocked = false;
+            MainWindowState::instance()->set_btnIsContourLocked(false);
             return;
         }
 
@@ -148,7 +161,7 @@ void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehi
         if (minDistance > toolContourDistance)
         {
             ctList.clear();
-            isLocked = false;
+            MainWindowState::instance()->set_btnIsContourLocked(false);
             return;
         }
     }
@@ -184,7 +197,7 @@ void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehi
     else return;
 
     //are we going same direction as stripList was created?
-    bool isSameWay = M_PI - fabs(fabs(vehicle.fixHeading - (*stripList[stripNum])[pt].heading) - M_PI) < 1.57;
+    bool isSameWay = M_PI - fabs(fabs(CVehicle::instance()->fixHeading() - (*stripList[stripNum])[pt].heading) - M_PI) < 1.57;
 
     double RefDist = (distanceFromRefLine + (isSameWay ? tool_toolOffset : -tool_toolOffset))
                      / (tool_toolWidth - tool_toolOverlap);
@@ -215,16 +228,19 @@ void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehi
         //make the new guidance line list called guideList
         ptCount = stripList[stripNum]->count();
 
-        //shorter behind you
+        //shorter behind you, scale ahead with speed so goal point doesn't run off the end
+        int behind = 20;
+        int ahead = qMax(70, static_cast<int>(CVehicle::instance()->avgSpeed() * 10));
+
         if (isSameWay)
         {
-            start = pt - 20; if (start < 0) start = 0;
-            stop = pt + 70; if (stop > ptCount) stop = ptCount;
+            start = pt - behind; if (start < 0) start = 0;
+            stop = pt + ahead; if (stop > ptCount) stop = ptCount;
         }
         else
         {
-            start = pt - 70; if (start < 0) start = 0;
-            stop = pt + 20; if (stop > ptCount) stop = ptCount;
+            start = pt - ahead; if (start < 0) start = 0;
+            stop = pt + behind; if (stop > ptCount) stop = ptCount;
         }
 
         //if (howManyPathsAway != 0 && (mf.tool.halfToolWidth < (0.5*mf.tool.toolOffset)))
@@ -273,35 +289,36 @@ void CContour::BuildContourGuidanceLine(double secondsSinceStart, CVehicle &vehi
         if (ptc < 5)
         {
             ctList.clear();
-            isLocked = false;
+            MainWindowState::instance()->set_btnIsContourLocked(false);
             return;
         }
     }
     else
     {
         ctList.clear();
-        isLocked = false;
+        MainWindowState::instance()->set_btnIsContourLocked(false);
         return;
     }
 
+    updateStripSparsePoints();
 
 }
 
-void CContour::DistanceFromContourLine(bool isAutoSteerBtnOn,
+void CContour::DistanceFromContourLine(bool isBtnAutoSteerOn,
                                        CVehicle &vehicle,
                                        CYouTurn &yt,
                                        CAHRS &ahrs,
                                        CNMEA &pn,
                                        Vec3 pivot, Vec3 steer)
 {
-    double wheelbase = property_setVehicle_wheelbase;
-    double maxSteerAngle = property_setVehicle_maxSteerAngle;
+    double wheelbase = SettingsManager::instance()->vehicle_wheelbase();
+    double maxSteerAngle = SettingsManager::instance()->vehicle_maxSteerAngle();
     //double maxAngularVelocity = property_setVehicle_maxAngularVelocity;
-    double stanleyHeadingErrorGain = property_stanleyHeadingErrorGain;
-    double stanleyDistanceErrorGain = property_stanleyDistanceErrorGain;
-    double purePursuitIntegralGain = property_purePursuitIntegralGainAB;
-
-    bool isStanleyUsed = property_setVehicle_isStanleyUsed;
+    double stanleyHeadingErrorGain = SettingsManager::instance()->vehicle_stanleyHeadingErrorGain();
+    double stanleyDistanceErrorGain = SettingsManager::instance()->vehicle_stanleyDistanceErrorGain();
+    double purePursuitIntegralGain = SettingsManager::instance()->vehicle_purePursuitIntegralGainAB();
+    double as_sideHillCompensation = SettingsManager::instance()->as_sideHillCompensation();
+    bool isStanleyUsed = SettingsManager::instance()->vehicle_isStanleyUsed();
 
     double minDistA = 1000000, minDistB = 1000000;
     int ptCount = ctList.count();
@@ -376,21 +393,21 @@ void CContour::DistanceFromContourLine(bool isAutoSteerBtnOn,
             if (abFixHeadingDelta > glm::PIBy2) abFixHeadingDelta -= M_PI;
             else if (abFixHeadingDelta < -glm::PIBy2) abFixHeadingDelta += M_PI;
 
-            if (vehicle.isReverse) abFixHeadingDelta *= -1;
+            if (CVehicle::instance()->isReverse()) abFixHeadingDelta *= -1;
 
             abFixHeadingDelta *= stanleyHeadingErrorGain;
             if (abFixHeadingDelta > 0.74) abFixHeadingDelta = 0.74;
             if (abFixHeadingDelta < -0.74) abFixHeadingDelta = -0.74;
 
             steerAngleCT = atan((distanceFromCurrentLinePivot * stanleyDistanceErrorGain)
-                                     / ((fabs(vehicle.avgSpeed) * 0.277777) + 1));
+                                     / ((fabs(CVehicle::instance()->avgSpeed()) * 0.277777) + 1));
 
             if (steerAngleCT > 0.74) steerAngleCT = 0.74;
             if (steerAngleCT < -0.74) steerAngleCT = -0.74;
 
             steerAngleCT = glm::toDegrees((steerAngleCT + abFixHeadingDelta) * -1.0);
 
-            if (steerAngleCT < -maxSteerAngle) steerAngleCT = maxSteerAngle;
+            if (steerAngleCT < -maxSteerAngle) steerAngleCT = -maxSteerAngle;
             if (steerAngleCT > maxSteerAngle) steerAngleCT = maxSteerAngle;
         }
         else
@@ -417,10 +434,11 @@ void CContour::DistanceFromContourLine(bool isAutoSteerBtnOn,
             //just need to make sure the points continue ascending in list order or heading switches all over the place
             if (A > B) { C = A; A = B; B = C; }
 
-            if (isLocked && (A < 2 || B > ptCount - 3))
+            if (MainWindowState::instance()->btnIsContourLocked() &&
+                (A < 2 || B > ptCount - 3))
             {
                 //ctList.clear();
-                isLocked = false;
+                MainWindowState::instance()->set_btnIsContourLocked(false);
                 lastLockPt = INT_MAX;
                 return;
             }
@@ -459,9 +477,9 @@ void CContour::DistanceFromContourLine(bool isAutoSteerBtnOn,
 
                 //pivotErrorTotal = pivotDistanceError + pivotDerivative;
 
-                if (isAutoSteerBtnOn
+                if (isBtnAutoSteerOn
                     && fabs(pivotDerivative) < (0.1)
-                    && vehicle.avgSpeed > 2.5
+                    && CVehicle::instance()->avgSpeed() > 2.5
                     && !yt.isYouTurnTriggered)
                 {
                     //if over the line heading wrong way, rapidly decrease integral
@@ -483,7 +501,7 @@ void CContour::DistanceFromContourLine(bool isAutoSteerBtnOn,
             }
             else inty = 0;
 
-            if (vehicle.isReverse) inty = 0;
+            if (CVehicle::instance()->isReverse()) inty = 0;
 
             isHeadingSameWay = M_PI - fabs(fabs(pivot.heading - ctList[A].heading) - M_PI) < glm::PIBy2;
 
@@ -498,9 +516,9 @@ void CContour::DistanceFromContourLine(bool isAutoSteerBtnOn,
             rNorthCT = ctList[A].northing + (U * dy);
 
             //update base on autosteer settings and distance from line
-            double goalPointDistance = vehicle.UpdateGoalPointDistance();
+            double goalPointDistance = CVehicle::instance()->UpdateGoalPointDistance();
 
-            bool ReverseHeading = vehicle.isReverse ? !isHeadingSameWay : isHeadingSameWay;
+            bool ReverseHeading = CVehicle::instance()->isReverse() ? !isHeadingSameWay : isHeadingSameWay;
 
             int count = ReverseHeading ? 1 : -1;
             Vec3 start(rEastCT, rNorthCT, 0);
@@ -530,14 +548,14 @@ void CContour::DistanceFromContourLine(bool isAutoSteerBtnOn,
             //calculate the the delta x in local coordinates and steering angle degrees based on wheelbase
             double localHeading;// = glm::twoPI - mf.fixHeading;
 
-            if (isHeadingSameWay) localHeading = glm::twoPI - vehicle.fixHeading + inty;
-            else localHeading = glm::twoPI - vehicle.fixHeading - inty;
+            if (isHeadingSameWay) localHeading = glm::twoPI - CVehicle::instance()->fixHeading() + inty;
+            else localHeading = glm::twoPI - CVehicle::instance()->fixHeading() - inty;
 
             steerAngleCT = glm::toDegrees(atan(2 * (((goalPointCT.easting - pivot.easting) * cos(localHeading))
                                                         + ((goalPointCT.northing - pivot.northing) * sin(localHeading))) * wheelbase / goalPointDistanceSquared));
 
             if (ahrs.imuRoll != 88888)
-                steerAngleCT += ahrs.imuRoll * -(double)property_setAS_sideHillComp;
+                steerAngleCT += ahrs.imuRoll * -as_sideHillCompensation;
 
             if (steerAngleCT < -maxSteerAngle) steerAngleCT = -maxSteerAngle;
             if (steerAngleCT > maxSteerAngle) steerAngleCT = maxSteerAngle;
@@ -545,17 +563,17 @@ void CContour::DistanceFromContourLine(bool isAutoSteerBtnOn,
         }
 
         //used for smooth mode
-        vehicle.modeActualXTE = (distanceFromCurrentLinePivot);
+        CVehicle::instance()->set_modeActualXTE ( (distanceFromCurrentLinePivot));
 
         //fill in the autosteer variables
-        vehicle.guidanceLineDistanceOff = (short)glm::roundMidAwayFromZero(distanceFromCurrentLinePivot * 1000.0);
-        vehicle.guidanceLineSteerAngle = (short)(steerAngleCT * 100);
+        CVehicle::instance()->set_guidanceLineDistanceOff ((short)glm::roundMidAwayFromZero(distanceFromCurrentLinePivot * 1000.0));
+        CVehicle::instance()->guidanceLineSteerAngle = (short)(steerAngleCT * 100);
     }
     else
     {
         //invalid distance so tell AS module
-        distanceFromCurrentLinePivot = 32000; //???
-        vehicle.guidanceLineDistanceOff = 32000;
+        distanceFromCurrentLinePivot = 0;
+        CVehicle::instance()->set_guidanceLineDistanceOff(0);
     }
 
 }
@@ -585,11 +603,54 @@ void CContour::StartContourLine() {
 
 //Add current position to stripList
 void CContour::AddPoint(Vec3 pivot) {
-    double tool_toolOffset = property_setVehicle_toolOffset;
+    double tool_toolOffset = SettingsManager::instance()->vehicle_toolOffset();
 
     ptList->append(Vec3(pivot.easting + cos(pivot.heading) * tool_toolOffset,
                         pivot.northing - sin(pivot.heading) * tool_toolOffset,
                         pivot.heading));
+}
+
+void CContour::updateStripSparsePoints()
+{
+    if (stripNum < 0 || stripNum >= stripList.count())
+        return;
+
+    QSharedPointer<QVector<Vec3>> strip = stripList[stripNum];
+    if (!strip || strip->count() == 0)
+        return;
+
+    int currentCount = strip->count();
+
+    // If strip changed (new strip selected), reset sparse points
+    if (currentCount < stripSparseLastCount) {
+        stripSparsePts.clear();
+        stripSparseLastCount = 0;
+    }
+
+    // Check if strip grew
+    if (currentCount > stripSparseLastCount) {
+        // Process only new points
+        for (int i = stripSparseLastCount; i < currentCount; i++) {
+            const Vec3 &newPt = (*strip)[i];
+
+            // If sparse list is empty, add first point
+            if (stripSparsePts.isEmpty()) {
+                stripSparsePts.append(newPt);
+                continue;
+            }
+
+            // Check distance from last sparse point
+            const Vec3 &lastSparsePt = stripSparsePts.last();
+            double dist = glm::Distance(newPt.easting, newPt.northing,
+                                       lastSparsePt.easting, lastSparsePt.northing);
+
+            // Only add if at least 1m from last sparse point
+            if (dist >= 1.0) {
+                stripSparsePts.append(newPt);
+            }
+        }
+        stripSparseLastCount = currentCount;
+    }
 }
 
 //End the strip
@@ -617,19 +678,19 @@ void CContour::StopContourLine(QVector<QSharedPointer <QVector<Vec3>>> &contourS
 //build contours for boundaries
 void CContour::BuildFenceContours(CBoundary &bnd, double spacingInt, int patchCounter)
 {
-    double tool_toolWidth = property_setVehicle_toolWidth;
-    double tool_toolOverlap = property_setVehicle_toolOverlap;
+    double tool_toolWidth = SettingsManager::instance()->vehicle_toolWidth();
+    double tool_toolOverlap = SettingsManager::instance()->vehicle_toolOverlap();
 
     spacingInt *= 0.01;
     if (bnd.bndList.count() == 0)
     {
-        emit TimedMessage(1500, tr("Boundary Contour Error"), tr("No Boundaries Made"));
+        emit Backend::instance()->timedMessage(1500, tr("Boundary Contour Error"), tr("No Boundaries Made"));
         return;
     }
 
     if (patchCounter != 0)
     {
-        emit TimedMessage(1500, tr("Section Control On"), tr("Turn Off Section Control"));
+        emit Backend::instance()->timedMessage(1500, tr("Section Control On"), tr("Turn Off Section Control"));
         return;
     }
 
@@ -663,15 +724,15 @@ void CContour::BuildFenceContours(CBoundary &bnd, double spacingInt, int patchCo
         }
     }
 
-    emit TimedMessage(1500, tr("Boundary Contour"), tr("Contour Path Created"));
+    emit Backend::instance()->timedMessage(1500, tr("Boundary Contour"), tr("Contour Path Created"));
 }
 
 //draw the red follow me line
-void CContour::DrawContourLine(QOpenGLFunctions *gl, const QMatrix4x4 &mvp)
+void CContour::DrawContourLine(QOpenGLFunctions *gl, const QMatrix4x4 &mvp, QElapsedTimer &swFrame)
 {
-    double lineWidth = property_setDisplay_lineWidth;
-    bool isStanleyUsed = property_setVehicle_isStanleyUsed;
-    bool isPureDisplayOn = property_setMenu_isPureOn;
+    bool isStanleyUsed = SettingsManager::instance()->vehicle_isStanleyUsed();
+    double lineWidth = SettingsManager::instance()->display_lineWidth();
+    bool isPureDisplayOn = SettingsManager::instance()->menu_isPureOn();
 
     GLHelperOneColor gldraw;
     QColor color;
@@ -687,7 +748,6 @@ void CContour::DrawContourLine(QOpenGLFunctions *gl, const QMatrix4x4 &mvp)
 
     gldraw.draw(gl,mvp,color,GL_LINE_STRIP, lineWidth);
 
-
     gldraw.clear();
     color.setRgbF(0.87f, 08.7f, 0.25f);
     for (int h = 0; h < ptCount; h++)
@@ -698,7 +758,7 @@ void CContour::DrawContourLine(QOpenGLFunctions *gl, const QMatrix4x4 &mvp)
     //Draw the captured ref strip, red if locked
     double useWidth;
 
-    if (isLocked)
+    if (MainWindowState::instance()->btnIsContourLocked())
     {
         color.setRgbF(0.983f, 0.92f, 0.420f);
         useWidth = 4;
@@ -712,12 +772,47 @@ void CContour::DrawContourLine(QOpenGLFunctions *gl, const QMatrix4x4 &mvp)
     if (stripNum > -1)
     {
         gldraw.clear();
+        QVector<QVector3D> stripListPart;
 
-        for (int h = 0; h < stripList[stripNum]->count(); h++)
+        if (stripListBuffersDirty) {
+            //release all existing GPU buffers
+            stripListBuffers.clear();
+            stripListBuffersDirty = false;
+        }
+
+        int numbuffs = stripList[stripNum]->count() / 10000; //10000 points per buffer
+
+        //draw points 10,000 at a time, caching them in GPU buffers
+        for (int b = 0; b < numbuffs; b++) {
+            if (stripListBuffers.size() <= b) {
+                //if additonal points were added since last time, make a
+                //new buffer and fill it
+                stripListBuffers.append(QOpenGLBuffer());
+                stripListPart.clear();
+
+                for (int h=b * 10000; h < (b+1) * 10000; h++) {
+                    stripListPart.append(QVector3D((*stripList[stripNum])[h].easting,
+                                                   (*stripList[stripNum])[h].northing,
+                                                   0));
+                }
+                stripListBuffers[b].create();
+                stripListBuffers[b].bind();
+                stripListBuffers[b].allocate(stripListPart.data(), 10000 * sizeof(QVector3D));
+                stripListBuffers[b].release();
+            }
+            //qDebug() << "Drawing from saved buffer.";
+            glDrawArraysColor(gl, mvp, GL_POINTS, color, stripListBuffers[b],GL_FLOAT, 10000);
+        }
+
+        //now draw the remaining points
+        //TODO: android crashes here sometimes with QList index out of range.  Need to implement locking
+        for (int h = numbuffs*10000; h < stripList[stripNum]->count(); h++)
             gldraw.append(QVector3D((*stripList[stripNum])[h].easting, (*stripList[stripNum])[h].northing, 0));
 
         gldraw.draw(gl,mvp,color,GL_POINTS,useWidth);
     }
+
+    //qDebug() << "drawcontour 4" << stripList[stripNum]->count() << swFrame.elapsed();
 
     color.setRgbF(0.35f, 0.30f, 0.90f);
     gldraw.clear();
@@ -731,6 +826,7 @@ void CContour::DrawContourLine(QOpenGLFunctions *gl, const QMatrix4x4 &mvp)
         gldraw.append(QVector3D(goalPointCT.easting, goalPointCT.northing, 0.0));
         gldraw.draw(gl,mvp,color,GL_POINTS,6.0f);
     }
+    //qDebug() << "drawcontour 5" << swFrame.elapsed();
 }
 
 //Reset the contour to zip

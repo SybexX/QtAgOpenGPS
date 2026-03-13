@@ -5,6 +5,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls.Fusion
+//import Settings
 //import QtQuick.Controls.Styles 1.4
 
 import ".."
@@ -13,7 +14,10 @@ import "../components"
 Rectangle{
 	anchors.fill: parent
 	visible: true
-    color: aog.backgroundColor
+    color: aogInterface.backgroundColor
+
+    // Qt 6.8 QProperty + BINDABLE: Use SettingsManager properties directly
+    // Removed local properties - now using SettingsManager.tool_isToolXXX directly
     TextLine{
 		id: text
 		anchors.top: parent.top
@@ -39,12 +43,13 @@ Rectangle{
 			id: i3pt
             icon.source: prefix + "/images/ToolChkRear.png"
             checkable: true
-            isChecked: settings.setTool_isToolRearFixed
+            // Threading Phase 1: Tool type - Rear Fixed 3 Point
+            isChecked: SettingsManager.tool_isToolRearFixed
             onClicked: {
-                settings.setTool_isToolRearFixed = true
-                settings.setTool_isToolFront = false
-                settings.setTool_isToolTrailing = false
-                settings.setTool_isToolTBT = false
+                SettingsManager.tool_isToolRearFixed = true
+                SettingsManager.tool_isToolFront = false
+                SettingsManager.tool_isToolTrailing = false
+                SettingsManager.tool_isTBT = false
             }
 		}
 
@@ -54,12 +59,12 @@ Rectangle{
 			id: i3ptfront
             icon.source: prefix + "/images/ToolChkFront.png"
             checkable: true
-            isChecked: settings.setTool_isToolFront
+            isChecked: SettingsManager.tool_isToolFront
             onClicked: {
-                settings.setTool_isToolRearFixed = false
-                settings.setTool_isToolFront = true
-                settings.setTool_isToolTrailing = false
-                settings.setTool_isToolTBT = false
+                SettingsManager.tool_isToolRearFixed = false
+                SettingsManager.tool_isToolFront = true
+                SettingsManager.tool_isToolTrailing = false
+                SettingsManager.tool_isTBT = false
             }
         }
 
@@ -69,12 +74,13 @@ Rectangle{
 			id: itrailed
             icon.source: prefix + "/images/ToolChkTrailing.png"
             checkable: true
-            isChecked: settings.setTool_isToolTrailing && ! settings.setTool_isToolTBT
+            // Threading Phase 1: Tool type - Trailing
+            isChecked: SettingsManager.tool_isToolTrailing
             onClicked: {
-                settings.setTool_isToolRearFixed = false
-                settings.setTool_isToolFront = false
-                settings.setTool_isToolTrailing = true
-                settings.setTool_isToolTBT = false
+                SettingsManager.tool_isToolRearFixed = false
+                SettingsManager.tool_isToolFront = false
+                SettingsManager.tool_isToolTrailing = true
+                SettingsManager.tool_isTBT = false
             }
         }
 		IconButtonColor{
@@ -83,12 +89,13 @@ Rectangle{
 			id: iTBT
             icon.source: prefix + "/images/ToolChkTBT.png"
             checkable: true
-            isChecked: settings.setTool_isToolTBT
+            // Threading Phase 1: Tool type - TBT (Tow Between Tractor)
+            isChecked: SettingsManager.tool_isTBT
             onClicked: {
-                settings.setTool_isToolRearFixed = false
-                settings.setTool_isToolFront = false
-                settings.setTool_isToolTrailing = true
-                settings.setTool_isToolTBT = true
+                SettingsManager.tool_isToolRearFixed = false
+                SettingsManager.tool_isToolFront = false
+                SettingsManager.tool_isToolTrailing = false
+                SettingsManager.tool_isTBT = true
             }
         }
 	}

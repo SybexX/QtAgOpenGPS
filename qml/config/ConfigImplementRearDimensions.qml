@@ -4,6 +4,9 @@
 // Config dimensions for rear 3pt mounted implement 
 import QtQuick
 import QtQuick.Controls.Fusion
+//import Settings
+import AOG
+
 
 import ".."
 import "../components"
@@ -11,7 +14,7 @@ import "../components"
 Rectangle{
     id: configImpDimWin
     anchors.fill: parent
-    color: aog.backgroundColor
+    color: aogInterface.backgroundColor
     visible: false
     Image{
         id: image1
@@ -33,10 +36,11 @@ Rectangle{
         anchors.rightMargin: parent.width * 0.6
         from: 10
         to:3000
-        boundValue: settings.setVehicle_hitchLength < 0 ? -settings.setVehicle_hitchLength : settings.setVehicle_hitchLength
-        onValueModified: settings.setVehicle_hitchLength = -value
+        // Threading Phase 1: Rear hitch length (absolute value)
+        boundValue: SettingsManager.vehicle_hitchLength < 0 ? -SettingsManager.vehicle_hitchLength : SettingsManager.vehicle_hitchLength
+        onValueModified: SettingsManager.vehicle_hitchLength = -value
         TextLine{
-            text: qsTr("Units: ")+ utils.cm_unit_abbrev()
+            text: qsTr("Units: ")+ Utils.cm_unit_abbrev()
             font.bold: true
             anchors.top: parent.bottom
         }

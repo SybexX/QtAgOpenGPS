@@ -4,11 +4,17 @@
 #include <QSharedPointer>
 #include <QVector>
 #include <QVector3D>
+#include <QObject>
+#include "vec2.h"
 
 typedef QVector<QVector3D> PatchTriangleList;
 
-class CFieldData;
-class CTool;
+struct PatchBoundingBox {
+    float minx;
+    float miny;
+    float maxx;
+    float maxy;
+};
 
 class CPatches
 {
@@ -16,11 +22,13 @@ public:
     //torriem: we use a QVector of QVector3D so that it's
     //more efficient to draw on openGL back buffer.
 
-    //list of patch data individual triangles
+    //currently building list of patch data individual triangles
     QSharedPointer<PatchTriangleList> triangleList;
+    QSharedPointer<PatchBoundingBox> triangleListBoundingBox;
 
     //list of the list of patch data individual triangles for that entire section activity
     QVector<QSharedPointer<PatchTriangleList>> patchList;
+    QVector<QSharedPointer<PatchBoundingBox>> patchBoundingBoxList;
 
     //mapping
     bool isDrawing = false;
@@ -34,13 +42,15 @@ public:
 
     CPatches();
 
-    void TurnMappingOn(CTool &tool,
-                       int j);
-    void TurnMappingOff(CTool &tool,
-                        CFieldData &fd);
-    void AddMappingPoint(CTool &tool,
-                         CFieldData &fd,
-                         int j);
+    void TurnMappingOn(QColor section_color,
+                       Vec2 rightPoint, Vec2 leftPoint);
+    void TurnMappingOff(QColor section_color,
+                        Vec2 leftPoint,
+                        Vec2 rightPoint,
+                        QVector<QSharedPointer<PatchTriangleList> > &patchSaveList);
+    void AddMappingPoint(QColor section_color,
+                         Vec2 rightPoint, Vec2 leftPoint,
+                         QVector<QSharedPointer<PatchTriangleList> > &patchSaveList);
 
 
 

@@ -5,6 +5,9 @@
 import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
+//import Settings
+import AOG
+// Interface import removed - now QML_SINGLETON
 
 import ".."
 import "../components" as Comp
@@ -38,10 +41,12 @@ Comp.MoveablePopup {
                     Comp.IconButtonTransparent{
                         icon.source: prefix + "/images/SnapLeftHalf.png"
                         Layout.alignment: Qt.AlignLeft
+                        onClicked: TracksInterface.ref_nudge((SettingsManager.vehicle_toolWidth - SettingsManager.vehicle_toolOverlap)/-2)
                     }
                     Comp.IconButtonTransparent{
                         icon.source: prefix + "/images/SnapRightHalf.png"
                         Layout.alignment: Qt.AlignRight
+                        onClicked: TracksInterface.ref_nudge((SettingsManager.vehicle_toolWidth - SettingsManager.vehicle_toolOverlap)/2)
                     }
                 }
                 RowLayout{
@@ -50,22 +55,28 @@ Comp.MoveablePopup {
                     Comp.IconButtonTransparent{
                         icon.source: prefix + "/images/SnapLeft.png"
                         Layout.alignment: Qt.AlignLeft
+                        onClicked: TracksInterface.ref_nudge(SettingsManager.as_snapDistanceRef/-100) // Threading Phase 1: Ref snap distance
                     }
                     Comp.IconButtonTransparent{
                         icon.source: prefix + "/images/SnapRight.png"
                         Layout.alignment: Qt.AlignRight
+                        onClicked: TracksInterface.ref_nudge(SettingsManager.as_snapDistanceRef/100) // Threading Phase 1: Ref snap distance
                     }
                 }
-                TextField{
+                Comp.SpinBoxCM{
+                    id: offset
                     Layout.alignment: Qt.AlignCenter
-                    implicitWidth: 75
+                    from: 1
+                    to: 10000
+                    boundValue: SettingsManager.as_snapDistanceRef
+                    onValueModified: SettingsManager.as_snapDistanceRef = value // Threading Phase 1: Reference nudge distance
                 }
             }
         }
         Comp.TextLine{
             id: nudgeText
             font.pixelSize: 25
-            text: qsTr("0 ")+ utils.cm_unit_abbrev()
+            text: qsTr("0 ")+ Utils.cm_unit_abbrev()
             anchors.bottom: bottomButtons.top
             anchors.bottomMargin: 15
         }

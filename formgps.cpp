@@ -1,770 +1,481 @@
-// Copyright (C) 2024 Michael Torrie and the QtAgOpenGPS Dev Team
+﻿// Copyright (C) 2024 Michael Torrie and the QtAgOpenGPS Dev Team
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
 //
 // Main class where everything is initialized
 #include "formgps.h"
-#include "aogproperty.h"
 #include <QColor>
 #include <QRgb>
 #include "qmlutil.h"
 #include "glm.h"
 #include "cpgn.h"
 #include <QLocale>
-#include <QLabel>
 #include <QQuickWindow>
-#include "qmlsettings.h"
-
-extern QLabel *grnPixelsWindow;
-extern QMLSettings qml_settings;
+#include "classes/settingsmanager.h"
+#include <cmath>
+#include <QPixmapCache>        // Phase 6.0.45: Memory leak fixes - image cache management
+#include <QCoreApplication>    // Phase 6.0.45: Memory leak fixes - sendPostedEvents for deferred deletion
+#include <QEvent>              // Phase 6.0.45: Memory leak fixes - QEvent::DeferredDelete enum
+#include "backend.h"
+#include "mainwindowstate.h"
+#include "flagsinterface.h"
+#include "siminterface.h"
+#include "recordedpath.h"
+#include "backendaccess.h"
+#include "modulecomm.h"
+#include "camera.h"
+#include "vehicleproperties.h"
+#include "layerservice.h"
+#include "boundaryinterface.h"
 
 FormGPS::FormGPS(QWidget *parent) : QQmlApplicationEngine(parent)
 {
+    qDebug() << "FormGPS constructor START";
 
-    connect_classes(); //make all the inter-class connections
-    qml_settings.setupKeys();
-    qml_settings.loadSettings();  //fetch everything from QSettings for QML to use
+    // PHASE 6.0.33: Initialize raw GPS position (two-buffer pattern)
+    m_rawGpsPosition = {0.0, 0.0};   // Will be updated when first NMEA packet arrives
 
-    /* Temporary test data to see if drawing routines are working. */
+    // PHASE 6.0.45: Set QPixmapCache limit to prevent memory leaks
+    // Default Qt cache is 10 MB which is too small for QtAgOpenGPS UI
+    // Heob analysis showed 94 MB QMovie leak + 15 MB QImage leaks
+    // Setting 32 MB limit prevents unbounded growth while allowing adequate caching
+    QPixmapCache::setCacheLimit(32768);  // 32 MB = 32768 KB
+    qDebug() << "PHASE 6.0.45: QPixmapCache limit set to 32 MB";
 
-    /*
-    if ((QString)property_setVehicle_vehicleName == "Default Vehicle") {
-        //set up a default vehicle
+    qDebug() << "Setting up basic connections...";
+    connect(this, &FormGPS::do_processSectionLookahead, this, &FormGPS::processSectionLookahead, Qt::QueuedConnection);
+    connect(this, &FormGPS::do_processOverlapCount, this, &FormGPS::processOverlapCount, Qt::QueuedConnection);
+    
+    qDebug() << "ðŸ”§ Setting up AgIO service FIRST...";
+    setupAgIOService();
+    // Phase 6.0.27: DISABLED legacy parsedDataReady connection
+    // Using separated signals (nmeaDataReady, imuDataReady, steerDataReady) instead
+    // Old connection caused double updates: both onParsedDataReady() and onNmeaDataReady()
+    // processed the same $PANDA sentence → race condition → satellite count fluctuation
+    // Phase 6.0.21: Connect to AgIOService broadcast signal for GPS/IMU data
+    // Phase 6.0.23.4: DirectConnection for real-time 40 Hz (same thread, no queue)
+    // Phase 6.0.24: QueuedConnection tested but caused 100% CPU → reverted
+    // connect(m_agioService, &AgIOService::parsedDataReady,
+    //         this, &FormGPS::onParsedDataReady, Qt::DirectConnection);
+    // qDebug() << "Phase 6.0.21: Connected to AgIOService::parsedDataReady signal";
 
-        //fieldColor = QColor(s.value("display/fieldColor", "#82781E").toString());
-        //sectionColor = QColor(s.value("display/sectionColor", "#32DCC8").toString());
-        property_setMenu_isCompassOn = true;
-        property_setMenu_isSpeedoOn = true;
+    // Phase 6.0.25: Connect separated data signals for optimal routing
+    connect(m_agioService, &AgIOService::nmeaDataReady,
+            this, &FormGPS::onNmeaDataReady, Qt::DirectConnection);
 
-        //just for debugging I think, force sections to be set
-        property_setSection_position1 = -3.3528;
-        property_setSection_position2 = -2.2352;
-        property_setSection_position3 = -1.1176;
-        property_setSection_position4 = 0;
-        property_setSection_position5 = 1.1176;
-        property_setSection_position6 = 2.2352;
-        property_setSection_position7 = 3.3528;
-        property_setVehicle_numSections = 6;
-        property_setVehicle_toolWidth = 6.7056;
+    connect(m_agioService, &AgIOService::imuDataReady,
+            this, &FormGPS::onImuDataReady, Qt::DirectConnection);
 
+    connect(m_agioService, &AgIOService::steerDataReady,
+            this, &FormGPS::onSteerDataReady, Qt::DirectConnection);
 
-        property_setTool_zones = QVector<int>( { 6,2,4,6,8,10,12,0,0 }); //2 rows per zone
-        property_setTool_numSectionsMulti = 12; //12 rows
-        property_setTool_sectionWidthMulti = .5588; //22" rows
-        property_setTool_isSectionsNotZones = true; //enable zones
+    connect(m_agioService, &AgIOService::machineDataReady,
+            this, &FormGPS::onMachineDataReady, Qt::DirectConnection);
 
-        if (property_setTool_isSectionsNotZones) {
-            tool.sectionCalcWidths();
-        } else {
-            tool.sectionCalcMulti();
-        }
+    qDebug() << "Phase 6.0.25: Separated NMEA/IMU/Steer signal connections established";
 
+    qDebug() << "ðŸŽ¯ Initializing singletons...";
+    // ===== CRITIQUE : Initialiser les singletons AVANT connect_classes() =====
+    // CTrack will be auto-initialized via QML singleton pattern
+    qDebug() << "  âœ… CTrack singleton will be auto-created by Qt";
+    
+    // Qt 6.8: Constructor ready for QML loading
+    qDebug() << "âœ… FormGPS constructor core completed - ready for QML loading";
 
-
-        property_setVehicle_wheelbase = 3.1496;
-        property_setVehicle_trackWidth = 2.286;
-        property_setVehicle_hitchLength = -2.54;
-        property_setTool_isToolTBT=true;
-        property_setVehicle_tankTrailingHitchLength = -3;
-
-        property_setTool_isToolTrailing = true;
-        property_setTool_toolTrailingHitchLength = -4.572;
-        property_setVehicle_minTurningRadius = 8;
-        property_setVehicle_maxSteerAngle = 30;
-    } else {
-        //reload our saved settings
-        vehicle_load(property_setVehicle_vehicleName);
-    }
-    */
+    qDebug() << "ðŸŽ¨ Now loading QML interface (AFTER constructor completion)...";
     setupGui();
-    loadSettings();
 
-    //QML does this now
-    //LineUpIndividualSectionBtns();
+    // ===== PHASE 6.3.1: PropertyWrapper initialization moved to initializeQMLInterfaces() =====
+    // PropertyWrapper must be initialized AFTER QML objects are fully loaded and accessible
+    qDebug() << "ðŸ”§ Phase 6.3.1: PropertyWrapper initialization will happen in initializeQMLInterfaces()";
 
-    /*
-    //hard wire this on for testing
-    isJobStarted = true;
-    //fileCreateField();
-    if (! FileOpenField((QString)property_setF_CurrentDir))
-    {
-        //set up default field to play in for debugging purposes
-        currentFieldDirectory = "TestField";
-        property_setF_CurrentDir = currentFieldDirectory;
-        pn.latStart = sim.latitude;
-        pn.lonStart = sim.longitude;
+    // Initialize AgIO singleton AFTER FormLoop is ready
+    // Old QMLSettings removed - now using AgIOService singleton
+    // Pure Qt 6.8 approach - factory function should be called automatically
 
-        FileCreateField();
+    qDebug() << "  âœ… AgIO service initialized in main thread";
+    //loadSettings(;
 
-        ABLine.refPoint1.easting = 0;
-        ABLine.refPoint1.easting = 0;
-        ABLine.abHeading = glm::toRadians(5.0f);
-        ABLine.SetABLineByHeading();
+    // Initialize language translation system
+    m_translator = new QTranslator(this);
+    on_language_changed(); // Load initial translation and set up QML retranslation
 
-        CABLines line;
-        line.origin = Vec2(0,0);
-        line.origin = Vec2(0,0);
-        line.heading = glm::toRadians(5.0f);
-        line.Name = "Test AB Line";
-        ABLine.lineArr.append( line );
-        FileSaveABLines();
-
-        CBoundaryList boundary;
-        boundary.isDriveThru = true;
-
-        boundary.fenceLine.append(Vec3(-100,0,0));
-        boundary.fenceLine.append(Vec3(-100,250,glm::toRadians((double)90)));
-        boundary.fenceLine.append(Vec3( 100,250,glm::toRadians((double)180)));
-        boundary.fenceLine.append(Vec3( 100,0,glm::toRadians((double)270)));
-        boundary.fenceLine.append(Vec3(-100,0,0));
-
-        boundary.CalculateFenceArea(0);
-
-        double delta = 0;
-        boundary.fenceLineEar.clear();
-
-        for (int i = 0; i < boundary.fenceLine.count(); i++)
-        {
-            if (i == 0)
-            {
-                boundary.fenceLineEar.append(Vec2(boundary.fenceLine[i].easting, boundary.fenceLine[i].northing));
-                continue;
-            }
-            delta += (boundary.fenceLine[i - 1].heading - boundary.fenceLine[i].heading);
-            if (fabs(delta) > 0.005)
-            {
-                boundary.fenceLineEar.append(Vec2(boundary.fenceLine[i].easting, boundary.fenceLine[i].northing));
-                delta = 0;
-            }
+    // === CRITICAL: applicationClosing connection for save_everything fix ===
+    // When applicationClosing changes → automatically save with vehicle
+    // Note: Using connect() instead of setBinding() to avoid recursive binding loops
+    connect(Backend::instance(), &Backend::applicationClosingChanged, this, [this]() {
+        if (Backend::instance()->applicationClosing()) {
+            qDebug() << "🚨 applicationClosing detected - scheduling vehicle save";
+            // Defer save to avoid conflicts and allow property propagation
+            QTimer::singleShot(100, this, [this]() {
+                qDebug() << "💾 Executing applicationClosing save with vehicle";
+                FileSaveEverythingBeforeClosingField(true);  // Save vehicle on app exit
+                qDebug() << "✅ applicationClosing save completed";
+            });
         }
-        bnd.bndList.append(boundary);
-        fd.UpdateFieldBoundaryGUIAreas(bnd.bndList);
+    });
+    qDebug() << "🔗 applicationClosing connection established for save_everything replacement";
 
-        calculateMinMax();
-        FileSaveBoundary();
-        bnd.BuildTurnLines(fd);
+    qDebug() << "âœ… FormGPS full initialization completed";
 
-        bootstrap_field=true;
-        isJobStarted = true;
-    }
-    //ABLine.isABLineSet = true;
-    //ABLine.isBtnABLineOn = true;
-    */
+    // Note: QML Component.onCompleted will trigger after setupGui() completes
+    // The initialization will happen via one of our three protection mechanisms
 
-    isJobStarted = false;
-
-    StartLoopbackServer();
-    if ((bool)property_setMenu_isSimulatorOn == false) {
-        qDebug() << "Stopping simulator because it's off in settings.";
-        timerSim.stop();
-    }
 }
 
 FormGPS::~FormGPS()
 {
-    /* clean up our dynamically-allocated
-     * objects.
-     */
+    qDebug() << "FormGPS destructor START - cleaning up resources";
+
+    // Phase 6.0.45: Memory leak fixes - 5-step QML cleanup sequence
+
+    // Step 1: Clear QML engine component cache to free QQmlObjectCreator instances
+    // Addresses: 90,513 leaked QQmlObjectCreator::createInstance() allocations
+    clearComponentCache();
+    qDebug() << "QML component cache cleared";
+
+    // Step 2: Trigger JavaScript garbage collection to free QML objects
+    // Addresses: 62,426 leaked QQmlObjectCreator::populateInstance() allocations
+    collectGarbage();
+    qDebug() << "QML garbage collection completed";
+
+    // Step 3: Clear Qt image caches to free QPixmap/QImage allocations
+    // Addresses: 94 MB QMovie leak + 15 MB QImage leaks
+    QPixmapCache::clear();
+    qDebug() << "QPixmapCache cleared";
+
+    // Step 4: Disconnect all signal/slot connections to prevent dangling references
+    // Addresses: 62,194 leaked QQmlObjectCreator::setPropertyBinding() allocations
+    disconnect();
+    qDebug() << "All signals disconnected";
+
+    // Step 5: Clean up AgIO service (existing cleanup)
+    cleanupAgIOService();
+    qDebug() << "AgIO service cleaned up";
+
+    // Step 6: Process pending deleteLater() calls to ensure deferred deletions complete
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    qDebug() << "Pending deletions processed";
+
+    // Clean up translator (automatically cleaned by parent)
+    // translator will be deleted automatically by parent object
+
+    qDebug() << "FormGPS destructor COMPLETE";
 }
 
-//This used to be part of oglBack_paint in the C# code, but
-//because openGL rendering can potentially be in another thread here, it's
-//broken out here.  So the lookaheadPixels array has been populated already
-//by the rendering routine.
-void FormGPS::processSectionLookahead() {
-    //qDebug() << "frame time before doing section lookahead " << swFrame.elapsed();
-    lock.lockForWrite();
-    //qDebug() << "frame time after getting lock  " << swFrame.elapsed();
-
-    if (property_displayShowBack)
-        grnPixelsWindow->setPixmap(QPixmap::fromImage(grnPix.mirrored()));
-
-    //determine where the tool is wrt to headland
-    if (bnd.isHeadlandOn) bnd.WhereAreToolCorners(tool);
-
-    //set the look ahead for hyd Lift in pixels per second
-    vehicle.hydLiftLookAheadDistanceLeft = tool.farLeftSpeed * vehicle.hydLiftLookAheadTime * 10;
-    vehicle.hydLiftLookAheadDistanceRight = tool.farRightSpeed * vehicle.hydLiftLookAheadTime * 10;
-
-    if (vehicle.hydLiftLookAheadDistanceLeft > 200) vehicle.hydLiftLookAheadDistanceLeft = 200;
-    if (vehicle.hydLiftLookAheadDistanceRight > 200) vehicle.hydLiftLookAheadDistanceRight = 200;
-
-    tool.lookAheadDistanceOnPixelsLeft = tool.farLeftSpeed * tool.lookAheadOnSetting * 10;
-    tool.lookAheadDistanceOnPixelsRight = tool.farRightSpeed * tool.lookAheadOnSetting * 10;
-
-    if (tool.lookAheadDistanceOnPixelsLeft > 200) tool.lookAheadDistanceOnPixelsLeft = 200;
-    if (tool.lookAheadDistanceOnPixelsRight > 200) tool.lookAheadDistanceOnPixelsRight = 200;
-
-    tool.lookAheadDistanceOffPixelsLeft = tool.farLeftSpeed * tool.lookAheadOffSetting * 10;
-    tool.lookAheadDistanceOffPixelsRight = tool.farRightSpeed * tool.lookAheadOffSetting * 10;
-
-    if (tool.lookAheadDistanceOffPixelsLeft > 160) tool.lookAheadDistanceOffPixelsLeft = 160;
-    if (tool.lookAheadDistanceOffPixelsRight > 160) tool.lookAheadDistanceOffPixelsRight = 160;
-
-    //determine if section is in boundary and headland using the section left/right positions
-    bool isLeftIn = true, isRightIn = true;
-
-    if (bnd.bndList.count() > 0)
+void FormGPS::processOverlapCount()
+{
+    if (Backend::instance()->isJobStarted())
     {
-        for (int j = 0; j < tool.numOfSections; j++)
-        {
-            //only one first left point, the rest are all rights moved over to left
-            isLeftIn = j == 0 ? bnd.IsPointInsideFenceArea(tool.section[j].leftPoint) : isRightIn;
-            isRightIn = bnd.IsPointInsideFenceArea(tool.section[j].rightPoint);
+        int once = 0;
+        int twice = 0;
+        int more = 0;
+        int level = 0;
+        double total = 0;
+        double total2 = 0;
 
-            if (tool.isSectionOffWhenOut)
+        //50, 96, 112
+        for (int i = 0; i < 400 * 400; i++)
+        {
+
+            if (overPixels[i].red > 105)
             {
-                //merge the two sides into in or out
-                if (isLeftIn || isRightIn) tool.section[j].isInBoundary = true;
-                else tool.section[j].isInBoundary = false;
+                more++;
+                level = overPixels[i].red;
             }
-            else
+            else if (overPixels[i].red > 85)
             {
-                //merge the two sides into in or out
-                if (!isLeftIn || !isRightIn) tool.section[j].isInBoundary = false;
-                else tool.section[j].isInBoundary = true;
+                twice++;
+                level = overPixels[i].red;
+            }
+            else if (overPixels[i].red > 50)
+            {
+                once++;
             }
         }
-    }
+        total = once + twice + more;
+        total2 = total + twice + more + more;
 
-    //determine farthest ahead lookahead - is the height of the readpixel line
-    double rpHeight = 0;
-    double rpOnHeight = 0;
-    double rpToolHeight = 0;
-
-    //pick the larger side
-    if (vehicle.hydLiftLookAheadDistanceLeft > vehicle.hydLiftLookAheadDistanceRight) rpToolHeight = vehicle.hydLiftLookAheadDistanceLeft;
-    else rpToolHeight = vehicle.hydLiftLookAheadDistanceRight;
-
-    if (tool.lookAheadDistanceOnPixelsLeft > tool.lookAheadDistanceOnPixelsRight) rpOnHeight = tool.lookAheadDistanceOnPixelsLeft;
-    else rpOnHeight = tool.lookAheadDistanceOnPixelsRight;
-
-    isHeadlandClose = false;
-
-    //clamp the height after looking way ahead, this is for switching off super section only
-    rpOnHeight = fabs(rpOnHeight);
-    rpToolHeight = fabs(rpToolHeight);
-
-    //10 % min is required for overlap, otherwise it never would be on.
-    int pixLimit = (int)((double)(tool.section[0].rpSectionWidth * rpOnHeight) / (double)(5.0));
-
-    if ((rpOnHeight < rpToolHeight && bnd.isHeadlandOn && bnd.isSectionControlledByHeadland)) rpHeight = rpToolHeight + 2;
-    else rpHeight = rpOnHeight + 2;
-
-    if (rpHeight > 290) rpHeight = 290;
-    if (rpHeight < 8) rpHeight = 8;
-
-    //read the whole block of pixels up to max lookahead, one read only
-    //pixels are already read in another thread.
-
-    //determine if headland is in read pixel buffer left middle and right.
-    int start = 0, end = 0, tagged = 0, totalPixel = 0;
-
-    //slope of the look ahead line
-    double mOn = 0, mOff = 0;
-
-    //tram and hydraulics
-    if (tram.displayMode > 0 && tool.width > vehicle.trackWidth)
-    {
-        tram.controlByte = 0;
-        //1 pixels in is there a tram line?
-        if (tram.isOuter)
+        if (total2 > 0)
         {
-            if (grnPixels[(int)(tram.halfWheelTrack * 10)].green == 245) tram.controlByte += 2;
-            if (grnPixels[tool.rpWidth - (int)(tram.halfWheelTrack * 10)].green == 245) tram.controlByte += 1;
+            Backend::instance()->currentField_setActualAreaCovered( (total / total2 * Backend::instance()->m_currentField.workedAreaTotal));
+            fd.overlapPercent = ((1 - total / total2) * 100);
         }
         else
         {
-            if (grnPixels[tool.rpWidth / 2 - (int)(tram.halfWheelTrack * 10)].green == 245) tram.controlByte += 2;
-            if (grnPixels[tool.rpWidth / 2 + (int)(tram.halfWheelTrack * 10)].green == 245) tram.controlByte += 1;
+            Backend::instance()->currentField_setActualAreaCovered( 0);
+            fd.overlapPercent = 0;
         }
     }
-    else tram.controlByte = 0;
+}
 
-    //determine if in or out of headland, do hydraulics if on
-    if (bnd.isHeadlandOn)
-    {
-        //calculate the slope
-        double m = (vehicle.hydLiftLookAheadDistanceRight - vehicle.hydLiftLookAheadDistanceLeft) / tool.rpWidth;
-        int height = 1;
-
-        for (int pos = 0; pos < tool.rpWidth; pos++)
-        {
-            height = (int)(vehicle.hydLiftLookAheadDistanceLeft + (m * pos)) - 1;
-            for (int a = pos; a < height * tool.rpWidth; a += tool.rpWidth)
-            {
-                if (grnPixels[a].green == 250)
-                {
-                    isHeadlandClose = true;
-                    goto GetOutTool;
-                }
-            }
-        }
-
-    GetOutTool: //goto
-
-        //is the tool completely in the headland or not
-        bnd.isToolInHeadland = bnd.isToolOuterPointsInHeadland && !isHeadlandClose;
-
-        //set hydraulics based on tool in headland or not
-        bnd.SetHydPosition(autoBtnState, p_239, vehicle);
-
-        //set hydraulics based on tool in headland or not
-        bnd.SetHydPosition(autoBtnState, p_239, vehicle);
-
+// PHASE 6.0.40: Reset GPS state when switching between sim/real modes
+// Prevents gray screen bug when toggling between simulation and real GPS
+void FormGPS::ResetGPSState(bool toSimMode)
+{
+    CNMEA &pn = *Backend::instance()->pn();
+    // PHASE 6.0.42.7: Save and close field before mode switch
+    // Field data is tied to current coordinate system (latStart/lonStart)
+    // Switching modes changes coordinate reference → must save field before switch
+    // Same logic as GPS jump detection (handleGPSJump)
+    if (Backend::instance()->isJobStarted()) {
+        qDebug() << "Field open during mode switch - saving and closing";
+        FileSaveEverythingBeforeClosingField(false);  // Save all field data
+        JobClose();  // Close field properly
+        qDebug() << "Field closed successfully before mode switch";
     }
 
-    ///////////////////////////////////////////   Section control        ssssssssssssssssssssss
+    // Reset initialization flags
+    isGPSPositionInitialized = false;
+    isFirstFixPositionSet = false;
+    CVehicle::instance()->vehicleProperties()->set_firstHeadingSet(false);
+    //isFirstHeadingSet = false;
+    startCounter = 0;
 
-    int endHeight = 1, startHeight = 1;
+    // PHASE 6.0.42: Reset guidance line offset when switching modes
+    // Old offset from previous mode is invalid in new coordinate system
+    CVehicle::instance()->set_guidanceLineDistanceOff(32000);
+    CVehicle::instance()->guidanceLineSteerAngle = 0;
 
-    if (bnd.isHeadlandOn && bnd.isSectionControlledByHeadland) bnd.WhereAreToolLookOnPoints(vehicle, tool);
-
-    for (int j = 0; j < tool.numOfSections; j++)
-    {
-        //Off or too slow or going backwards
-        if (tool.sectionButtonState.get(j) == btnStates::Off || vehicle.avgSpeed < vehicle.slowSpeedCutoff || tool.section[j].speedPixels < 0)
-        {
-            tool.section[j].sectionOnRequest = false;
-            tool.section[j].sectionOffRequest = true;
-
-            // Manual on, force the section On
-            if (tool.sectionButtonState.get(j) == btnStates::On)
-            {
-                tool.section[j].sectionOnRequest = true;
-                tool.section[j].sectionOffRequest = false;
-                continue;
-            }
-            continue;
-        }
-
-        // Manual on, force the section On
-        if (tool.sectionButtonState.get(j) == btnStates::On)
-        {
-            tool.section[j].sectionOnRequest = true;
-            tool.section[j].sectionOffRequest = false;
-            continue;
-        }
-
-
-        //AutoSection - If any nowhere applied, send OnRequest, if its all green send an offRequest
-        tool.section[j].isSectionRequiredOn = false;
-
-        //calculate the slopes of the lines
-        mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-        mOff = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
-
-        start = tool.section[j].rpSectionPosition - tool.section[0].rpSectionPosition;
-        end = tool.section[j].rpSectionWidth - 1 + start;
-
-        if (end >= tool.rpWidth)
-            end = tool.rpWidth - 1;
-
-        totalPixel = 1;
-        tagged = 0;
-
-        for (int pos = start; pos <= end; pos++)
-        {
-            startHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOff * pos)) * tool.rpWidth + pos;
-            endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-
-            for (int a = startHeight; a <= endHeight; a += tool.rpWidth)
-            {
-                totalPixel++;
-                if (grnPixels[a].green == 0) tagged++;
-            }
-        }
-
-        //determine if meeting minimum coverage
-        tool.section[j].isSectionRequiredOn = ((tagged * 100) / totalPixel > (100 - tool.minCoverage));
-
-        //logic if in or out of boundaries or headland
-        if (bnd.bndList.count() > 0)
-        {
-            //if out of boundary, turn it off
-            if (!tool.section[j].isInBoundary)
-            {
-                tool.section[j].isSectionRequiredOn = false;
-                tool.section[j].sectionOffRequest = true;
-                tool.section[j].sectionOnRequest = false;
-                tool.section[j].sectionOffTimer = 0;
-                tool.section[j].sectionOnTimer = 0;
-                continue;
-            }
-            else
-            {
-                //is headland coming up
-                if (bnd.isHeadlandOn && bnd.isSectionControlledByHeadland)
-                {
-                    bool isHeadlandInLookOn = false;
-
-                    //is headline in off to on area
-                    mOn = (tool.lookAheadDistanceOnPixelsRight - tool.lookAheadDistanceOnPixelsLeft) / tool.rpWidth;
-                    mOff = (tool.lookAheadDistanceOffPixelsRight - tool.lookAheadDistanceOffPixelsLeft) / tool.rpWidth;
-
-                    start = tool.section[j].rpSectionPosition - tool.section[0].rpSectionPosition;
-
-                    end = tool.section[j].rpSectionWidth - 1 + start;
-
-                    if (end >= tool.rpWidth)
-                        end = tool.rpWidth - 1;
-
-                    tagged = 0;
-
-                    for (int pos = start; pos <= end; pos++)
-                    {
-                        startHeight = (int)(tool.lookAheadDistanceOffPixelsLeft + (mOff * pos)) * tool.rpWidth + pos;
-                        endHeight = (int)(tool.lookAheadDistanceOnPixelsLeft + (mOn * pos)) * tool.rpWidth + pos;
-
-                        for (int a = startHeight; a <= endHeight; a += tool.rpWidth)
-                        {
-                            if (a < 0)
-                                mOn = 0;
-                            if (grnPixels[a].green == 250)
-                            {
-                                isHeadlandInLookOn = true;
-                                goto GetOutHdOn;
-                            }
-                        }
-                    }
-                GetOutHdOn:
-
-                    //determine if look ahead points are completely in headland
-                    if (tool.section[j].isSectionRequiredOn && tool.section[j].isLookOnInHeadland && !isHeadlandInLookOn)
-                    {
-                        tool.section[j].isSectionRequiredOn = false;
-                        tool.section[j].sectionOffRequest = true;
-                        tool.section[j].sectionOnRequest = false;
-                    }
-
-                    if (tool.section[j].isSectionRequiredOn && !tool.section[j].isLookOnInHeadland && isHeadlandInLookOn)
-                    {
-                        tool.section[j].isSectionRequiredOn = true;
-                        tool.section[j].sectionOffRequest = false;
-                        tool.section[j].sectionOnRequest = true;
-                    }
-                }
-            }
-        }
-
-
-        //global request to turn on section
-        tool.section[j].sectionOnRequest = tool.section[j].isSectionRequiredOn;
-        tool.section[j].sectionOffRequest = !tool.section[j].sectionOnRequest;
-
-    }  // end of go thru all sections "for"
-
-    //Set all the on and off times based from on off section requests
-    for (int j = 0; j < tool.numOfSections; j++)
-    {
-        //SECTION timers
-
-        if (tool.section[j].sectionOnRequest)
-            tool.section[j].isSectionOn = true;
-
-        //turn off delay
-        if (tool.turnOffDelay > 0)
-        {
-            if (!tool.section[j].sectionOffRequest) tool.section[j].sectionOffTimer = (int)(gpsHz / 2.0 * tool.turnOffDelay);
-
-            if (tool.section[j].sectionOffTimer > 0) tool.section[j].sectionOffTimer--;
-
-            if (tool.section[j].sectionOffRequest && tool.section[j].sectionOffTimer == 0)
-            {
-                if (tool.section[j].isSectionOn) tool.section[j].isSectionOn = false;
-            }
-        }
-        else
-        {
-            if (tool.section[j].sectionOffRequest)
-                tool.section[j].isSectionOn = false;
-        }
-
-        //Mapping timers
-        if (tool.section[j].sectionOnRequest && !tool.section[j].isMappingOn && tool.section[j].mappingOnTimer == 0)
-        {
-            tool.section[j].mappingOnTimer = (int)(tool.lookAheadOnSetting * (gpsHz / 2) - 1);
-        }
-        else if (tool.section[j].sectionOnRequest && tool.section[j].isMappingOn && tool.section[j].mappingOffTimer > 1)
-        {
-            tool.section[j].mappingOffTimer = 0;
-            tool.section[j].mappingOnTimer = (int)(tool.lookAheadOnSetting * (gpsHz / 2) - 1);
-        }
-
-        if (tool.lookAheadOffSetting > 0)
-        {
-            if (tool.section[j].sectionOffRequest && tool.section[j].isMappingOn && tool.section[j].mappingOffTimer == 0)
-            {
-                tool.section[j].mappingOffTimer = (int)(tool.lookAheadOffSetting * (gpsHz / 2) + 4);
-            }
-        }
-        else if (tool.turnOffDelay > 0)
-        {
-            if (tool.section[j].sectionOffRequest && tool.section[j].isMappingOn && tool.section[j].mappingOffTimer == 0)
-                tool.section[j].mappingOffTimer = (int)(tool.turnOffDelay * gpsHz / 2);
-        }
-        else
-        {
-            tool.section[j].mappingOffTimer = 0;
-        }
-
-        //MAPPING - Not the making of triangle patches - only status - on or off
-        if (tool.section[j].sectionOnRequest)
-        {
-            tool.section[j].mappingOffTimer = 0;
-            if (tool.section[j].mappingOnTimer > 1)
-                tool.section[j].mappingOnTimer--;
-            else
-            {
-                tool.section[j].isMappingOn = true;
-            }
-        }
-
-        if (tool.section[j].sectionOffRequest)
-        {
-            tool.section[j].mappingOnTimer = 0;
-            if (tool.section[j].mappingOffTimer > 1)
-                tool.section[j].mappingOffTimer--;
-            else
-            {
-                tool.section[j].isMappingOn = false;
-            }
-        }
+    // PHASE 6.0.42: Reset stepFixPts[] for heading calculation
+    // Old position history from previous coordinate system is invalid
+    // Must accumulate 3 new points to calculate heading automatically
+    for (int i = 0; i < totalFixSteps; i++) {
+        stepFixPts[i].isSet = 0;
     }
 
-    //Checks the workswitch or steerSwitch if required
-    if (ahrs.isAutoSteerAuto || mc.isRemoteWorkSystemOn)
-        mc.CheckWorkAndSteerSwitch(ahrs,isAutoSteerBtnOn);
+    // Reset sentence counter to prevent "No GPS" false alarm
+    Backend::instance()->m_fixFrame.sentenceCounter = 0;
 
-    // check if any sections have changed status
-    number = 0;
+    if (toSimMode) {
+        // Initialize with simulation coordinates
+        pn.latitude = SimInterface::instance()->latitude;
+        pn.longitude = SimInterface::instance()->longitude;
+        pn.headingTrue = 0;
 
-    for (int j = 0; j < tool.numOfSections; j++)
-    {
-        if (tool.section[j].isMappingOn)
+        // CRITICAL: Initialize latStart/lonStart for sim mode
+        // Without this, ConvertWGS84ToLocal uses wrong reference point
+        pn.setLatStart(pn.latitude);
+        pn.setLonStart(pn.longitude);
+        pn.SetLocalMetersPerDegree();
+
+        // Convert sim position to local coords
+        pn.ConvertWGS84ToLocal(SimInterface::instance()->latitude, SimInterface::instance()->longitude, pn.fix.northing, pn.fix.easting);
+
+        // Initialize raw GPS position for sim (used for heading calculation)
         {
-            number |= 1ul << j;
+            QMutexLocker lock(&m_rawGpsPositionMutex);
+            m_rawGpsPosition.easting = pn.fix.easting;
+            m_rawGpsPosition.northing = pn.fix.northing;
         }
+
+        // PHASE 6.0.42: Update last known position for jump detection
+        // Prevents false jump detection when switching to simulation
+        m_lastKnownLatitude = pn.latitude;
+        m_lastKnownLongitude = pn.longitude;
+
+        // PHASE 6.0.42.6: Reset IMU values for simulation mode
+        // Simulation = perfect flat terrain, no roll/pitch/yaw
+        // Prevents old real-mode IMU values from corrupting simulation position calculations
+        // Old IMU values would cause incorrect roll corrections and sidehill compensation
+        ahrs.imuRoll = 0.0;     // Flat terrain (no roll)
+        ahrs.imuPitch = 0.0;    // No slope (no pitch)
+        ahrs.imuYawRate = 0.0;  // No rotation (no yaw rate)
+        // Note: ahrs.imuHeading updated by onSimNewPosition() = pn.headingTrue (line 69)
+
+        // PHASE 6.0.42.1: Mark position as initialized since we just set latStart/lonStart above
+        // Allows startCounter to increment immediately instead of wasting 1 cycle in InitializeFirstFewGPSPositions()
+        isFirstFixPositionSet = true;
+    } else {
+        // PHASE 6.0.42.3: Real mode - INVALIDATE position to prevent premature initialization
+        // Problem: If we keep SIM coordinates, InitializeFirstFewGPSPositions() initializes
+        // with stale SIM coords BEFORE real GPS arrives → gray screen when GPS finally arrives
+        // Solution: Reset pn.latitude/longitude to 0 to force waiting for real GPS
+        // This makes behavior identical to application startup (REAL + UDP ON)
+
+        // PHASE 6.0.42.4: ALSO reset m_lastKnownLatitude/longitude to prevent false GPS jump detection
+        // Problem: If we keep SIM coords in m_lastKnown*, detectGPSJump() triggers when real GPS arrives
+        // → handleGPSJump() resets everything → gray screen even with UDP ON
+        // Solution: Reset m_lastKnown* to 0 → first real GPS treated as "first fix", not a "jump"
+        m_lastKnownLatitude = 0;
+        m_lastKnownLongitude = 0;
+
+        // Invalidate current position - forces waiting for real GPS data
+        pn.latitude = 0;
+        pn.longitude = 0;
+        pn.fix.easting = 0;
+        pn.fix.northing = 0;
+
+        // Reset raw GPS position - will be updated when real GPS data arrives
+        {
+            QMutexLocker lock(&m_rawGpsPositionMutex);
+            m_rawGpsPosition.easting = 0;
+            m_rawGpsPosition.northing = 0;
+        }
+
+        // PHASE 6.0.41: Force latStart/lonStart reinitialization even if field is open
+        // Prevents gray screen when GPS arrives after mode switch with open field
+        m_forceGPSReinitialization = true;
+
+        // PHASE 6.0.42.2: DON'T set isFirstFixPositionSet = true in REAL mode
+        // Because we don't have valid GPS coordinates yet (UDP OFF scenario)
+        // InitializeFirstFewGPSPositions() will wait for real GPS to arrive
     }
 
-    //there has been a status change of section on/off
-    if (number != lastNumber)
-    {
-        int sectionOnOffZones = 0, patchingZones = 0;
+    // Reset previous positions for heading calculation
+    prevFix.easting = pn.fix.easting;
+    prevFix.northing = pn.fix.northing;
+    prevDistFix = pn.fix;
+}
 
-        //everything off
-        if (number == 0)
-        {
-            for (int j = 0; j < triStrip.count(); j++)
-            {
-                if (triStrip[j].isDrawing)
-                    triStrip[j].TurnMappingOff(tool, fd);
-            }
-        }
-        else if (!tool.isMultiColoredSections)
-        {
-            //set the start and end positions from section points
-            for (int j = 0; j < tool.numOfSections; j++)
-            {
-                //skip till first mapping section
-                if (!tool.section[j].isMappingOn) continue;
-
-                //do we need more patches created
-                if (triStrip.count() < sectionOnOffZones + 1)
-                    triStrip.append(CPatches());
-
-                //set this strip start edge to edge of this section
-                triStrip[sectionOnOffZones].newStartSectionNum = j;
-
-                while ((j + 1) < tool.numOfSections && tool.section[j + 1].isMappingOn)
-                {
-                    j++;
-                }
-
-                //set the edge of this section to be end edge of strp
-                triStrip[sectionOnOffZones].newEndSectionNum = j;
-                sectionOnOffZones++;
-            }
-
-            //count current patch strips being made
-            for (int j = 0; j < triStrip.count(); j++)
-            {
-                if (triStrip[j].isDrawing) patchingZones++;
-            }
-
-            //tests for creating new strips or continuing
-            bool isOk = (patchingZones == sectionOnOffZones && sectionOnOffZones < 3);
-
-            if (isOk)
-            {
-                for (int j = 0; j < sectionOnOffZones; j++)
-                {
-                    if (triStrip[j].newStartSectionNum > triStrip[j].currentEndSectionNum
-                        || triStrip[j].newEndSectionNum < triStrip[j].currentStartSectionNum)
-                        isOk = false;
-                }
-            }
-
-            if (isOk)
-            {
-                for (int j = 0; j < sectionOnOffZones; j++)
-                {
-                    if (triStrip[j].newStartSectionNum != triStrip[j].currentStartSectionNum
-                        || triStrip[j].newEndSectionNum != triStrip[j].currentEndSectionNum)
-                    {
-                        //if (tool.isSectionsNotZones)
-                        {
-                            triStrip[j].AddMappingPoint(tool,fd, 0);
-                        }
-
-                        triStrip[j].currentStartSectionNum = triStrip[j].newStartSectionNum;
-                        triStrip[j].currentEndSectionNum = triStrip[j].newEndSectionNum;
-                        triStrip[j].AddMappingPoint(tool,fd, 0);
-                    }
-                }
-            }
-            else
-            {
-                //too complicated, just make new strips
-                for (int j = 0; j < triStrip.count(); j++)
-                {
-                    if (triStrip[j].isDrawing)
-                        triStrip[j].TurnMappingOff(tool, fd);
-                }
-
-                for (int j = 0; j < sectionOnOffZones; j++)
-                {
-                    triStrip[j].currentStartSectionNum = triStrip[j].newStartSectionNum;
-                    triStrip[j].currentEndSectionNum = triStrip[j].newEndSectionNum;
-                    triStrip[j].TurnMappingOn(tool, 0);
-                }
-            }
-        }
-        else if (tool.isMultiColoredSections) //could be else only but this is more clear
-        {
-            //set the start and end positions from section points
-            for (int j = 0; j < tool.numOfSections; j++)
-            {
-                //do we need more patches created
-                if (triStrip.count() < sectionOnOffZones + 1)
-                    triStrip.append(CPatches());
-
-                //set this strip start edge to edge of this section
-                triStrip[sectionOnOffZones].newStartSectionNum = j;
-
-                //set the edge of this section to be end edge of strp
-                triStrip[sectionOnOffZones].newEndSectionNum = j;
-                sectionOnOffZones++;
-
-                if (!tool.section[j].isMappingOn)
-                {
-                    if (triStrip[j].isDrawing)
-                        triStrip[j].TurnMappingOff(tool, fd);
-                }
-                else
-                {
-                    triStrip[j].currentStartSectionNum = triStrip[j].newStartSectionNum;
-                    triStrip[j].currentEndSectionNum = triStrip[j].newEndSectionNum;
-                    triStrip[j].TurnMappingOn(tool,j);
-                }
-            }
-        }
-
-
-        lastNumber = number;
+// PHASE 6.0.42: Detect if GPS position jumped drastically
+// Prevents gray screen and field corruption when GPS coordinates change significantly
+// Use cases: SIM<->REAL mode switch, GPS module change, position correction after signal loss
+bool FormGPS::detectGPSJump(double newLat, double newLon)
+{
+    // First GPS fix - not a jump
+    if (m_lastKnownLatitude == 0 && m_lastKnownLongitude == 0) {
+        m_lastKnownLatitude = newLat;
+        m_lastKnownLongitude = newLon;
+        return false;
     }
 
-    //send the byte out to section machines
-    BuildMachineByte();
+    // Calculate distance in kilometers using Haversine approximation
+    // dLat: Latitude difference in km (111.32 km per degree latitude)
+    // dLon: Longitude difference in km (adjusted by cosine of latitude for Earth curvature)
+    double dLat = (newLat - m_lastKnownLatitude) * 111.32;
+    double dLon = (newLon - m_lastKnownLongitude) * 111.32 * cos(newLat * 0.01745329);
+    double distanceKm = sqrt(dLat*dLat + dLon*dLon);
 
-    //if a minute has elapsed save the field in case of crash and to be able to resume
-    if (minuteCounter > 30 && (uint)sentenceCounter < 20)
-    {
-        tmrWatchdog->stop();
+    qDebug() << "GPS position check: distance from last known =" << distanceKm << "km";
 
-        //don't save if no gps
-        if (isJobStarted)
-        {
-            //auto save the field patches, contours accumulated so far
-            FileSaveSections();
-            FileSaveContour();
+    return (distanceKm > GPS_JUMP_THRESHOLD_KM);
+}
 
-            //NMEA log file
-            //TODO: if (isLogElevation) FileSaveElevation();
-            //ExportFieldAs_KML();
-        }
+// PHASE 6.0.42: Handle GPS jump - save field, regenerate OpenGL center, update position
+// This function ensures clean transition when GPS coordinates change significantly:
+// 1. Save and close current field (if open) to prevent coordinate corruption
+// 2. Update latStart/lonStart with new GPS position (OpenGL reference point)
+// 3. Reset GPS initialization flags for proper reinitialization
+// 4. Update last known position for future jump detection
+void FormGPS::handleGPSJump(double newLat, double newLon)
+{
+    CNMEA &pn = *Backend::instance()->pn();
 
-        //if its the next day, calc sunrise sunset for next day
-        minuteCounter = 0;
+    qDebug() << "GPS JUMP DETECTED - regenerating OpenGL center";
+    qDebug() << "Old position: lat=" << m_lastKnownLatitude << "lon=" << m_lastKnownLongitude;
+    qDebug() << "New position: lat=" << newLat << "lon=" << newLon;
 
-        //set saving flag off
-        isSavingFile = false;
-
-        //go see if data ready for draw and position updates
-        tmrWatchdog->start();
-
-        //calc overlap
-        //oglZoom.Refresh();
-
+    // If field is open, save and close it to prevent coordinate corruption
+    // Field data is tied to specific GPS coordinates (latStart/lonStart)
+    // When GPS jumps, field coordinates no longer match real-world positions
+    if (Backend::instance()->isJobStarted()) {
+        qDebug() << "Field open during GPS jump - saving and closing";
+        FileSaveEverythingBeforeClosingField(false);  // Save all field data (sections, boundary, contour, flags, tracks)
+        JobClose();  // Close field properly (clears boundaries, sections, resets flags)
+        qDebug() << "Field closed successfully";
     }
 
-    //stop the timer and calc how long it took to do calcs and draw
-    frameTimeRough = swFrame.elapsed();
-    //qDebug() << "frame time after finishing section lookahead " << frameTimeRough ;
+    // Update latStart/lonStart with new GPS position
+    // These are the reference coordinates for WGS84->Local conversion
+    // OpenGL rendering uses local meters (northing/easting) calculated from these
+    pn.setLatStart(newLat);
+    pn.setLonStart(newLon);
+    pn.SetLocalMetersPerDegree();  // Recalculate meters per degree for new latitude
 
-    if (frameTimeRough > 50) frameTimeRough = 50;
-    frameTime = frameTime * 0.90 + frameTimeRough * 0.1;
+    // PHASE 6.0.42.1: Reset GPS initialization for reinitialization cycle
+    // BUT set isFirstFixPositionSet = true because we just initialized latStart/lonStart above
+    // This allows startCounter to increment immediately instead of wasting 1 cycle
+    isGPSPositionInitialized = false;
+    isFirstFixPositionSet = true;  // Position reference initialized above
+    CVehicle::instance()->vehicleProperties()->set_firstHeadingSet(false);
+    startCounter = 0;
 
-    QObject *aog = qmlItem(qml_root, "aog");
-    aog->setProperty("frameTime", frameTime);
+    // PHASE 6.0.42.1: Update pn structure with new GPS position
+    // Ensures pn.latitude/longitude match the new reference point
+    pn.latitude = newLat;
+    pn.longitude = newLon;
 
-    //TODO 5 hz sections
-    //if (bbCounter++ > 0)
-    //    bbCounter = 0;
+    // CRITICAL: Convert new GPS position to local coordinates using new reference point
+    // This ensures pn.fix.northing/easting are valid for the first UpdateFixPosition() call
+    pn.ConvertWGS84ToLocal(newLat, newLon, pn.fix.northing, pn.fix.easting);
 
-    //draw the section control window off screen buffer
-    //if (bbCounter == 0)
-    //{
-    if (isJobStarted)
+    // PHASE 6.0.42.1: Initialize raw GPS position for heading calculation
+    // Symmetric to simulation mode initialization (formgps_sim.cpp:82-85)
     {
-        p_239.pgn[p_239.geoStop] = mc.isOutOfBounds ? 1 : 0;
-
-        SendPgnToLoop(p_239.pgn);
-
-        SendPgnToLoop(p_229.pgn);
+        QMutexLocker lock(&m_rawGpsPositionMutex);
+        m_rawGpsPosition.easting = pn.fix.easting;
+        m_rawGpsPosition.northing = pn.fix.northing;
     }
 
+    // PHASE 6.0.42.1: Initialize prevFix for position tracking
+    // Ensures first position update after jump has valid reference
+    prevFix.easting = pn.fix.easting;
+    prevFix.northing = pn.fix.northing;
 
-    lock.unlock();
+    // PHASE 6.0.42: Reset guidance line distance offset
+    // Old offset based on previous coordinate system is now invalid
+    // Set to 32000 = "no guidance active" until new guidance line is calculated
+    CVehicle::instance()->set_guidanceLineDistanceOff(32000);
+    CVehicle::instance()->guidanceLineSteerAngle = 0;
 
-    //this is the end of the "frame". Now we wait for next NMEA sentence with a valid fix.
+    // PHASE 6.0.42: Reset stepFixPts[] for heading calculation
+    // Old position history from previous coordinate system is invalid
+    // System will accumulate 3 new points and auto-calculate heading when speed > 1.5 km/h
+    for (int i = 0; i < totalFixSteps; i++) {
+        stepFixPts[i].isSet = 0;
+    }
+
+    // Update last known position for future jump detection
+    m_lastKnownLatitude = newLat;
+    m_lastKnownLongitude = newLon;
 }
 
 void FormGPS::tmrWatchdog_timeout()
 {
+    CNMEA &pn = *Backend::instance()->pn();
+    BACKEND_TRACK(track);
+    BACKEND_YT(yt);
+
     //TODO: replace all this with individual timers for cleaner
 
-    if (! (bool)property_setMenu_isSimulatorOn && timerSim.isActive()) {
-        qDebug() << "Shutting down simulator.";
-        timerSim.stop();
-    } else if ( (bool)property_setMenu_isSimulatorOn && ! timerSim.isActive() ) {
-        qDebug() << "Starting up simulator.";
-        pn.latitude = sim.latitude;
-        pn.longitude = sim.longitude;
-        pn.headingTrue = 0;
+    // PHASE 6.0.40: Detect mode change and reset GPS state
+    // Prevents gray screen when switching between sim and real modes
+    static bool wasSimulatorOn = SettingsManager::instance()->menu_isSimulatorOn();
+    bool isSimulatorOn = SettingsManager::instance()->menu_isSimulatorOn();
 
-        timerSim.start(100); //fire simulator every 100 ms.
-        gpsHz = 10;
+    if (wasSimulatorOn != isSimulatorOn) {
+        // Mode changed - reset GPS state to prevent gray screen bug
+        qDebug() << "Mode switch detected:" << (wasSimulatorOn ? "SIM to REAL" : "REAL to SIM");
+        //TODO: redundant code with ResetGPSState()
+        ResetGPSState(isSimulatorOn);
+        wasSimulatorOn = isSimulatorOn;
     }
 
+    if (! isSimulatorOn && SimInterface::instance()->isRunning()) {
+        qDebug() << "Shutting down simulator.";
+        SimInterface::instance()->shutDown();
+    } else if (isSimulatorOn && ! SimInterface::instance()->isRunning() ) {
+        qDebug() << "Starting up simulator.";
+        // Old initialization removed - now done in ResetGPSState()
+        pn.latitude = SimInterface::instance()->latitude;
+        pn.longitude = SimInterface::instance()->longitude;
+        pn.headingTrue = 0;
 
-    // This is done in QML
-//    if ((uint)sentenceCounter++ > 20)
-//    {
-//        //TODO: ShowNoGPSWarning();
-//        return;
-//    }
-    sentenceCounter += 1;
+        // PHASE 6.0.35 FIX: Initialize latStart/lonStart BEFORE first conversion
+        // Problem: onSimNewPosition() calls ConvertWGS84ToLocal() BEFORE UpdateFixPosition() initializes latStart/lonStart
+        // Solution: Initialize latStart/lonStart here when simulation starts (similar to real GPS mode)
+        // This ensures ConvertWGS84ToLocal() uses correct reference point from first conversion
+        pn.setLatStart(pn.latitude);
+        pn.setLonStart(pn.longitude);
+        pn.SetLocalMetersPerDegree();
 
+        gpsHz = 10;
+        SimInterface::instance()->startUp();
+    }
+
+    Backend::instance()->m_fixFrame.sentenceCounter += 1;
+    //notify QML here since UpdateFixPosition() only runs with a new fix
+    emit Backend::instance()->fixFrameChanged();
 
     if (tenSecondCounter++ >= 40)
     {
@@ -807,28 +518,16 @@ void FormGPS::tmrWatchdog_timeout()
         displayUpdateThreeSecondCounter = threeSeconds;
 
         //check to make sure the grid is big enough
-        //worldGrid.checkZoomWorldGrid(pn.fix.northing, pn.fix.easting);
+        //worldGrid.checkZoomWorldGrid(pn.fix.northing, pn.fix.easting;
 
         //hide the NAv panel in 6  secs
-        /* TODO:
-        if (panelNavigation.Visible)
-        {
-            if (navPanelCounter-- < 2) panelNavigation.Visible = false;
-        }
-
-        if (panelNavigation.Visible)
-            lblHz.Text = gpsHz.ToString("N1") + " ~ " + (frameTime.ToString("N1")) + " " + FixQuality;
-
-        lblFix.Text = FixQuality + pn.age.ToString("N1");
-
-        lblTime.Text = DateTime.Now.ToString("T");
-        */
+        // TODO:
 
         //save nmea log file
-        //TODO: if (isLogNMEA) FileSaveNMEA();
+        //TODO: if (isLogNMEA) FileSaveNMEA(;
 
         //update button lines numbers
-        //TODO: UpdateGuidanceLineButtonNumbers();
+        //TODO: UpdateGuidanceLineButtonNumbers(;
 
     }//end every 3 seconds
 
@@ -841,6 +540,11 @@ void FormGPS::tmrWatchdog_timeout()
         //counter used for saving field in background
         minuteCounter++;
         tenMinuteCounter++;
+
+        // PHASE 6.0.42.9: Auto-track timer increment (C# GUI.Designer.cs:275)
+        // Enables automatic switching to closest track as tractor moves
+        // Timer prevents rapid switching (max 1 switch/second when >= 1)
+        track.autoTrack3SecTimer++;
     }
 
     //every half of a second update all status  ////////////////    0.5  0.5   0.5    0.5    /////////////////
@@ -851,12 +555,14 @@ void FormGPS::tmrWatchdog_timeout()
 
         isFlashOnOff = !isFlashOnOff;
 
-        //the ratemap trigger
-        worldGrid.isRateTrigger = true;
-
         //Make sure it is off when it should
-        if ((!ct.isContourBtnOn && trk.idx == -1 && isAutoSteerBtnOn)
-            ) onStopAutoSteer();
+        if (!MainWindowState::instance()->isContourBtnOn() &&
+            track.idx() == -1 &&
+            MainWindowState::instance()->isBtnAutoSteerOn() )
+        {
+
+            MainWindowState::instance()->set_isBtnAutoSteerOn(false);
+        }
 
     } //end every 1/2 second
 
@@ -865,81 +571,72 @@ void FormGPS::tmrWatchdog_timeout()
         //reset the counter
         oneHalfSecondCounter++;
         oneSecondCounter++;
-        makeUTurnCounter++;
+        yt.makeUTurnCounter++;
 
         secondsSinceStart = stopwatch.elapsed() / 1000.0;
     }
 }
 
-QString FormGPS::speedKPH() {
-    double spd = vehicle.avgSpeed;
-
-    //convert to kph
-    spd *= 0.1;
-
-    return locale.toString(spd,'f',1);
-}
-
-QString FormGPS::speedMPH() {
-    double spd = vehicle.avgSpeed;
-
-    //convert to mph
-    spd *= 0.0621371;
-
-    return locale.toString(spd,'f',1);
-}
-
 void FormGPS::SwapDirection() {
+    BACKEND_YT(yt);
+
     if (!yt.isYouTurnTriggered)
     {
         yt.isYouTurnRight = ! yt.isYouTurnRight;
-        yt.ResetCreatedYouTurn(makeUTurnCounter);
+        yt.ResetCreatedYouTurn();
     }
-    else if (yt.isYouTurnBtnOn)
+    else if (MainWindowState::instance()->isYouTurnBtnOn())
     {
-        yt.isYouTurnBtnOn = false;
+        MainWindowState::instance()->set_isYouTurnBtnOn(false);
     }
 }
 
 
 void FormGPS::JobClose()
 {
-    recPath.resumeState = 0;
-    recPath.currentPositonIndex = 0;
+    BACKEND_TRACK(track);
+    CContour &ct = track.contour;
+    BACKEND_YT(yt);
+
+    lock.lockForWrite();
+    RecordedPath::instance()->resumeState = 0;
+    RecordedPath::instance()->currentPositonIndex = 0;
 
     sbGrid.clear();
 
     //reset field offsets
-    if (!isKeepOffsetsOn)
-    {
-        pn.fixOffset.easting = 0;
-        pn.fixOffset.northing = 0;
-    }
+
+    Backend::instance()->pn()->set_fixOffset(Vec2(0,0));
 
     //turn off headland
-    bnd.isHeadlandOn = false; //this turns off the button
+    MainWindowState::instance()->set_isHeadlandOn(false); //this turns off the button
 
-    recPath.recList.clear();
-    recPath.StopDrivingRecordedPath();
+    RecordedPath::instance()->recList.clear();
+    RecordedPath::instance()->StopDrivingRecordedPath();
 
     //make sure hydraulic lift is off
-    p_239.pgn[p_239.hydLift] = 0;
-    vehicle.isHydLiftOn = false; //this turns off the button also
+    ModuleComm::instance()->p_239.pgn[CPGN_EF::hydLift] = 0;
+    emit ModuleComm::instance()->p_239_changed();
 
-    //oglZoom.SendToBack();
+    CVehicle::instance()->setIsHydLiftOn(false); //this turns off the button also - Qt 6.8
+
+    //oglZoom.SendToBack(;
 
     //clean all the lines
     bnd.bndList.clear();
-    //TODO: bnd.shpList.clear();
+    //TODO: bnd.shpList.clear(;
 
 
-    isJobStarted = false;
+    Backend::instance()->set_isJobStarted(false);
 
     //fix ManualOffOnAuto buttons
-    manualBtnState = btnStates::Off;
+    MainWindowState::instance()->set_manualBtnState(SectionState::Off);
 
     //fix auto button
-    autoBtnState = btnStates::Off;
+    MainWindowState::instance()->set_autoBtnState(SectionState::Off);
+
+    // ⚡ PHASE 6.0.20: Disable AutoSteer when job closes (safety + clean state)
+    MainWindowState::instance()->set_isBtnAutoSteerOn(false);
 
     /*
     btnZone1.BackColor = Color.Silver;
@@ -996,27 +693,38 @@ void FormGPS::JobClose()
     */
 
     //clear the section lists
-    for (int j = 0; j < triStrip.count(); j++)
+    for (int j = 0; j < tool.triStrip.count(); j++)
     {
         //clean out the lists
-        triStrip[j].patchList.clear();
-        triStrip[j].triangleList.clear();
+        tool.triStrip[j].patchList.clear();
+        tool.triStrip[j].triangleList.clear();
     }
 
-    triStrip.clear();
-    triStrip.append(CPatches());
+    tool.triStrip.clear();
+    tool.triStrip.append(CPatches());
+
+    //clear coverage layers
+    LayerService::instance()->clearAllLayers();
+
+    //turn off all boundaries.
+    BoundaryInterface::instance()->properties()->clearAll();
+
+    //invalidate all GPU patch list buffers. Must be destroyed
+    //in the OpenGL context, so deferred to the next drawing
+    //pass.
+    tool.patchesBufferDirty = true;
 
     //clear the flags
-    flagPts.clear();
+    FlagsInterface::instance()->clearFlags();
 
     //ABLine
     tram.tramList.clear();
 
-    curve.ResetCurveLine(trk);
+    track.ResetCurveLine();
 
     //tracks
-    trk.gArr.clear();
-    trk.idx = -1;
+    track.gArr.clear();
+    track.setIdx(-1);
 
     //clean up tram
     tram.displayMode = 0;
@@ -1026,7 +734,7 @@ void FormGPS::JobClose()
 
     //clear out contour and Lists
     ct.ResetContour();
-    ct.isContourBtnOn = false; //turns off button in gui
+    MainWindowState::instance()->set_isContourBtnOn(false); //turns off button in gui
     ct.isContourOn = false;
 
     //btnABDraw.Enabled = false;
@@ -1037,65 +745,82 @@ void FormGPS::JobClose()
 
     //AutoSteer
     //btnAutoSteer.Enabled = false;
-    isAutoSteerBtnOn = false;
+    MainWindowState::instance()->set_isBtnAutoSteerOn(false);
 
     //auto YouTurn shutdown
-    yt.isYouTurnBtnOn = false;
+    MainWindowState::instance()->set_isYouTurnBtnOn(false);
 
-    yt.ResetYouTurn(makeUTurnCounter);
+    yt.ResetYouTurn();
 
     //reset acre and distance counters
-    fd.workedAreaTotal = 0;
+    Backend::instance()->currentField_setWorkedAreaTotal(0);
 
     //reset GUI areas
-    fd.UpdateFieldBoundaryGUIAreas(bnd.bndList);
+    bnd.UpdateFieldBoundaryGUIAreas();
 
     displayFieldName = tr("None");
 
-    recPath.recList.clear();
-    recPath.shortestDubinsList.clear();
-    recPath.shuttleDubinsList.clear();
+    RecordedPath::instance()->recList.clear();
+    RecordedPath::instance()->shortestDubinsList.clear();
+    RecordedPath::instance()->shuttleDubinsList.clear();
 
     //FixPanelsAndMenus();
-    SetZoom();
-    worldGrid.isGeoMap = false;
-    worldGrid.isRateMap = false;
+    Camera::instance()->SetZoom();
 
     //release Bing texture
-
+    lock.unlock();
 }
 
 void FormGPS::JobNew()
 {
-    isJobStarted = true;
+    BACKEND_TRACK(track);
+
+
+    JobClose();
+
     startCounter = 0;
 
     //btnSectionMasterManual.Enabled = true;
-    manualBtnState = btnStates::Off;
+    MainWindowState::instance()->set_manualBtnState(SectionState::Off);
     //btnSectionMasterManual.Image = Properties.Resources.ManualOff;
 
     //btnSectionMasterAuto.Enabled = true;
-    autoBtnState = btnStates::Off;
+    MainWindowState::instance()->set_autoBtnState(SectionState::Off);
     //btnSectionMasterAuto.Image = Properties.Resources.SectionMasterOff;
 
-    ABLine.abHeading = 0.00;
+    lock.lockForWrite();
+    track.ABLine.abHeading = 0.00;
 
-    SetZoom();
+    Camera::instance()->SetZoom();
     fileSaveCounter = 25;
-    trk.isAutoTrack = false;
+    track.setIsAutoTrack(false);
+    Backend::instance()->set_isJobStarted(true);
+
+    // PHASE 6.0.29: Reset recorded path flags when opening field
+    // Prevents steer from activating due to garbage flag values (formgps_position.cpp:800)
+    RecordedPath::instance()->set_isDrivingRecordedPath(false);
+    RecordedPath::instance()->isFollowingDubinsToPath = false;
+    RecordedPath::instance()->isFollowingRecPath = false;
+    RecordedPath::instance()->isFollowingDubinsHome = false;
+
+    RecordedPath::instance()->isRecordOn = false;
+    tool.patchesBufferDirty = true;
+
+    lock.unlock();
+
 }
 
-void FormGPS::FileSaveEverythingBeforeClosingField()
+void FormGPS::FileSaveEverythingBeforeClosingField(bool saveVehicle)
 {
     qDebug() << "shutting down, saving field items.";
 
-    //update our settings to the vehicle as well
-    if((QString)property_setVehicle_vehicleName != "Default Vehicle") {
-        vehicle_saveas(property_setVehicle_vehicleName);
-    }
+    BACKEND_TRACK(track);
+    CContour &ct = track.contour;
 
-    if (! isJobStarted) return;
+    if (! Backend::instance()->isJobStarted()) return;
 
+    qDebug() << "Test3";
+    lock.lockForWrite();
     //turn off contour line if on
     if (ct.isContourOn) ct.StopContourLine(contourSaveList);
 
@@ -1107,25 +832,166 @@ void FormGPS::FileSaveEverythingBeforeClosingField()
     }
 
     //turn off patching
-    for (int j = 0; j < triStrip.count(); j++)
+    for (int j = 0; j < tool.triStrip.count(); j++)
     {
-        if (triStrip[j].isDrawing) triStrip[j].TurnMappingOff(tool, fd);
+        if (tool.triStrip[j].isDrawing)
+            tool.triStrip[j].TurnMappingOff(tool.secColors[j],
+                                       tool.section[tool.triStrip[j].currentStartSectionNum].leftPoint,
+                                       tool.section[tool.triStrip[j].currentEndSectionNum].rightPoint,
+                                       tool.patchSaveList);
     }
+    lock.unlock();
+    qDebug() << "Test4";
 
-    //FileSaveHeadland();
+    //FileSaveHeadland(;
+    qDebug() << "Starting FileSaveBoundary()";
     FileSaveBoundary();
+    qDebug() << "Starting FileSaveSections()";
     FileSaveSections();
+    qDebug() << "Starting FileSaveContour()";
     FileSaveContour();
-
+    qDebug() << "Starting FileSaveTracks()";
+    FileSaveTracks();
+    qDebug() << "Starting FileSaveFlags()";
+    FileSaveFlags();
+    qDebug() << "Starting ExportFieldAs_KML()";
     ExportFieldAs_KML();
+    qDebug() << "All file operations completed";
     //ExportFieldAs_ISOXMLv3()
     //ExportFieldAs_ISOXMLv4()
 
-    //property_setF_CurrentDir = tr("None");
+    // Save vehicle settings AFTER all field operations complete (conditional)
+    // Include applicationClosing property in save decision (Qt 6.8 Rectangle Pattern)
+    bool shouldSaveVehicle = saveVehicle || Backend::instance()->applicationClosing();
+    qDebug() << "Before vehicle_saveas check, saveVehicle=" << saveVehicle << "applicationClosing=" << Backend::instance()->applicationClosing() << "shouldSaveVehicle=" << shouldSaveVehicle;
+    if(shouldSaveVehicle && SettingsManager::instance()->vehicle_vehicleName() != "Default Vehicle") {
+        QString vehicleName = SettingsManager::instance()->vehicle_vehicleName();
+        qDebug() << "Scheduling async vehicle_saveas():" << vehicleName;
+
+        // ASYNC SOLUTION: Defer vehicle_saveas to avoid mutex deadlock during field close
+        QTimer::singleShot(100, this, [this, vehicleName]() {
+            qDebug() << "Executing async vehicle_saveas():" << vehicleName;
+            vehicle_saveas(vehicleName);
+            qDebug() << "Async vehicle_saveas() completed";
+        });
+    } else {
+        qDebug() << "Skipping vehicle_saveas (saveVehicle=" << saveVehicle << "applicationClosing=" << Backend::instance()->applicationClosing() << "shouldSaveVehicle=" << shouldSaveVehicle << ")";
+    }
+
+    qDebug() << "Before field cleanup";
+    //property_setF_CurrentDir = tr("None";
     //currentFieldDirectory = (QString)property_setF_CurrentDir;
     displayFieldName = tr("None");
 
+    qDebug() << "Before JobClose()";
     JobClose();
+    qDebug() << "JobClose() completed";
     //Text = "AgOpenGPS";
-
+    qDebug() << "Test5";
 }
+
+// AgIO Service Setup Methods
+void FormGPS::setupAgIOService()
+{
+    qDebug() << "Setting up AgIO service (main thread)...";
+
+    // Phase 6.0.21: Get AgIOService singleton instance for signal connection
+    m_agioService = AgIOService::instance();
+
+    qDebug() << "AgIOService singleton accessed - ready for parsedDataReady signal connection";
+}
+
+void FormGPS::connectToAgIOFactoryInstance()
+{
+    qDebug() << "ðŸ”— Connecting to AgIOService factory instance...";
+    
+    // Get the factory-created singleton instance
+    m_agioService = AgIOService::instance();
+    
+    if (m_agioService) {
+        qDebug() << "âœ… Connected to AgIOService singleton instance";
+        
+        // Now connect the Phase 4.2 pipeline: AgIOService â†’ pn â†’ vehicle â†’ OpenGL
+        connectFormLoopToAgIOService();
+        
+        qDebug() << "ðŸ”— Phase 4.2: AgIOService â†’ pn â†’ vehicle pipeline established";
+    } else {
+        qDebug() << "âŒ ERROR: AgIOService singleton not found";
+    }
+}
+
+void FormGPS::testAgIOConfiguration()
+{
+    qDebug() << "\n=================================";
+    qDebug() << "ðŸ“‹ AgIO Configuration Test";
+    qDebug() << "=================================";
+    
+    QSettings settings("QtAgOpenGPS", "QtAgOpenGPS");
+    qDebug() << "ðŸ“ Settings file:" << settings.fileName();
+    
+    // Display NTRIP settings
+    qDebug() << "\nðŸŒ NTRIP Configuration:";
+    qDebug() << "  URL:" << settings.value("comm/ntripURL", "").toString();
+    qDebug() << "  Mount:" << settings.value("comm/ntripMount", "").toString();
+    qDebug() << "  Port:" << settings.value("comm/ntripCasterPort", 2101).toInt();
+    qDebug() << "  Enabled:" << settings.value("comm/ntripIsOn", false).toBool();
+    qDebug() << "  User:" << (settings.value("comm/ntripUserName", "").toString().isEmpty() ? "none" : "configured");
+    
+    // Display UDP settings
+    qDebug() << "\nðŸ“¡ UDP Configuration:";
+    int ip1 = settings.value("comm/udpIP1", 192).toInt();
+    int ip2 = settings.value("comm/udpIP2", 168).toInt();
+    int ip3 = settings.value("comm/udpIP3", 5).toInt();
+    qDebug() << "  Subnet:" << QString("%1.%2.%3.xxx").arg(ip1).arg(ip2).arg(ip3);
+    qDebug() << "  Broadcast:" << QString("%1.%2.%3.255").arg(ip1).arg(ip2).arg(ip3);
+    qDebug() << "  Listen Port:" << settings.value("comm/udpListenPort", 9999).toInt();
+    qDebug() << "  Send Port:" << settings.value("comm/udpSendPort", 8888).toInt();
+    
+    qDebug() << "\nðŸ” Expected Data Sources:";
+    qDebug() << "  1. GPS via UDP on port 9999 (NMEA sentences)";
+    qDebug() << "  2. GPS via Serial port (if configured)";
+    qDebug() << "  3. NTRIP corrections from" << settings.value("comm/ntripURL", "").toString();
+    qDebug() << "  4. AgOpenGPS modules on" << QString("%1.%2.%3.255").arg(ip1).arg(ip2).arg(ip3);
+    qDebug() << "=================================\n";
+}
+
+void FormGPS::connectFormLoopToAgIOService()
+{
+    qDebug() << "ðŸ”— Phase 4.2: Connecting AgIOService â†’ pn â†’ vehicle ...";
+    
+    if (!m_agioService) {
+        qDebug() << "âŒ Cannot connect: AgIOService is null";
+        return;
+    }
+    
+    // PHASE 4.2: Direct connection AgIOService â†’ pn â†’ vehicle
+    // This replaces FormLoop progressively as per architecture document
+    
+    // ✅ RECTANGLE PATTERN PURE: Direct access via updateGPSData() method
+    // GPS data automatically synchronized via property bindings and main timer
+    // No connect() needed - updateGPSData() called directly when needed
+    
+    // Phase 6.0.21: IMU initialization removed - GPS/IMU data now comes via gpsDataReceived signal
+    // Data flow: AgIOService broadcasts via signal -> FormGPS stores -> ahrs updated in UpdateFixPosition()
+    // ahrs.imuRoll, ahrs.imuPitch, ahrs.imuHeading initialized from signal data
+
+    qDebug() << "OK AgIOService -> FormGPS signal pipeline established";
+    qDebug() << "  Data flow: AgIOService (broadcast) -> FormGPS (storage) -> vehicle -> OpenGL";
+    qDebug() << "  Phase 6.0.21: GPS/IMU data via gpsDataReceived signal";
+}
+
+void FormGPS::cleanupAgIOService()
+{
+    qDebug() << "ðŸ”§ Cleaning up AgIO service...";
+
+    if (m_agioService) {
+        m_agioService->shutdown();
+        // Note: Don't delete m_agioService as it's managed by QML singleton system
+        m_agioService = nullptr;
+        qDebug() << "âœ… AgIO service cleaned up";
+    }
+}
+
+// Qt 6.8: All complex property binding methods removed
+// Using simple objectCreated signal instead
+

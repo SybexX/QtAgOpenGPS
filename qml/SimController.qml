@@ -2,14 +2,18 @@
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
 //
 // Sim controller panel on main screen
-import QtQuick 2.0
+import QtQuick
 import QtQuick.Controls.Fusion
+import AOG
+//import Settings
 import "components" as Comp
+import "../"
 
 Rectangle{
-    color: boundaryInterface.isOutOfBounds ? "darksalmon" : "gray"
+    color: BoundaryInterface.isOutOfBounds ? "darksalmon" : "gray"
     height: 60 * theme.scaleHeight
     width: 650 * theme.scaleWidth
+    z: 100
 	function changedSteerDir(isRight){
 		if(isRight){
 			steerSlider.value = steerSlider.value + 10
@@ -17,12 +21,6 @@ Rectangle{
 			steerSlider.value = steerSlider.value - 10
 		}
 	}
-    Connections{
-        target: settings
-        function onSetMenu_isSimulatorOnChanged(){
-            simBarRect.visible = settings.setMenu_isSimulatorOn
-        }
-    }
 
     Row{
         spacing: 4 * theme.scaleWidth
@@ -31,18 +29,18 @@ Rectangle{
         anchors.centerIn: parent
         Button{
 			id: resetButton
-            text: "Reset"
-            font.pixelSize: 15
+            text: qsTr("Reset")
+            font.pointSize: 11
             height: parent.height
             width: 65 * theme.scaleWidth
-            onClicked: aog.sim_reset()
+            onClicked: SimInterface.reset()
         }
         Button{
-            text: aog.steerAngleActual
-            font.pixelSize: 15
+            text: SimInterface.steerAngleActual
+            font.pointSize: 11
             height: parent.height
             width: 65 * theme.scaleWidth
-            onClicked: steerSlider.value = 300
+            onClicked: SimInterface.steerAngle = 0;
         }
         Comp.SliderCustomized {
             id: steerSlider
@@ -52,33 +50,36 @@ Rectangle{
 			width: 200 * theme.scaleWidth
             from: 0
             to: 600
-            value: 300
+            value: SimInterface.steerAngle * 10 + 300
+            onValueChanged: {
+                SimInterface.steerAngle = (value - 300) / 10
+            }
         }
         Comp.IconButtonTransparent{
             height: parent.height
             width: 65 * theme.scaleWidth
             icon.source: prefix + "/images/DnArrow64.png"
-            onClicked: aog.sim_bump_speed(false)
+            onClicked: SimInterface.slowdown();
         }
         Comp.IconButtonTransparent{
             height: parent.height
             width: 65 * theme.scaleWidth
             icon.source: prefix + "/images/AutoStop.png"
-            onClicked: aog.sim_zero_speed()
+            onClicked: SimInterface.stop()
         }
         Comp.IconButtonTransparent{
             height: parent.height
             width: 65 * theme.scaleWidth
             icon.source: prefix + "/images/UpArrow64.png"
-            onClicked: aog.sim_bump_speed(true)
+            onClicked: SimInterface.speedup()
         }
         Comp.IconButtonTransparent{
             height: parent.height
             width: 65 * theme.scaleWidth
             icon.source: prefix + "/images/YouTurn80.png"
             onClicked: {
-                aog.sim_rotate()
-                aog.isAutoSteerBtnOn = false;
+                SimInterface.rotate()
+                MainWindowState.isBtnAutoSteerOn = false; 
             }
         }
     }

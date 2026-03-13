@@ -14,20 +14,30 @@ TextField {
     signal manualTextChanged()
 
     Component.onCompleted: {
-        //save default color. Seems like a hack to me
         defaultTextColor = color
     }
 
     function set_without_onchange(new_value) {
         suppress_onchange = true
-        text = Number(new_value).toLocaleString(Qt.locale(),'f',9)
+        text = Number(new_value).toLocaleString(Qt.locale(), 'f', 9)
         suppress_onchange = false
     }
 
+    // Save the previous text if validation is not passed.
+    property string _lastValidText: ""
+
     onTextChanged: {
-        //manual entry!
-        if (! suppress_onchange) {
-            manualTextChanged()
+        // Check format
+        var isValid = /^-?(\d+\.?\d*|\.\d+)?$/.test(text)
+
+        if (isValid) {
+            _lastValidText = text
+        } else {
+            // Returning the last valid text
+            text = _lastValidText
+            // Restoring the cursor position
+            cursorPosition = _lastValidText.length
+            return
         }
 
         var value = Number(text)
@@ -36,9 +46,10 @@ TextField {
         } else {
             color = defaultTextColor
         }
-    }
 
-    validator: DoubleValidator {
+        if (!suppress_onchange) {
+            manualTextChanged()
+        }
     }
 
     onEditingFinished: {

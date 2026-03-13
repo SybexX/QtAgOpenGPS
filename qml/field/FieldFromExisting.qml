@@ -6,6 +6,8 @@ import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Controls.Material
+import AOG
+//import Settings
 
 import ".."
 import "../components"
@@ -18,6 +20,9 @@ Dialog {
     visible: false
     function show(){
         parent.visible = true
+        fieldFromExisting.visible = true
+        btnKeepHeadland.isChecked = true
+        btnKeepLines.isChecked = true
     }
     TopLine{
         id: topLine
@@ -54,10 +59,10 @@ Dialog {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        color: aog.backgroundColor
+        color: aogInterface.backgroundColor
         Rectangle{
             id: editFieldName
-            height: parent.height*0.15
+            height: 50  * theme.scaleHeight
             width: parent.width*0.5
             anchors.left: parent.left
             anchors.bottom: bottomButtons.top
@@ -78,13 +83,14 @@ Dialog {
             TextField{
                 id: newField
                 objectName: "fieldFromExisting"
-                placeholderText: qsTr("New field name")
+                placeholderText: focus || text ? "" : qsTr("New field name")
                 anchors.fill: parent
                 selectByMouse: true
+                height: 50  * theme.scaleHeight
 
                 onTextChanged: {
-                    for (var i=0; i < fieldInterface.field_list.length ; i++) {
-                        if (text === fieldInterface.field_list[i].name) {
+                    for (var i=0; i < FieldInterface.field_list.length ; i++) {
+                        if (text === FieldInterface.field_list[i].name) {
                             errorMessage.visible = true
                             break
                         } else
@@ -119,7 +125,6 @@ Dialog {
             onClicked: newField.text = ""
             height: 50  * theme.scaleHeight
             width: 100  * theme.scaleWidth
-
         }
 
         RowLayout{
@@ -136,38 +141,47 @@ Dialog {
                 id: btnAddVehicleName
                 icon.source: prefix + "/images/Config/Con_VehicleMenu.png"
                 Text{
+                    rightPadding: 3
                     anchors.right: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     text: "+"
                 }
                 onClicked: {
-                    newField.text += " " + settings.setVehicle_vehicleName
+                    // Threading Phase 1: Add vehicle name to field
+                    newField.text += " " + SettingsManager.vehicle_vehicleName
                 }
             }
             IconButtonTransparent{
                 id: marker
                 icon.source: prefix + "/images/JobNameCalendar.png"
                 Text{
+                    rightPadding: 3
                     anchors.right: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     text: "+"
                 }
                 onClicked: {
-                    var time = new Date().toLocaleDateString(Qt.locale(), Locale.ShortFormat)
-                    newField.text += " " + time
+                    var date = new Date();
+                    var year = date.getFullYear();
+                    var month = String(date.getMonth() + 1).padStart(2, '0');
+                    var day = String(date.getDate()).padStart(2, '0');
+                    newField.text += " " + `${year}-${month}-${day}`
                 }
             }
             IconButtonTransparent{
                 id: btnAddTime
                 icon.source: prefix + "/images/JobNameTime.png"
                 Text{
+                    rightPadding: 3
                     anchors.right: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     text: "+"
                 }
                 onClicked: {
-                    var time = new Date().toLocaleTimeString(Qt.locale())
-                    newField.text += " " + time
+                    var date = new Date();
+                    var hours = String(date.getHours()).padStart(2, '0');
+                    var minutes = String(date.getMinutes()).padStart(2, '0');
+                    newField.text += " " + `${hours}-${minutes}`
                 }
             }
             IconButtonColor{
@@ -177,7 +191,7 @@ Dialog {
                 width: marker.width
                 height: marker.height
                 icon.source: prefix + "/images/FlagRed.png"
-                text: "Flags"
+                text: qsTr("Flags")
             }
             IconButtonColor{
                 id: btnKeepMapping
@@ -186,25 +200,25 @@ Dialog {
                 width: marker.width
                 height: marker.height
                 icon.source: prefix + "/images/ManualOff.png"
-                text: "Mapping"
+                text: qsTr("Mapping")
             }
             IconButtonColor{
                 id: btnKeepHeadland
                 checkable: true
-                checked: true
+                //checked: true
                 width: marker.width
                 height: marker.height
                 icon.source: prefix + "/images/HeadlandMenu.png"
-                text: "Headland"
+                text: qsTr("Headland")
             }
             IconButtonColor{
                 id: btnKeepLines
                 checkable: true
-                checked: true
+                //checked: true
                 width: marker.width
                 height: marker.height
                 icon.source: prefix + "/images/ABLineEdit.png"
-                text: "Lines"
+                text: qsTr("Lines")
             }
         }
         Row{
@@ -235,16 +249,16 @@ Dialog {
                             newField.text != existingField.text) {
                         var flag = 0;
                         if (btnKeepFlags.checked)
-                            flag |= fieldInterface.loadFlags
+                            flag |= FieldInterface.Flags.Flags
                         if (btnKeepHeadland.checked)
-                            flag |= fieldInterface.loadHeadland
+                            flag |= FieldInterface.Flags.Headland
                         if (btnKeepLines.checked)
-                            flag |= fieldInterface.loadLines
+                            flag |= FieldInterface.Flags.Lines
                         if (btnKeepMapping.checked)
-                            flag |= fieldInterface.loadMapping
+                            flag |= FieldInterface.Flags.Mapping
 
                         fieldFromExisting.visible = false
-                        fieldInterface.field_new_from(fieldView.currentFieldName, newField.text, flag)
+                        aog.fieldNewFrom(fieldView.currentFieldName, newField.text.trim(), flag) // Qt 6.8 MODERN: Direct Q_INVOKABLE call
                         newField.text = ""
                         existingField.text = ""
                         fieldView.clear_selection()

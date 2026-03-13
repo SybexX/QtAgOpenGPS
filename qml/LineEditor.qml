@@ -10,15 +10,15 @@ Rectangle {
     id: lineEditor
     width: 300
     height: 375
-    color: aog.backgroundColor
+    color: aogInterface.blackDayWhiteNight
     border.width: 1
-    border.color: aog.blackDayWhiteNight
+    border.color: aogInterface.whiteDayBlackNight
     Comp.TopLine{
         id: topLine
-        titleText: "Edit AB"
+        titleText: qsTr("Edit AB")
     }
     Row{
-        anchors.top: topLine. bottom
+        anchors.top: topLine.bottom
         anchors.topMargin: 20
         anchors.horizontalCenter: parent.horizontalCenter
         id: lineNudge
@@ -49,9 +49,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: lineNudge.bottom
         anchors.topMargin: 35
-        width: children.width
         spacing: 35
-        height: children.height
         Comp.IconButtonTransparent{
             icon.source: prefix + "/images/ABSwapPoints.png"
         }
@@ -74,7 +72,7 @@ Rectangle {
             color1: "transparent"
             color2: "transparent"
             color3: "transparent"
-            text: "Cancel"
+            text: qsTr("Cancel")
             width: 75
             height: 75
         }
@@ -83,7 +81,7 @@ Rectangle {
             color1: "transparent"
             color2: "transparent"
             color3: "transparent"
-            text: "For Now"
+            text: qsTr("For Now")
             width: 75
             height: 75
             onClicked: lineEditor.visible = false
@@ -93,7 +91,7 @@ Rectangle {
             color1: "transparent"
             color2: "transparent"
             color3: "transparent"
-            text: "Save"
+            text: qsTr("Save")
             width: 75
             height: 75
             onClicked: lineEditor.visible = false

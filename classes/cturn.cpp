@@ -1,8 +1,7 @@
 #include "cboundary.h"
 #include "glm.h"
-#include "aogproperty.h"
+#include "classes/settingsmanager.h"
 #include "cabline.h"
-#include "cfielddata.h"
 
 /************/
 /* CTurn.cs *
@@ -101,7 +100,7 @@ void CBoundary::FindClosestTurnPoint(const CABLine &ABLine, Vec3 fromPt)
     }
 }
 
-void CBoundary::BuildTurnLines(CFieldData &fd)
+void CBoundary::BuildTurnLines()
 {
     if (bndList.count() == 0)
     {
@@ -110,13 +109,13 @@ void CBoundary::BuildTurnLines(CFieldData &fd)
     }
 
     //update the GUI values for boundaries
-    fd.UpdateFieldBoundaryGUIAreas(bndList);
+    UpdateFieldBoundaryGUIAreas();
 
     //to fill the list of line points
     Vec3 point;
 
     //determine how wide a headland space
-    double totalHeadWidth = property_set_youTurnDistanceFromBoundary;
+    double totalHeadWidth = SettingsManager::instance()->youturn_distanceFromBoundary();
 
     //inside boundaries
     for (int j = 0; j < bndList.count(); j++)
@@ -172,9 +171,12 @@ void CBoundary::BuildTurnLines(CFieldData &fd)
             }
         }
 
-        Vec3 end(bndList[j].turnLine[0].easting,
-                 bndList[j].turnLine[0].northing, bndList[j].turnLine[0].heading);
-        bndList[j].turnLine.append(end);
+        if(bndList[j].turnLine.count() > 0)
+        {
+            Vec3 end(bndList[j].turnLine[0].easting,
+                     bndList[j].turnLine[0].northing, bndList[j].turnLine[0].heading);
+            bndList[j].turnLine.append(end);
+        }
     }
 }
 

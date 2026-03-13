@@ -110,6 +110,9 @@ void CBoundaryList::FixFenceLine(int bndNum)
     //make sure headings are correct for calculated points
     CalculateFenceLineHeadings();
 
+    //prepare the fenceLine polygon for ear clipping.
+    //note in this version of the code ear clipping is not done.
+    //only vertex removal when the angle of the vertex is about 180.
     double delta = 0;
     fenceLineEar.clear();
 

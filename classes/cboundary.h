@@ -8,9 +8,8 @@
 #include <QSharedPointer>
 #include <QOpenGLBuffer>
 #include "cboundarylist.h"
-#include "btnenum.h"
+#include "mainwindowstate.h"
 #include <QObject>
-#include "interfaceproperty.h"
 
 
 class QOpenGLFunctions;
@@ -18,8 +17,7 @@ class QMatrix4x4;
 class CVehicle;
 class CABLine;
 class CYouTurn;
-class CModuleComm;
-class CFieldData;
+class ModuleComm;
 class CTool;
 class CPGN_EF;
 
@@ -34,17 +32,23 @@ private:
     bool bufferCurrent = false;
     bool backBufferCurrent = false;
 
+    Vec2 prevBoundaryPos;
+
+    quint64 m_lastFingerprint = 0;
+    quint64 calculateFingerprint() const;
+
 public:
+    // Singleton access
+    static CBoundary *instance();
+
     //area of boundaries
     QVector<CBoundaryList> bndList;
 
     QVector<Vec3> bndBeingMadePts;
 
-    InterfaceProperty<BoundaryInterface,double> createBndOffset = InterfaceProperty<BoundaryInterface,double>("createBndOffset");
-    //InterfaceProperty<BoundaryInterface,bool> isBndBeingMade = InterfaceProperty<BoundaryInterface,bool>("isBndBeingMade");
-    bool isBndBeingMade = false;
+    // isBndBeingMade in BoundaryInterface as property
+    //bool isBndBeingMade = false;
 
-    InterfaceProperty<BoundaryInterface,bool> isDrawRightSide = InterfaceProperty<BoundaryInterface,bool>("isDrawRightSide");
     bool isOkToAddPoints = false;
 
     int closestFenceNum;
@@ -61,31 +65,24 @@ public:
     Vec3 closestTurnPt = Vec3(-10000, -10000, 9);
     Vec3 closePt;
 
-    InterfaceProperty<BoundaryInterface,bool> isHeadlandOn = InterfaceProperty<BoundaryInterface,bool>("isHeadlandOn");
     bool isToolInHeadland, isToolOuterPointsInHeadland, isSectionControlledByHeadland;
 
 
-    CBoundary(QObject *parent = 0);
     void loadSettings();
 
     //CFence.cs
     bool IsPointInsideFenceArea(Vec3 testPoint) const ;
     bool IsPointInsideFenceArea(Vec2 testPoint) const;
-    void DrawFenceLines(const CVehicle &v, const CModuleComm &mc, QOpenGLFunctions *g, const QMatrix4x4 &mvp);
+    void DrawFenceLines(Vec3 pivot, QOpenGLFunctions *g, const QMatrix4x4 &mvp);
 
     //CTurn.sh
     int IsPointInsideTurnArea(Vec3 pt) const;
     void FindClosestTurnPoint(const CABLine &abline, Vec3 fromPt);
-    void BuildTurnLines(CFieldData &fd);
+    void BuildTurnLines();
 
     //CHead.cs
-    void SetHydPosition(btnStates autoBtnState, CPGN_EF &p_239, CVehicle &vehicle); //TODO sounds, p_239
-    void WhereAreToolCorners(CTool &tool);
-    void WhereAreToolLookOnPoints(CVehicle &vehicle, CTool &tool);
-    bool IsPointInsideHeadArea(Vec2 pt);
-
-
-
+    void SetHydPosition(SectionState::State autoBtnState, CPGN_EF &p_239, CVehicle &vehicle); //TODO sounds, p_239
+    bool IsPointInsideHeadArea(Vec2 pt) const;
 
     /*
     void findClosestBoundaryPoint(Vec2 fromPt, double headAB);
@@ -94,10 +91,49 @@ public:
     //void drawClosestPoint(QOpenGLFunctions *g, const QMatrix4x4 &mvp);
     //void drawBoundaryLineOnBackBuffer(QOpenGLFunctions *gl, const QMatrix4x4 &mvp);
 
+    void AddCurrentPoint(double min_dist);
+    void UpdateFieldBoundaryGUIAreas();
+    bool CalculateMinMax();
+    bool loadBoundary(const QString &field_path);
+    static double getSavedFieldArea(const QString &boundarytxt_path);
+
+    void updateInterface();
+
+
+public slots:
+    // methods to be used by GUI.
+    void calculateArea();
+    void updateList();
+    void start();
+    void stop();
+    void addPoint();
+    void deleteLastPoint();
+    void pause();
+    void record();
+    void reset();
+    void deleteBoundary(int which_boundary);
+    void setDriveThrough(int which_boundary, bool drive_thru);
+    void deleteAll();
+
+    void loadBoundaryFromKML(QString filename);
+    void addBoundaryOSMPoint(double latitude, double longitude);
+
+
 signals:
     void TimedMessage(int timeout, QString title, QString message);
     void soundHydLiftChange(bool);
 
+    void saveBoundaryRequested();
+
+private:
+    explicit CBoundary(QObject *parent = nullptr);
+    ~CBoundary() override = default;
+
+    // Prevent copying
+    CBoundary(const CBoundary &) = delete;
+    CBoundary &operator=(const CBoundary &) = delete;
+
+    static CBoundary *s_instance;
 };
 
 #endif // CBOUNDARY_H

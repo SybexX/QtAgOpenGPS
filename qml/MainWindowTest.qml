@@ -1,4 +1,4 @@
-import QtQuick 2.7
+import QtQuick
 import QtQuick.Controls.Fusion
 
 ApplicationWindow {
@@ -35,23 +35,23 @@ ApplicationWindow {
                             //checkable: true
                         }
                         MenuItem {
-                            text: "Save Vehicle"
+                            text: qsTr("Save Vehicle")
                         }
                         MenuSeparator {
 
                         }
                         MenuItem {
-                            text: "Start Field"
+                            text: qsTr("Start Field")
                         }
                     }
                 }
                 ToolButton {
                     id: optionsButton
-                    text: "Options"
+                    text: qsTr("Options")
                 }
                 ToolButton {
                     id: toolsButton
-                    text: "Tools"
+                    text: qsTr("Tools")
                 }
             }
         }
@@ -60,7 +60,7 @@ ApplicationWindow {
             anchors.horizontalCenter: parent.horizontalCenter
             Text {
                 id: speedText
-                text: "0 kph"
+                text: qsTr("0 kph")
             }
             Text {
                 id: txtDistanceFromABLine

@@ -3,7 +3,7 @@
 //
 // Spinbox for displaying one decimal only.
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls.Fusion
 
 Item {
     id: spinBox_singledigit
@@ -16,7 +16,7 @@ Item {
     property bool editable: true
     property double boundValue
     width: spinner.width
-    height: 100
+    height: spinner.height + (spin_message.length > 0 ? spin_message.height : 0) + (text.length > 0 ? 20 : 0)
 
     signal valueModified()
 
@@ -36,9 +36,68 @@ Item {
         editable: spinBox_singledigit.editable
         value: spinBox_singledigit.value * 10
 		stepSize: spinBox_singledigit.stepSize
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
-		property int decimals: spinBox_singledigit.decimals
+        //anchors.horizontalCenter: parent.horizontalCenter
+        //anchors.verticalCenter: parent.verticalCenter
+        height: 40 * theme.scaleHeight
+        width: 150 * theme.scaleWidth
+        property int decimals: spinBox_singledigit.decimals
+
+        contentItem: TextInput {
+            id: text_input
+            text: spinner.textFromValue(spinner.value, spinner.locale)
+            font: spinner.font
+            color: enabled ? "black" : "gray"
+            horizontalAlignment: Qt.AlignHCenter
+            verticalAlignment: Qt.AlignVCenter
+            anchors.horizontalCenter: spinner.horizontalCenter
+            anchors.verticalCenter: spinner.verticalCenter
+            readOnly: !spinner.editable
+            validator: spinner.validator
+            inputMethodHints: Qt.ImhFormattedNumbersOnly
+        }
+
+        up.indicator: Rectangle {
+            x: spinner.mirrored ? 0 : parent.width - width
+            height: parent.height
+            implicitHeight: 40 * theme.scaleHeight
+            implicitWidth: 40 * theme.scaleWidth
+            color: spinner.up.pressed ? "#yellow" : "#f6f6f6"
+            border.color: enabled ? "darkgray" : "lightgray"
+
+            Text {
+                text: "+"
+                font.pixelSize: spinner.font.pixelSize * 2
+                color: enabled ? "black" : "gray"
+                anchors.fill: parent
+                fontSizeMode: Text.Fit
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+        }
+
+        down.indicator: Rectangle {
+            x: spinner.mirrored ? parent.width - width : 0
+            height: parent.height
+            implicitHeight: 40 * theme.scaleHeight
+            implicitWidth: 40 * theme.scaleWidth
+            color: spinner.down.pressed ? "#yellow" : "#f6f6f6"
+            border.color: enabled ? "darkgray" : "lightgray"
+
+            Text {
+                text: "–"
+                font.pixelSize: spinner.font.pixelSize * 2
+                color: enabled ? "black" : "gray"
+                anchors.fill: parent
+                fontSizeMode: Text.Fit
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+        }
+        background: Rectangle {
+            implicitHeight: 40 * theme.scaleHeight
+            implicitWidth: 150 * theme.scaleWidth
+            border.color: enabled ? "black" : "gray"
+        }
 
         onValueModified: {
             if (value == spinner.from) {
@@ -72,6 +131,7 @@ Item {
         anchors.bottom: spinner.top
         anchors.left: spinner.left
         font.pixelSize: 15
+        color: enabled ? "black" : "gray"
     }
     Text {
         id: spin_message

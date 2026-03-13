@@ -5,6 +5,9 @@
 // we are using sections or zones.
 import QtQuick
 import QtQuick.Controls.Fusion
+//import Settings
+import AOG
+
 
 import ".."
 import "../components"
@@ -13,8 +16,14 @@ import "../components"
 Rectangle{
     id: configImplementSection
     anchors.fill: parent
-    color: aog.backgroundColor
+    color: aogInterface.backgroundColor
     visible: false
+
+    // Qt 6.8 QProperty + BINDABLE: Simple properties to allow setProperty() updates from C++
+    property bool toolIsSectionsNotZones: SettingsManager.tool_isSectionsNotZones
+    property int vehicleMinCoverage: SettingsManager.vehicle_minCoverage
+    property bool toolIsSectionOffWhenOut: SettingsManager.tool_isSectionOffWhenOut
+    property double vehicleSlowSpeedCutoff: SettingsManager.vehicle_slowSpeedCutoff
 
     Row{
         id: bottomRow
@@ -27,11 +36,8 @@ Rectangle{
         spacing: 90 * theme.scaleWidth
         Button{
             function toggleZones(){
-                if( utils.isTrue(settings.setTool_isSectionsNotZones)){
-                    settings.setTool_isSectionsNotZones = false
-                }else{
-                    settings.setTool_isSectionsNotZones = true
-                }
+                // Threading Phase 1: Toggle between sections and zones mode
+                SettingsManager.tool_isSectionsNotZones = ! SettingsManager.tool_isSectionsNotZones
             }
             width: 180 * theme.scaleWidth
             height: 130 * theme.scaleHeight
@@ -41,13 +47,14 @@ Rectangle{
                 toggleZones()
             }
             background: Rectangle{
-                color: aog.backgroundColor
-                border.color: aog.blackDayWhiteNight
+                color: aogInterface.backgroundColor
+                border.color: aogInterface.blackDayWhiteNight
                 border.width: 1
                 Image{
                     id: image
 
-                    source: utils.isTrue(settings.setTool_isSectionsNotZones) ? prefix + "/images/Config/ConT_Asymmetric.png" : prefix + "/images/Config/ConT_Symmetric.png"
+                    // Threading Phase 1: Display section/zone mode image
+                    source: toolIsSectionsNotZones ? prefix + "/images/Config/ConT_Asymmetric.png" : prefix + "/images/Config/ConT_Symmetric.png"
                     anchors.fill: parent
                 }
             }
@@ -56,14 +63,16 @@ Rectangle{
             id: percentCoverage
             from: 0
             to: 100
-            boundValue: settings.setVehicle_minCoverage
+            // Threading Phase 1: Minimum coverage percentage
+            boundValue: vehicleMinCoverage
             anchors.bottom: parent.bottom
             text: qsTr("% Coverage")
-            onValueModified: settings.setVehicle_minCoverage = value
+            onValueModified: vehicleMinCoverage = value
         }
         IconButton{
             icon.source: prefix + "/images/SectionOffBoundary.png"
             iconChecked: prefix + "/images/SectionOnBoundary.png"
+            checkable: true
             anchors.bottom: parent.bottom
             implicitWidth: 100 * theme.scaleWidth
             implicitHeight: 100 * theme.scaleHeight
@@ -73,19 +82,21 @@ Rectangle{
             colorChecked1: "green"
             colorChecked2: "green"
             colorChecked3: "green"
-            isChecked: settings.setTool_isSectionOffWhenOut
-            onCheckedChanged: settings.setTool_isSectionOffWhenOut = checked
+            // Threading Phase 1: Section off when outside boundary
+            isChecked: toolIsSectionOffWhenOut
+            onCheckedChanged: SettingsManager.tool_isSectionOffWhenOut = checked
         }
         SpinBoxCustomized{
             //todo: this should be made english/metric
             decimals: 1
             id: slowSpeedCutoff
-            from: utils.speed_to_unit(0)
-            to: utils.speed_to_unit(30)
-            boundValue: utils.speed_to_unit(settings.setVehicle_slowSpeedCutoff)
+            from: Utils.speed_to_unit(0)
+            to: Utils.speed_to_unit(30)
+            // Threading Phase 1: Slow speed cutoff for sections
+            boundValue: Utils.speed_to_unit(vehicleSlowSpeedCutoff)
             anchors.bottom: parent.bottom
-            onValueModified: settings.setVehicle_slowSpeedCutoff = utils.speed_from_unit(value)
-            text: utils.speed_unit()
+            onValueModified: SettingsManager.vehicle_slowSpeedCutoff = Utils.speed_from_unit(value)
+            text: Utils.speed_unit()
 
             Image{
                 anchors.bottom: parent.top
@@ -97,14 +108,15 @@ Rectangle{
     ConfigImplementSectionsSection{
         id: configImplementSectionsSection
         anchors.top: parent.top
-        anchors.topMargin: 80 * theme.scaleHeight
+        //anchors.topMargin: 80 * theme.scaleHeight
         anchors.right: parent.right
 		anchors.rightMargin: 7 * theme.scaleWidth
         anchors.left: parent.left
 		anchors.leftMargin: 7 * theme.scaleWidth
         anchors.bottom: bottomRow.top
-        anchors.bottomMargin: 30 * theme.scaleHeight
-        visible: utils.isTrue(settings.setTool_isSectionsNotZones)
+        //anchors.bottomMargin: 30 * theme.scaleHeight
+        // Threading Phase 1: Show sections configuration
+        visible: toolIsSectionsNotZones
     }
     ConfigImplementSectionsZones{
         id: configImplementSectionsZones
@@ -116,7 +128,8 @@ Rectangle{
 		anchors.leftMargin: 7 * theme.scaleWidth
         anchors.bottom: bottomRow.top
         anchors.bottomMargin: 30 * theme.scaleHeight
-        visible: !utils.isTrue(settings.setTool_isSectionsNotZones)
+        // Threading Phase 1: Show zones configuration
+        visible: !toolIsSectionsNotZones
 
     }
 }

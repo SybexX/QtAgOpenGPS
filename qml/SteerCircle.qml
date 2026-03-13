@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
 //
 // IMU angle display, bottom right. Called "SteerCircle:" in AOG
-import QtQuick 2.15
+import QtQuick
 import QtQuick.Effects
 
 Rectangle {

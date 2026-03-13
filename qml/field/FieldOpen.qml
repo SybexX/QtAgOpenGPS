@@ -6,6 +6,7 @@ import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Controls.Material
+import AOG
 
 import ".."
 import "../components"
@@ -17,7 +18,7 @@ Dialog {
     height: 500  * theme.scaleHeight
     width:700  * theme.scaleWidth
     anchors.centerIn: parent
-    modal: falce
+    modal: false
     function show(){
         parent.visible = true
     }
@@ -33,16 +34,19 @@ Dialog {
         id: fieldTable
         anchors.top: topLine.bottom
         anchors.bottom: grid3.top
-        width:parent.width - 10
+        width: parent.width - 10
         anchors.left: parent.left
         anchors.topMargin: 10
         anchors.leftMargin: 5
         anchors.rightMargin: 15
         anchors.bottomMargin: 10
 
+        adjustWidth: - scrollbar.width
+
         sortBy: fieldOpen.sortBy
 
         anchors.right: topLine.right
+
         ScrollBar.vertical: ScrollBar {
             id: scrollbar
             anchors.left: fieldOpen.right
@@ -52,8 +56,6 @@ Dialog {
             active: true
             contentItem.opacity: 1
         }
-
-
     }
 
     Rectangle{
@@ -75,14 +77,14 @@ Dialog {
                 id: deleteField
                 objectName: "btnDeleteField"
                 icon.source: prefix + "/images/skull.png"
-                text: "Delete Field"
+                text: qsTr("Delete Field")
                 //radius: 0
                 //color3: "white"
                 //border: 1
                 //height: 75
                 enabled: fieldTable.currentIndex > -1
                 onClicked: {
-                    fieldInterface.field_delete(fieldTable.currentFieldName)
+                    FieldInterface.deleteField(fieldTable.currentFieldName) // Qt 6.8 MODERN: Direct Q_INVOKABLE call
                     //backend should update the list
                 }
             }
@@ -95,7 +97,7 @@ Dialog {
                 icon.source: prefix + "/images/Sort.png"
                 //color3: "white"
                 //height: 75
-                text: "Toggle Sort"
+                text: qsTr("Toggle Sort")
                 //radius: 0
 
                 //border: 1
@@ -108,7 +110,7 @@ Dialog {
                 id: cancel
                 objectName: "btnCancel"
                 icon.source: prefix + "/images/Cancel64.png"
-                text: "Cancel"
+                text: qsTr("Cancel")
                 //color3: "white"
                 //radius: 0
                 //border: 1
@@ -116,21 +118,21 @@ Dialog {
                 onClicked: {
                     fieldTable.clear_selection()
                     fieldOpen.close()
-                    closeDialog()
+                    //closeDialog()
                 }
             }
             IconButtonTransparent {
                 id: useSelected
                 objectName: "btnUseSelected"
                 icon.source: prefix + "/images/FileOpen.png"
-                text: "Use Selected"
+                text: qsTr("Use Selected")
                 //radius: 0
                 //color3: "white"
                 //border: 1
                 //height: 75
                 enabled: fieldTable.currentIndex > -1
                 onClicked: {
-                    fieldInterface.field_open(fieldTable.currentFieldName)
+                    FieldInterface.openField(fieldTable.currentFieldName) // Qt 6.8 MODERN: Direct Q_INVOKABLE call
                     fieldTable.clear_selection()
                     fieldOpen.close()
                 }

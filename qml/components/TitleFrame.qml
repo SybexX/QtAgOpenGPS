@@ -13,7 +13,7 @@ Rectangle {
     property alias font: titleLabel.font
 
     property bool enabled: true
-    property color titleColorEnabled: aog.textColor
+    property color titleColorEnabled: aogInterface.textColor
     property color titleColorDisabled: "grey"
 
     property int titleHeight: titleLabel.height

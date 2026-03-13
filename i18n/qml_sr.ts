@@ -1,0 +1,2414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="sr" sourcelanguage="en">
+<context>
+    <name>ABCurvePicker</name>
+    <message>
+        <location filename="../qml/ABCurvePicker.qml" line="16"/>
+        <location filename="../qml/ABCurvePicker.qml" line="60"/>
+        <source>AB Curve</source>
+        <translation>AB Kriva</translation>
+    </message>
+</context>
+<context>
+    <name>ABLinePicker</name>
+    <message>
+        <location filename="../qml/ABLinePicker.qml" line="20"/>
+        <location filename="../qml/ABLinePicker.qml" line="65"/>
+        <source>AB Line</source>
+        <translation>AB Linija</translation>
+    </message>
+    <message>
+        <location filename="../qml/ABLinePicker.qml" line="241"/>
+        <source>Drive to AB line &lt;b&gt;start&lt;/b&gt; point and press the A button or enter Latitude and Longitude.</source>
+        <translation>Pomerite se do početne tačke linije AB i pritisnite dugme A ili unesite geografsku širinu i dužinu.</translation>
+    </message>
+    <message>
+        <location filename="../qml/ABLinePicker.qml" line="279"/>
+        <location filename="../qml/ABLinePicker.qml" line="430"/>
+        <source>Lat</source>
+        <comment>Latitude abbreviation</comment>
+        <translation>Širina</translation>
+    </message>
+    <message>
+        <location filename="../qml/ABLinePicker.qml" line="284"/>
+        <location filename="../qml/ABLinePicker.qml" line="435"/>
+        <location filename="../qml/ABLinePicker.qml" line="460"/>
+        <source>Latitude</source>
+        <translation>Geografska širina</translation>
+    </message>
+    <message>
+        <location filename="../qml/ABLinePicker.qml" line="304"/>
+        <location filename="../qml/ABLinePicker.qml" line="455"/>
+        <source>Lon</source>
+        <comment>Longitude abbreviation</comment>
+        <translation>Dužina</translation>
+    </message>
+    <message>
+        <location filename="../qml/ABLinePicker.qml" line="309"/>
+        <source>Longitude</source>
+        <translation>Geografska dužina</translation>
+    </message>
+    <message>
+        <location filename="../qml/ABLinePicker.qml" line="336"/>
+        <source>For an A+ line, enter the heading.  Otherwise drive to AB line &lt;b&gt;end&lt;/b&gt; point and press the B button, or manually enter Latitude and Longitude.</source>
+        <translation>Za liniju tipa A+, unesete kurs. Inače pomerite se do krajnje tačke linije AB i pritisnite dugme B ili ručno unesete geografsku širinu i dužinu.</translation>
+    </message>
+</context>
+<context>
+    <name>BlockageData</name>
+    <message>
+        <location filename="../qml/BlockageData.qml" line="19"/>
+        <source>Max: </source>
+        <translation>Maksimalna vrednost: </translation>
+    </message>
+    <message>
+        <location filename="../qml/BlockageData.qml" line="20"/>
+        <source>Row N max  </source>
+        <translation>Red br. N maksimalan </translation>
+    </message>
+    <message>
+        <location filename="../qml/BlockageData.qml" line="21"/>
+        <source>Avg </source>
+        <translation>Prosjek </translation>
+    </message>
+    <message>
+        <location filename="../qml/BlockageData.qml" line="22"/>
+        <source>Min </source>
+        <translation>Minimalna vrednost </translation>
+    </message>
+    <message>
+        <location filename="../qml/BlockageData.qml" line="23"/>
+        <source>Rows </source>
+        <translation>Redovi </translation>
+    </message>
+    <message>
+        <location filename="../qml/BlockageData.qml" line="24"/>
+        <source>Blocked </source>
+        <translation>Blokirano </translation>
+    </message>
+</context>
+<context>
+    <name>BoundaryMenu</name>
+    <message>
+        <location filename="../qml/boundary/BoundaryMenu.qml" line="33"/>
+        <source>Start or Delete A Boundary</source>
+        <translation>Pokreni ili obriši granicu</translation>
+    </message>
+    <message>
+        <location filename="../qml/boundary/BoundaryMenu.qml" line="116"/>
+        <source>Delete All Boundaries?</source>
+        <translation>Obrisati sve granice?</translation>
+    </message>
+    <message>
+        <location filename="../qml/boundary/BoundaryMenu.qml" line="128"/>
+        <source>Are you sure you wish to delete all boundaries for this field? This action cannot be undone.</source>
+        <translation>Da li ste sigurni da želite da obrišete sve granice za ovo polje? Ova radnja ne može biti poništena.</translation>
+    </message>
+</context>
+<context>
+    <name>BoundaryRecord</name>
+    <message>
+        <location filename="../qml/boundary/BoundaryRecord.qml" line="29"/>
+        <source>Record Boundary</source>
+        <translation>Snimi granicu</translation>
+    </message>
+    <message>
+        <location filename="../qml/boundary/BoundaryRecord.qml" line="48"/>
+        <source>Centimeter</source>
+        <translation>Centimetar</translation>
+    </message>
+    <message>
+        <location filename="../qml/boundary/BoundaryRecord.qml" line="96"/>
+        <source>Area:</source>
+        <translation>Površina:</translation>
+    </message>
+    <message>
+        <location filename="../qml/boundary/BoundaryRecord.qml" line="99"/>
+        <source>Points:</source>
+        <translation>Tačke:</translation>
+    </message>
+</context>
+<context>
+    <name>BoundaryTable</name>
+    <message>
+        <location filename="../qml/boundary/BoundaryTable.qml" line="127"/>
+        <source>Boundary</source>
+        <translation>Granična linija</translation>
+    </message>
+    <message>
+        <location filename="../qml/boundary/BoundaryTable.qml" line="164"/>
+        <source>Area</source>
+        <translation>Površina</translation>
+    </message>
+    <message>
+        <location filename="../qml/boundary/BoundaryTable.qml" line="200"/>
+        <source>Drive Through</source>
+        <translation>Prolazak kroz granicu</translation>
+    </message>
+    <message>
+        <location filename="../qml/boundary/BoundaryTable.qml" line="237"/>
+        <source>Outer</source>
+        <comment>outer boundary</comment>
+        <translation>Spoljna granična linija</translation>
+    </message>
+    <message>
+        <location filename="../qml/boundary/BoundaryTable.qml" line="238"/>
+        <source>Inner</source>
+        <comment>inner boundary</comment>
+        <translation>Unutrašnja granična linija</translation>
+    </message>
+    <message>
+        <location filename="../qml/boundary/BoundaryTable.qml" line="259"/>
+        <source>Yes</source>
+        <translation>Da</translation>
+    </message>
+    <message>
+        <location filename="../qml/boundary/BoundaryTable.qml" line="259"/>
+        <source>No</source>
+        <translation>Ne</translation>
+    </message>
+</context>
+<context>
+    <name>BoundaryType</name>
+    <message>
+        <location filename="../qml/boundary/BoundaryType.qml" line="34"/>
+        <location filename="../qml/boundary/BoundaryType.qml" line="98"/>
+        <source>Choose a Type</source>
+        <translation>Izaberite tip</translation>
+    </message>
+</context>
+<context>
+    <name>CloseAOG</name>
+    <message>
+        <location filename="../qml/CloseAOG.qml" line="8"/>
+        <source>AgOpenGPS is already running</source>
+        <translation>AgOpenGPS je već pokrenut</translation>
+    </message>
+</context>
+<context>
+    <name>Config</name>
+    <message>
+        <location filename="../qml/config/Config.qml" line="26"/>
+        <source>General Settings</source>
+        <translation>Opšta podešavanja</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigDisplay</name>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="32"/>
+        <source>Field Texture</source>
+        <translation>Tekstura terena</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="41"/>
+        <source>Auto Day Night</source>
+        <translation>Automatski prelaz dan/noć</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="46"/>
+        <source>Start FullScreen</source>
+        <translation>Pokretanje u punom ekranu</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="53"/>
+        <source>Grid</source>
+        <translation>Mreža</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="60"/>
+        <source>Sky</source>
+        <translation>Nebo</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="67"/>
+        <source>Brightness</source>
+        <translation>Osvetljenost</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="74"/>
+        <source>Lightbar</source>
+        <translation>Svjetlosna traka</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="81"/>
+        <source>Log NMEA</source>
+        <translation>NMEA log</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="86"/>
+        <source>GuideLines</source>
+        <translation>Vodičke linije</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="93"/>
+        <source>Svenn Arrow</source>
+        <translation>Strelica Svenga</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="100"/>
+        <source>Compass</source>
+        <translation>Kompas</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigDisplay.qml" line="115"/>
+        <source>Units</source>
+        <translation>Jedinice mere</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigFeatures</name>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="37"/>
+        <source>Tram Lines</source>
+        <translation>Putne linije</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="43"/>
+        <source>Headland</source>
+        <translation>Rubna zona</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="49"/>
+        <source>Boundary</source>
+        <translation>Granica</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="55"/>
+        <source>Rec Path</source>
+        <translation>Putevni zapisnik</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="71"/>
+        <source>Tools Menu</source>
+        <translation>Menij alata</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="79"/>
+        <source>AB Smooth</source>
+        <translation>Glatkanje AB</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="85"/>
+        <source>Hide Contour</source>
+        <translation>Sakrij konturu</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="91"/>
+        <source>WebCam</source>
+        <translation>Web-kamera</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="97"/>
+        <source>Offset Fix</source>
+        <translation>Ispravka pomaka</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="126"/>
+        <source>U-Turn</source>
+        <translation>Okretanje U-oblika</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="133"/>
+        <source>Lateral</source>
+        <translation>Bočno upravljanje</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="146"/>
+        <source>Auto Start AgIO</source>
+        <translation>Automatizovan start AgIO</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="163"/>
+        <source>Sound</source>
+        <translation>Zvuk</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="170"/>
+        <source>Auto Steer</source>
+        <translation>Autonomno vožnje</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="177"/>
+        <source>You Turn</source>
+        <translation>Vaš okret</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigFeatures.qml" line="185"/>
+        <source>Hyd Lift</source>
+        <translation>Hidro-podignji mehanizam</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigImplement</name>
+    <message>
+        <location filename="../qml/config/ConfigImplement.qml" line="22"/>
+        <source>&lt;h1&gt;Attachment Style&lt;/h1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfigImplementFrontDimensions</name>
+    <message>
+        <location filename="../qml/config/ConfigImplementFrontDimensions.qml" line="41"/>
+        <source>Units: </source>
+        <translation>Jedinice mera: </translation>
+    </message>
+</context>
+<context>
+    <name>ConfigImplementOffset</name>
+    <message>
+        <location filename="../qml/config/ConfigImplementOffset.qml" line="24"/>
+        <source>Tool Offset Direction</source>
+        <translation>Smjer pomaka alata</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementOffset.qml" line="102"/>
+        <source>Tool Right</source>
+        <translation>Alat desno</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementOffset.qml" line="107"/>
+        <source>Overlap / Gap</source>
+        <translation>Preklapanje / Prostor između</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementOffset.qml" line="167"/>
+        <source>Overlap</source>
+        <translation>Preklapanje</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigImplementRearDimensions</name>
+    <message>
+        <location filename="../qml/config/ConfigImplementRearDimensions.qml" line="42"/>
+        <source>Units: </source>
+        <translation>Jedinice merenja: </translation>
+    </message>
+</context>
+<context>
+    <name>ConfigImplementSections</name>
+    <message>
+        <location filename="../qml/config/ConfigImplementSections.qml" line="64"/>
+        <source>% Coverage</source>
+        <translation>% Pokrivene površine</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigImplementSectionsSection</name>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="278"/>
+        <source>Section</source>
+        <comment>Refers to an implement section</comment>
+        <translation>Sekcija</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="313"/>
+        <source>Default Section Width</source>
+        <translation>Podrazumevana širina sekcije</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="356"/>
+        <source>1</source>
+        <translation>1</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="357"/>
+        <source>2</source>
+        <translation>2</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="358"/>
+        <source>3</source>
+        <translation>3</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="359"/>
+        <source>4</source>
+        <translation>4</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="360"/>
+        <source>5</source>
+        <translation>5</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="361"/>
+        <source>6</source>
+        <translation>6</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="362"/>
+        <source>7</source>
+        <translation>7</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="363"/>
+        <source>8</source>
+        <translation>8</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="364"/>
+        <source>9</source>
+        <translation>9</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="365"/>
+        <source>10</source>
+        <translation>10</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="366"/>
+        <source>11</source>
+        <translation>11</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="367"/>
+        <source>12</source>
+        <translation>12</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="368"/>
+        <source>13</source>
+        <translation>13</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="369"/>
+        <source>14</source>
+        <translation>14</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="370"/>
+        <source>15</source>
+        <translation>15</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="371"/>
+        <source>16</source>
+        <translation>16</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsSection.qml" line="377"/>
+        <source>Sections</source>
+        <translation>Sekcije</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigImplementSectionsZones</name>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsZones.qml" line="265"/>
+        <source>Zone</source>
+        <comment>Zone as in zone of sections</comment>
+        <translation>Zona</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsZones.qml" line="275"/>
+        <source>↦</source>
+        <comment>In LTR languages, right arrow</comment>
+        <translation>→</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsZones.qml" line="302"/>
+        <source>Zones</source>
+        <comment>Zones as in zones of sections</comment>
+        <translation>Zone</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsZones.qml" line="333"/>
+        <source>Uniform Section Width</source>
+        <translation>Jednak širine sekcije</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSectionsZones.qml" line="345"/>
+        <source>Sections</source>
+        <translation>Sekcije</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigImplementSwitches</name>
+    <message>
+        <location filename="../qml/config/ConfigImplementSwitches.qml" line="37"/>
+        <location filename="../qml/config/ConfigImplementSwitches.qml" line="54"/>
+        <source>Work Switch</source>
+        <translation>Prekidač rada</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSwitches.qml" line="68"/>
+        <location filename="../qml/config/ConfigImplementSwitches.qml" line="143"/>
+        <source>Manual Sections</source>
+        <translation>Ručno upravljane sekcije</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSwitches.qml" line="78"/>
+        <location filename="../qml/config/ConfigImplementSwitches.qml" line="151"/>
+        <source>Auto Sections</source>
+        <translation>Automatsko upravljane sekcije</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementSwitches.qml" line="113"/>
+        <location filename="../qml/config/ConfigImplementSwitches.qml" line="129"/>
+        <source>Steer Switch</source>
+        <translation>Prekidač vožnje</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigImplementTBTDimensions</name>
+    <message>
+        <location filename="../qml/config/ConfigImplementTBTDimensions.qml" line="52"/>
+        <source>Units: </source>
+        <translation>Jedinice merenja: </translation>
+    </message>
+</context>
+<context>
+    <name>ConfigImplementTiming</name>
+    <message>
+        <location filename="../qml/config/ConfigImplementTiming.qml" line="20"/>
+        <source>Look Ahead Time Settings</source>
+        <translation>Postavke naprednog računa vremena</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementTiming.qml" line="74"/>
+        <source>On (secs)</source>
+        <translation>Uklučeno (sekunde)</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementTiming.qml" line="86"/>
+        <source>Off (secs)</source>
+        <translation>Isključeno (sekunde)</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigImplementTiming.qml" line="98"/>
+        <source>Delay (secs)</source>
+        <translation>Kašnjenje (sekunde)</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigImplementTrailingDimensions</name>
+    <message>
+        <location filename="../qml/config/ConfigImplementTrailingDimensions.qml" line="41"/>
+        <source>Units: </source>
+        <translation>Jedinice merenja: </translation>
+    </message>
+</context>
+<context>
+    <name>ConfigModules</name>
+    <message>
+        <location filename="../qml/config/ConfigModules.qml" line="95"/>
+        <source>Machine Module</source>
+        <translation>Modul mašine</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModules.qml" line="119"/>
+        <source>Hydraulic Lift Config</source>
+        <translation>Konfiguracija hidrauličkog dizala</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModules.qml" line="145"/>
+        <source>Raise Time(secs)</source>
+        <translation>Vreme dizanja (sekunde)</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModules.qml" line="162"/>
+        <source>Hyd Lift Look Ahead (secs)</source>
+        <translation>Predviđanje vremenskog odlaganja hidrauličkog dizala (sekunde)</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModules.qml" line="174"/>
+        <source>Lower Time(secs)</source>
+        <translation>Vreme spuštanja (sekunde)</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModules.qml" line="189"/>
+        <source>Invert Relays</source>
+        <translation>Inverz relaja</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModules.qml" line="222"/>
+        <source>User 1</source>
+        <translation>Korisnik 1</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModules.qml" line="232"/>
+        <source>User 2</source>
+        <translation>Korisnik 2</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModules.qml" line="242"/>
+        <source>User 3</source>
+        <translation>Korisnik 3</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModules.qml" line="252"/>
+        <source>User 4</source>
+        <translation>Korisnik 4</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModules.qml" line="273"/>
+        <source>Send + Save</source>
+        <translation>Pošalji + sačuvaj</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigModulesBlockage</name>
+    <message>
+        <location filename="../qml/config/ConfigModulesBlockage.qml" line="62"/>
+        <source>Planter Monitor</source>
+        <translation>Monitor sadnje</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModulesBlockage.qml" line="92"/>
+        <source>Rows on module 1: </source>
+        <translation>Redovi na modulu 1: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModulesBlockage.qml" line="110"/>
+        <source>Rows on module 2: </source>
+        <translation>Redovi na modulu 2: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModulesBlockage.qml" line="128"/>
+        <source>Rows on module 3: </source>
+        <translation>Redovi na modulu 3: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModulesBlockage.qml" line="146"/>
+        <source>Rows on module 4: </source>
+        <translation>Redovi na modulu 4: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModulesBlockage.qml" line="165"/>
+        <source>Minimum </source>
+        <translation>Minimum </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModulesBlockage.qml" line="189"/>
+        <source>Maximum </source>
+        <translation>Maximum </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigModulesBlockage.qml" line="268"/>
+        <source>Send + Save</source>
+        <translation>Pošalji + sačuvaj</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigModulesPins</name>
+    <message>
+        <location filename="../qml/config/ConfigModulesPins.qml" line="281"/>
+        <source>Send + Save</source>
+        <translation>Pošalji + sačuvaj</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigSources</name>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="30"/>
+        <source>Antenna Type</source>
+        <comment>GPS Antenna type, fixed or dual</comment>
+        <translation>Tip antene</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="52"/>
+        <source>Dual</source>
+        <translation>Dvostruka</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="64"/>
+        <source>Antenna Offset error!</source>
+        <translation>Greška pomaka antene!</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="64"/>
+        <source>You have antenna offset set to &quot;left&quot;. Dual requires it set to &quot;right&quot;. Change it or you will have offset errors</source>
+        <translation>Podešili ste pomak antene na „levo“. Dvostruki režim zahteva postavku na „desno“. Promenite ga ili ćete imati greške pomaka</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="81"/>
+        <source>Fix</source>
+        <translation>Popravi</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="117"/>
+        <source>RTK Alarm</source>
+        <translation>Alarm RTK</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="176"/>
+        <source>Single Antenna Settings</source>
+        <translation>Postavke jednosmernih antena</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="188"/>
+        <source>Minimum GPS Step</source>
+        <translation>Najmanji korak GPS-a</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="208"/>
+        <location filename="../qml/config/ConfigSources.qml" line="227"/>
+        <source>cm</source>
+        <comment>centimeter abbreviation</comment>
+        <translation>cm</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="220"/>
+        <source>Heading Distance</source>
+        <translation>Razmak kursa</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="242"/>
+        <source>IMU &lt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="245"/>
+        <source>&gt; GPS</source>
+        <translation>&gt; GPS</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="247"/>
+        <source>Fusion</source>
+        <translation>Fuzija</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="270"/>
+        <source>Default: 70%</source>
+        <translation>Standardno: 70%</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="275"/>
+        <source>Reverse Detection</source>
+        <translation>Detekcija reverza</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="300"/>
+        <source>Dual Antenna Settings</source>
+        <translation>Postavke dvostrukih antena</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="325"/>
+        <source>Heading Offset (Degrees)</source>
+        <translation>Pomak kursa (stepeni)</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSources.qml" line="330"/>
+        <source>Dual As IMU</source>
+        <translation>Dvostruke antene kao IMU</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigSourcesRoll</name>
+    <message>
+        <location filename="../qml/config/ConfigSourcesRoll.qml" line="26"/>
+        <source>Remove Offset</source>
+        <translation>Ukloni pomak</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSourcesRoll.qml" line="34"/>
+        <source>Zero Roll</source>
+        <translation>Nula nagiba</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSourcesRoll.qml" line="95"/>
+        <source>Invert Roll</source>
+        <translation>Obrnuti nagib</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSourcesRoll.qml" line="118"/>
+        <source>Less</source>
+        <translation>Manje</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSourcesRoll.qml" line="119"/>
+        <source>Roll Filter</source>
+        <translation>Filter nagiba</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigSourcesRoll.qml" line="120"/>
+        <source>More</source>
+        <translation>Više</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigTrams</name>
+    <message>
+        <location filename="../qml/config/ConfigTrams.qml" line="41"/>
+        <source>Tram Width</source>
+        <translation>Širina tramvajskih koloseka</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigVehicleAntenna</name>
+    <message>
+        <location filename="../qml/config/ConfigVehicleAntenna.qml" line="56"/>
+        <source>Antenna Offset</source>
+        <translation>Pomak antene</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehicleAntenna.qml" line="84"/>
+        <source>Not Allowed</source>
+        <translation>Nije dozvoljeno</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehicleAntenna.qml" line="84"/>
+        <source>Dual heading MUST be right only</source>
+        <translation>Dvostruki kurs MORA biti samo udesno</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigVehicleDimensions</name>
+    <message>
+        <location filename="../qml/config/ConfigVehicleDimensions.qml" line="40"/>
+        <source>Wheelbase</source>
+        <translation>Osovinska baza</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehicleDimensions.qml" line="51"/>
+        <source>Track</source>
+        <translation>Tračni put</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehicleDimensions.qml" line="62"/>
+        <source>Turn Radius</source>
+        <translation>Poluprečnik skretanja</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigVehiclePicker</name>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="43"/>
+        <source>Units: </source>
+        <translation>Jedinice: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="44"/>
+        <source>Width: </source>
+        <translation>Širina: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="45"/>
+        <source>Sections: </source>
+        <translation>Sekcije: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="46"/>
+        <source>Offset: </source>
+        <translation>Pomak: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="47"/>
+        <source>Overlap: </source>
+        <translation>Preklapanje: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="48"/>
+        <source>LookAhead: </source>
+        <translation>Napredni pregled: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="49"/>
+        <source>Nudge: </source>
+        <translation>Pokret: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="50"/>
+        <source>Tram Width: </source>
+        <translation>Širina tramvajskih koloseka: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="51"/>
+        <source>Wheelbase: </source>
+        <translation>Osovinska baza: </translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="131"/>
+        <source>Current vehicle is</source>
+        <translation>Trenutno vozilo je</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="167"/>
+        <source>Save As</source>
+        <translation>Sačuvaj kao</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="187"/>
+        <source>Load</source>
+        <translation>Učitaj</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigVehiclePicker.qml" line="204"/>
+        <source>Delete</source>
+        <translation>Obriši</translation>
+    </message>
+</context>
+<context>
+    <name>ConfigVehicleType</name>
+    <message>
+        <location filename="../qml/config/ConfigVehicleType.qml" line="19"/>
+        <source>&lt;h1&gt;Choose Vehicle Type&lt;/h1&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfigYouTurn</name>
+    <message>
+        <location filename="../qml/config/ConfigYouTurn.qml" line="97"/>
+        <source>Set Extension
+Length to 2 or
+3x Radius</source>
+        <translation>Postavi produženje
+dužine na 2 ili
+3x poluprečnika</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigYouTurn.qml" line="103"/>
+        <source>Set Smoothing
+ to 3 or 4x
+Radius</source>
+        <translation>Postavi gladjenje
+na 3 ili 4x
+poluprečnika</translation>
+    </message>
+    <message>
+        <location filename="../qml/config/ConfigYouTurn.qml" line="119"/>
+        <source>UTurn Style</source>
+        <translation>Stil zaokreta U</translation>
+    </message>
+</context>
+<context>
+    <name>FieldData</name>
+    <message>
+        <location filename="../qml/field/FieldData.qml" line="37"/>
+        <source>%1:%2 hours</source>
+        <translation>%1:%2 sati</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldData.qml" line="40"/>
+        <source>∞ hours</source>
+        <translation>∞ sati</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldData.qml" line="43"/>
+        <source>%1%</source>
+        <translation>%1%</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldData.qml" line="45"/>
+        <source>--</source>
+        <translation>--</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldData.qml" line="52"/>
+        <source>Total: </source>
+        <translation>Ukupno: </translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldData.qml" line="55"/>
+        <source>Worked</source>
+        <translation>Radovano</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldData.qml" line="56"/>
+        <location filename="../qml/field/FieldData.qml" line="63"/>
+        <source>Applied: </source>
+        <translation>Primenjeno: </translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldData.qml" line="57"/>
+        <location filename="../qml/field/FieldData.qml" line="64"/>
+        <source>Remain: </source>
+        <translation>Preostalo: </translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldData.qml" line="62"/>
+        <source>Actual</source>
+        <translation>Stvarno</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldData.qml" line="65"/>
+        <source>Overlap: </source>
+        <translation>Preklapanje: </translation>
+    </message>
+</context>
+<context>
+    <name>FieldFromExisting</name>
+    <message>
+        <location filename="../qml/field/FieldFromExisting.qml" line="25"/>
+        <source>Create New Field from Existing Field</source>
+        <translation>Kreiraj novo polje iz postojećeg polja</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldFromExisting.qml" line="77"/>
+        <source>---</source>
+        <translation>---</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldFromExisting.qml" line="82"/>
+        <source>New field name</source>
+        <translation>Novo naziv polja</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldFromExisting.qml" line="103"/>
+        <source>Edit Field Name</source>
+        <translation>Uredi naziv polja</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldFromExisting.qml" line="111"/>
+        <source>This field exists already; please change the new name.</source>
+        <translation>Ovo polje već postoji; molimo promenite novi naziv.</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldFromExisting.qml" line="189"/>
+        <source>Flags</source>
+        <translation>Označivači</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldFromExisting.qml" line="198"/>
+        <source>Mapping</source>
+        <translation>Mapiranje</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldFromExisting.qml" line="207"/>
+        <source>Headland</source>
+        <translation>Oboda</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldFromExisting.qml" line="216"/>
+        <source>Lines</source>
+        <translation>Linje</translation>
+    </message>
+</context>
+<context>
+    <name>FieldFromKML</name>
+    <message>
+        <location filename="../qml/field/FieldFromKML.qml" line="24"/>
+        <source>Load From KML</source>
+        <translation>Učitaj iz KML fajla</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldFromKML.qml" line="43"/>
+        <source>Enter Field Name</source>
+        <translation>Unesi naziv polja</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldFromKML.qml" line="69"/>
+        <source>This field exists already; please choose another name.</source>
+        <translation>Ovo polje već postoji; molimo izaberite drugi naziv.</translation>
+    </message>
+</context>
+<context>
+    <name>FieldMenu</name>
+    <message>
+        <location filename="../qml/field/FieldMenu.qml" line="45"/>
+        <source>Drive In</source>
+        <translation>Vožnja unutra</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldMenu.qml" line="52"/>
+        <source>ISO-XML</source>
+        <translation>ISO-XML</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldMenu.qml" line="58"/>
+        <source>From KML</source>
+        <translation>Iz KML fajla</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldMenu.qml" line="65"/>
+        <source>From Existing</source>
+        <translation>Iz postojećeg</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldMenu.qml" line="75"/>
+        <source>New</source>
+        <translation>Novo</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldMenu.qml" line="85"/>
+        <source>Resume</source>
+        <translation>Nastavi</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldMenu.qml" line="108"/>
+        <source>Close</source>
+        <translation>Zatvori</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldMenu.qml" line="120"/>
+        <source>Open</source>
+        <translation>Otvori</translation>
+    </message>
+</context>
+<context>
+    <name>FieldNew</name>
+    <message>
+        <location filename="../qml/field/FieldNew.qml" line="28"/>
+        <source>New Field</source>
+        <translation>Novo polje</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldNew.qml" line="48"/>
+        <source>Enter Field Name</source>
+        <translation>Unesi naziv polja</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldNew.qml" line="57"/>
+        <source>New Field Name</source>
+        <translation>Naziv novog polja</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldNew.qml" line="74"/>
+        <source>This field exists already; please choose another name.</source>
+        <translation>Ovo polje već postoji; molimo izaberite drugi naziv.</translation>
+    </message>
+</context>
+<context>
+    <name>FieldOpen</name>
+    <message>
+        <location filename="../qml/field/FieldOpen.qml" line="29"/>
+        <source>Open Field</source>
+        <translation>Otvoriti polje</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldOpen.qml" line="79"/>
+        <source>Delete Field</source>
+        <translation>Obriši polje</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldOpen.qml" line="99"/>
+        <source>Toggle Sort</source>
+        <translation>Promeni sortiranje</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldOpen.qml" line="112"/>
+        <source>Cancel</source>
+        <translation>Otkaži</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldOpen.qml" line="127"/>
+        <source>Use Selected</source>
+        <translation>Koristi selektirano</translation>
+    </message>
+</context>
+<context>
+    <name>FieldToolsMenu</name>
+    <message>
+        <location filename="../qml/field/FieldToolsMenu.qml" line="35"/>
+        <source>Boundary</source>
+        <translation>Granica</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldToolsMenu.qml" line="45"/>
+        <source>Headland</source>
+        <translation>Oboda</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldToolsMenu.qml" line="54"/>
+        <location filename="../qml/field/FieldToolsMenu.qml" line="68"/>
+        <source>No Boundaries</source>
+        <translation>Nema granica</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldToolsMenu.qml" line="54"/>
+        <location filename="../qml/field/FieldToolsMenu.qml" line="68"/>
+        <source>Create A Boundary First</source>
+        <translation>Prvo stvorite granicu</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldToolsMenu.qml" line="59"/>
+        <source>Headland (Build)</source>
+        <translation>Oboda (gradnja)</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldToolsMenu.qml" line="73"/>
+        <source>Tram Lines</source>
+        <translation>Putne linije</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldToolsMenu.qml" line="80"/>
+        <source>Recorded Path</source>
+        <translation>Snimljena trasa</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldToolsMenu.qml" line="92"/>
+        <source>Delete Applied Area</source>
+        <translation>Obriši primenjenu površinu</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FieldToolsMenu.qml" line="100"/>
+        <source>Flag by Lat Lon</source>
+        <translation>Označi po geografskim koordinatama</translation>
+    </message>
+</context>
+<context>
+    <name>FlagLatLon</name>
+    <message>
+        <location filename="../qml/field/FlagLatLon.qml" line="37"/>
+        <source>Flag by Lat Lon</source>
+        <translation>Označi po geografskim koordinatama</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FlagLatLon.qml" line="46"/>
+        <source>Latitude</source>
+        <translation>Geografska širina</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FlagLatLon.qml" line="55"/>
+        <source>( +90 to -90 )</source>
+        <translation>( +90 do -90 )</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FlagLatLon.qml" line="79"/>
+        <source>Longitude</source>
+        <translation>Geografska dužina</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/FlagLatLon.qml" line="88"/>
+        <source>( +180 to -180 )</source>
+        <translation>( +180 do -180 )</translation>
+    </message>
+</context>
+<context>
+    <name>Flags</name>
+    <message>
+        <location filename="../qml/field/Flags.qml" line="35"/>
+        <source>Flags</source>
+        <translation>Označivači</translation>
+    </message>
+    <message>
+        <location filename="../qml/field/Flags.qml" line="104"/>
+        <source>ID: </source>
+        <translation>ID: </translation>
+    </message>
+    <message>
+        <location filename="../qml/field/Flags.qml" line="113"/>
+        <source>Lat: </source>
+        <translation>Šir.: </translation>
+    </message>
+    <message>
+        <location filename="../qml/field/Flags.qml" line="123"/>
+        <source>Lon: </source>
+        <translation>Duž.: </translation>
+    </message>
+    <message>
+        <location filename="../qml/field/Flags.qml" line="149"/>
+        <source>Dist: </source>
+        <translation>Rastoj.: </translation>
+    </message>
+    <message>
+        <location filename="../qml/field/Flags.qml" line="157"/>
+        <source>This flag exists already; please choose another name.</source>
+        <translation>Ovaj označivač već postoji; molimo izaberite drugi naziv.</translation>
+    </message>
+</context>
+<context>
+    <name>GPSData</name>
+    <message>
+        <location filename="../qml/GPSData.qml" line="18"/>
+        <source>Serial </source>
+        <translation>Serijsko </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="19"/>
+        <source>Lat </source>
+        <comment>abbreviation for latitude</comment>
+        <translation>Šir.: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="20"/>
+        <source>Lon </source>
+        <comment>abbreviation for longitude</comment>
+        <translation>Duž.: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="21"/>
+        <source>N </source>
+        <comment>abbreviation for northing</comment>
+        <translation>N: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="22"/>
+        <source>E </source>
+        <comment>abbreviation for easting</comment>
+        <translation>I: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="23"/>
+        <source>Elev </source>
+        <comment>abbreviation for elevation</comment>
+        <translation>Vis.: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="24"/>
+        <source># Sats </source>
+        <comment>abbreviation for # Satellites</comment>
+        <translation>Br. satelita: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="25"/>
+        <source>HDOP </source>
+        <comment>acronym for Horizontal Degree Of Precision</comment>
+        <translation>HDOP: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="26"/>
+        <source>Frame </source>
+        <translation>Okvir: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="27"/>
+        <source>Raw Hz </source>
+        <comment>abbreviation for Raw Hertz</comment>
+        <translation>Sirowi Hz: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="28"/>
+        <source>Hz </source>
+        <comment>abbreviation for Hertz</comment>
+        <translation>Hz: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="29"/>
+        <source>Dropped </source>
+        <translation>Izbačeni: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="30"/>
+        <source>Fix2Fix </source>
+        <translation>Fix2Fix: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="31"/>
+        <source>IMU </source>
+        <translation>IMU: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="32"/>
+        <source>Heading </source>
+        <translation>Kurs: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="36"/>
+        <source>RTK Age</source>
+        <comment>abbreviation for Real Time Kinematic Age</comment>
+        <translation>Staros RTK: </translation>
+    </message>
+    <message>
+        <location filename="../qml/GPSData.qml" line="37"/>
+        <source>Fix: </source>
+        <translation>Fix: </translation>
+    </message>
+</context>
+<context>
+    <name>HamburgerMenu</name>
+    <message>
+        <location filename="../qml/HamburgerMenu.qml" line="29"/>
+        <source>Languages</source>
+        <translation>Jeziči</translation>
+    </message>
+    <message>
+        <location filename="../qml/HamburgerMenu.qml" line="34"/>
+        <source>Directories</source>
+        <translation>Direktoriji</translation>
+    </message>
+    <message>
+        <location filename="../qml/HamburgerMenu.qml" line="39"/>
+        <source>Colors</source>
+        <translation>Boje</translation>
+    </message>
+    <message>
+        <location filename="../qml/HamburgerMenu.qml" line="43"/>
+        <source>Section Colors</source>
+        <translation>Boje sekcija</translation>
+    </message>
+    <message>
+        <location filename="../qml/HamburgerMenu.qml" line="47"/>
+        <source>Enter Sim Coords</source>
+        <translation>Unesi sim koordinate</translation>
+    </message>
+    <message>
+        <location filename="../qml/HamburgerMenu.qml" line="55"/>
+        <source>Simulator On</source>
+        <translation>Simulator uključen</translation>
+    </message>
+    <message>
+        <location filename="../qml/HamburgerMenu.qml" line="68"/>
+        <source>Reset All</source>
+        <translation>Ponovi sve</translation>
+    </message>
+    <message>
+        <location filename="../qml/HamburgerMenu.qml" line="73"/>
+        <source>HotKeys</source>
+        <translation>Hit ključevi</translation>
+    </message>
+    <message>
+        <location filename="../qml/HamburgerMenu.qml" line="78"/>
+        <source>About...</source>
+        <translation>O programu...</translation>
+    </message>
+    <message>
+        <location filename="../qml/HamburgerMenu.qml" line="83"/>
+        <source>Help</source>
+        <translation>Pomoć</translation>
+    </message>
+</context>
+<context>
+    <name>HeadAcheDesigner</name>
+    <message>
+        <location filename="../qml/HeadAcheDesigner.qml" line="436"/>
+        <source>Tool: </source>
+        <translation>Alat: </translation>
+    </message>
+</context>
+<context>
+    <name>HeadlandDesigner</name>
+    <message>
+        <location filename="../qml/HeadlandDesigner.qml" line="407"/>
+        <source>Tool: </source>
+        <translation>Alat: </translation>
+    </message>
+</context>
+<context>
+    <name>LineDrawer</name>
+    <message>
+        <location filename="../qml/tracks/LineDrawer.qml" line="25"/>
+        <source>Click 2 points on the Boundary to Begin</source>
+        <translation>Klikni 2 tačke na granici da bi započeo</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/LineDrawer.qml" line="39"/>
+        <source>nothing to see here yet</source>
+        <translation>još nema ničega ovde</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/LineDrawer.qml" line="96"/>
+        <source>Boundary Curve</source>
+        <translation>Kriva granice</translation>
+    </message>
+</context>
+<context>
+    <name>LineEditor</name>
+    <message>
+        <location filename="../qml/LineEditor.qml" line="18"/>
+        <source>Edit AB</source>
+        <translation>Uredi AB</translation>
+    </message>
+    <message>
+        <location filename="../qml/LineEditor.qml" line="37"/>
+        <source>cm</source>
+        <translation>cm</translation>
+    </message>
+    <message>
+        <location filename="../qml/LineEditor.qml" line="77"/>
+        <source>Cancel</source>
+        <translation>Otkaži</translation>
+    </message>
+    <message>
+        <location filename="../qml/LineEditor.qml" line="86"/>
+        <source>For Now</source>
+        <translation>Za sada</translation>
+    </message>
+    <message>
+        <location filename="../qml/LineEditor.qml" line="96"/>
+        <source>Save</source>
+        <translation>Sačuvaj</translation>
+    </message>
+</context>
+<context>
+    <name>LineName</name>
+    <message>
+        <location filename="../qml/LineName.qml" line="24"/>
+        <source>AB </source>
+        <translation>AB </translation>
+    </message>
+</context>
+<context>
+    <name>MainBottomRow</name>
+    <message>
+        <location filename="../qml/MainBottomRow.qml" line="62"/>
+        <source>YouSkips</source>
+        <translation>Preskočići</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainBottomRow.qml" line="71"/>
+        <source>Reset Tool</source>
+        <translation>Resetuj alat</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainBottomRow.qml" line="83"/>
+        <source>Tram Lines</source>
+        <translation>Putne linije</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainBottomRow.qml" line="98"/>
+        <source>HydLift</source>
+        <translation>Hidr. dizalo</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainBottomRow.qml" line="110"/>
+        <source>Headland</source>
+        <translation>Oboda</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainBottomRow.qml" line="129"/>
+        <source>Flag</source>
+        <translation>Označi</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainBottomRow.qml" line="153"/>
+        <source>Track</source>
+        <translation>Tračni put</translation>
+    </message>
+</context>
+<context>
+    <name>MainLeftColumn</name>
+    <message>
+        <location filename="../qml/MainLeftColumn.qml" line="60"/>
+        <source>Display</source>
+        <translation>Prikaz</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainLeftColumn.qml" line="66"/>
+        <source>Settings</source>
+        <translation>Postavke</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainLeftColumn.qml" line="72"/>
+        <source>Tools</source>
+        <translation>Alati</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainLeftColumn.qml" line="78"/>
+        <source>Field</source>
+        <translation>Polje</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainLeftColumn.qml" line="84"/>
+        <source>Field Tools</source>
+        <translation>Alati za polje</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainLeftColumn.qml" line="92"/>
+        <source>AgIO</source>
+        <translation>AgIO</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainLeftColumn.qml" line="101"/>
+        <source>Steer config</source>
+        <translation>Postavke vožnje</translation>
+    </message>
+</context>
+<context>
+    <name>MainRightColumn</name>
+    <message>
+        <location filename="../qml/MainRightColumn.qml" line="30"/>
+        <source>Lock</source>
+        <translation>Blokiraj</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainRightColumn.qml" line="58"/>
+        <source>Contour</source>
+        <translation>Kontura</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainRightColumn.qml" line="115"/>
+        <source>Manual</source>
+        <translation>Ručno</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainRightColumn.qml" line="135"/>
+        <source>Auto</source>
+        <translation>Automatski</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainRightColumn.qml" line="153"/>
+        <source>AutoUturn</source>
+        <translation>AutoUturn</translation>
+    </message>
+</context>
+<context>
+    <name>MainTopPanel</name>
+    <message>
+        <location filename="../qml/MainTopPanel.qml" line="89"/>
+        <source>Lat: %1 Lon: %2</source>
+        <translation>Šir.: %1 Duž.: %2</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainTopPanel.qml" line="97"/>
+        <source>Field: %1</source>
+        <translation>Polje: %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainTopPanel.qml" line="101"/>
+        <source>%1%</source>
+        <translation>%1%</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainTopPanel.qml" line="105"/>
+        <source>App: %1 Actual: %2 %3 %4</source>
+        <translation>Aplikacija: %1 Stvarno: %2 %3 %4</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainTopPanel.qml" line="113"/>
+        <source>Track: %1</source>
+        <translation>Tračni put: %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainTopPanel.qml" line="115"/>
+        <source>Track: none active</source>
+        <translation>Tračni put: nema aktivnih</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainTopPanel.qml" line="129"/>
+        <source>ab</source>
+        <translation>ab</translation>
+    </message>
+</context>
+<context>
+    <name>MainWindow</name>
+    <message>
+        <location filename="../qml/MainWindow.qml" line="48"/>
+        <source>Some windows are open. Close them first.</source>
+        <translation>Neka prozor su otvorena. Prvo ih zatvorite.</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindow.qml" line="53"/>
+        <source>Section Control on. Shut off Section Control.</source>
+        <translation>Upravljanje sekcijama je uključeno. Isključite upravljanje sekcijama.</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindow.qml" line="410"/>
+        <source>Simulator On</source>
+        <translation>Simulator uključen</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindow.qml" line="420"/>
+        <source>Lost RTK</source>
+        <translation>Izgubio RTK</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindow.qml" line="427"/>
+        <source>Age: </source>
+        <translation>Staros: </translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindow.qml" line="812"/>
+        <source>Steer Chart</source>
+        <translation>Grafički prikaz vožnje</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindow.qml" line="829"/>
+        <source>XTE Chart</source>
+        <translation>XTE grafikon</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindow.qml" line="846"/>
+        <source>Heading Chart</source>
+        <translation>Kurs grafikon</translation>
+    </message>
+</context>
+<context>
+    <name>MainWindowTest</name>
+    <message>
+        <location filename="../qml/MainWindowTest.qml" line="20"/>
+        <source>File</source>
+        <translation>Datoteka</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindowTest.qml" line="34"/>
+        <source>Load Vehicle</source>
+        <translation>Učitaj vozilo</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindowTest.qml" line="38"/>
+        <source>Save Vehicle</source>
+        <translation>Sačuvaj vozilo</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindowTest.qml" line="44"/>
+        <source>Start Field</source>
+        <translation>Pokreni polje</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindowTest.qml" line="50"/>
+        <source>Options</source>
+        <translation>Opcije</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindowTest.qml" line="54"/>
+        <source>Tools</source>
+        <translation>Alati</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindowTest.qml" line="63"/>
+        <source>0 kph</source>
+        <translation>0 km/h</translation>
+    </message>
+    <message>
+        <location filename="../qml/MainWindowTest.qml" line="83"/>
+        <source>Blah</source>
+        <translation>Blah</translation>
+    </message>
+</context>
+<context>
+    <name>ManualTurnBtns</name>
+    <message>
+        <location filename="../qml/ManualTurnBtns.qml" line="23"/>
+        <location filename="../qml/ManualTurnBtns.qml" line="38"/>
+        <location filename="../qml/ManualTurnBtns.qml" line="51"/>
+        <location filename="../qml/ManualTurnBtns.qml" line="64"/>
+        <source>Too Fast</source>
+        <translation>Previse brzo</translation>
+    </message>
+    <message>
+        <location filename="../qml/ManualTurnBtns.qml" line="23"/>
+        <location filename="../qml/ManualTurnBtns.qml" line="38"/>
+        <location filename="../qml/ManualTurnBtns.qml" line="51"/>
+        <location filename="../qml/ManualTurnBtns.qml" line="64"/>
+        <source>Slow down below</source>
+        <translation>Usporite ispod</translation>
+    </message>
+</context>
+<context>
+    <name>PlayerMenuBar</name>
+    <message>
+        <location filename="../qml/wizards/PlayerMenuBar.qml" line="48"/>
+        <source>URL:</source>
+        <translation>URL:</translation>
+    </message>
+    <message>
+        <location filename="../qml/wizards/PlayerMenuBar.qml" line="85"/>
+        <source>&amp;Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/wizards/PlayerMenuBar.qml" line="89"/>
+        <source>&amp;URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/wizards/PlayerMenuBar.qml" line="94"/>
+        <source>&amp;cam1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/wizards/PlayerMenuBar.qml" line="99"/>
+        <source>&amp;Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RefNudge</name>
+    <message>
+        <location filename="../qml/tracks/RefNudge.qml" line="29"/>
+        <source>Ref Adjust</source>
+        <translation>Referentna korekcija</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/RefNudge.qml" line="79"/>
+        <source>0 </source>
+        <translation>0 </translation>
+    </message>
+</context>
+<context>
+    <name>SetSimCoords</name>
+    <message>
+        <location filename="../qml/SetSimCoords.qml" line="23"/>
+        <source>Set Sim Coords</source>
+        <translation>Postavi sim koordinate</translation>
+    </message>
+    <message>
+        <location filename="../qml/SetSimCoords.qml" line="42"/>
+        <location filename="../qml/SetSimCoords.qml" line="70"/>
+        <source>Latitude</source>
+        <translation>Geografska širina</translation>
+    </message>
+    <message>
+        <location filename="../qml/SetSimCoords.qml" line="56"/>
+        <source>Longituge</source>
+        <translation>Geografska dužina</translation>
+    </message>
+    <message>
+        <location filename="../qml/SetSimCoords.qml" line="76"/>
+        <location filename="../qml/SetSimCoords.qml" line="96"/>
+        <source>From -180 to +180</source>
+        <translation>Od -180 do +180</translation>
+    </message>
+    <message>
+        <location filename="../qml/SetSimCoords.qml" line="90"/>
+        <source>Longitude</source>
+        <translation>Geografska dužina</translation>
+    </message>
+</context>
+<context>
+    <name>SimController</name>
+    <message>
+        <location filename="../qml/SimController.qml" line="36"/>
+        <source>Reset</source>
+        <translation>Ponovi</translation>
+    </message>
+</context>
+<context>
+    <name>StartUp</name>
+    <message>
+        <location filename="../qml/StartUp.qml" line="30"/>
+        <source>About AgOpenGPS</source>
+        <translation>O AgOpenGPS-u</translation>
+    </message>
+    <message>
+        <location filename="../qml/StartUp.qml" line="51"/>
+        <source>Version 0.0</source>
+        <translation>Verzija 0.0</translation>
+    </message>
+    <message>
+        <location filename="../qml/StartUp.qml" line="57"/>
+        <source>Terms and Conditions</source>
+        <translation>Uslovi i odredbe</translation>
+    </message>
+    <message>
+        <location filename="../qml/StartUp.qml" line="63"/>
+        <source>If you distribute copies of this FREE program, whether gratis or for a fee, improved, changed, you must pass on to the recipients the same freedoms that you received as Outlined in the GPLv3 License.</source>
+        <translation>Ako rasprostrujate kopije ove besplatne aplikacije, bez naknade ili uz naknadu, promenjene ili nepromenjene, morate davati primateljima iste slobode koje ste dobili, kako je opisano u licenci GPLv3.</translation>
+    </message>
+    <message>
+        <location filename="../qml/StartUp.qml" line="71"/>
+        <source>You must make sure that they, too, receive or can get the source code. And you must show them these terms so they know their rights. Don&apos;t steal others work and call it your own</source>
+        <translation>Morate obezbediti da i oni mogu dobiti kod programa. Morate takođe pokazati ovu informaciju kako bi poznali svoja prava. Ne ukradite tuđe delo i ne kažite da je vaše.</translation>
+    </message>
+    <message>
+        <location filename="../qml/StartUp.qml" line="78"/>
+        <source>AgOpenGPS is strictly educational software to learn about guidance systems, GPS sentences, and theoretical application of machine control.</source>
+        <translation>AgOpenGPS je obrazovna softverska aplikacija namenjena za učenje sistema vođenja, GPS poruka i teoretsku primenu kontrole mašina.</translation>
+    </message>
+    <message>
+        <location filename="../qml/StartUp.qml" line="85"/>
+        <source>It is in no way to be used on real equipment in any circumstance. A simulator is provided to allow the student to safely experience machine guidance.</source>
+        <translation>Program se nikako ne smije koristiti na stvarnom opremu u bilo kojim okolnostima. Postoji simulator koji omogućava studencima da sigurno probaju sisteme vođenja.</translation>
+    </message>
+    <message>
+        <location filename="../qml/StartUp.qml" line="92"/>
+        <source>There are not safety systems in the software and none are implied.</source>
+        <translation>Softver ne poseduje nijedan sistem za zaštitu i nije predviđen za istu.</translation>
+    </message>
+    <message>
+        <location filename="../qml/StartUp.qml" line="98"/>
+        <source>Use at your own Risk</source>
+        <translation>Koristite na sopstveni rizik</translation>
+    </message>
+    <message>
+        <location filename="../qml/StartUp.qml" line="122"/>
+        <source>Official Repository</source>
+        <translation>Službeni repozitorij</translation>
+    </message>
+    <message>
+        <location filename="../qml/StartUp.qml" line="142"/>
+        <source>Disagree</source>
+        <translation>Ne slažem se</translation>
+    </message>
+    <message>
+        <location filename="../qml/StartUp.qml" line="152"/>
+        <source>I Agree to the Terms&lt;br&gt; and Conditions</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SteerConfigSettings</name>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="20"/>
+        <source>Auto Steer Config</source>
+        <translation>Postavke automatskog vođenja</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="49"/>
+        <source>Sensors</source>
+        <translation>Senzori</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="56"/>
+        <source>Config</source>
+        <translation>Postavke</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="61"/>
+        <source>Settings</source>
+        <translation>Postavke</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="66"/>
+        <source>Steer Settings</source>
+        <translation>Postavke vođenja</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="352"/>
+        <source>Count Sensor</source>
+        <translation>Brojač senzor</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="361"/>
+        <source>Pressure Turn Sensor</source>
+        <translation>Senzor za okret pod pritiskom</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="369"/>
+        <source>Current Turn Sensor</source>
+        <translation>Senzor trenutnog okreta</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="379"/>
+        <source>Off at %</source>
+        <translation>Isključeno na %</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="394"/>
+        <source>Counts</source>
+        <translation>Brojevi</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="458"/>
+        <source>Danfoss</source>
+        <translation>Danfoss</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="474"/>
+        <source>Invert Motor Dir</source>
+        <translation>Inverziraj motor</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="482"/>
+        <source>Invert Relays</source>
+        <translation>Inverziraj releje</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="515"/>
+        <source>Single</source>
+        <translation>Jedinostruki</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="516"/>
+        <source>Differential</source>
+        <translation>Diferencijalni</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="518"/>
+        <source>A2D Converter</source>
+        <translation>Konverter A2D</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="530"/>
+        <source>IMU X or Y Axis</source>
+        <translation>OS X ili Y</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="545"/>
+        <source>None</source>
+        <translation>Nijedan</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="546"/>
+        <source>Switch</source>
+        <translation>Prekidač</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="547"/>
+        <source>Button</source>
+        <translation>Dugme</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="549"/>
+        <source>Steer Enable</source>
+        <translation>Omogući vođenje</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="554"/>
+        <source>Button- Push On, Push Off
+Switch- Pushed On, Release Off</source>
+        <translation>Dugme- pritisni za uključenje, pritisni za isključenje
+Prekidač- pritisni za uključenje, oslobodi za isključenje</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="577"/>
+        <source>UTurn Compensation</source>
+        <translation>Kompenzacija za U-okret</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="587"/>
+        <source>Sidehill Deg Turn per Deg of Roll</source>
+        <translation>Stepeni strminarenja za stepene navijanja</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="597"/>
+        <source>Stanley/Pure</source>
+        <translation>Stanley/Cisto</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="606"/>
+        <source>Steer In Reverse?</source>
+        <translation>Vođenje u reverzu?</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="673"/>
+        <source>Steer Switch Control</source>
+        <translation>Kontrola prekidača vođenja</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="694"/>
+        <source>Line Width</source>
+        <translation>Debljina linije</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="717"/>
+        <source>pixels</source>
+        <translation>pikseli</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="735"/>
+        <source>Nudge Distance</source>
+        <translation>Udaljenost pomicanja</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="776"/>
+        <source>Line Acquire Look Ahead</source>
+        <translation>Prognoza crtanja linije</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="800"/>
+        <source>Seconds</source>
+        <translation>Sekundi</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="818"/>
+        <source>Manual Turns Limit</source>
+        <translation>Limit ručnih okreta</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="835"/>
+        <source>Min AutoSteer Speed</source>
+        <translation>Minimalna brzina autovođenja</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="853"/>
+        <source>Max AutoSteer Speed</source>
+        <translation>Maksimalna brzina autovođenja</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="871"/>
+        <source>Max Turn Rate</source>
+        <translation>Maksimalna stopa okreta</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="890"/>
+        <source>Degrees/sec</source>
+        <translation>Stepeni/sekund</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="905"/>
+        <source>Wizard</source>
+        <translation>Vodič</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="912"/>
+        <source>Reset All To Defaults</source>
+        <translation>Ponovi sve na standardne vrednosti</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigSettings.qml" line="931"/>
+        <source>Send + Save</source>
+        <translation>Pošalji + Sačuvaj</translation>
+    </message>
+</context>
+<context>
+    <name>SteerConfigWindow</name>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="147"/>
+        <source>WAS Zero</source>
+        <translation>WAS Zero</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="160"/>
+        <source>Counts per Degree</source>
+        <translation>Broj po stepenu</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="173"/>
+        <source>AckerMann</source>
+        <translation>AckerMann</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="186"/>
+        <source>Max Steer Angle</source>
+        <translation>Maksimalni ugao vođenja</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="203"/>
+        <source>Proportional Gain</source>
+        <translation>Proporsionačni dobitak</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="216"/>
+        <source>Maximum Limit</source>
+        <translation>Maksimalna granica</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="229"/>
+        <source>Minimum to Move</source>
+        <translation>Minimalno za kretanje</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="246"/>
+        <source>Agressiveness</source>
+        <translation>Agresivnost</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="259"/>
+        <source>OverShoot Reduction</source>
+        <translation>Smanjenje prevare</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="272"/>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="328"/>
+        <source>Integral</source>
+        <translation>Integral</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="289"/>
+        <source>Acquire Look Ahead</source>
+        <translation>Prognoza nabora</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="302"/>
+        <source>Hold Look Ahead</source>
+        <translation>Prognoza držanja</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="315"/>
+        <source>Look Ahead Speed Gain</source>
+        <translation>Prognoza povećanja brzine</translation>
+    </message>
+    <message>
+        <location filename="../qml/steerconfig/SteerConfigWindow.qml" line="474"/>
+        <source>0r +5</source>
+        <translation>0r +5</translation>
+    </message>
+</context>
+<context>
+    <name>ToolsWindow</name>
+    <message>
+        <location filename="../qml/ToolsWindow.qml" line="41"/>
+        <source>Wizards</source>
+        <translation>Vodiči</translation>
+    </message>
+    <message>
+        <location filename="../qml/ToolsWindow.qml" line="49"/>
+        <source>Charts</source>
+        <translation>Grafikoni</translation>
+    </message>
+    <message>
+        <location filename="../qml/ToolsWindow.qml" line="57"/>
+        <source>Smooth AB Curve</source>
+        <translation>Utopi krivu AB</translation>
+    </message>
+    <message>
+        <location filename="../qml/ToolsWindow.qml" line="64"/>
+        <source>Delete Contour Paths</source>
+        <translation>Obriši konturen putanje</translation>
+    </message>
+    <message>
+        <location filename="../qml/ToolsWindow.qml" line="79"/>
+        <source>Offset Fix</source>
+        <translation>Ispravi pomak</translation>
+    </message>
+    <message>
+        <location filename="../qml/ToolsWindow.qml" line="113"/>
+        <source>Steer Wizard</source>
+        <translation>Vodič za vođenje</translation>
+    </message>
+    <message>
+        <location filename="../qml/ToolsWindow.qml" line="139"/>
+        <source>Steer Chart</source>
+        <translation>Grafikon vođenja</translation>
+    </message>
+    <message>
+        <location filename="../qml/ToolsWindow.qml" line="146"/>
+        <source>Heading Chart</source>
+        <translation>Grafikon kursa</translation>
+    </message>
+    <message>
+        <location filename="../qml/ToolsWindow.qml" line="153"/>
+        <source>XTE Chart</source>
+        <translation>Grafikon XTE</translation>
+    </message>
+    <message>
+        <location filename="../qml/ToolsWindow.qml" line="160"/>
+        <source>Roll Chart</source>
+        <translation>Grafikon zavijanja</translation>
+    </message>
+</context>
+<context>
+    <name>TrackList</name>
+    <message>
+        <location filename="../qml/tracks/TrackList.qml" line="56"/>
+        <source>Tracks</source>
+        <translation>Trasi</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackList.qml" line="154"/>
+        <source>Track not visible!</source>
+        <translation>Tračni put nije vidljiv!</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackList.qml" line="154"/>
+        <source>Cannot Desired because it is not marked as visible.</source>
+        <translation>Ne može biti željeno jer nije označeno kao vidljivo.</translation>
+    </message>
+</context>
+<context>
+    <name>TrackNewButtons</name>
+    <message>
+        <location filename="../qml/tracks/TrackNewButtons.qml" line="42"/>
+        <source>AB + Curve</source>
+        <translation>AB + kriva</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackNewButtons.qml" line="66"/>
+        <source>Lat/Lon</source>
+        <translation>Šir./Duž.</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackNewButtons.qml" line="77"/>
+        <source>Lat/Heading</source>
+        <translation>Šir./Kurs</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackNewButtons.qml" line="88"/>
+        <source>Pivot</source>
+        <translation>Okretni centar</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackNewButtons.qml" line="99"/>
+        <source>A+</source>
+        <translation>A+</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackNewButtons.qml" line="110"/>
+        <source>AB Line</source>
+        <translation>AB linija</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackNewButtons.qml" line="121"/>
+        <source>AB Curve</source>
+        <translation>AB kriva</translation>
+    </message>
+</context>
+<context>
+    <name>TrackNewSet</name>
+    <message>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="271"/>
+        <source>Status: Driving</source>
+        <translation>Status: Vožnja</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="391"/>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="435"/>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="550"/>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="662"/>
+        <source>Latitude (+- 90)</source>
+        <translation>Geografska širina (+- 90)</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="403"/>
+        <source>A</source>
+        <translation>A</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="416"/>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="460"/>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="569"/>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="678"/>
+        <source>Longitude (+- 180)</source>
+        <translation>Geografska dužina (+- 180)</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="447"/>
+        <source>B</source>
+        <translation>B</translation>
+    </message>
+    <message>
+        <location filename="../qml/tracks/TrackNewSet.qml" line="589"/>
+        <source>Heading</source>
+        <translation>Kurs</translation>
+    </message>
+</context>
+<context>
+    <name>TrackNum</name>
+    <message>
+        <location filename="../qml/TrackNum.qml" line="27"/>
+        <location filename="../qml/TrackNum.qml" line="39"/>
+        <source>Track</source>
+        <comment>Track as in &quot;track number.&quot;</comment>
+        <translation>Tračni put</translation>
+    </message>
+    <message>
+        <location filename="../qml/TrackNum.qml" line="34"/>
+        <source>R</source>
+        <comment>Abbreviation for right-hand direction.</comment>
+        <translation>D</translation>
+    </message>
+    <message>
+        <location filename="../qml/TrackNum.qml" line="36"/>
+        <source>L</source>
+        <comment>Abbreviation for left-hand direction.</comment>
+        <translation>L</translation>
+    </message>
+</context>
+<context>
+    <name>TracksNewAddName</name>
+    <message>
+        <location filename="../qml/tracks/TracksNewAddName.qml" line="28"/>
+        <source>Enter Track Name:</source>
+        <translation>Unesite naziv trasi:</translation>
+    </message>
+</context>
+<context>
+    <name>TramLinesEditor</name>
+    <message>
+        <location filename="../qml/TramLinesEditor.qml" line="34"/>
+        <source>Tram Lines</source>
+        <translation>Putne linije</translation>
+    </message>
+    <message>
+        <location filename="../qml/TramLinesEditor.qml" line="48"/>
+        <source>2.00 m</source>
+        <translation>2.00 m</translation>
+    </message>
+    <message>
+        <location filename="../qml/TramLinesEditor.qml" line="70"/>
+        <source>10 cm</source>
+        <translation>10 cm</translation>
+    </message>
+    <message>
+        <location filename="../qml/TramLinesEditor.qml" line="93"/>
+        <source>Mode</source>
+        <translation>Režim</translation>
+    </message>
+    <message>
+        <location filename="../qml/TramLinesEditor.qml" line="117"/>
+        <source>Passes</source>
+        <translation>Prelazi</translation>
+    </message>
+    <message>
+        <location filename="../qml/TramLinesEditor.qml" line="148"/>
+        <source>Seed</source>
+        <translation>Semena</translation>
+    </message>
+    <message>
+        <location filename="../qml/TramLinesEditor.qml" line="151"/>
+        <source>Spray</source>
+        <translation>Sisanje</translation>
+    </message>
+    <message>
+        <location filename="../qml/TramLinesEditor.qml" line="154"/>
+        <source>Track</source>
+        <translation>Tračni put</translation>
+    </message>
+</context>
+</TS>

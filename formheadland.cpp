@@ -1,5 +1,8 @@
 // Copyright (C) 2024 Michael Torrie and the QtAgOpenGPS Dev Team
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
+#include <utility>
+#include <QApplication>
+#include <QWidget>
 #include "formheadland.h"
 #include "cheadline.h"
 #include "cboundary.h"
@@ -11,11 +14,13 @@
 #include <QMatrix4x4>
 #include <QOpenGLFunctions>
 #include "glutils.h"
-#include "aogproperty.h"
-#include "aogrenderer.h"
+#include "classes/settingsmanager.h"
+#include "mainwindowstate.h"
+#include "backend.h"
+#include "headlandinterface.h"
+#include "fencelinemodel.h"
 
 //here for now.  Put in another module for use in other places.
-
 void CalculateHeadings(QVector<Vec3> &xList)
 {
     //to calc heading based on next and previous points to give an average heading.
@@ -107,50 +112,35 @@ int GetLineIntersection(double p0x, double p0y, double p1x, double p1y,
 FormHeadland::FormHeadland(QObject *parent)
     : QObject{parent}
 {
+    //connect UI signals
+    connect(HeadlandInterface::instance(),&HeadlandInterface::load,this,&FormHeadland::load_headline);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::close,this,&FormHeadland::FormHeadLine_FormClosing);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::updateLines,this,&FormHeadland::update_lines);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::mouseClicked,this,&FormHeadland::clicked);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::slice,this,&FormHeadland::btnSlice_Click);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::createHeadland,this,&FormHeadland::btnBndLoop_Click);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::deletePoints,this,&FormHeadland::btnDeletePoints_Click);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::undo,this,&FormHeadland::btnUndo_Click);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::ashrink,this,&FormHeadland::btnAShrink_Click);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::bshrink,this,&FormHeadland::btnBShrink_Click);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::alength,this,&FormHeadland::btnALength_Click);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::blength,this,&FormHeadland::btnBLength_Click);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::headlandOff,this,&FormHeadland::btnHeadlandOff_Click);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::isSectionControlled,this,&FormHeadland::isSectionControlled);
+    connect(HeadlandInterface::instance(),&HeadlandInterface::saveExit,this,&FormHeadland::btn_Exit_Click);
+
     connect(&updateVehiclePositionTimer, &QTimer::timeout,
             this, &FormHeadland::updateVehiclePosition);
-
-}
-
-void FormHeadland::connect_ui(QObject *headland_designer_instance) {
-    this->headland_designer_instance = headland_designer_instance;
-
-    InterfaceProperty<HeadlandDesigner,int>::set_qml_root(headland_designer_instance);
-    InterfaceProperty<HeadlandDesigner,bool>::set_qml_root(headland_designer_instance);
-    InterfaceProperty<HeadlandDesigner,double>::set_qml_root(headland_designer_instance);
-    InterfaceProperty<HeadlandDesigner,QColor>::set_qml_root(headland_designer_instance);
-    InterfaceProperty<HeadlandDesigner,QPoint>::set_qml_root(headland_designer_instance);
-
-    //connect UI signals
-    connect(headland_designer_instance,SIGNAL(load()),this,SLOT(load_headline()));
-    connect(headland_designer_instance,SIGNAL(close()),this,SLOT(FormHeadLine_FormClosing()));
-    connect(headland_designer_instance,SIGNAL(update_lines()),this,SLOT(update_lines()));
-    connect(headland_designer_instance,SIGNAL(mouseClicked(int, int)),this,SLOT(clicked(int,int)));
-    connect(headland_designer_instance,SIGNAL(slice()),this,SLOT(btnSlice_Click()));
-    connect(headland_designer_instance,SIGNAL(create_headland()),this,SLOT(btnBndLoop_Click()));
-    connect(headland_designer_instance,SIGNAL(deletePoints()),this,SLOT(btnDeletePoints_Click()));
-    connect(headland_designer_instance,SIGNAL(undo()),this,SLOT(btnUndo_Click()));
-    connect(headland_designer_instance,SIGNAL(ashrink()),this,SLOT(btnAShrink_Click()));
-    connect(headland_designer_instance,SIGNAL(bshrink()),this,SLOT(btnBShrink_Click()));
-    connect(headland_designer_instance,SIGNAL(alength()),this,SLOT(btnALength_Click()));
-    connect(headland_designer_instance,SIGNAL(blength()),this,SLOT(btnBLength_Click()));
-    connect(headland_designer_instance,SIGNAL(headlandOff()),this,SLOT(btnHeadlandOff_Click()));
-    connect(headland_designer_instance,SIGNAL(isSectionControlled(bool)),this,SLOT(isSectionControlled(bool)));
-    connect(headland_designer_instance,SIGNAL(save_exit()),this,SLOT(btn_Exit_Click()));
-}
-
-void FormHeadland::setFieldInfo(double maxFieldDistance, double fieldCenterX, double fieldCenterY) {
-    this->maxFieldDistance = maxFieldDistance;
-    this->fieldCenterX = fieldCenterX;
-    this->fieldCenterY = fieldCenterY;
 }
 
 void FormHeadland::SetLineDistance() {
+    if (!hdl) return; //FormGPS is not yet fully initialized
+
     hdl->desList.clear();
 
     if (sliceArr.count() < 1) return;
 
-    double distAway = (double)lineDistance;
+    double distAway = HeadlandInterface::instance()->lineDistance();
 
     double distSqAway = (distAway * distAway) - 0.01;
     Vec3 point;
@@ -196,7 +186,7 @@ void FormHeadland::SetLineDistance() {
     }
 
     hdl->desList.clear();
-    sliceCount = sliceArr.count();
+    HeadlandInterface::instance()->set_sliceCount(sliceArr.count());
 }
 
 QVector3D FormHeadland::mouseClickToField(int mouseX, int mouseY) {
@@ -207,8 +197,8 @@ QVector3D FormHeadland::mouseClickToField(int mouseX, int mouseY) {
     QMatrix4x4 modelview;
     QMatrix4x4 projection;
 
-    int width = qmlItem(headland_designer_instance, "headlandRenderer")->property("width").toReal();
-    int height = qmlItem(headland_designer_instance, "headlandRenderer")->property("height").toReal();
+    int width = HeadlandInterface::instance()->viewportWidth();
+    int height = HeadlandInterface::instance()->viewportHeight();
 
     projection.setToIdentity();
 
@@ -219,11 +209,11 @@ QVector3D FormHeadland::mouseClickToField(int mouseX, int mouseY) {
 
     modelview.setToIdentity();
     //back the camera up
-    modelview.translate(0, 0, -(double)maxFieldDistance * (double)zoom);
+    modelview.translate(0, 0, -(double)Backend::instance()->m_currentField.maxDistance * (double)HeadlandInterface::instance()->zoom());
 
     //translate to that spot in the world
-    modelview.translate(-(double)fieldCenterX + (double)sX * (double)maxFieldDistance,
-                        -(double)fieldCenterY + (double)sY * (double)maxFieldDistance,
+    modelview.translate(-(double)Backend::instance()->m_currentField.centerX + (double)HeadlandInterface::instance()->sX() * (double)Backend::instance()->m_currentField.maxDistance,
+                        -(double)Backend::instance()->m_currentField.centerY + (double)HeadlandInterface::instance()->sY() * (double)Backend::instance()->m_currentField.maxDistance,
                         0);
 
     float x,y;
@@ -248,6 +238,9 @@ QVector3D FormHeadland::mouseClickToField(int mouseX, int mouseY) {
 }
 
 void FormHeadland::load_headline() {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
+    qDebug() << "load_headline";
     hdl->idx = -1;
 
     start = 99999; end = 99999;
@@ -256,8 +249,8 @@ void FormHeadland::load_headline() {
 
     sliceArr.clear();
     backupList.clear();
-    sliceCount = 0;
-    backupCount = 0;
+    HeadlandInterface::instance()->set_sliceCount(0);
+    HeadlandInterface::instance()->set_backupCount(0);
 
     if(bnd->bndList[0].hdLine.count() == 0)
     {
@@ -277,8 +270,8 @@ void FormHeadland::load_headline() {
         MakePointMinimumSpacing(bnd->bndList[0].hdLine, 1.2);
         CalculateHeadings(bnd->bndList[0].hdLine);
     }
-    sliceCount = sliceArr.count();
-    backupCount = backupList.count();
+    HeadlandInterface::instance()->set_sliceCount(sliceArr.count());
+    HeadlandInterface::instance()->set_backupCount(backupList.count());
     update_lines();
 
     updateVehiclePositionTimer.start(1000);
@@ -293,16 +286,16 @@ void FormHeadland::setup_matrices(QMatrix4x4 &modelview, QMatrix4x4 &projection)
 
     modelview.setToIdentity();
     //back the camera up
-    modelview.translate(0, 0, -(double)maxFieldDistance * (double)zoom);
+     modelview.translate(0, 0, -(double)Backend::instance()->m_currentField.maxDistance * (double)HeadlandInterface::instance()->zoom());
 
     //translate to that spot in the world
-    modelview.translate(-(double)fieldCenterX + (double)sX * (double)maxFieldDistance,
-                        -(double)fieldCenterY + (double)sY * (double)maxFieldDistance,
+    modelview.translate(-(double)Backend::instance()->m_currentField.centerX + (double)HeadlandInterface::instance()->sX() * (double)Backend::instance()->m_currentField.maxDistance,
+                        -(double)Backend::instance()->m_currentField.centerY + (double)HeadlandInterface::instance()->sY() * (double)Backend::instance()->m_currentField.maxDistance,
                         0);
 }
 
 void FormHeadland::updateVehiclePosition() {
-    if (vehicle == NULL) return;
+    // Vehicle is now singleton - always available
 
     QMatrix4x4 modelview;
     QMatrix4x4 projection;
@@ -312,24 +305,24 @@ void FormHeadland::updateVehiclePosition() {
 
     setup_matrices(modelview, projection);
 
-    int width = qmlItem(headland_designer_instance, "headlandRenderer")->property("width").toReal();
-    int height = qmlItem(headland_designer_instance, "headlandRenderer")->property("height").toReal();
+    int width = HeadlandInterface::instance()->viewportWidth();
+    int height = HeadlandInterface::instance()->viewportHeight();
 
-    p = QVector3D(vehicle->pivotAxlePos.easting,
-                  vehicle->pivotAxlePos.northing,
+    if (width == 0) return; //timer is running but QML Rect is not displaying
+
+    p = QVector3D(CVehicle::instance()->pivotAxlePos.easting,
+                  CVehicle::instance()->pivotAxlePos.northing,
                   0);
     s = p.project(modelview, projection, QRect(0,0,width,height));
 
-    vehiclePoint = QPoint(s.x(), height-s.y());
+    HeadlandInterface::instance()->set_vehiclePoint(QPoint(s.x(), height-s.y()));
 }
 
 
 void FormHeadland::update_lines() {
-    QVariantList lines;
-    QVariantMap linemap;
-    QVariantList linepoints;
-    QPoint linepoint;
-    QColor color;
+    if (!bnd) return; //FormGPS is not yet fully initialized
+
+    QVector<FenceLineModel::FenceLine> boundaries;
     QMatrix4x4 modelview;
     QMatrix4x4 projection;
 
@@ -338,41 +331,46 @@ void FormHeadland::update_lines() {
 
     setup_matrices(modelview, projection);
 
-    int width = qmlItem(headland_designer_instance, "headlandRenderer")->property("width").toReal();
-    int height = qmlItem(headland_designer_instance, "headlandRenderer")->property("height").toReal();
+    int width = HeadlandInterface::instance()->viewportWidth();
+    int height = HeadlandInterface::instance()->viewportHeight();
 
     for (int j = 0; j < bnd->bndList.count(); j++)
     {
+        FenceLineModel::FenceLine line;
+        line.index = j;
+
         if (j == bndSelect)
-            color = QColor::fromRgbF(0.75f, 0.75f, 0.750f);
+            line.color = QColor::fromRgbF(0.75f, 0.75f, 0.750f);
         else
-            color = QColor::fromRgbF(0.0f, 0.25f, 0.10f);
+            line.color = QColor::fromRgbF(0.0f, 0.25f, 0.10f);
 
-        linemap.clear();
-        linemap["index"] = j;
-        linemap["color"] = color;
-        linemap["width"] = 4;
+        line.width = 4;
 
-        linepoints.clear();
+        QVariantList linepoints;
         for (int i = 0; i < bnd->bndList[j].fenceLine.count(); i++)
         {
             p = QVector3D (bnd->bndList[j].fenceLine[i].easting,
                            bnd->bndList[j].fenceLine[i].northing,
                            0);
             s = p.project(modelview, projection, QRect(0,0,width,height));
-            linepoint = QPoint(s.x(),height - s.y());
+            QPoint linepoint = QPoint(s.x(),height - s.y());
             linepoints.append(linepoint);
         }
-        linemap["points"] = linepoints;
+        line.points = linepoints;
 
-        lines.append(linemap);
+        boundaries.append(line);
     }
-    headland_designer_instance->setProperty("boundaryLines", lines);
+
+    // Update the model
+    HeadlandInterface::instance()->boundaryLineModel()->setFenceLines(boundaries);
+
     update_slice();
     update_headland();
 }
 
 void FormHeadland::update_slice() {
+    if (!bnd) return; //FormGPS is not yet fully initialized
+
     QMatrix4x4 modelview, projection;
     QVector3D p, s;
 
@@ -381,26 +379,26 @@ void FormHeadland::update_slice() {
 
     setup_matrices(modelview, projection);
 
-    int width = qmlItem(headland_designer_instance, "headlandRenderer")->property("width").toReal();
-    int height = qmlItem(headland_designer_instance, "headlandRenderer")->property("height").toReal();
+    int width = HeadlandInterface::instance()->viewportWidth();
+    int height = HeadlandInterface::instance()->viewportHeight();
 
     //draw A and B points
     if (start != 99999) {
         p = QVector3D(bnd->bndList[bndSelect].fenceLine[start].easting, bnd->bndList[bndSelect].fenceLine[start].northing, 0);
         s = p.project(modelview, projection, QRect(0,0,width,height));
-        showa = true;
-        apoint = QPoint(s.x(), height - s.y());
+        HeadlandInterface::instance()->set_showa(true);
+        HeadlandInterface::instance()->set_apoint(QPoint(s.x(), height - s.y()));
     } else {
-        showa = false;
+        HeadlandInterface::instance()->set_showa(false);
     }
     if (end == 99999)
-        showb = false;
+        HeadlandInterface::instance()->set_showb(false);
 
     //draw line between A and B
     if (sliceArr.count()) {
         //color is set in QML
 
-        for (Vec3 item: sliceArr)
+        for (const Vec3& item : std::as_const(sliceArr))
         {
             p = QVector3D( item.easting, item.northing, 0);
             s = p.project(modelview, projection, QRect(0,0,width,height));
@@ -408,17 +406,19 @@ void FormHeadland::update_slice() {
             line.append(linepoint);
         }
 
-        headland_designer_instance->setProperty("sliceLine", line);
+        HeadlandInterface::instance()->set_sliceLine(line);
         //turn on the A and B points
-        apoint = line[0].toPoint();
-        showa = true;
-        bpoint = line[line.length()-1].toPoint();
-        showb = true;
+        HeadlandInterface::instance()->set_apoint(line[0].toPoint());
+        HeadlandInterface::instance()->set_showa(true);
+        HeadlandInterface::instance()->set_bpoint(line[line.length()-1].toPoint());
+        HeadlandInterface::instance()->set_showb(true);
 
     }
 }
 
 void FormHeadland::update_headland() {
+    if (!bnd) return; //FormGPS is not yet fully initialized
+
     QMatrix4x4 modelview, projection;
     QVector3D p, s;
 
@@ -427,11 +427,11 @@ void FormHeadland::update_headland() {
 
     setup_matrices(modelview, projection);
 
-    int width = qmlItem(headland_designer_instance, "headlandRenderer")->property("width").toReal();
-    int height = qmlItem(headland_designer_instance, "headlandRenderer")->property("height").toReal();
+    int width = HeadlandInterface::instance()->viewportWidth();
+    int height = HeadlandInterface::instance()->viewportHeight();
 
      //draw headland line if exists
-    if (bnd->bndList[0].hdLine.count()) {
+    if (bnd->bndList.count() > 0 && bnd->bndList[0].hdLine.count()) {
         //color is set in QML
 
         for (int i = 0; i < bnd->bndList[0].hdLine.count(); i++)
@@ -445,16 +445,18 @@ void FormHeadland::update_headland() {
             line.append(linepoint);
         }
     }
-    headland_designer_instance->setProperty("headlandLine", line);
+    HeadlandInterface::instance()->set_headlandLine(line);
 }
 
 void FormHeadland::FormHeadLine_FormClosing()
 {
+    if (!hdl) return; //FormGPS is not yet fully initialized
+
     //hdl
     if (hdl->idx == -1)
     {
-        isBtnAutoSteerOn = false;
-        isYouTurnBtnOn = false;
+        MainWindowState::instance()->set_isYouTurnBtnOn(false);
+        MainWindowState::instance()->set_isBtnAutoSteerOn(false);
     }
 
     if (sliceArr.count() > 0)
@@ -465,8 +467,10 @@ void FormHeadland::FormHeadLine_FormClosing()
 }
 
 void FormHeadland::clicked(int mouseX, int mouseY) {
-    if ((double)lineDistance == 0 && (bool)curveLine) {
-        timedMessageBox(3000, tr("Distance Error"), tr("Distance Set to 0, Nothing to Move"));
+    if (!bnd) return; //FormGPS is not yet fully initialized
+
+    if (HeadlandInterface::instance()->lineDistance() == 0 && HeadlandInterface::instance()->curveLine()) {
+        emit Backend::instance()->timedMessage(3000, tr("Distance Error"), tr("Distance Set to 0, Nothing to Move"));
         return;
     }
     sliceArr.clear();
@@ -517,7 +521,7 @@ void FormHeadland::clicked(int mouseX, int mouseY) {
         isA = true;
 
         //build the lines
-        if ((bool)curveLine)
+        if (HeadlandInterface::instance()->curveLine())
         {
             bool isLoop = false;
             int limit = end;
@@ -696,18 +700,20 @@ void FormHeadland::clicked(int mouseX, int mouseY) {
         }
 
         //Move the line
-        if ((double)lineDistance != 0)
+        if (HeadlandInterface::instance()->lineDistance() != 0)
             SetLineDistance();
 
         //QML: btnSlice.Enabled = true;
     }
 
-    sliceCount = sliceArr.count();
-    backupCount = sliceArr.count();
+    HeadlandInterface::instance()->set_sliceCount(sliceArr.count());
+    HeadlandInterface::instance()->set_backupCount(sliceArr.count());
     update_slice();
 }
 
 void FormHeadland::btn_Exit_Click() {
+    if (!bnd) return; //FormGPS is not yet fully initialized
+
     QVector<Vec3> hdArr;
 
     if (bnd->bndList[0].hdLine.count() > 0)
@@ -755,14 +761,18 @@ void FormHeadland::btn_Exit_Click() {
 }
 
 void FormHeadland::isSectionControlled(bool wellIsIt) {
+    if (!bnd) return; //FormGPS is not yet fully initialized
+
     bnd->isSectionControlledByHeadland = wellIsIt;
-    property_setHeadland_isSectionControlled = wellIsIt;
+    SettingsManager::instance()->setHeadland_isSectionControlled(wellIsIt);
 }
 
 void FormHeadland::btnBndLoop_Click() {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     int ptCount = bnd->bndList[0].fenceLine.count();
 
-    if ((double)lineDistance == 0)
+    if (HeadlandInterface::instance()->lineDistance() == 0)
     {
         hdl->desList.clear();
 
@@ -780,7 +790,7 @@ void FormHeadland::btnBndLoop_Click() {
         //outside point
         Vec3 pt3;
 
-        double moveDist = (double)lineDistance;
+        double moveDist = HeadlandInterface::instance()->lineDistance();
         double distSq = (moveDist) * (moveDist) * 0.999;
 
         //make the boundary tram outer array
@@ -842,7 +852,7 @@ void FormHeadland::btnBndLoop_Click() {
             bnd->bndList[0].hdLine.clear();
 
             //write out the Points
-            for (Vec3 item: hdl->desList)
+            for (const Vec3& item : std::as_const(hdl->desList))
             {
                 bnd->bndList[0].hdLine.append(item);
             }
@@ -855,6 +865,8 @@ void FormHeadland::btnBndLoop_Click() {
 }
 
 void FormHeadland::btnSlice_Click() {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     int startBnd = 0, endBnd = 0, startLine = 0, endLine = 0;
     int isStart = 0;
 
@@ -862,7 +874,7 @@ void FormHeadland::btnSlice_Click() {
 
     //save a backup
     backupList.clear();
-    for (auto item: bnd->bndList[0].hdLine)
+    for (const Vec3& item : std::as_const(bnd->bndList[0].hdLine))
     {
         backupList.append(item);
     }
@@ -901,7 +913,7 @@ void FormHeadland::btnSlice_Click() {
 
     if (isStart < 2)
     {
-        emit timedMessageBox(2000, tr("Error"), tr("Crossings not Found"));
+        emit Backend::instance()->timedMessage(2000, tr("Error"), tr("Crossings not Found"));
         return;
     }
 
@@ -931,7 +943,7 @@ void FormHeadland::btnSlice_Click() {
         //build headline from desList
         bnd->bndList[0].hdLine.clear();
 
-        for (auto item: hdl->desList)
+        for (const Vec3& item : std::as_const(hdl->desList))
         {
             bnd->bndList[0].hdLine.append(item);
         }
@@ -969,7 +981,7 @@ void FormHeadland::btnSlice_Click() {
         //build headline from desList
         bnd->bndList[0].hdLine.clear();
 
-        for (auto item: hdl->desList)
+        for (const Vec3& item : std::as_const(hdl->desList))
         {
             bnd->bndList[0].hdLine.append(item);
         }
@@ -977,13 +989,15 @@ void FormHeadland::btnSlice_Click() {
 
     hdl->desList.clear();
     sliceArr.clear();
-    sliceCount = sliceArr.count();
-    backupCount = backupList.count();
+    HeadlandInterface::instance()->set_sliceCount(sliceArr.count());
+    HeadlandInterface::instance()->set_backupCount(backupList.count());
     update_headland();
     update_slice();
 }
 
 void FormHeadland::btnDeletePoints_Click() {
+    if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
+
     start = 99999; end = 99999;
     isA = true;
     hdl->desList.clear();
@@ -997,20 +1011,22 @@ void FormHeadland::btnDeletePoints_Click() {
     {
         bnd->bndList[0].hdLine.append(bnd->bndList[0].fenceLine[i]);
     }
-    sliceCount = sliceArr.count();
-    backupCount = backupList.count();
+    HeadlandInterface::instance()->set_sliceCount(sliceArr.count());
+    HeadlandInterface::instance()->set_backupCount(backupList.count());
     update_headland();
     update_slice();
 }
 
 void FormHeadland::btnUndo_Click() {
+    if (!bnd) return; //FormGPS is not yet fully initialized
+
     bnd->bndList[0].hdLine.clear();
-    for (auto item: backupList)
+    for (const Vec3& item : std::as_const(backupList))
     {
         bnd->bndList[0].hdLine.append(item);
     }
     backupList.clear();
-    backupCount = backupList.count();
+    HeadlandInterface::instance()->set_backupCount(backupList.count());
     update_headland();
     update_slice();
 }
@@ -1029,7 +1045,7 @@ void FormHeadland::btnALength_Click() {
             sliceArr.insert(0, pt);
         }
     }
-    sliceCount = sliceArr.count();
+    HeadlandInterface::instance()->set_sliceCount(sliceArr.count());
     update_slice();
 }
 
@@ -1047,7 +1063,7 @@ void FormHeadland::btnBLength_Click()
             sliceArr.append(pt);
         }
     }
-    sliceCount = sliceArr.count();
+    HeadlandInterface::instance()->set_sliceCount(sliceArr.count());
     update_slice();
 }
 
@@ -1055,7 +1071,7 @@ void FormHeadland::btnBShrink_Click()
 {
     if (sliceArr.count() > 8)
         sliceArr.remove(sliceArr.count() - 5, 5);
-    sliceCount = sliceArr.count();
+    HeadlandInterface::instance()->set_sliceCount(sliceArr.count());
     update_slice();
 }
 
@@ -1063,17 +1079,19 @@ void FormHeadland::btnAShrink_Click()
 {
     if (sliceArr.count() > 8)
         sliceArr.remove(0, 5);
-    sliceCount = sliceArr.count();
+    HeadlandInterface::instance()->set_sliceCount(sliceArr.count());
     update_slice();
 }
 
 void FormHeadland::btnHeadlandOff_Click()
 {
+    if (!bnd) return; //FormGPS is not yet fully initialized
+
     bnd->bndList[0].hdLine.clear();
     update_headland();
     update_slice();
     emit saveHeadland();
-    bnd->isHeadlandOn = false;
-    vehicle->isHydLiftOn = false;
+    MainWindowState::instance()->set_isHeadlandOn(false);
+    CVehicle::instance()->setIsHydLiftOn(false);
     updateVehiclePositionTimer.stop();
 }

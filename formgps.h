@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QScopedPointer>
+#include <memory> // C++17 smart pointers
+#include <QProperty> // Qt 6.8 QProperty + BINDABLE
+#include <QBindable> // Qt 6.8 QBindable for automatic change tracking
 #include <QtQuick/QQuickItem>
 #include <QOpenGLFunctions>
 #include <QOpenGLTexture>
@@ -14,38 +17,34 @@
 #include <QOpenGLFramebufferObject>
 #include <QOpenGLBuffer>
 #include <QQmlApplicationEngine>
+#include <QTranslator>
 //#include <QSerialPort>
-
 #include "common.h"
-
 #include "vecfix2fix.h"
 #include "vec2.h"
 #include "vec3.h"
-#include "cflag.h"
-#include "cmodulecomm.h"
-#include "ccamera.h"
 #include "btnenum.h"
 
-#include "cworldgrid.h"
-#include "cnmea.h"
 #include "cvehicle.h"
 #include "ctool.h"
+#include "agioservice.h"
+#include "pgnparser.h"  // Phase 6.0.21: For ParsedData struct
 #include "cboundary.h"
 #include "cabline.h"
 #include "ctram.h"
-#include "ccontour.h"
 #include "cabcurve.h"
 #include "cyouturn.h"
 #include "cfielddata.h"
-#include "csim.h"
 #include "cahrs.h"
-#include "crecordedpath.h"
-#include "cguidance.h"
+// CRecordedPath merged into RecordedPath singleton - use RecordedPath::instance()
 #include "cheadline.h"
-#include "cpgn.h"
-
+#include "ctrack.h"
 #include "formheadland.h"
 #include "formheadache.h"
+
+#include <QVector>
+#include <QDateTime>
+#include <QDebug>
 
 //forward declare classes referred to below, to break circular
 //references in the code
@@ -54,36 +53,60 @@ class AOGRendererInSG;
 class QQuickCloseEvent;
 class QVector3D;
 
+struct PatchBuffer {
+    QOpenGLBuffer patchBuffer;
+    int length;
+};
+
+struct PatchInBuffer {
+    int which;
+    int offset;
+    int length;
+};
+
+
 class FormGPS : public QQmlApplicationEngine
 {
     Q_OBJECT
+
 public:
     explicit FormGPS(QWidget *parent = 0);
     ~FormGPS();
+
+    // ===== Q_PROPERTY GETTERS, SETTERS AND BINDABLES =====
+    // Manual declarations for all Rectangle Pattern properties
+
+    // Misc Status
+    void setSensorData(int value);
+    QBindable<int> bindableSensorData();
+
+    // GPS/IMU Heading - Phase 6.0.20 Task 24 Step 2
+    bool isReverseWithIMU() const;
+    void setIsReverseWithIMU(bool value);
+    QBindable<bool> bindableIsReverseWithIMU();
+
+    // Job Control
+    bool isPatchesChangingColor() const;
+    void setIsPatchesChangingColor(bool value);
+    QBindable<bool> bindableIsPatchesChangingColor();
 
      /***********************************************
      * Qt-specific things we need to keep track of *
      ***********************************************/
     QLocale locale;
-    QObject *qml_root;
     QSignalMapper *sectionButtonsSignalMapper;
     QTimer *tmrWatchdog;
-    QTimer timerSim;
-
-    //other
-    QObject *btnFlag;
+    QTimer timerGPS;  // Phase 6.0.24: Fixed 40 Hz timer for real GPS mode (like timerSim for simulation)
 
     /***************************
      * Qt and QML GUI elements *
      ***************************/
     //QQuickView *qmlview;
     QWidget *qmlcontainer;
-    AOGRendererInSG *openGLControl;
+    QQuickItem *openGLControl;
 
     //flag context menu and buttons
-    QObject *contextFlag;
-    QObject *btnDeleteFlag;
-    QObject *btnDeleteAllFlags;
+    QObject *recordedPathInterface;
 
     //section buttons
     QObject *sectionButton[MAXSECTIONS-1]; //zero based array
@@ -94,7 +117,19 @@ public:
     QSurfaceFormat backSurfaceFormat;
     QOpenGLContext backOpenGLContext;
     QOffscreenSurface backSurface;
-    QOpenGLFramebufferObject *backFBO = 0;
+    std::unique_ptr<QOpenGLFramebufferObject> backFBO; // C++17 RAII - automatic cleanup
+
+    QSurfaceFormat zoomSurfaceFormat;
+    QOpenGLContext zoomOpenGLContext;
+    QOffscreenSurface zoomSurface;
+    std::unique_ptr<QOpenGLFramebufferObject> zoomFBO; // C++17 RAII - automatic cleanup
+
+    QSurfaceFormat mainSurfaceFormat;
+    QOpenGLContext mainOpenGLContext;
+    QOffscreenSurface mainSurface;
+
+    std::unique_ptr<QOpenGLFramebufferObject> mainFBO[2]; // C++17 RAII - automatic cleanup
+    int active_fbo=-1;
 
     /*******************
      * from FormGPS.cs *
@@ -114,16 +149,15 @@ public:
     //current fields and field directory
     QString fieldsDirectory, currentFieldDirectory, displayFieldName;
 
+    // android directory
+    QString androidDirectory = "/storage/emulated/0/Documents/";
+
 
     bool leftMouseDownOnOpenGL; //mousedown event in opengl window
     int flagNumberPicked = 0;
 
     //bool for whether or not a job is active
-    bool /*isJobStarted = false,*/ isAreaOnRight = true /*, isAutoSteerBtnOn = false*/;
-
-    //this bool actually lives in the QML aog object.
-    InterfaceProperty<AOGInterface,bool> isJobStarted = InterfaceProperty<AOGInterface,bool>("isJobStarted");
-    InterfaceProperty<AOGInterface,bool> isAutoSteerBtnOn = InterfaceProperty<AOGInterface,bool>("isAutoSteerBtnOn");
+    bool /*setIsJobStarted(false),*/ isAreaOnRight = true /*, setIsBtnAutoSteerOn(false)*/;
 
     //if we are saving a file
     bool isSavingFile = false, isLogElevation = false;
@@ -131,42 +165,38 @@ public:
     //the currentversion of software
     QString currentVersionStr, inoVersionStr;
 
-    int inoVersionInt;
+    int inoVersionInt = 0;  // Phase 6.0.24 Problem 18: Initialize to prevent garbage
 
     //create instance of a stopwatch for timing of frames and NMEA hz determination
     QElapsedTimer swFrame;
 
-    double secondsSinceStart;
-
-    //Time to do fix position update and draw routine
-    double frameTime = 0;
+    double secondsSinceStart = 0.0;  // Phase 6.0.24 Problem 18: Initialize to prevent garbage
 
     //Time to do fix position update and draw routine
     double gpsHz = 10;
 
     bool isStanleyUsed = false;
 
-    int pbarSteer, pbarRelay, pbarUDP;
+    // Phase 6.0.24 Problem 18: Initialize progress bar values
+    int pbarSteer = 0;
+    int pbarRelay = 0;
+    int pbarUDP = 0;
 
     double nudNumber = 0;
 
-    double m2InchOrCm, inchOrCm2m, m2FtOrM, ftOrMtoM, cm2CmOrIn, inOrCm2Cm;
-    QString unitsFtM, unitsInCm;
-
-    //used by filePicker Form to return picked file and directory
-    //QString filePickerFileAndDirectory;
-
-    //the position of the GPS Data window within the FormGPS window
-    //int GPSDataWindowLeft = 76, GPSDataWindowTopOffset = 220;
-
-    //the autoManual drive button. Assume in Auto
-    bool isInAutoDrive = true;
-
-    //isGPSData form up
-    bool isGPSSentencesOn = false, isKeepOffsetsOn = false;
-
-
 private:
+    // AgIO Service (main thread for zero-latency OpenGL access)
+    AgIOService* m_agioService;
+
+    // ⚡ QML Interface Initialization - Delayed to avoid timing issues
+    void initializeQMLInterfaces();
+
+    // Geodetic Conversion - Phase 6.0.20 Task 24 Step 3.5
+    void updateMPerDegreeLat();
+
+    // ⚡ PHASE 6.0.3.2: Constructor completion protection
+    // Qt 6.8: Simplified - no complex state tracking needed
+    
     //For field saving in background
     int fileSaveCounter = 1;
     int minuteCounter = 1;
@@ -181,7 +211,8 @@ private:
     int oneHalfSecondCounter = 0, oneHalfSecond = 0;
     int oneFifthSecondCounter = 0, oneFifthSecond = 0;
 
-    int makeUTurnCounter = 0;
+    //moved to CYouTurn
+    //int makeUTurnCounter = 0;
 
 
      /*******************
@@ -192,7 +223,7 @@ public:
     QString ablinesdirectory;
 
     //colors for sections and field background
-    uchar flagColor = 0;
+    int flagColor = 0;
 
     //how many cm off line per big pixel
     int lightbarCmPerPixel = 2;
@@ -220,34 +251,17 @@ public:
     bool isPureDisplayOn = true, isSkyOn = true, isRollMeterOn = false, isTextureOn = true;
     bool isDay = true, isDayTime = true, isBrightnessOn = true;
     bool isKeyboardOn = true, isAutoStartAgIO = true, isSvennArrowOn = true;
-
+    bool isConnectedBlockage = false; //Dim
     bool isUTurnOn = true, isLateralOn = true;
 
     //sunrise, sunset
 
     bool isFlashOnOff = false;
-    //makes nav panel disappear after 6 seconds
-    int navPanelCounter = 0;
-
-    InterfaceProperty<AOGInterface,uint> sentenceCounter = InterfaceProperty<AOGInterface,uint>("sentenceCounter");
-
-    //master Manual and Auto, 3 states possible
-    //btnStates manualBtnState = btnStates::Off;
-    //btnStates autoBtnState = btnStates::Off;
-    InterfaceProperty<AOGInterface,btnStates> manualBtnState = InterfaceProperty<AOGInterface,btnStates>("manualBtnState");
-    InterfaceProperty<AOGInterface,btnStates> autoBtnState = InterfaceProperty<AOGInterface,btnStates>("autoBtnState");
-    //InterfaceProperty<AOGInterface,bool> ct.isLocked = InterfaceProperty<AOGInterface,bool>("btnIsContourLocked");
 
 private:
 public:
     //for animated submenu
     //bool isMenuHid = true;
-
-    //Zoom variables
-    double gridZoom;
-    double zoomValue = 10;
-    double triangleResolution = 1.0;
-    double previousZoom = 25;
 
     // Storage For Our Tractor, implement, background etc Textures
     //Texture particleTexture;
@@ -260,70 +274,24 @@ public:
     //Time to do fix position update and draw routine
     double HzTime = 5;
 
-    QVector<CPatches> triStrip = QVector<CPatches>( { CPatches() } );
-
 
     //used to update the screen status bar etc
     int statusUpdateCounter = 1;
 
-    //create the scene camera
-    CCamera camera;
-
-    //create world grid
-    //QScopedPointer <CWorldGrid> worldGrid;
-    CWorldGrid worldGrid;
-
-    //Parsing object of NMEA sentences
-    //QScopedPointer<CNMEA> pn;
-    CNMEA pn;
-
-    //ABLine Instance
-    //QScopedPointer<CABLine> ABLine;
-
-    //NOTE: do these get removed? David
-    CABLine ABLine;
-    CABCurve curve;
-
-    CTrack trk;
-    CGuidance gyd;
-
     CTram tram;
 
-    //Contour mode Instance
-    //QScopedPointer<CContour> ct;
-    CContour ct;
-    CYouTurn yt;
-
-    CVehicle vehicle;
     CTool tool;
 
-    //module communication object
-    CModuleComm mc;
+    //boundary instance (singleton)
+    CBoundary &bnd = *CBoundary::instance();
 
-    //boundary instance
-    CBoundary bnd;
-
-    CSim sim;
     CAHRS ahrs;
-    CRecordedPath recPath;
     CFieldData fd;
 
     CHeadLine hdl;
 
     FormHeadland headland_form;
     FormHeadache headache_form;
-
-    /*
-     * PGNs *
-     */
-    CPGN_FE p_254;
-    CPGN_FC p_252;
-    CPGN_FB p_251;
-    CPGN_EF p_239;
-    CPGN_EE p_238;
-    CPGN_EC p_236;
-    CPGN_EB p_235;
-    CPGN_E5 p_229;
 
     /* GUI synchronization lock */
     QReadWriteLock lock;
@@ -337,8 +305,6 @@ public:
     bool isTT;
     bool isABCyled = false;
 
-    InterfaceProperty<AOGInterface,bool> isPatchesChangingColor = InterfaceProperty<AOGInterface,bool>("isPatchesChangingColor");
-
     void GetHeadland();
     void CloseTopMosts();
     void getAB();
@@ -351,7 +317,8 @@ public:
      *************************/
 public:
     //very first fix to setup grid etc
-    bool isFirstFixPositionSet = false, isGPSPositionInitialized = false, isFirstHeadingSet = false;
+    bool isFirstFixPositionSet = false, isGPSPositionInitialized = false;
+    bool m_forceGPSReinitialization = false;  // PHASE 6.0.41: Force latStart/lonStart update on mode switch even if field open
     bool /*isReverse = false (CVehicle),*/ isSteerInReverse = true, isSuperSlow = false, isAutoSnaptoPivot = false;
     double startGPSHeading = 0;
 
@@ -360,15 +327,12 @@ public:
 
     // autosteer variables for sending serial moved to CVehicle
     //short guidanceLineDistanceOff, guidanceLineSteerAngle; --> CVehicle
-    double avGuidanceSteerAngle;
+    double avGuidanceSteerAngle = 0.0;  // Phase 6.0.24 Problem 18
 
-    short errorAngVel;
-    double setAngVel, actAngVel;
+    short errorAngVel = 0;  // Phase 6.0.24 Problem 18
+    double setAngVel = 0.0;  // Phase 6.0.24 Problem 18
+    double actAngVel = 0.0;  // Phase 6.0.24 Problem 18
     bool isConstantContourOn;
-
-    //guidance line look ahead
-    double guidanceLookAheadTime = 2;
-    Vec2 guidanceLookPos;
 
     //for heading or Atan2 as camera
     QString headingFromSource, headingFromSourceBak;
@@ -387,7 +351,7 @@ public:
     Vec2 lastReverseFix;
 
     //headings
-    double smoothCamHeading = 0, gpsHeading = 10.0, prevGPSHeading = 0.0;
+    double smoothCamHeading = 0, prevGPSHeading = 0.0;
 
     //storage for the cos and sin of heading
     //moved to vehicle
@@ -405,19 +369,15 @@ public:
     //Everything is so wonky at the start
     int startCounter = 0;
 
-    //individual points for the flags in a list
-    QVector<CFlag> flagPts;
-    bool flagsBufferCurrent = false;
-
     //tally counters for display
     //public double totalSquareMetersWorked = 0, totalUserSquareMeters = 0, userSquareMetersAlarm = 0;
 
 
-    double /*avgSpeed --> CVehicle,*/ previousSpeed;//for average speed
-    double crossTrackError; //for average cross track error
+    double /*avgSpeed --> CVehicle,*/ previousSpeed = 0.0;  // Phase 6.0.24 Problem 18
+    double crossTrackError = 0.0;  // Phase 6.0.24 Problem 18: for average cross track error
 
     //youturn
-    double distancePivotToTurnLine = -2222;
+    double _distancePivotToTurnLine = -2222;  // Renamed to avoid Q_PROPERTY conflict
     double distanceToolToTurnLine = -2222;
 
     //the value to fill in you turn progress bar
@@ -425,16 +385,17 @@ public:
 
     //IMU
     double rollCorrectionDistance = 0;
-    double imuGPS_Offset, imuCorrected;
+    double imuGPS_Offset = 0.0;
+    double _imuCorrected = 0.0;  // Renamed to avoid Q_PROPERTY conflict
 
     //step position - slow speed spinner killer
     int currentStepFix = 0;
     int totalFixSteps = 10;
     VecFix2Fix stepFixPts[10];
-    double distanceCurrentStepFix = 0, distanceCurrentStepFixDisplay = 0, minHeadingStepDist = 1, startSpeed = 0.5;
-    double fixToFixHeadingDistance = 0, gpsMinimumStepDistance = 0.05;
+    double distanceCurrentStepFix = 0, distanceCurrentStepFixDisplay = 0, minHeadingStepDist, startSpeed = 0.5;
+    double fixToFixHeadingDistance = 0, gpsMinimumStepDistance;  // PHASE 6.0.35: Loaded from SettingsManager in loadSettings()
 
-    bool isReverseWithIMU;
+    // isReverseWithIMU moved to Q_OBJECT_BINDABLE_PROPERTY m_isReverseWithIMU (line 1848)
 
     double nowHz = 0, filteredDelta = 0, delta = 0;
 
@@ -447,23 +408,22 @@ public:
     double uncorrectedEastingGraph = 0;
     double correctionDistanceGraph = 0;
 
-    double frameTimeRough = 3;
     double timeSliceOfLastFix = 0;
 
     bool isMaxAngularVelocity = false;
 
     int minSteerSpeedTimer = 0;
 
-    InterfaceProperty<BoundaryInterface,bool> isOutOfBounds = InterfaceProperty<BoundaryInterface,bool>("isOutOfBounds");
 
     void UpdateFixPosition(); //process a new position
+
     void TheRest();
     void CalculatePositionHeading(); // compute all headings and fixes
-    void AddBoundaryPoint();
     void AddContourPoints();
     void AddSectionOrPathPoints();
     void CalculateSectionLookAhead(double northing, double easting, double cosHeading, double sinHeading);
     void InitializeFirstFewGPSPositions();
+    void ResetGPSState(bool toSimMode);  // PHASE 6.0.40: Reset GPS state on sim/real switch
 
     /************************
      * SaveOpen.Designer.cs *
@@ -479,7 +439,7 @@ public:
 
     void FileSaveHeadLines();
     void FileLoadHeadLines();
-    void FileSaveTracks();
+    //moved up to a SLOT: void FileSaveTracks();
     void FileLoadTracks();
     void FileSaveCurveLines();
     void FileLoadCurveLines();
@@ -514,17 +474,6 @@ public:
     void ExportFieldAs_ISOXMLv3();
     void ExportFieldAs_ISOXMLv4();
 
-
-    /************************
-     * formgps_sections.cpp *
-     ************************/
-    //void SectionSetPosition();
-    //void SectionCalcWidths();
-    //void SectionCalcMulti();
-    void BuildMachineByte();
-    void DoRemoteSwitches();
-
-
     /************************
      * formgps_settimgs.cpp *
      ************************/
@@ -541,14 +490,14 @@ public:
     double camDistanceFactor = -2;
     int mouseX = 0, mouseY = 0;
     double mouseEasting = 0, mouseNorthing = 0;
-    int lastWidth=-1, lastHeight=-1;
-    double maxFieldX, maxFieldY, minFieldX, minFieldY, fieldCenterX, fieldCenterY, maxFieldDistance;
+    // Phase 6.0.24 Problem 18: Initialize field boundary variables
     double offX = 0.0, offY = 0.0;
 
     //data buffer for pixels read from off screen buffer
     //uchar grnPixels[80001];
     LookAheadPixels grnPixels[150001];
-    QImage grnPix;
+    LookAheadPixels *overPixels = new LookAheadPixels[160000]; //400x400
+    QImage overPix; //for debugging purposes to show in a window
 
     /*
     QOpenGLShaderProgram *simpleColorShader = 0;
@@ -556,27 +505,52 @@ public:
     QOpenGLShaderProgram *interpColorShader = 0;
     */
     QOpenGLBuffer skyBuffer;
-    QOpenGLBuffer flagsBuffer;
 
     /***********************
      * formgps_udpcomm.cpp *
      ***********************/
 private:
-    QUdpSocket *udpSocket = NULL;
+    // UDP FormGPS REMOVED - Phase 4.6: Workers → AgIOService ONLY source
+    // QUdpSocket *udpSocket = NULL;  // ❌ REMOVED - AgIOService Workers only
 
 public:
-    QElapsedTimer udpWatch;
-    int udpWatchLimit = 70;
-    int udpWatchCounts = 0;
+    // ===== Q_INVOKABLE MODERN ACTIONS - Qt 6.8 Direct QML Calls =====
+    // Phase 6.0.20: Modernization of button actions - replace signal/slot with direct calls
+    // Batch 9 - 2 actions Snap Track - lines 237-238
+    // Batch 10 - 8 actions Modules & Steering - lines 253-266
 
-    bool isUDPServerOn = false;
+    // Batch 13 - 7 actions Field Management - lines 1826-1832
+    Q_INVOKABLE void fieldUpdateList();
+    Q_INVOKABLE void fieldClose();
+    Q_INVOKABLE void fieldOpen(const QString& fieldName);
+    Q_INVOKABLE void fieldNew(const QString& fieldName);
+    Q_INVOKABLE void fieldNewFrom(const QString& fieldName, const QString& sourceField, int fieldType);
+    Q_INVOKABLE void fieldNewFromKML(const QString& fieldName, const QString& kmlPath);
+    Q_INVOKABLE void fieldDelete(const QString& fieldName);
 
-    void StartLoopbackServer();
-    void stopUDPServer();
+    // Batch 14 - 11 actions Boundary Management - lines 1843-1854
+    Q_INVOKABLE void loadBoundaryFromKML(QString filename);
 
-    void SendPgnToLoop(QByteArray byteData);
-    void DisableSim();
-    //void ReceiveFromAgIO(); // in slots below
+    // Batch 3 - 8 actions Camera Navigation - lines 201-208
+    // Batch 4 - 2 actions Settings - lines 227-228
+    Q_INVOKABLE void settingsReload();
+    Q_INVOKABLE void settingsSave();
+
+    // AB Lines and Curves management - Qt 6.8 additions
+    Q_INVOKABLE void updateABLines();
+    Q_INVOKABLE void updateCurves();
+    Q_INVOKABLE void setCurrentABCurve(int index);
+
+    // AB Lines Methods - Phase 6.0.20
+    Q_INVOKABLE void swapABLineHeading(int index);
+    Q_INVOKABLE void deleteABLine(int index);
+    Q_INVOKABLE void addABLine(const QString& name);
+    Q_INVOKABLE void changeABLineName(int index, const QString& newName);
+
+    // ===== Q_INVOKABLE ALIASES FOR QML CONSISTENCY =====
+    Q_INVOKABLE void settings_save() { settingsSave(); }
+    Q_INVOKABLE void settings_revert() { settingsReload(); }
+    // modules_send_252 not needed - modulesSend252() already exists as Q_INVOKABLE
 
     /******************
      * formgps_ui.cpp *
@@ -590,42 +564,52 @@ public:
 
     bool isHeadlandClose = false;
 
-    int steerModuleConnectedCounter = 0;
-    double avgPivDistance=0, lightbarDistance=0;
+    double lightbarDistance=0;
     QString strHeading;
     int lenth = 4;
 
     void MakeFlagMark(QOpenGLFunctions *gl);
     void DrawFlags(QOpenGLFunctions *gl, QMatrix4x4 mvp);
-    void DrawTramMarkers(QOpenGLFunctions *gl, QMatrix4x4 mvp);
+    void DrawTramMarkers();
     void CalcFrustum(const QMatrix4x4 &mvp);
     void calculateMinMax();
 
     QVector3D mouseClickToField(int mouseX, int mouseY);
     QVector3D mouseClickToPan(int mouseX, int mouseY);
 
-    void SetZoom();
     void loadGLTextures();
 
 private:
+    bool toSend = false, isSA = false;
+
+    // Language translation system
+    QTranslator* m_translator;
+
+    // PHASE 6.0.42: GPS jump detection for automatic field close and OpenGL regeneration
+    double m_lastKnownLatitude = 0;
+    double m_lastKnownLongitude = 0;
+    const double GPS_JUMP_THRESHOLD_KM = 1.0;  // 1 km threshold for jump detection
+    double latK, lonK = 0.0;
+
+private:
     void setupGui();
+    void setupAgIOService();
+    void connectToAgIOFactoryInstance(); // New: connect to factory-created instance
+    void testAgIOConfiguration();
+    void connectFormLoopToAgIOService();
+    void cleanupAgIOService();
+
+    // PHASE 6.0.42: GPS jump detection helper functions
+    bool detectGPSJump(double newLat, double newLon);
+    void handleGPSJump(double newLat, double newLon);
 
 
     /**************
      * FormGPS.cs *
      **************/
 public:
-    QString speedMPH();
-    QString speedKPH();
-
     void JobNew();
     void JobClose();
-
-    /******************************
-     * formgps_classcallbacks.cpp *
-     ******************************/
-    void connect_classes();
-
 
     /****************
      * form_sim.cpp *
@@ -637,28 +621,35 @@ public:
      **************************/
 
 public slots:
+    // Phase 6.0.21: Receive parsed data from AgIOService
+    void onParsedDataReady(const PGNParser::ParsedData& data);
+
+    // Phase 6.0.25: Separated data handlers for optimal performance
+    void onNmeaDataReady(const PGNParser::ParsedData& data);    // GPS position updates
+    void onImuDataReady(const PGNParser::ParsedData& data);     // External IMU updates
+    void onSteerDataReady(const PGNParser::ParsedData& data);   // AutoSteer feedback
+    void onMachineDataReady(const PGNParser::ParsedData& data); // Machine
+    void onBlockageDataReady(const PGNParser::ParsedData& data); // Blockage data
+    void onRateControlDataReady(const PGNParser::ParsedData& data); // RateControl data
+
+
     /*******************
      * from FormGPS.cs *
      *******************/
     void tmrWatchdog_timeout();
     void processSectionLookahead(); //called when section lookahead GL stuff is rendered
+    void processOverlapCount(); //called to calculate overlap stats
 
     void TimedMessageBox(int timeout, QString s1, QString s2);
 
-    /*
-    //AB Lines in GUI. TODO: rename these, make them consistent
-    void update_ABlines_in_qml();
-    void update_current_ABline_from_qml();
-    void add_new_ABline(QString name, double easting, double northing,double heading);
-    void start_newABLine(bool start_or_cancel, double easting, double northing, double heading);
-    void delete_ABLine(int which_line);
-    void swap_heading_ABLine(int which_line);
-    void change_name_ABLine(int which_line, QString name);
-    */
+    void on_qml_created(QObject *object, const QUrl &url);
+
+    // Qt 6.8: Simplified - removed complex property binding slots
 
     //settings dialog callbacks
     void on_settings_reload();
     void on_settings_save();
+    void on_language_changed(); // Dynamic language switching
 
     //vehicle callbacks
     void vehicle_saveas(QString vehicle_name);
@@ -674,25 +665,18 @@ public slots:
     void field_open(QString field_name);
     void field_new(QString field_name);
     void field_new_from(QString existing, QString field_name, int flags);
+    void field_new_from_KML(QString field_name, QString file_name);
     void field_delete(QString field_name);
+    void field_saveas(QString field_name);
+    void field_load_json(QString field_name);
+    void FindLatLon(QString filename);
+    void LoadKMLBoundary(QString filename);
 
     //modules ui callback
-    void modules_send_238();
-	void modules_send_251();
+    // Note: modulesSend238/251/252 are Q_INVOKABLE versions for QML
 
     //boundary UI for recording new boundary
-    void boundary_calculate_area();
-    void boundary_update_list();
-    void boundary_start();
-    void boundary_stop();
-    void boundary_add_point();
-    void boundary_delete_last_point();
-    void boundary_pause();
-    void boundary_record();
-    void boundary_restart();
-    void boundary_delete(int which_boundary);
-    void boundary_set_drivethru(int which_boundary, bool drive_through);
-    void boundary_delete_all();
+    void boundary_new_from_KML(QString filename);
 
     void headland_save();
     void headlines_save();
@@ -700,59 +684,28 @@ public slots:
 
     //headland creation
 
-    void onBtnResetDirection_clicked();
-    //left column
-    void onBtnAgIO_clicked();
+    void resetDirection();
     //right column
-    void onBtnContour_clicked();
-    void onBtnAutoYouTurn_clicked();
-    void onBtnSwapAutoYouTurnDirection_clicked();
-    void onBtnContourPriority_clicked(bool isRight);
-    void onBtnContourLock_clicked();
+    void contourPriority(bool isRight);
     //bottom row
-    void onBtnResetTool_clicked();
-    void onBtnHeadland_clicked();
-    void onBtnHydLift_clicked();
-    void onBtnFlag_clicked();
     void onBtnTramlines_clicked();
-    void onBtnSnapSideways_clicked(double distance);
-    void onBtnSnapToPivot_clicked();
-    //don't need ablineedit
-    void onBtnYouSkip_clicked();
 
+    void snapSideways(double distance);
+    void snapToPivot();
 
     //displaybuttons.qml
-    void onBtnTiltDown_clicked();
-    void onBtnTiltUp_clicked();
-    void onBtn2D_clicked();
-    void onBtn3D_clicked();
-    void onBtnN2D_clicked();
-    void onBtnN3D_clicked();
-
-    void onBtnZoomIn_clicked();
-    void onBtnZoomOut_clicked();
-
-    void onBtnRedFlag_clicked();
-    void onBtnGreenFlag_clicked();
-    void onBtnYellowFlag_clicked();
-    void onBtnDeleteFlag_clicked();
-    void onBtnDeleteAllFlags_clicked();
 
     void SwapDirection();
     void turnOffBoundAlarm();
 
-    void onBtnManUTurn_clicked(bool right); //TODO add the skip number as a parameter
-    void onBtnLateral_clicked(bool right); //TODO add the skip number as a parameter
-    void onBtnResetSim_clicked();
-    void onBtnRotateSim_clicked();
+    void centerOgl();
 
-    void onBtnCenterOgl_clicked();
-
-    void onDeleteAppliedArea_clicked();
+    void deleteAppliedArea();
 
     /***************************
      * from OpenGL.Designer.cs *
      ***************************/
+    void render_main_fbo();
     void oglMain_Paint();
     void openGLControl_Initialized();
     void openGLControl_Shutdown();
@@ -763,11 +716,13 @@ public slots:
     void oglBack_Paint();
     void openGLControlBack_Initialized();
 
+    void oglZoom_Paint();
+
     /***
      * UDPCOMM.Designer.cs
      * formgps_udpcomm.cpp
      ***/
-    void ReceiveFromAgIO(); // in slots below
+    // void ReceiveFromAgIO(); // ❌ REMOVED - AgIOService Workers handle all UDP communication
 
     /*******************
      * simulator       *
@@ -780,20 +735,33 @@ public slots:
                      double altitude,
                      double satellitesTracked);
 
-    void onSimNewSteerAngle(double steerAngleAve);
-
-    void onSimTimerTimeout();
+    // Phase 6.0.24: GPS timer callback for real GPS mode (40 Hz fixed rate)
+    void onGPSTimerTimeout();
 
     /*
      * misc
      */
-    void FileSaveEverythingBeforeClosingField();
+    void FileSaveEverythingBeforeClosingField(bool saveVehicle = true);
+    void FileSaveTracks();
 
     /* formgps_classcallbacks.cpp */
-    void onStopAutoSteer(); //cancel autosteer and ensure button state
-    void onSectionMasterAutoOff();
-    void onSectionMasterManualOff();
     void onStoppedDriving();
+
+signals:
+    void do_processSectionLookahead();
+    void do_processOverlapCount();
+
+private:
+    // OLD translator removed - now using m_translator
+
+    // PHASE 6.0.33: Two-buffer pattern for position stability
+    // Separates RAW GPS position (immutable) from CORRECTED position (computed)
+    // Prevents cascade corrections when timer calls UpdateFixPosition() between GPS packets
+    Vec2 m_rawGpsPosition;          // RAW GPS position (8 Hz updates, never corrected)
+    QMutex m_rawGpsPositionMutex;   // Thread-safe access (onNmeaDataReady writes, UpdateFixPosition reads)
+
+    // ===== Q_PROPERTY MEMBER VARIABLES =====
+    // 69 members for optimized properties
 
 };
 

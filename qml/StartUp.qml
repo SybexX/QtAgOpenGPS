@@ -28,7 +28,7 @@ Rectangle{
         anchors.left: parent.left
         anchors.margins: 5
         text: qsTr("About AgOpenGPS")
-        font.pixelSize: 10
+        font.pointSize: 13
     }
     AnimatedImage {
         id: gif
@@ -49,11 +49,13 @@ Rectangle{
         spacing: 10
         Text{
             text: qsTr("Version 0.0")
+            font.pointSize: 13
             wrapMode: Text.WordWrap
             width: disclaimer.width
         }
         Text{
             text: qsTr("Terms and Conditions")
+            font.pointSize: 13
             wrapMode: Text.WordWrap
             width: disclaimer.width
         }
@@ -61,34 +63,40 @@ Rectangle{
             text: qsTr("If you distribute copies of this FREE program, whether gratis or for a fee, impro" +
                        "ved, changed, you must pass on to the recipients the same freedoms that you rece" +
                        "ived as Outlined in the GPLv3 License.")
+            font.pointSize: 13
             wrapMode: Text.WordWrap
             width: disclaimer.width
         }
         Text{
             text: qsTr("You must make sure that they, too, receive or can get the source code. And you must"+
                        " show them these terms so they know their rights. Don't steal others work and call it your own")
+            font.pointSize: 13
             wrapMode: Text.WordWrap
             width: disclaimer.width
         }
         Text{
             text: qsTr("AgOpenGPS is strictly educational software to learn about guidance systems, GPS sentences"+
                        ", and theoretical application of machine control.")
+            font.pointSize: 13
             wrapMode: Text.WordWrap
             width: disclaimer.width
         }
         Text {
             text: qsTr("It is in no way to be used on real equipment in any circumstance. A simulator is provided"+
                        " to allow the student to safely experience machine guidance.")
+            font.pointSize: 13
             wrapMode: Text.WordWrap
             width: disclaimer.width
         }
         Text{
             text: qsTr("There are not safety systems in the software and none are implied.")
+            font.pointSize: 13
             wrapMode: Text.WordWrap
             width: disclaimer.width
         }
         Text{
             text: qsTr("Use at your own Risk")
+            font.pointSize: 13
             wrapMode: Text.WordWrap
             width: disclaimer.width
         }
@@ -112,9 +120,11 @@ Rectangle{
 //        }
         Text{
             text: qsTr("Official Repository")
+            font.pointSize: 13
         }
         Text{
             text: "<a href='https://github.com/torriem/QtAgOpenGPS'>https://github.com/torriem/QtAgOpenGPS</a>"
+            font.pointSize: 13
         }
     }
     RowLayout{
@@ -130,6 +140,7 @@ Rectangle{
             onClicked: Qt.quit()
             Text{
                 text: qsTr("Disagree")
+                font.pointSize: 13
                 anchors.top: parent.bottom
             }
         }
@@ -139,6 +150,7 @@ Rectangle{
             onClicked: startUp.visible = false
             Text{
                 text: qsTr("I Agree to the Terms<br> and Conditions")
+                font.pointSize: 13
                 anchors.top: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
             }

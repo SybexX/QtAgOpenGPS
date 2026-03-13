@@ -5,6 +5,7 @@
 import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
+//import Settings
 
 import ".."
 import "steercomponents"
@@ -14,7 +15,7 @@ Item {
     Rectangle{
         id: configDisplay
         anchors.fill: parent
-        color: aog.backgroundColor
+        color: aogInterface.backgroundColor
         GridLayout{
             id:buttonsMain
             anchors.top: parent.top
@@ -30,13 +31,13 @@ Item {
                 id: fieldTexture
                 text: qsTr("Field Texture")
                 icon.source: prefix + "/images/Config/ConD_FloorTexture.png"
-                isChecked: settings.setDisplay_isTextureOn
-                onCheckedChanged: settings.setDisplay_isTextureOn = checked
+                isChecked: SettingsManager.display_isTextureOn
+                onCheckedChanged: SettingsManager.display_isTextureOn = checked
             }
             DisplayAndFeaturesBtns{
                 id: autoDayNight
-                isChecked: settings.setDisplay_isAutoDayNight
-                onCheckedChanged: settings.setDisplay_isAutoDayNight = !checked
+                isChecked: SettingsManager.display_autoDayNight
+                onCheckedChanged: SettingsManager.display_autoDayNight = !checked
                 text: qsTr("Auto Day Night")
                 icon.source: prefix + "/images/Config/ConD_AutoDayNight.png"
             }
@@ -44,36 +45,36 @@ Item {
                 id:startFullScreen
                 text: qsTr("Start FullScreen")
                 icon.source: prefix + "/images/Config/ConD_FullScreenBegin.png"
-                isChecked: settings.setDisplay_isStartFullScreen
-                onCheckedChanged: settings.setDisplay_isStartFullScreen = checked
+                isChecked: SettingsManager.display_isStartFullscreen
+                onCheckedChanged: SettingsManager.display_isStartFullscreen = checked
             }
             DisplayAndFeaturesBtns{
                 id:grid
                 text: qsTr("Grid")
                 icon.source: prefix + "/images/Config/ConD_Grid.png"
-                isChecked: settings.setMenu_isGridOn
-                onCheckedChanged: settings.setMenu_isGridOn = checked
+                isChecked: SettingsManager.menu_isGridOn
+                onCheckedChanged: SettingsManager.menu_isGridOn = checked
             }
             DisplayAndFeaturesBtns{
                 id:sky
                 text:qsTr("Sky")
                 icon.source: prefix + "/images/Config/ConD_Sky.png"
-                isChecked: settings.setMenu_isSkyOn
-                onCheckedChanged: settings.setMenu_isSkyOn = checked
+                isChecked: SettingsManager.menu_isSkyOn
+                onCheckedChanged: SettingsManager.menu_isSkyOn = checked
             }
             DisplayAndFeaturesBtns{
                 id:brightness
                 text:qsTr("Brightness")
                 icon.source: prefix + "/images/BrightnessUp.png"
-                isChecked: settings.setDisplay_isBrightnessOn
-                onCheckedChanged: settings.setDisplay_isBrightnessOn = checked
+                isChecked: SettingsManager.display_isBrightnessOn
+                onCheckedChanged: SettingsManager.display_isBrightnessOn = checked
             }
             DisplayAndFeaturesBtns{
                 id:lightBar
                 text:qsTr("Lightbar")
                 icon.source: prefix + "/images/Config/ConD_LightBar.png"
-                isChecked: settings.setMenu_isLightbarOn
-                onCheckedChanged: settings.setMenu_isLightbarOn = checked
+                isChecked: SettingsManager.menu_isLightBarOn
+                onCheckedChanged: SettingsManager.menu_isLightBarOn = checked
             }
             DisplayAndFeaturesBtns{
                 id:logNMEA
@@ -84,29 +85,36 @@ Item {
                 id: guideLines
                 text: qsTr("GuideLines")
                 icon.source: prefix + "/images/Config/ConD_ExtraGuides.png"
-                isChecked: settings.setMenu_isSideGuideLines
-                onCheckedChanged: settings.setMenu_isSideGuideLines = checked
+                isChecked: SettingsManager.menu_isSideGuideLines
+                onCheckedChanged: SettingsManager.menu_isSideGuideLines = checked
             }
             DisplayAndFeaturesBtns{
                 id:svennArrow
                 text: qsTr("Svenn Arrow")
                 icon.source: prefix + "/images/SvennArrow.png"
-                isChecked: settings.setDisplay_isSvennArrowOn
-                onCheckedChanged: settings.setDisplay_isSvennArrowOn
+                isChecked: SettingsManager.display_isSvennArrowOn
+                onCheckedChanged: SettingsManager.display_isSvennArrowOn = checked
             }
             DisplayAndFeaturesBtns{
                 id: compass
                 text: qsTr("Compass")
                 icon.source: prefix + "/images/Images/z_Compass.png"
-                isChecked: settings.setMenu_isCompassOn
-                onCheckedChanged: settings.setMenu_isCompassOn
+                isChecked: SettingsManager.menu_isCompassOn
+                onCheckedChanged: SettingsManager.menu_isCompassOn = checked
+            }
+            DisplayAndFeaturesBtns{
+                id: keyboard
+                text: qsTr("Keyboard")
+                icon.source: prefix + "/images/Config/ConD_KeyBoard.png"
+                isChecked: SettingsManager.menu_isKeyboardOn
+                onCheckedChanged: SettingsManager.menu_isKeyboardOn = checked
             }
             /*DisplayAndFeaturesBtns{ //appears there is no setting for this
                 id: speedo
                 text: qsTr("Speedometer")
                 icon.source: prefix + "/images/Images/z_Speedo.png"
-                isChecked: settings.setMenu_isSpeedoOn
-                onCheckedChanged: settings.setMenu_isSpeedoOn
+                isChecked: Settings.menu_isSpeedoOn
+                onCheckedChanged: Settings.menu_isSpeedoOn
             }*/
         }
 		TextLine{
@@ -130,18 +138,19 @@ Item {
                 id:metric
                 icon.source: prefix + "/images/Config/ConD_Metric.png"
                 //text: qsTr("Metric")
-                property bool settingsChecked: settings.setMenu_isMetric
+                // Threading Phase 1: Metric unit selection
+                property bool settingsChecked: false
                 checkable: true
-                isChecked: settings.setMenu_isMetric
-                onCheckedChanged: settings.setMenu_isMetric = checked
+                isChecked: SettingsManager.menu_isMetric
+                onCheckedChanged: SettingsManager.menu_isMetric = checked
             }
             IconButtonColor{
                 id:imperial
                 icon.source: prefix + "/images/Config/ConD_Imperial.png"
                 text: ""
                 checkable: true
-                isChecked: !settings.setMenu_isMetric
-                onCheckedChanged: settings.setMenu_isMetric = !checked
+                isChecked: !SettingsManager.menu_isMetric
+                onCheckedChanged: SettingsManager.menu_isMetric = !checked
             }
         }
     }

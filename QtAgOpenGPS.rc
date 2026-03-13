@@ -1,0 +1,6 @@
+// QtAgOpenGPS Windows Resource File
+// Sets the application icon for the executable
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON                    "icons/icon.ico"

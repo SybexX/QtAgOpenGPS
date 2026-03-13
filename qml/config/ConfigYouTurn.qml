@@ -5,6 +5,9 @@
 import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
+//import Settings
+import AOG
+
 
 import ".."
 import "../components"
@@ -17,7 +20,7 @@ Item {
     anchors.fill: parent
     Rectangle{
         anchors.fill: parent
-        color: aog.backgroundColor
+        color: aogInterface.backgroundColor
         GridLayout{
             anchors.top: parent.top
             anchors.left: parent.left
@@ -50,9 +53,10 @@ Item {
             SpinBoxM{
                 objectName: "UturnRadius"
                 from: 2
-                boundValue: settings.set_youTurnRadius
-                stepSize: settings.setMenu_isMetric ?  1 : 5
-                onValueChanged: settings.set_youTurnRadius = value
+                // Threading Phase 1: U-turn radius setting
+                boundValue: SettingsManager.youturn_radius
+                stepSize: SettingsManager.menu_isMetric ?  1 : 5
+                onValueChanged: SettingsManager.youturn_radius = value
                 to: 100
                 editable: true
 				decimals: 1
@@ -60,8 +64,9 @@ Item {
             SpinBoxM{
                 objectName: "UturnDistance"
                 from: 0
-                boundValue: settings.set_youTurnDistanceFromBoundary
-                onValueChanged: settings.set_youTurnDistanceFromBoundary = value
+                // Threading Phase 1: U-turn distance from boundary
+                boundValue: SettingsManager.youturn_distanceFromBoundary
+                onValueChanged: SettingsManager.youturn_distanceFromBoundary = value
                 to: 100
                 editable: true
 				decimals: 1
@@ -69,35 +74,37 @@ Item {
             SpinBoxM{
                 objectName: "UturnExtensionLength"
                 from: 3
-                boundValue: settings.set_youTurnExtensionLength
-                onValueChanged: settings.set_youTurnExtensionLength = value
+                // Threading Phase 1: U-turn extension length
+                boundValue: SettingsManager.youturn_extensionLength
+                onValueChanged: SettingsManager.youturn_extensionLength = value
                 to:50
                 editable: true
             }
             SpinBoxM{
                 objectName: "UturnSmoothing"
                 from: 8
-                boundValue: settings.setAS_uTurnSmoothing
-                onValueChanged: settings.setAS_uTurnSmoothing = value
+                // Threading Phase 1: U-turn smoothing value
+                boundValue: SettingsManager.as_uTurnSmoothing
+                onValueChanged: SettingsManager.as_uTurnSmoothing = value
                 to:50
                 editable: true
             }
             Text{
-                text: utils.m_unit()
+                text: Utils.m_unit()
                 font.bold: true
             }
             Text{
-                text: utils.m_unit()
+                text: Utils.m_unit()
                 font.bold: true
             }
             Text{
-                text: utils.m_unit() + " \n" + qsTr("Set Extension
+                text: Utils.m_unit() + " \n" + qsTr("Set Extension
 Length to 2 or
 3x Radius")
                 font.bold: true
             }
             Text{
-                text: utils.m_unit() + " \n" + qsTr("Set Smoothing
+                text: Utils.m_unit() + " \n" + qsTr("Set Smoothing
  to 3 or 4x
 Radius")
                 font.bold: true
@@ -137,15 +144,17 @@ Radius")
                     id: uTurnUBtn
                     icon.source: prefix + "/images/YouTurnU.png"
                     checkable: true
-                    isChecked: settings.set_uTurnStyle === 0
-                    onClicked: settings.set_uTurnStyle = 1
+                    // Threading Phase 1: U-turn style (U-shape)
+                    isChecked: SettingsManager.youturn_style === 0
+                    onClicked: SettingsManager.youturn_style = 0
                 }
                 IconButtonColor{
                     id: uTurnHBtn
                     checkable: true
                     icon.source: prefix + "/images/YouTurnH.png"
-                    isChecked: settings.set_uTurnStyle === 1
-                    onClicked: settings.set_uTurnStyle = 1
+                    // Threading Phase 1: U-turn style (H-shape)
+                    isChecked: SettingsManager.youturn_style === 1
+                    onClicked: SettingsManager.youturn_style = 1
                 }
             }
         }

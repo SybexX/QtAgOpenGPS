@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
 //
 // The "Tools" button on main screen
-import QtQuick 2.0
-import QtQuick.Controls.Fusion
-
-import ".."
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+//import Settings
+import AOG
+// Interface import removed - now QML_SINGLETON
 import "components" as Comp
+import "wizards" as Wiz
 
 //Item{
 //    id: toolsWindowItem
@@ -14,7 +17,7 @@ import "components" as Comp
 //    height: mainWindow.height
     Drawer {
         id: toolsMenu
-        width: 250
+        width: 270 * theme.scaleWidth
         height: mainWindow.height
         modal: true
 //        onVisibleChanged: if (visible === false){
@@ -25,7 +28,7 @@ import "components" as Comp
             id: toolsMenuContent
             anchors.fill: parent
             height: toolsMenu.height
-            color: aog.blackDayWhiteNight
+            color: aogInterface.blackDayWhiteNight
         }
 
         Comp.ScrollViewExpandableColumn {
@@ -35,150 +38,137 @@ import "components" as Comp
             Comp.IconButtonTextBeside {
                 id: wizards
                 icon.source: prefix + "/images/WizardWand.png"
-                width: 250
-                height: 50
                 text: qsTr("Wizards")
                 onClicked: wizardMenu.visible = !wizardMenu.visible
-                visible: false //todo later
+                visible: true //todo later
             }
 
             Comp.IconButtonTextBeside {
                 id: charts
                 icon.source: prefix + "/images/Chart.png"
-                width: 250
-                height: 50
                 text: qsTr("Charts")
-                onClicked: chartMenu.visible = !chartMenu.visible
-                visible: false //todo later
+                onClicked: chartsMenu.visible = !chartsMenu.visible
+                visible: true
             }
 
             Comp.IconButtonTextBeside {
                 id: smABCurve
                 icon.source: prefix + "/images/ABSmooth.png"
-                width: 250
-                height: 50
                 text: qsTr("Smooth AB Curve")
-                visible: settings.setFeature_isABSmoothOn
+                // Threading Phase 1: AB smooth feature visibility
+                visible: SettingsManager.feature_isABSmoothOn
             }
 
             Comp.IconButtonTextBeside {
                 id: delContourPaths
                 icon.source: prefix + "/images/TrashContourRef.png"
-                width: 250
-                height: 50
                 text: qsTr("Delete Contour Paths")
-                visible:settings.setFeature_isHideContourOn
+                // Threading Phase 1: Contour hide feature visibility
+                visible: SettingsManager.feature_isHideContourOn
             }
 
-            Comp.IconButtonTextBeside {
-                id: delAppliedArea
-                icon.source: prefix + "/images/TrashApplied.png"
-                width: 250
-                height: 50
-                text: qsTr("Delete Applied Area")
-                onClicked: aog.deleteAppliedArea()
-            }
-
-            Comp.IconButtonTextBeside {
-                id: webcam
-                icon.source: prefix + "/images/Webcam.png"
-                width: 250
-                height: 50
-                text: qsTr("WebCam")
-                visible:settings.setFeature_isWebCamOn
-            }
+            // Comp.IconButtonTextBeside {
+            //     id: webcam
+            //     icon.source: prefix + "/images/Webcam.png"
+            //     text: qsTr("WebCam")
+            //     visible:Settings.feature_isWebCamOn
+            //     onClicked: cam1.visible = !cam1.visible, toolsMenu.visible = false
+            // }
 
             Comp.IconButtonTextBeside {
                 id: offsetFix
                 icon.source: prefix + "/images/YouTurnReverse.png" // this is horrible. This has nothing to do with YouTurnReverse.
-                width: 250
-                height: 50
                 text: qsTr("Offset Fix")
-                visible: settings.setFeature_isOffsetFixOn
+                // Threading Phase 1: Offset fix feature visibility
+                visible: SettingsManager.feature_isOffsetFixOn
+            }
+        }
+
+
+        Drawer {
+            id: wizardMenu
+            width: 270 * theme.scaleWidth
+            height: mainWindow.height
+            modal: true
+
+            contentItem: Rectangle{
+                id: wizardMenuContent
+                anchors.fill: parent
+                height: wizardMenu.height
+                color: aogInterface.blackDayWhiteNight
+            }
+
+            Grid {
+                id: grid2
+                height: childrenRect.height
+                width: childrenRect.width
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.topMargin: 5
+                spacing: 10
+                flow: Grid.TopToBottom
+                rows: 2
+                columns: 1
+
+            Comp.IconButtonTextBeside{
+                id: wasWiz
+                text: qsTr("Was Wizard")
+                onClicked: { wizardMenu.visible = false, toolsMenu.visible = false, wasWizard.show()}
+            }
+
+            Comp.IconButtonTextBeside{
+                id: steerWiz
+                text: qsTr("Steer Wizard")
+            }
+        }
+    }
+    Drawer {
+        id: chartsMenu
+        width: 270 * theme.scaleWidth
+        height: mainWindow.height
+        modal: true
+//        onVisibleChanged: if (visible === false){
+//                             toolsWindowItem.visible = false
+//                          }
+
+        contentItem: Rectangle{
+            id: chartsMenuContent
+            anchors.fill: parent
+            height: chartsMenu.height
+            color: aogInterface.blackDayWhiteNight
+        }
+
+        Comp.ScrollViewExpandableColumn {
+            id: chartsGrid
+            anchors.fill: parent
+
+            Comp.IconButtonTextBeside{
+                id: steerChart
+                text: qsTr("Steer Chart")
+                icon.source: prefix + "/images/AutoSteerOn.png"
+                onClicked: chartsMenu.visible = !chartsMenu.visible, toolsMenu.visible = false, steerCharta.show(), toolsMenu.visible = false
+                visible: true
+            }
+            Comp.IconButtonTextBeside{
+                id: headingChart
+                text: qsTr("Heading Chart")
+                onClicked: chartsMenu.visible = !chartsMenu.visible, toolsMenu.visible = false, headingCharta.show()
+                icon.source: prefix + "/images/Config/ConS_SourcesHeading.png"
+
+            }
+            Comp.IconButtonTextBeside{
+                id: xteChart
+                text: qsTr("XTE Chart")
+                icon.source: prefix + "/images/AutoManualIsAuto.png"
+                onClicked: chartsMenu.visible = !chartsMenu.visible, toolsMenu.visible = false, xteCharta.show()
+                visible: true
+            }
+            Comp.IconButtonTextBeside{
+                id: rollChart
+                text: qsTr("Roll Chart")
+                icon.source: prefix + "/images/Config/ConDa_InvertRoll.png"
             }
         }
     }
 
-//    Rectangle{ //this all needs to be done sometime
-//        id: wizardMenu
-//        width: childrenRect.width+10
-//        height: childrenRect.height+10
-//        visible: false
-//        color: "black"
-//        border.color: "lime"
-//        anchors.left: toolsMenu.right
-
-
-
-//        Grid {
-//            id: grid2
-//            height: childrenRect.height
-//            width: childrenRect.width
-//            anchors.left: parent.left
-//            anchors.leftMargin: 5
-//            anchors.top: parent.top
-//            anchors.topMargin: 5
-//            spacing: 10
-//            flow: Grid.TopToBottom
-//            rows: 1
-//            columns: 1
-
-//            IconButtonTextBeside{
-//                id: steerWiz
-//                width: 250
-//                height: 50
-//                text: qsTr("Steer Wizard")
-//            }
-//        }
-//    }
-//    Rectangle{
-//        id: chartMenu
-//        width: childrenRect.width+10
-//        height: childrenRect.height+10
-//        visible: false
-//        color: "black"
-//        border.color: "lime"
-//        anchors.left: toolsMenu.right
-
-
-
-//        Grid {
-//            id: grid3
-//            height: childrenRect.height
-//            width: childrenRect.width
-//            anchors.left: parent.left
-//            anchors.leftMargin: 5
-//            anchors.top: parent.top
-//            anchors.topMargin: 5
-//            spacing: 10
-//            flow: Grid.TopToBottom
-//            rows: 4
-//            columns: 1
-
-//            IconButtonTextBeside{
-//                id: steerChart
-//                width: 250
-//                height: 50
-//                text: qsTr("Steer Chart")
-//            }
-//            IconButtonTextBeside{
-//                id: headingChart
-//                width: 250
-//                height: 50
-//                text: qsTr("Heading Chart")
-//            }
-//            IconButtonTextBeside{
-//                id: xteChart
-//                width: 250
-//                height: 50
-//                text: qsTr("XTE Chart")
-//            }
-//            IconButtonTextBeside{
-//                id: rollChart
-//                width: 250
-//                height: 50
-//                text: qsTr("Roll Chart")
-//            }
-//        }
-//    }
-//}
+}

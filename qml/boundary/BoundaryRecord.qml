@@ -7,6 +7,7 @@ import QtQuick.Layouts
 import Qt.labs.folderlistmodel
 import QtQuick.Controls.Fusion
 import QtQuick.Controls.Material
+import AOG
 
 import ".."
 import "../components"
@@ -20,7 +21,7 @@ MoveablePopup {
     onVisibleChanged: {
         if (visible) {
             boundaryRecordBtn.checked = false
-            boundaryInterface.start()
+            BoundaryInterface.start() // Qt 6.8 MODERN: Direct Q_INVOKABLE call
         }
     }
     TopLine{
@@ -35,7 +36,7 @@ MoveablePopup {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         color: "lightgray"
-        border.color: "aqua"
+        border.color: "black"
         border.width: 2
         SpinBoxCM{
             height: 80  * theme.scaleHeight
@@ -44,11 +45,11 @@ MoveablePopup {
             anchors.top: recordBoundaryWindow.top
             anchors.margins: 5
             objectName: "boundaryRecordOffset"
-            text: "Centimeter"
+            text: qsTr("Centimeter")
             from: 0
             to: 1968
-            boundValue: boundaryInterface.createBndOffset
-            onValueChanged: boundaryInterface.createBndOffset = value
+            boundValue: BoundaryInterface.createBndOffset
+            onValueChanged: BoundaryInterface.createBndOffset = value
         }
         IconButtonTransparent{
             id: side2Record
@@ -62,12 +63,12 @@ MoveablePopup {
             border: 1
             height: 80  * theme.scaleHeight
             width: 80  * theme.scaleWidth
-            isChecked: ! boundaryInterface.isDrawRightSide
+            isChecked: !BoundaryInterface.isDrawRightSide
             onClicked: {
                 if (checked)
-                    boundaryInterface.isDrawRightSide = false
+                    BoundaryInterface.isDrawRightSide = false
                 else
-                    boundaryInterface.isDrawRightSide = true
+                    BoundaryInterface.isDrawRightSide = true
             }
         }
 
@@ -85,17 +86,17 @@ MoveablePopup {
                 icon.source: prefix + "/images/BoundaryDelete.png"
                 height: 80  * theme.scaleHeight
                 width: 80  * theme.scaleWidth
-                onClicked: boundaryInterface.reset()
+                onClicked: BoundaryInterface.reset() // Qt 6.8 MODERN: Direct Q_INVOKABLE call
             }
             Column{
                 height: boundaryDelete.height
                 width: boundaryDelete.width
                 spacing: 20 * theme.scaleHeight
                 Text{
-                    text: qsTr("Area:") + " " + utils.area_to_unit_string(boundaryInterface.area,1) + " " + utils.area_unit()
+                    text: qsTr("Area:") + " " + Utils.area_to_unit_string(BoundaryInterface.area,1) + " " + Utils.area_unit()
                 }
                 Text{
-                    text: qsTr("Points:") + " " + boundaryInterface.pts
+                    text: qsTr("Points:") + " " + BoundaryInterface.pointCount
                 }
             }
         }
@@ -117,7 +118,7 @@ MoveablePopup {
                 icon.source: prefix + "/images/PointAdd.png"
                 height: 80  * theme.scaleHeight
                 width: 80  * theme.scaleWidth
-                onClicked: boundaryInterface.add_point()
+                onClicked: BoundaryInterface.addPoint() // Qt 6.8 MODERN: Direct Q_INVOKABLE call
             }
             IconButtonTransparent{
                 border: 1
@@ -125,7 +126,7 @@ MoveablePopup {
                 icon.source: prefix + "/images/PointDelete.png"
                 height: 80  * theme.scaleHeight
                 width: 80  * theme.scaleWidth
-                onClicked: boundaryInterface.delete_last_point()
+                onClicked: BoundaryInterface.deleteLastPoint() // Qt 6.8 MODERN: Direct Q_INVOKABLE call
             }
             IconButtonTransparent{
                 id: boundaryRecordBtn
@@ -138,9 +139,9 @@ MoveablePopup {
 
                 onCheckedChanged: {
                     if (checked)
-                        boundaryInterface.record()
+                        BoundaryInterface.record() // Qt 6.8 MODERN: Direct Q_INVOKABLE call
                     else
-                        boundaryInterface.pause()
+                        BoundaryInterface.pause() // Qt 6.8 MODERN: Direct Q_INVOKABLE call
                 }
             }
 
@@ -149,7 +150,7 @@ MoveablePopup {
                 icon.source: prefix + "/images/OK64.png"
                 onClicked: {
                     boundaryRecord.visible = false
-                    boundaryInterface.stop()
+                    BoundaryInterface.stop() // Qt 6.8 MODERN: Direct Q_INVOKABLE call
                 }
                 height: 80  * theme.scaleHeight
                 width: 80  * theme.scaleWidth

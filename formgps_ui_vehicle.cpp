@@ -4,16 +4,18 @@
 // GUI to backend vehicle interface
 #include "formgps.h"
 #include "qmlutil.h"
-#include "aogproperty.h"
-#include "qmlsettings.h"
+#include "classes/settingsmanager.h"
+#include <QTimer>
 
-QString caseInsensitiveFilename(QString directory, QString filename);
-
-extern QMLSettings qml_settings;
+QString caseInsensitiveFilename(const QString &directory, const QString &filename);
 
 void FormGPS::vehicle_saveas(QString vehicle_name) {
+#ifdef __ANDROID__
+    QString directoryName = androidDirectory + QCoreApplication::applicationName() + "/Vehicles";
+#else
     QString directoryName = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
-            + "/" + QCoreApplication::applicationName() + "/Vehicles";
+                            + "/" + QCoreApplication::applicationName() + "/Vehicles";
+#endif
 
     QDir saveDir(directoryName);
     if (!saveDir.exists()) {
@@ -26,13 +28,40 @@ void FormGPS::vehicle_saveas(QString vehicle_name) {
 
     QString filename = directoryName + "/" + caseInsensitiveFilename(directoryName, vehicle_name);
 
-    settings->saveJson(filename);
+    // CRITICAL: Save current vehicle AND tool settings to SettingsManager BEFORE saving JSON
+    qDebug() << "Before CVehicle::saveSettings()";
+    CVehicle::instance()->saveSettings();
+    qDebug() << "CVehicle::saveSettings() completed";
+
+    qDebug() << "Before tool.saveSettings()";
+    this->tool.saveSettings();
+    qDebug() << "tool.saveSettings() completed";
+
+    // RESTORED: JSON Vehicle Profile System (format compatible avec Documents/QtAgOpenGPS/Vehicles/)
+    // ASYNC SOLUTION: Defer saveJson to avoid mutex deadlock (same as field_close fix)
+    qDebug() << "Scheduling async saveJson:" << filename;
+    QTimer::singleShot(50, this, [this, filename]() {
+        qDebug() << "Executing async saveJson:" << filename;
+        SettingsManager::instance()->saveJson(filename);
+
+        // Set as active profile for future auto-saving
+        SettingsManager::instance()->setActiveVehicleProfile(filename);
+        qDebug() << "Async saveJson completed and set as active profile:" << filename;
+
+        // Update vehicle list after save is complete for real-time UI refresh
+        this->vehicle_update_list();
+        qDebug() << "Vehicle list updated after save";
+    });
 
 }
 
 void FormGPS::vehicle_load(QString vehicle_name) {
+#ifdef __ANDROID__
+    QString directoryName = androidDirectory + QCoreApplication::applicationName() + "/Vehicles";
+#else
     QString directoryName = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
                             + "/" + QCoreApplication::applicationName() + "/Vehicles";
+#endif
 
     QDir loadDir(directoryName);
     if (!loadDir.exists()) {
@@ -48,24 +77,24 @@ void FormGPS::vehicle_load(QString vehicle_name) {
 
     QString filename = directoryName + "/" + caseInsensitiveFilename(directoryName, vehicle_name);
 
-    settings->loadJson(filename);
+    // CRITICAL: Set as active profile BEFORE loading to prevent vehicleName corruption
+    // This ensures that loadJson() sets the correct active profile path before loading
+    SettingsManager::instance()->setActiveVehicleProfile(filename);
+    qDebug() << "Vehicle profile set as active before loading:" << filename;
+
+    // RESTORED: JSON Vehicle Profile Loading System (format compatible avec Documents/QtAgOpenGPS/Vehicles/)
+    qDebug() << "Vehicle load starting:" << filename;
+    SettingsManager::instance()->loadJson(filename);
+    qDebug() << "Vehicle JSON loaded successfully:" << filename;
 }
 
 void FormGPS::vehicle_delete(QString vehicle_name) {
-    /*
-    if ((bool)property_setMenu_isMetric) {
-        settings->setValue("display/isMetric", "false");
-        qml_settings.insert("testing123","false");
-    } else {
-        settings->setValue("display/isMetric", "true");
-        qml_settings.insert("testing123","true");
-    }
-
-    return;
-    */
-
+#ifdef __ANDROID__
+    QString directoryName = androidDirectory + QCoreApplication::applicationName() + "/Vehicles";
+#else
     QString directoryName = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
                             + "/" + QCoreApplication::applicationName() + "/Vehicles";
+#endif
 
     QDir vehicleDir(directoryName);
     if (vehicleDir.exists()) {
@@ -75,8 +104,12 @@ void FormGPS::vehicle_delete(QString vehicle_name) {
 }
 
 void FormGPS::vehicle_update_list() {
+#ifdef __ANDROID__
+    QString directoryName = androidDirectory + QCoreApplication::applicationName() + "/Vehicles";
+#else
     QString directoryName = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
                             + "/" + QCoreApplication::applicationName() + "/Vehicles";
+#endif
 
     QDir vehicleDirectory(directoryName);
     if(!vehicleDirectory.exists()) {
@@ -99,6 +132,7 @@ void FormGPS::vehicle_update_list() {
         index++;
     }
 
-    this->vehicle.setProperty("vehicle_list", vehicleList);
+    CVehicle::instance()->setVehicleList(vehicleList);
+    // Qt 6.8 QProperty + BINDABLE: vehicle_listChanged signal removed, automatic notification
 }
 

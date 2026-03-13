@@ -6,7 +6,6 @@
 #include "vec2.h"
 #include "vec3.h"
 #include <QString>
-#include "ctrack.h"
 
 class QOpenGLFunctions;
 //namespace AgOpenGPS
@@ -19,7 +18,8 @@ class CNMEA;
 class CTram;
 class CCamera;
 class CAHRS;
-class CGuidance;
+class CTrk;
+class CWorldGrid;
 
 class CABLines
 {
@@ -56,12 +56,11 @@ public:
     //pure pursuit values
     Vec2 goalPointAB = Vec2(0, 0);
 
-    //List of all available ABLines
-    CTrk refLine;
-
-    double howManyPathsAway = 0.0;
-    bool isMakingABLine;
+    int howManyPathsAway = 0;              // Phase 6.0.43 BUG FIX: Changed from double to int for type consistency
+    int lastHowManyPathsAway = 98888;      // Phase 6.0.43: Track previous parallel line for conditional reconstruction
+    bool isMakingABLine = false;
     bool isHeadingSameWay = true;
+    bool lastIsHeadingSameWay = true;      // Phase 6.0.43: Track previous direction for conditional reconstruction
 
     double ppRadiusAB;
 
@@ -75,6 +74,7 @@ public:
     //design
     Vec2 desPtA = Vec2(0.2, 0.15);
     Vec2 desPtB = Vec2(0.2, 0.15);
+    bool isDesPtBSet = false;
 
     Vec2 desLineEndA = Vec2(0.3, 0.3);
     Vec2 desLineEndB = Vec2(0.3, 0.3);
@@ -100,26 +100,22 @@ public:
 
     void BuildCurrentABLineList(Vec3 pivot,
                                 double secondsSinceStart,
-                                CTrack &trk,
+                                CTrk &track,
                                 const CYouTurn &yt,
                                 const CVehicle &vehicle);
     void GetCurrentABLine(Vec3 pivot, Vec3 steer,
-                          bool isAutoSteerBtnOn,
+                          bool isBtnAutoSteerOn,
                           CVehicle &vehicle,
                           CYouTurn &yt,
                           const CAHRS &ahrs,
-                          CGuidance &gyd,
-                          CNMEA &pn, int &makeUTurnCounter);
-    void DrawABLineNew(QOpenGLFunctions *gl, const QMatrix4x4 &mvp,
-                       const CCamera &camera);
+                          CNMEA &pn);
+    void DrawABLineNew(QOpenGLFunctions *gl, const QMatrix4x4 &mvp);
 
     void DrawABLines(QOpenGLFunctions *gl, const QMatrix4x4 &mvp,
-                     bool isFontOn,
-                     const CTrack &trk,
-                     CYouTurn &yt,
-                     const CCamera &camera,
-                     const CGuidance &gyd);
-    void BuildTram(const CTrack &trk, CBoundary &bnd, CTram &tram);
+                     bool isFontOn, bool isRateMapOn, double camSetDistance,
+                     const CTrk &track,
+                     CYouTurn &yt);
+    void BuildTram(const CTrk &track, CBoundary &bnd, CTram &tram);
 
     CABLine &operator= (CABLine &src)
     {
@@ -143,11 +139,11 @@ public:
 
         goalPointAB = src.goalPointAB;
 
-        refLine = src.refLine;
-
         howManyPathsAway = src.howManyPathsAway;
+        lastHowManyPathsAway = src.lastHowManyPathsAway;  // Phase 6.0.43
         isMakingABLine = src.isMakingABLine;
         isHeadingSameWay = src.isHeadingSameWay;
+        lastIsHeadingSameWay = src.lastIsHeadingSameWay;  // Phase 6.0.43
 
         ppRadiusAB = src.ppRadiusAB;
 

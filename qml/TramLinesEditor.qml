@@ -15,8 +15,8 @@ import "components" as Comp
 Item {
 
     id: mainWindowTram
-    width: parent.width
-    height: parent.height
+   // width: parent.width
+   // height: parent.height
 
 
     Popup {
@@ -24,14 +24,14 @@ Item {
         //anchors.bottom: parent.bottom
         //anchors.right: parent.right
         //anchors.top: topLine.bottom
-        height: 600  * theme.scaleHeight
-        width: 300  * theme.scaleWidth
+        height: 600 // * theme.scaleHeight
+        width: 300 // * theme.scaleWidth
         modal: false
         visible: mainWindowTram.visible
         anchors.centerIn: parent
         Comp.TopLine{
             id: tramtopLine
-            titleText: "Tram Lines"
+            titleText: qsTr("Tram Lines")
         }
         Row{
             anchors.top: tramtopLine.bottom
@@ -45,7 +45,7 @@ Item {
                 icon.source: prefix + "/images/SnapLeftHalf.png"
             }
             Text{
-                text: "2.00 m"
+                text: qsTr("2.00 m")
                 font.bold: true
                 font.pixelSize: 15
                 anchors.verticalCenter: parent.verticalCenter
@@ -67,7 +67,7 @@ Item {
                 icon.source: prefix + "/images/ArrowLeft.png"
             }
             Text{
-                text: "10 cm"
+                text: qsTr("10 cm")
                 font.bold: true
                 font.pixelSize: 15
                 anchors.verticalCenter: parent.verticalCenter
@@ -145,13 +145,13 @@ Item {
             anchors.top: tramPasses.bottom
             spacing: 10  * theme.scaleHeight
             Text{
-                text: "Seed"
+                text: qsTr("Seed")
             }
             Text{
-                text: "Spray"
+                text: qsTr("Spray")
             }
             Text{
-                text: "Track"
+                text: qsTr("Track")
             }
         }
     }

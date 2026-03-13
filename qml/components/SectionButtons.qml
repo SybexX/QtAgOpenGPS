@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
 import QtQuick
 import QtQuick.Controls.Fusion
+//import Settings
+import AOG
 
 //This is a the row of on-screen section-control buttonw
 
 Rectangle {
     id: sectionButtons
+    objectName: "sectionButtons"
 
     /*
     MockSettings { //for testing with qmlscene only
@@ -17,14 +20,14 @@ Rectangle {
         id: aog
     }*/
 
+    // Tool index - which tool's sections to display
+    property int toolIndex: 0
+
     width: 600
     height: childrenRect.height * theme.scaleHeight
 
-    color: "transparent"
+    color: "red"
 
-    property bool triState: true
-    property int numSections: (settings.setTool_isSectionsNotZones ? settings.setVehicle_numSections : settings.setTool_zones[0])
-    property var buttonState: [ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 ]
     property color offColor: "Crimson"
     property color offTextColor: "White"
     property color onColor: "DarkGoldenrod"
@@ -32,12 +35,10 @@ Rectangle {
     property color autoColor: "ForestGreen"
     property color autoTextColor: "White"
 
-    signal sectionClicked(int whichsection)
-
     //methods
     function setColors() {
         //same colors for sections and zones
-        if (settings.setDisplay_isDayMode) {
+        if (theme.displayIsDayMode) {
             sectionButtons.offColor = "Red"
             sectionButtons.offTextColor = "Black"
 
@@ -58,125 +59,47 @@ Rectangle {
         }
     }
 
-    function setSectionState (sectionNo: int, new_state: int) {
-        //states: 0 = off, 1 = auto, 2 = on
-        var temp1 = aog.sectionButtonState //actual sections or row units
-        var temp2 = sectionButtons.buttonState //onscreen section button
-        var j
-
-
-        if (settings.setTool_isSectionsNotZones) {
-            //1:1 correlation between buttons and sections
-            temp1[sectionNo] = new_state //this is the tie-in back to the C++ land
-            temp2[sectionNo] = new_state //this is the onscreen button
-        } else {
-            //zones, not buttons. numSections is the number of zones
-            temp2[sectionNo] = new_state; //this is the onscreen button
-
-            var zone_left
-            var zone_right
-
-            //get the left-most section in the zone
-            if (sectionNo===0) zone_left = 0
-            else zone_left = settings.setTool_zones[sectionNo]
-
-            //get the right-most section in the zone
-            zone_right = settings.setTool_zones[sectionNo+1]
-
-            //set all sections between left and right
-            for (j = zone_left ; j < zone_right ; j++) {
-                temp1[j] = new_state //set individual sections button state (grouped together)
-            }
-        }
-        aog.sectionButtonState = temp1
-        sectionButtons.buttonState = temp2
-    }
-
-    function setAllSectionsToState(new_state: int) {
-        //states: 0 = off, 1 = auto, 2 = on
-        var temp1 = aog.sectionButtonState
-        var temp2 = sectionButtons.buttonState
-        var i,j
-
-        if (settings.setTool_isSectionsNotZones) {
-            //1:1 correlation between buttons and sections
-            for (i=0; i < 65 ; i++) {
-                if (i < numSections)
-                    temp1[i] = new_state //this is the tie-in back to the C++ land
-                else
-                    temp1[i] = 0; //off
-
-                if (i < 16)
-                    temp2[i] = new_state //this is the onscreen button
-            }
-         } else {
-            //zones, not buttons. numSections is the number of zones
-            for (i=0; i < numSections; i++) {
-                temp2[i] = new_state; //this is the onscreen button
-
-                var zone_left
-                var zone_right
-
-                //get the left-most section in the zone
-                if (i===0) zone_left = 0
-                else zone_left = settings.setTool_zones[i]
-
-                //get the right-most section in the zone
-                zone_right = settings.setTool_zones[i+1]
-
-                //set all sections between left and right
-                for (j = zone_left ; j < zone_right ; j++) {
-                    temp1[j] = new_state
-                }
-            }
-        }
-        aog.sectionButtonState = temp1
-        sectionButtons.buttonState = temp2
-   }
-
-    onNumSectionsChanged: {
-        buttonModel.clear()
-        for (var i = 0; i < numSections; i++) {
-            buttonModel.append( { sectionNo: i } )
-        y}
-    }
-
-    //callbacks, connections, and signals
-    Component.onCompleted:  {
-        setColors()
-        buttonModel.clear()
-        for (var i = 0; i < numSections; i++) {
-            buttonModel.append( { sectionNo: i } )
-        }
+    Component.onCompleted: {
+        console.debug(qmlLog, "toolIndex is ", toolIndex);
     }
 
     Connections {
-        target: settings
-        function onSetDisplay_isDayModeChanged() {
-            setColors()
-        }
-    }
+        target: mainWindow
+        function onHotKeyPressed(index) {
+            var model = Tools.toolsProperties.tools[toolIndex].sectionButtonsModel;
+            if (!model || index < 0 || index >= 8) return;
 
-    ListModel {
-        id: buttonModel
-        //this will hold the individual buttons
-        //{ sectionNo: button_number }
+            var idx = model.index(index, 0);
+            if (!idx || !idx.valid) return;
+
+            // StateRole = Qt.UserRole + 2 = 0x0102
+            var currentState = model.data(idx, 0x0102);
+            if (currentState === undefined) return;
+
+            var newState = (currentState + 1) % 3;
+            Tools.setSectionButtonState(toolIndex, index, newState);
+        }
     }
 
     Component {
         id: sectionViewDelegate
         SectionButton {
-            width: (sectionButtons.width / numSections) > 40 ? (sectionButtons.width / numSections) : 40
-            buttonText: (model.sectionNo + 1).toFixed(0)
-            visible: (model.sectionNo < numSections) ? true : false
-            color: (sectionButtons.buttonState[model.sectionNo]===0 ? offColor : (sectionButtons.buttonState[model.sectionNo] === 1 ? autoColor : onColor))
-            textColor: (sectionButtons.buttonState[model.sectionNo]===0 ? offTextColor : (sectionButtons.buttonState[model.sectionNo] === 1 ? autoTextColor : onTextColor))
 
-            onClicked: {
-                //emit signal
-                sectionClicked(model.sectionNo)
-                //set the state here
-                setSectionState(model.sectionNo, (sectionButtons.buttonState[model.sectionNo] + 1 ) % 3)
+            Component.onCompleted: {
+                console.log(qmlLog, model);
+
+            }
+            property int numSections: Tools.toolsProperties.tools[toolIndex].sectionButtonsModel.rowCount()
+            width: (sectionButtons.width / numSections) > 40 ? (sectionButtons.width / numSections) : 40
+            buttonText: (model.buttonNumber + 1).toFixed(0)
+            visible: (model.buttonNumber < numSections) ? true : false
+            color: (model.state === SectionState.Off ? offColor : (model.state === SectionState.Auto ? autoColor : onColor))
+            textColor: (model.state ===SectionState.Off ? offTextColor : (model.state === SectionState.Auto ? autoTextColor : onTextColor))
+
+            onButtonClicked: {
+                //toggle tri state
+                Tools.setSectionButtonState(toolIndex,model.buttonNumber, (model.state + 1 ) % 3)
+                console.debug(qmlLog, "button clicked: ",model.buttonNumber, " new state is ", model.state);
             }
         }
     }
@@ -190,7 +113,8 @@ Rectangle {
         anchors.right: parent.right
         anchors.top: parent.top
 
-        model: buttonModel
+        model: Tools.toolsProperties.tools[toolIndex].sectionButtonsModel
+
         boundsMovement: Flickable.StopAtBounds
 
         ScrollBar.horizontal: ScrollBar {

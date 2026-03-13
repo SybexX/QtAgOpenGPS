@@ -12,7 +12,7 @@ class CBoundaryList
 public:
     //list of coordinates of boundary line
     QVector<Vec3> fenceLine;
-    QVector<Vec2> fenceLineEar;
+    QVector<Vec2> fenceLineEar; //Ear-clipped polygon
     QVector<Vec3> hdLine;
     QVector<Vec3> turnLine;
 

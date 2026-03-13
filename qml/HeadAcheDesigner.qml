@@ -4,7 +4,10 @@ import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 import QtQuick.Shapes
+//import Settings
+import AOG
 import "components" as Comp
+
 
 Popup{
     id: headacheDesigner
@@ -15,53 +18,19 @@ Popup{
 
     function show(){
         headacheDesigner.visible = true
+        headacheCurve.isChecked = true
     }
 
-    property int headacheCount: 0
-    property bool curveLine: true
-    property double lineDistance: 0
-
-    property double zoom: 1
-    property double sX: 0
-    property double sY: 0
-
-    property point apoint: Qt.point(300,200)
-    property point bpoint: Qt.point(200,300)
-    property bool showa: true
-    property bool showb: true
-
-    signal load()
-    signal close()
-    signal update_lines()
-    signal save_exit()
-
-    signal mouseClicked(int x, int y)
-    signal mouseDragged(int fromX, int fromY, int toX, int toY)
-    signal createHeadland()
-    signal deleteHeadland()
-    signal ashrink()
-    signal alength()
-    signal bshrink()
-    signal blength()
-    signal headlandOff()
-    signal cycleForward()
-    signal cycleBackward()
-    signal deleteCurve()
-    signal cancelTouch()
-
-    signal isSectionControlled(bool wellIsIt)
-
-    onWidthChanged: if(aog.isJobStarted) update_lines()
-    onHeightChanged: if(aog.isJobStarted) update_lines()
     onVisibleChanged: {
         if(visible) {
-            load()
+            HeadacheInterface.load()
         } else {
-            close()
+            HeadacheInterface.close()
         }
     }
 
-    property var boundaryLines: [
+    /*
+    property var boundaryLineModel: [
         {
             index: 0,
             color: "#FF0000",
@@ -88,7 +57,7 @@ Popup{
         }
     ]
 
-    property var headacheLines: [
+    property var headacheLineModel: [
         {
             index: 0,
             color: "#FF0000",
@@ -116,14 +85,22 @@ Popup{
             dashed: true
         }
     ]
+    */
 
-    property var headlandLine: [
-        Qt.point(0,0),
-        Qt.point(100,20)
-    ]
+    Connections {
+        //Let backend interface know about the viewport size
+        target: headacheRenderer
 
-    onHeadlandLineChanged: {
-        headlandShapePath.p = headlandLine
+        function onWidthChanged() {
+            HeadacheInterface.viewportWidth = headacheRenderer.width;
+            HeadacheInterface.updateLines()
+        }
+
+        function onHeightChanged() {
+            HeadacheInterface.viewportHeight = headacheRenderer.height;
+            HeadacheInterface.updateLines()
+        }
+
     }
 
     Rectangle {
@@ -149,69 +126,51 @@ Popup{
 
             Rectangle {
                 id: a_rect
-                visible: headacheDesigner.showa
+                visible: HeadacheInterface.showa
                 width: 24
                 height: 24
                 radius: 12
                 color: "#ffc059"
-                x: headacheDesigner.apoint.x - 12
-                y: headacheDesigner.apoint.y - 12
+                x: HeadacheInterface.apoint.x - 12
+                y: HeadacheInterface.apoint.y - 12
                 z: 1
             }
 
             Rectangle {
                 id: b_rect
-                visible: headacheDesigner.showb
+                visible: HeadacheInterface.showb
                 width: 24
                 height: 24
                 radius: 12
                 color:  "#80c0ff"
-                x: headacheDesigner.bpoint.x - 12
-                y: headacheDesigner.bpoint.y - 12
+                x: HeadacheInterface.bpoint.x - 12
+                y: HeadacheInterface.bpoint.y - 12
                 z: 1
             }
 
             Repeater {
                 id: boundaryRepeater
 
-                model: boundaryLines.length
+                model: HeadacheInterface.boundaryLineModel
 
                 Shape {
-                    property int outerIndex: index
+                    smooth: true
 
                     anchors.fill: parent
-                    Connections {
-                        target: headacheDesigner
-                        function onBoundaryLinesChanged() {
-                            shapePath.draw_boundaries()
-                        }
-                    }
 
                     ShapePath {
                         id: shapePath
-                        strokeColor: boundaryLines[index].color
-                        strokeWidth: boundaryLines[index].width
+                        strokeColor: model.color
+                        strokeWidth: model.width
                         fillColor: "transparent"
-                        startX: p[0].x
-                        startY: p[0].y
+                        startX: model.points[0].x
+                        startY: model.points[0].y
                         scale: Qt.size(1,1)
                         joinStyle: ShapePath.RoundJoin
 
-                        property var p: [Qt.point(0,0), Qt.point(headlandRenderer.width, headlandRenderer.height)]
-
                         PathPolyline {
                             id: ps
-                            path: shapePath.p
-                        }
-
-
-                        Component.onCompleted: draw_boundaries()
-
-
-                        function draw_boundaries()
-                        {
-                        //    console.debug(boundaryLines[index].points)
-                            p = boundaryLines[index].points
+                            path: model.points
                         }
                     }
                 }
@@ -219,46 +178,27 @@ Popup{
             Repeater {
                 id: headlinesRepeater
 
-                model: headacheLines.length
+                model: HeadacheInterface.headacheLineModel
 
                 Shape {
-                    property int outerIndex: index
+                    smooth: true
 
                     anchors.fill: parent
-                    Connections {
-                        target: headacheDesigner
-                        function onHeadacheLinesChanged() {
-                            headlinesShapePath.draw_boundaries()
-                        }
-                    }
 
                     ShapePath {
                         id: headlinesShapePath
-                        strokeColor: headacheLines[index].color
-                        strokeWidth: headacheLines[index].width
+                        strokeColor: model.color
+                        strokeWidth: model.width
+                        strokeStyle: model.dashed ? ShapePath.DashLine : ShapePath.SolidLine;
                         fillColor: "transparent"
-                        startX: p[0].x
-                        startY: p[0].y
+                        startX: model.points[0].x
+                        startY: model.points[0].y
                         scale: Qt.size(1,1)
                         joinStyle: ShapePath.RoundJoin
 
-                        property var p: [Qt.point(headlandRenderer.width,0), Qt.point(0, headlandRenderer.height)]
-
                         PathPolyline {
                             id: headachePs
-                            path: headlinesShapePath.p
-                        }
-
-                        Component.onCompleted: draw_boundaries()
-
-                        function draw_boundaries()
-                        {
-                            //console.debug(boundaryLines[index].points)
-                            p = headacheLines[index].points
-                            if(headacheLines[index].dashed)
-                                headlinesShapePath.strokeStyle = ShapePath.DashLine
-                            else
-                                headlinesShapePath.strokeStyle = ShapePath.SolidLine
+                            path: model.points
                         }
                     }
                 }
@@ -266,26 +206,20 @@ Popup{
 
             Shape {
                 id: headlandShape
-                visible: headlandLine.length > 0
+                visible: HeadacheInterface.headlandLine.length > 0
                 anchors.fill: parent
                 ShapePath {
                     id: headlandShapePath
                     strokeColor: "#f1e817"
                     strokeWidth: 8
                     fillColor: "transparent"
-                    startX: p[0].x
-                    startY: p[0].y
+                    startX: HeadacheInterface.headlandLine.length > 0 ? HeadacheInterface.headlandLine[0].x : 0
+                    startY: HeadacheInterface.headlandLine.length > 0 ? HeadacheInterface.headlandLine[0].y : 0
                     joinStyle: ShapePath.RoundJoin
-
-                    property var p: [
-                        Qt.point(0,0),
-                        Qt.point(20,100),
-                        Qt.point(200,150)
-                    ]
 
                     PathPolyline {
                         id: headlandShapePolyLine
-                        path: headlandShapePath.p
+                        path: HeadacheInterface.headlandLine
                     }
                 }
             }
@@ -298,18 +232,18 @@ Popup{
                 property int fromY: 0
 
                 onClicked: {
-                    if (cboxIsZoom.checked && headacheDesigner.zoom === 1) {
-                        sX = ((parent.width / 2 - mouseX) / parent.width) * 1.1
-                        sY = ((parent.width / 2 - mouseY) / -parent.width) * 1.1
-                        zoom = 0.1
-                        headacheDesigner.update_lines()
+                    if (cboxIsZoom.checked && HeadacheInterface.zoom === 1) {
+                        HeadacheInterface.sX = ((parent.width / 2 - mouseX) / parent.width) * 1.1
+                        HeadacheInterface.sY = ((parent.width / 2 - mouseY) / -parent.width) * 1.1
+                        HeadacheInterface.zoom = 0.1
+                        HeadacheInterface.updateLines()
                     } else {
-                        headacheDesigner.mouseClicked(mouseX, mouseY)
-                        if (zoom != 1.0) {
-                            zoom = 1.0
-                            sX = 0
-                            sY = 0
-                            headacheDesigner.update_lines()
+                        HeadacheInterface.mouseClicked(mouseX, mouseY)
+                        if (HeadacheInterface.zoom != 1.0) {
+                            HeadacheInterface.zoom = 1.0
+                            HeadacheInterface.sX = 0
+                            HeadacheInterface.sY = 0
+                            HeadacheInterface.updateLines()
                         }
                     }
                 }
@@ -321,7 +255,7 @@ Popup{
                 }
 
                 onPositionChanged: {
-                    headacheDesigner.mouseDragged(fromX, fromY, mouseX, mouseY)
+                    HeadacheInterface.mouseDragged(fromX, fromY, mouseX, mouseY)
                     fromX = mouseX
                     fromY = mouseY
                 }
@@ -354,40 +288,41 @@ Popup{
                 //objectName: "btnBLength"
                 icon.source: prefix + "/images/APlusPlusB.png"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: headacheDesigner.blength()
+                onClicked: HeadacheInterface.blength()
             }
             Comp.IconButtonTransparent{
                 //objectName: "btnBShrink"
                 icon.source: prefix + "/images/APlusMinusB.png"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: HeadacheDesigner.bshrink()
+                onClicked: HeadacheInterface.bshrink()
             }
             Comp.IconButtonTransparent{
                 //objectName: "cBoxIsSectionControlled"
-                icon.source: prefix + "/images/HeadlandSectionOff.png"
-                iconChecked: prefix + "/images/HeadlandSectionOn.png"
+                icon.source: prefix + "/images/HeadlandSectionOn.png"
+                iconChecked: prefix + "/images/HeadlandSectionOff.png"
                 checkable: true
                 Layout.alignment: Qt.AlignCenter
-                isChecked: settings.setHeadland_isSectionControlled
-                onCheckedChanged: isSectionControlled(checked)
+                // Threading Phase 1: Headland section control
+                isChecked: SettingsManager.headland_isSectionControlled
+                onCheckedChanged: HeadacheInterface.isSectionControlled(checked)
             }
             Comp.IconButtonTransparent{
                 //objectName: "btnALength"
                 icon.source: prefix + "/images/APlusPlusA.png"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: headacheDesigner.alength()
+                onClicked: HeadacheInterface.alength()
             }
             Comp.IconButtonTransparent{
                 //objectName: "btnAShrink"
                 icon.source: prefix + "/images/APlusMinusA.png"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: headacheDesigner.ashrink()
+                onClicked: HeadacheInterface.ashrink()
             }
             Comp.IconButtonTransparent{
                 //objectName: "btnAShrink"
                 icon.source: prefix + "/images/HeadlandDeletePoints.png"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: headacheDesigner.cancelTouch()
+                onClicked: HeadacheInterface.cancelTouch()
             }
         }
         GridLayout{
@@ -398,30 +333,30 @@ Popup{
             rowSpacing: buttons.spacing
             Comp.IconButtonColor{
                 id: headacheCurve
-                //objectName: "rbtnLine"
+                objectName: "rbtnCurve"
                 checkable: true
-                isChecked: true
+                //isChecked: true
                 Layout.alignment: Qt.AlignCenter
                 icon.source: prefix + "/images/ABTrackCurve.png"
-                onClicked: curveLine = true
+                onClicked: HeadacheInterface.curveLine = true
             }
             Comp.IconButtonColor{
                 id: headacheAB
-                //objectName: "rbtnCurve"
+                objectName: "rbtnLine"
                 checkable: true
                 Layout.alignment: Qt.AlignCenter
                 icon.source: prefix + "/images/ABTrackAB.png"
-                onClicked: curveLine = false
+                onClicked: HeadacheInterface.curveLine = false
             }
             Comp.SpinBoxM {
                 //objectName: "nudSetDistance"
                 from: 0
                 to: 2000
-                boundValue: numTracks.value * settings.setVehicle_toolWidth
+                boundValue: numTracks.value * SettingsManager.vehicle_toolWidth
                 Layout.alignment: Qt.AlignCenter
-                Comp.TextLine{anchors.top: parent.bottom; text: "( "+ utils.m_unit_abbrev()+" )"}
+                Comp.TextLine{anchors.top: parent.bottom; text: "( "+ Utils.m_unit_abbrev()+" )"}
 
-                onValueChanged: lineDistance = value
+                onValueChanged: HeadacheInterface.lineDistance = value
             }
             Comp.SpinBoxCustomized{
                 id: numTracks
@@ -429,7 +364,7 @@ Popup{
                 to: 10
                 value: 0
                 Layout.alignment: Qt.AlignCenter
-                Comp.TextLine{anchors.top: parent.bottom; text: qsTr("Tool: ")+ utils.m_to_ft_string(settings.setVehicle_toolWidth)}
+                Comp.TextLine{anchors.top: parent.bottom; text: qsTr("Tool: ")+ Utils.m_to_ft_string(SettingsManager.vehicle_toolWidth)}
             }
             Comp.IconButtonColor{
                 id: cboxIsZoom
@@ -444,7 +379,7 @@ Popup{
 
                 icon.source: prefix + "/images/HeadlandBuild.png"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: createHeadland()
+                onClicked: HeadacheInterface.createHeadland()
             }
         }
         GridLayout{
@@ -457,37 +392,37 @@ Popup{
                 //objectName: "btnDeletePoints"
                 icon.source: prefix + "/images/HeadlandReset.png"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: deleteHeadland()
+                onClicked: HeadacheInterface.deleteHeadland()
             }
             Comp.IconButtonTransparent{
                 icon.source: prefix + "/images/ABLineCycleBk.png"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: cycleBackward()
+                onClicked: HeadacheInterface.cycleBackward()
             }
             Comp.IconButtonTransparent{
                 icon.source: prefix + "/images/ABLineCycle.png"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: cycleForward()
+                onClicked: HeadacheInterface.cycleForward()
             }
             Comp.IconButtonTransparent{
                 icon.source: prefix + "/images/SwitchOff.png"
                 Layout.alignment: Qt.AlignCenter
                 onClicked: {
-                    headlandOff()
+                    HeadacheInterface.headlandOff();
                     headacheDesigner.visible = false
                 }
             }
             Comp.IconButtonTransparent{
                 icon.source: prefix + "/images/Trash.png"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: deleteCurve()
+                onClicked: HeadacheInterface.deleteCurve()
             }
             Comp.IconButtonTransparent{
                 icon.source: prefix + "/images/OK64.png"
                 Layout.alignment: Qt.AlignCenter
                 onClicked: {
-                    save_exit()
-                    boundaryInterface.isHeadlandOn = true
+                    HeadacheInterface.saveExit()
+                    MainWindowState.isHeadlandOn = true
                     headacheDesigner.visible = false
                 }
             }

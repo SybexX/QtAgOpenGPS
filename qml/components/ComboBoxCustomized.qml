@@ -11,24 +11,29 @@ Item{
     property alias model: rootCombo.model
     property alias editable: rootCombo.editable
     property alias currentIndex: rootCombo.currentIndex
+    property alias currentText: rootCombo.currentText
 
-	signal activated()
-    height: 75
-    width: rootCombo.width
+    signal activated()
+    implicitWidth: Math.max(label.implicitWidth, rootCombo.implicitWidth)
+    implicitHeight: combo_text.implicitHeight + rootCombo.implicitHeight
     TextLine{
-        anchors.top: parent.top
+        id: combo_text
+        anchors.bottom: rootCombo.top
+        anchors.left: rootCombo.left
         text: itemCombo.text
     }
     ComboBox{
         id: rootCombo
         editable: true
-        implicitWidth: 200
-        implicitHeight: 50
-        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        implicitHeight: 40 * theme.scaleHeight
+        implicitWidth: 150 * theme.scaleWidth
+
         model: ListModel{
             id: rootComboModel
         }
-		onActivated: itemCombo.activated()
+        onActivated: itemCombo.activated()
         onAccepted: {
             if (rootCombo.find(currentText) === -1){
                 rootComboModel.append({text: editText})

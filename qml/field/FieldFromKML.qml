@@ -5,6 +5,7 @@
 import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Controls.Material
+import QtQuick.Dialogs
 
 import ".."
 import "../components"
@@ -30,19 +31,42 @@ Dialog{
         anchors.top:parent.top
         anchors.topMargin: 75
         anchors.horizontalCenter: parent.horizontalCenter
-        color: aog.backgroundColor
+        color: aogInterface.backgroundColor
         border.color: "darkgray"
         border.width: 1
         Text {
+            id: newFieldLabel
             anchors.left: parent.left
             anchors.bottom: parent.top
             font.bold: true
             font.pixelSize: 15
             text: qsTr("Enter Field Name")
         }
-        TextInput{
-            objectName: "fieldNew"
-            anchors.fill: parent
+        TextField{
+            id: newField
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: newFieldLabel.bottom
+            height: 50
+            selectByMouse: true
+            placeholderText: focus || text ? "" : "New Field Name"
+            onTextChanged: {
+                for (var i=0; i < FieldInterface.field_list.length ; i++) {
+                    if (text === FieldInterface.field_list[i].name) {
+                        errorMessage.visible = true
+                        break
+                    } else
+                        errorMessage.visible = false
+                }
+            }
+        }
+        Text {
+            id: errorMessage
+            anchors.top: newField.bottom
+            anchors.left: newField.left
+            color: "red"
+            visible: false
+            text: qsTr("This field exists already; please choose another name.")
         }
     }
     Row{
@@ -56,18 +80,33 @@ Dialog{
             id: marker
             icon.source: prefix + "/images/JobNameCalendar.png"
             Text{
+                rightPadding: 10
                 anchors.right: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: "+"
+            }
+            onClicked: {
+                var date = new Date();
+                var year = date.getFullYear();
+                var month = String(date.getMonth() + 1).padStart(2, '0');
+                var day = String(date.getDate()).padStart(2, '0');
+                newField.text += " " + `${year}-${month}-${day}`
             }
         }
         IconButtonTransparent{
             objectName: "btnAddTime"
             icon.source: prefix + "/images/JobNameTime.png"
             Text{
+                rightPadding: 10
                 anchors.right: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: "+"
+            }
+            onClicked: {
+                var date = new Date();
+                var hours = String(date.getHours()).padStart(2, '0');
+                var minutes = String(date.getMinutes()).padStart(2, '0');
+                newField.text += " " + `${hours}-${minutes}`
             }
         }
     }
@@ -77,6 +116,16 @@ Dialog{
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.margins: 20
+        anchors.leftMargin: 30
+        enabled: newField.text
+        onClicked: fileDialog.open()
+    }
+    FileDialog {
+        id: fileDialog
+        onAccepted: {
+            console.log("Selected file:", fileDialog.selectedFile);
+            aog.fieldNewFromKML(newField.text.trim(), fileDialog.selectedFile); // Qt 6.8 MODERN: Direct Q_INVOKABLE call
+        }
     }
 
     Row{
@@ -94,6 +143,10 @@ Dialog{
         IconButtonTransparent{
             objectName: "btnSave"
             icon.source: prefix + "/images/OK64.png"
+            onClicked: {
+                fieldFromKML.visible = false
+                newField.text = ""
+            }
         }
     }
 }

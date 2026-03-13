@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
 //
 // Window to set the coordinates of the simulator
-import QtQuick 2.0
-import QtQuick.Layouts 1.3
+import QtQuick
+import QtQuick.Layouts
 import "components" as Comp
 
 Rectangle{
     id: setSimCoordsRoot
     anchors.fill: mainWindow
-    color: aog.backgroundColor
+    color: aogInterface.backgroundColor
     visible: false
     function show(){
         setSimCoordsRoot.visible = true
@@ -47,13 +47,13 @@ Rectangle{
         }
         Rectangle{// longitude text
             color: setSimCoordsRoot.color
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 30
+            anchors.top: parent.bottom
+            anchors.topMargin: 30
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width *.45
             height: children.height
             Comp.TextLine{
-                text: qsTr("Longituge")
+                text: qsTr("Longitude")
                 anchors.centerIn: parent
                 font.pixelSize: 30
                 font.bold: true
@@ -73,18 +73,19 @@ Rectangle{
         }
         Comp.TextLine{
             id: latFromTo
-            text: qsTr("From -180 to +180")
+            text: qsTr("From -90 to +90")
             anchors.bottom: latInput.top
             anchors.horizontalCenter: latInput.horizontalCenter
         }
 
         Comp.LatLonTextField{
             id: latInput
-            width: textInputField*.45
-            height: 50
+            width: textInputField.width * 0.45
+            height: 50* theme.scaleHeight
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            //placeholderText: settings.setGPS_simLatitude
+            placeholderText: SettingsManager.gps_simLatitude
+            inputMethodHints: Qt.ImhDigitsOnly
         }
         Comp.TextLine{
             text: qsTr("Longitude")
@@ -99,14 +100,16 @@ Rectangle{
         }
         Comp.LatLonTextField{
             id: lonInput
-            width: textInputField.width *.45
-            height: 50
+            width: textInputField.width * 0.45
+            height: 50* theme.scaleHeight
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            //placeholderText: settings.setGPS_simLongitude
+            placeholderText: SettingsManager.gps_simLongitude
+            inputMethodHints: Qt.ImhDigitsOnly
         }
     }
-
+    //width: 200* theme.scaleWidth
+    //height: childrenRect.height + 30 * theme.scaleHeight
     RowLayout{
         id: buttons
         anchors.right: parent.right
@@ -121,9 +124,10 @@ Rectangle{
         Comp.IconButtonTransparent{
             icon.source: prefix + "/images/OK64.png"
             onClicked: {
-                settings.setGPS_simLatitude = latInput.text
-                settings.setGPS_simLongitude = lonInput.text
+                SettingsManager.gps_simLatitude = latInput.text
+                SettingsManager.gps_simLongitude = lonInput.text
                 setSimCoordsRoot.visible = false
+                aog.settings_reload()
             }
         }
     }

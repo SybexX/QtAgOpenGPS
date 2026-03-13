@@ -4,39 +4,15 @@
 #include <QObject>
 #include <QVector>
 #include "vec3.h"
-#include "interfaceproperty.h"
 #include <QTimer>
 
 class CBoundary;
 class CHeadLine;
-class CTool;
-class CVehicle;
-class QOpenGLFunctions;
-
-class HeadlandDesigner;
-
 
 class FormHeadland : public QObject
 {
     Q_OBJECT
 protected:
-    //InterfaceProperty<HeadlandDesigner,double> maxFieldDistance = InterfaceProperty<HeadlandDesigner,double>("maxFieldDistance");
-    //InterfaceProperty<HeadlandDesigner,double> fieldCenterX = InterfaceProperty<HeadlandDesigner,double>("fieldCenterX");
-    //InterfaceProperty<HeadlandDesigner,double> fieldCenterY = InterfaceProperty<HeadlandDesigner,double>("fieldCenterY");
-
-    double maxFieldDistance = 0;
-    double fieldCenterX = 0;
-    double fieldCenterY = 0;
-
-    InterfaceProperty<HeadlandDesigner,bool> showa = InterfaceProperty<HeadlandDesigner,bool>("showa");
-    InterfaceProperty<HeadlandDesigner,bool> showb = InterfaceProperty<HeadlandDesigner,bool>("showb");
-    InterfaceProperty<HeadlandDesigner,QPoint> apoint = InterfaceProperty<HeadlandDesigner,QPoint>("apoint");
-    InterfaceProperty<HeadlandDesigner,QPoint> bpoint = InterfaceProperty<HeadlandDesigner,QPoint>("bpoint");
-    InterfaceProperty<HeadlandDesigner,QPoint> vehiclePoint = InterfaceProperty<HeadlandDesigner,QPoint>("vehiclePoint");
-
-    InterfaceProperty<AOGInterface,bool> isBtnAutoSteerOn = InterfaceProperty<AOGInterface,bool>("isBtnAutoSteerOn");
-    InterfaceProperty<AOGInterface,bool> isYouTurnBtnOn = InterfaceProperty<AOGInterface,bool>("isYouTurnBtnOn");
-
     int fixX, fixY;
     //InterfaceProperty<HeadlandDesigner,bool> isA = InterfaceProperty<HeadlandDesigner,bool>("isA");
     bool isA = false;
@@ -46,15 +22,8 @@ protected:
     QVector<Vec3> sliceArr;
     QVector<Vec3> backupList;
 
-    InterfaceProperty<HeadlandDesigner,int> sliceCount = InterfaceProperty<HeadlandDesigner,int>("sliceCount");
-    InterfaceProperty<HeadlandDesigner,int> backupCount = InterfaceProperty<HeadlandDesigner,int>("backupCount");
-    InterfaceProperty<HeadlandDesigner,bool> curveLine = InterfaceProperty<HeadlandDesigner,bool>("curveLine");
-    InterfaceProperty<HeadlandDesigner,double> lineDistance = InterfaceProperty<HeadlandDesigner,double>("lineDistance");
 
     bool zoomToggle;
-    InterfaceProperty<HeadlandDesigner,double> zoom = InterfaceProperty<HeadlandDesigner,double>("zoom");
-    InterfaceProperty<HeadlandDesigner,double> sX = InterfaceProperty<HeadlandDesigner,double>("sX");
-    InterfaceProperty<HeadlandDesigner,double> sY = InterfaceProperty<HeadlandDesigner,double>("sY");
 
     Vec3 pint = Vec3(0,1,0);
 
@@ -66,26 +35,14 @@ protected:
     void setup_matrices(QMatrix4x4 &modelview, QMatrix4x4 &projection);
 
 public:
+    explicit FormHeadland(QObject *parent = nullptr);
     double iE = 0, iN = 0;
     QVector<int> crossings;
 
-    CBoundary *bnd;
-    CHeadLine *hdl;
-    CTool *tool;
-    CVehicle *vehicle = NULL;
-    QObject *headland_designer_instance;
-
-    explicit FormHeadland(QObject *parent = nullptr);
-
-    //this class is pretty closely coupled to the QML file
-    //of necessity
-    void connect_ui(QObject *headland_designer_instance);
+    CBoundary *bnd = nullptr;
+    CHeadLine *hdl = nullptr;
 
 public slots:
-    void setFieldInfo(double maxFieldDistance,
-                      double fieldCenterX,
-                      double fieldCenterY);
-
     void load_headline();
     void update_lines(); //update the boundary lines in GUI
     void update_headland(); //update headland line

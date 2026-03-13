@@ -5,6 +5,7 @@
 import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
+//import Settings
 
 import ".."
 import "../components"
@@ -16,7 +17,7 @@ import "../components"
 Rectangle{
 	id: configImplementSwitch
 	anchors.fill: parent
-    color: aog.backgroundColor
+    color: aogInterface.backgroundColor
 	visible: false
 	Rectangle{
 		anchors.left: parent.left
@@ -27,8 +28,8 @@ Rectangle{
 		anchors.bottomMargin: 20 * theme.scaleHeight
 		anchors.leftMargin: 20 * theme.scaleWidth
 		anchors.rightMargin: 20 * theme.scaleWidth
-        border.color: aog.blackDayWhiteNight
-        color: aog.backgroundColor
+        border.color: aogInterface.blackDayWhiteNight
+        color: aogInterface.backgroundColor
 		Text{
 			id: workTitle
 			anchors.top: parent.top
@@ -48,8 +49,9 @@ Rectangle{
 			IconButtonTextBeside{
 				icon.source: prefix + "/images/HydraulicLiftOff.png"
                 checkable: true
-                isChecked: settings.setF_isRemoteWorkSystemOn
-                onCheckedChanged: settings.setF_isRemoteWorkSystemOn = checked
+                // Threading Phase 1: Remote work system enable
+                isChecked: SettingsManager.f_isRemoteWorkSystemOn
+                onCheckedChanged: SettingsManager.f_isRemoteWorkSystemOn = checked
 				text: qsTr("Work Switch")
 			}
 
@@ -61,9 +63,9 @@ Rectangle{
                 id: workSwitchMan
 				icon.source: prefix + "/images/ManualOff.png"
                 checkable: true
-                enabled: settings.setF_isRemoteWorkSystemOn
-                isChecked: settings.setF_isWorkSwitchManualSections
-                onCheckedChanged: settings.setF_isWorkSwitchManualSections = checked
+                enabled: SettingsManager.f_isRemoteWorkSystemOn
+                isChecked: SettingsManager.f_isWorkSwitchManualSections
+                onCheckedChanged: SettingsManager.f_isWorkSwitchManualSections = checked
 				text: qsTr("Manual Sections")
 			}
 
@@ -71,9 +73,9 @@ Rectangle{
                 id: workSwitchAuto
 				icon.source: prefix + "/images/SectionMasterOff.png"
                 checkable: true
-                enabled: settings.setF_isRemoteWorkSystemOn
-                isChecked: !settings.setF_isWorkSwitchManualSections
-                onCheckedChanged: settings.setF_isWorkSwitchManualSections = !checked
+                enabled: SettingsManager.f_isRemoteWorkSystemOn
+                isChecked: !SettingsManager.f_isWorkSwitchManualSections
+                onCheckedChanged: SettingsManager.f_isWorkSwitchManualSections = !checked
 				text: qsTr("Auto Sections")
 			}
 
@@ -88,8 +90,9 @@ Rectangle{
 				colorChecked2: "green"
 				colorChecked3: "green"
                 checkable: true
-                isChecked: settings.setF_isWorkSwitchActiveLow
-                onCheckedChanged: settings.setF_isWorkSwitchActiveLow = checked
+                // Threading Phase 1: Work switch active low logic
+                isChecked: SettingsManager.f_isWorkSwitchActiveLow
+                onCheckedChanged: SettingsManager.f_isWorkSwitchActiveLow = checked
 			}
 		}
 	}
@@ -103,8 +106,8 @@ Rectangle{
 		anchors.bottomMargin: 20 * theme.scaleHeight
 		anchors.rightMargin: 20 * theme.scaleWidth
 		anchors.leftMargin: 20 * theme.scaleWidth
-        border.color: aog.blackDayWhiteNight
-        color: aog.backgroundColor
+        border.color: aogInterface.blackDayWhiteNight
+        color: aogInterface.backgroundColor
 		Text{
 			id: steerTitle
 			anchors.top: parent.top
@@ -122,8 +125,9 @@ Rectangle{
 			anchors.rightMargin: 7 * theme.scaleWidth
 			anchors.leftMargin: 7 * theme.scaleWidth
 			IconButtonTextBeside{
-                isChecked: settings.setF_isSteerWorkSwitchEnabled
-                onCheckedChanged: settings.setF_isSteerWorkSwitchEnabled = checked
+                // Threading Phase 1: Steer work switch enable
+                isChecked: SettingsManager.f_isSteerWorkSwitchEnabled
+                onCheckedChanged: SettingsManager.f_isSteerWorkSwitchEnabled = checked
                 checkable: true
 				text: qsTr("Steer Switch")
 				icon.source: prefix + "/images/AutoSteerOff.png"
@@ -135,18 +139,20 @@ Rectangle{
 
             IconButtonTextBeside{
                 id: steerSwitchMan
-                isChecked: settings.setF_isSteerWorkSwitchManualSections
-                onCheckedChanged: settings.setF_isSteerWorkSwitchManualSections = checked
-                enabled: settings.setF_isSteerWorkSwitchEnabled
+                // Threading Phase 1: Steer switch manual sections
+                isChecked: SettingsManager.f_isSteerWorkSwitchManualSections
+                onCheckedChanged: SettingsManager.f_isSteerWorkSwitchManualSections = checked
+                enabled: SettingsManager.f_isSteerWorkSwitchEnabled
                 checkable: true
 				text: qsTr("Manual Sections")
 				icon.source: prefix + "/images/ManualOff.png"
 			}
 			IconButtonTextBeside{
                 id: steerSwitchAuto
-                isChecked: !settings.setF_isSteerWorkSwitchManualSections
-                onCheckedChanged: settings.setF_isSteerWorkSwitchManualSections = !checked
-                enabled: settings.setF_isSteerWorkSwitchEnabled
+                // Threading Phase 1: Steer switch auto sections
+                isChecked: !SettingsManager.f_isSteerWorkSwitchManualSections
+                onCheckedChanged: SettingsManager.f_isSteerWorkSwitchManualSections = !checked
+                enabled: SettingsManager.f_isSteerWorkSwitchEnabled
                 text: qsTr("Auto Sections")
 				icon.source: prefix + "/images/SectionMasterOff.png"
 			}

@@ -13,25 +13,25 @@ import QtQuick.Layouts
  *
  * The following methods are defined as javascript functions:
  * cancelAllMessages() - cancel all displayed messages and close popup
- * addMessage(timeout, title, message) - Popup (if not open already) 
- *        and display a title and message, and timeout after 
+ * addMessage(timeout, title, message) - Popup (if not open already)
+ *        and display a title and message, and timeout after
  *        timeout milliseconds.
- */ 
+ */
 Popup {
     padding: 5
     x: parent.width / 2
     y: parent.height * 0.25
     modal: false
 
-    property int fontsize: 14
+    property int fontsize: 15 * theme.scaleHeight
 
     id: timedMessage
 
     Rectangle {
         id: timedMessageR
 
-        width: 500
-        height: 200
+        width: 500 * theme.scaleWidth
+        height: 200 * theme.scaleHeight
         anchors.centerIn:parent
 
         border.color: "red"
@@ -42,30 +42,29 @@ Popup {
             id: timedMessageDelegate
             Rectangle {
                 id: our_item
-                width: 460
-                height: textTitle.implicitHeight + textMessage.implicitHeight + 10
+                width: 460 * theme.scaleWidth
+                height: textTitle.implicitHeight + textMessage.implicitHeight + 10 * theme.scaleHeight
                 //border.width: 1
                 radius: 5
                 color: "transparent"
 
                 ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: 5
+                    anchors.margins: 5 * theme.scaleWidth
                     Item {
                         Text {
                             id: textTitle
-                            width: 450
+                            width: 450 * theme.scaleWidth
                             font.bold: true
                             font.pointSize: timedMessage.fontsize + 2
                             text: "(" + Number(model.timeout / 1000).toLocaleString(Qt.locale(),'f',0) + ") " + model.title
                         }
                         Text {
                             id: textMessage
-                            width: 450
+                            width: 450 * theme.scaleWidth
                             font.pointSize: timedMessage.fontsize
                             anchors.top: textTitle.bottom
                             wrapMode: Text.WordWrap
-
                             text: model.message
                         }
                     }
@@ -93,8 +92,8 @@ Popup {
         ListView {
             id: timedMessageListView
             anchors.fill: parent
-            anchors.margins: 10
-            spacing: 10
+            //anchors.margins: 10 * theme.scaleHeight
+            //spacing: 10 * theme.scaleHeight
             ScrollBar.vertical: ScrollBar { }
             clip: true
 
@@ -123,53 +122,52 @@ Popup {
         }
 
         Timer {
-            interval: 100
-            running: true
+            interval: 200
+            running: timedMessage.visible
             repeat: true
 
             onTriggered: function() {
                 for (var i=0; i < timedMessageModel.rowCount(); i++) {
-                    timedMessageModel.get(i).timeout -= 100;
+                    timedMessageModel.get(i).timeout -= 200;
                     if (timedMessageModel.get(i).timeout < 0) {
                         //console.warn("Removed item " + i)
                         timedMessageModel.remove(i)
                         i-- //our iteration is now broken
                     }
                 }
-                
+
                 if (timedMessageModel.rowCount() === 0) {
                     close()
                     //timedMessage.visible = false
                 }
 
                 if (timedMessageModel.rowCount() > 3) {
-                    timedMessageR.height = 240;
+                    timedMessageR.height = (150 * theme.scaleHeight);
                 } else {
-                    timedMessageR.height = timedMessageModel.rowCount() * 80
+                    timedMessageR.height = timedMessageModel.rowCount() * (120 * theme.scaleHeight)
                 }
             }
         }
     }
 
     onClosed: cancelAllMessages()
-        
+
     function cancelAllMessages() {
-    	timedMessageModel.clear();
+        timedMessageModel.clear();
         //console.debug("canceling all messages.")
     }
 
     function addMessage(timeout: int, title: string, message: string) {
         //console.debug(timeout + " " + title + " " + message)
         timedMessage.open()
-            
-    	timedMessageModel.append( { timeout: timeout, title: title, message: message });
+
+        timedMessageModel.append( { timeout: timeout, title: title, message: message });
 
         if (timedMessageModel.rowCount() > 3) {
-            timedMessageR.height = 240;
+            timedMessageR.height = (150 * theme.scaleHeight);
         } else {
-            timedMessageR.height = timedMessageModel.rowCount() * 80
+            timedMessageR.height = (timedMessageModel.rowCount() * 120)
         }
 
     }
 }
-

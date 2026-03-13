@@ -15,7 +15,7 @@ Rectangle{
     anchors.left: parent.left
     anchors.right: parent.right
     height: 30  * theme.scaleHeight
-    color: aog.backgroundColor
+    color: aogInterface.backgroundColor
     Text {
         text: topLine.titleText
         font.pixelSize: 20

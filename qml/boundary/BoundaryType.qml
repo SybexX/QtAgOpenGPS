@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import Qt.labs.folderlistmodel
 import QtQuick.Controls.Fusion
 import QtQuick.Controls.Material
+import QtQuick.Dialogs
 
 import ".."
 import "../components"
@@ -122,6 +123,15 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.leftMargin: 20 * theme.scaleWidth
                         text: "+"
+                    }
+                    onClicked: fileDialog.open()
+                }
+                FileDialog {
+                    id: fileDialog
+                    onAccepted: {
+                        console.log("Selected file:", fileDialog.selectedFile);
+                        aog.loadBoundaryFromKML(fileDialog.selectedFile);
+                        boundaryKMLType.visible = false;
                     }
                 }
                 IconButtonTransparent{

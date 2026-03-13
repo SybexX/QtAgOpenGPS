@@ -27,7 +27,7 @@ IconButton {
     colorChecked1: colorChecked
     colorChecked2: colorChecked
     colorChecked3: colorChecked
-    property color color: aog.backgroundColor
+    property color color: aogInterface.backgroundColor
     property color colorChecked: "#99ff99"
     property color colorHover: "white"
     onButtonTextChanged: text = buttonText
@@ -41,7 +41,7 @@ IconButton {
               else
                   0
     MouseArea{
-		visible: text.length>0
+        visible: text.length>0
         id: textLabel
         width: icon_button.width
         height: text1.height

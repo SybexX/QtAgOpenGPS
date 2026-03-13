@@ -25,6 +25,11 @@ public:
     Vec2 operator*= (double rhs);
     Vec2 &operator=(const Vec2 &other) = default;
 
+    inline bool operator == (const Vec2 &other) {
+        return (other.easting == easting && other.northing == northing);
+    }
+
+
     operator QVector3D() { return QVector3D(easting,northing,0); }
 };
 

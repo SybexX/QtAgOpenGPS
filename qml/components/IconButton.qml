@@ -19,7 +19,7 @@ Button {
     //checkable: true
     icon.source: ""
     icon.color: "transparent"
-	property alias imageFillMode: content_image.fillMode
+    property alias imageFillMode: content_image.fillMode
 
     property double iconHeightScaleText: 0.75
     property int border: 2
@@ -111,7 +111,6 @@ Button {
 
         Image {
             id: content_image
-            width: parent.width
             anchors.fill: parent
             anchors.topMargin: parent.height * 0.00
             anchors.bottomMargin: icon_button.text  ?
@@ -177,8 +176,9 @@ Button {
             }
 
             states: [
+                // Pressed states (highest priority - when down is true)
                 State {
-                    when: icon_button.down
+                    when: icon_button.down && !icon_button.checked
                     name: "pressedUnchecked"
                     PropertyChanges {
                         target: gradientStop1
@@ -192,17 +192,6 @@ Button {
                         target: gradientStop3
                         color: icon_button.color1
                     }
-                    /* PropertyChanges {
-                    target: icon_button_background
-                    border.width: 5
-                }*/
-                    /*
-                PropertyChanges {
-                    target: content_image
-                    source: icon_button.icon.source
-                }
-                */
-
                 },
                 State {
                     when: icon_button.down && icon_button.checked
@@ -219,17 +208,31 @@ Button {
                         target: gradientStop3
                         color: icon_button.color1
                     }
-                    /*   PropertyChanges {
-                    target: icon_button_background
-                    border.width: 1
-                }*/
                     PropertyChanges {
                         target: content_image
                         source: icon_button.icon.source
                     }
                 },
+                // Hover + checked state (specific combination)
                 State {
-                    when: ! icon_button.down && icon_button.checked
+                    when: !icon_button.down && icon_button.checked && icon_button.hovered
+                    name: "hoveredChecked"
+                    PropertyChanges {
+                        target: gradientStop1
+                        color: icon_button.colorHover1
+                    }
+                    PropertyChanges {
+                        target: gradientStop2
+                        color: icon_button.colorHover2
+                    }
+                    PropertyChanges {
+                        target: gradientStop3
+                        color: icon_button.colorChecked3
+                    }
+                },
+                // Checked state (without hover)
+                State {
+                    when: !icon_button.down && icon_button.checked && !icon_button.hovered
                     name: "checked"
                     PropertyChanges {
                         target: gradientStop1
@@ -243,19 +246,27 @@ Button {
                         target: gradientStop3
                         color: icon_button.colorChecked3
                     }
-                    /* PropertyChanges {
-                    target: icon_button_background
-                    border.width: 0
-                }*/
-                    /*
-                PropertyChanges {
-                    target: content_image
-                    source: (icon_button.iconChecked ? icon_button.iconChecked : icon_button.icon.source)
-                }
-                */
                 },
+                // Hover state (without checked)
                 State {
-                    when: ! icon_button.down && ! icon_button.checked && ! icon_button.hovered
+                    when: !icon_button.down && !icon_button.checked && icon_button.hovered
+                    name: "hovered"
+                    PropertyChanges {
+                        target: gradientStop1
+                        color: icon_button.colorHover1
+                    }
+                    PropertyChanges {
+                        target: gradientStop2
+                        color: icon_button.colorHover2
+                    }
+                    PropertyChanges {
+                        target: gradientStop3
+                        color: icon_button.colorHover3
+                    }
+                },
+                // Default state (lowest priority)
+                State {
+                    when: !icon_button.down && !icon_button.checked && !icon_button.hovered
                     name: "up"
                     PropertyChanges {
                         target: gradientStop1
@@ -269,42 +280,6 @@ Button {
                         target: gradientStop3
                         color: icon_button.color3
                     }
-                    /*PropertyChanges {
-                    target: icon_button_background
-                    border.width: 0
-                }*/
-                    /*
-                PropertyChanges {
-                    target: content_image
-                    source: icon_button.icon.source
-                }
-                */
-                },
-                State {
-                    when: icon_button.hovered
-                    name: "hovered"
-                    /* PropertyChanges {
-                    target: icon_button_background
-                    border.width: 1
-                }*/
-                    PropertyChanges {
-                        target: gradientStop1
-                        color: icon_button.colorHover1
-                    }
-                    PropertyChanges {
-                        target: gradientStop2
-                        color: icon_button.colorHover2
-                    }
-                    PropertyChanges {
-                        target: gradientStop3
-                        color: icon_button.colorHover3
-                    }
-                    /*
-                PropertyChanges {
-                    target: content_image
-                    source: icon_button.icon.source
-                }
-                */
                 }
             ]
 

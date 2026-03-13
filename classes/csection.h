@@ -6,7 +6,7 @@
 #include <QSharedPointer>
 #include "vec2.h"
 //#include "vec3.h"
-#include "btnenum.h"
+#include "sectionstate.h"
 
 
 class CSection
@@ -73,7 +73,7 @@ public:
     int numTriangles = 0;
 
     //used to determine state of Manual section button - Off Auto On
-    btnStates sectionBtnState=btnStates::Off; //default to Off (see enum in formgps.h)
+    SectionState::State sectionBtnState=SectionState::Off; //default to Off (see enum in formgps.h)
 
     CSection();
 };

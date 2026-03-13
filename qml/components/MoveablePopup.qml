@@ -23,8 +23,8 @@ Popup {
 	}
 	background: Rectangle {
 		id: background
-		color: aog.backgroundColor
+		color: aogInterface.backgroundColor
 		border.width: 1
-		border.color: aog.blackDayWhiteNight
+		border.color: aogInterface.blackDayWhiteNight
 	}
 }

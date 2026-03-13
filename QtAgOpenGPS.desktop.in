@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=@PROJECT_NAME@
+Comment=Agricultural OpenGPS Application
+Exec=@CMAKE_INSTALL_FULL_BINDIR@/@PROJECT_NAME@
+Icon=@PROJECT_NAME@
+Terminal=false
+Categories=Utility;Science;Agriculture;
+StartupNotify=true
+Keywords=agriculture;gps;farming;

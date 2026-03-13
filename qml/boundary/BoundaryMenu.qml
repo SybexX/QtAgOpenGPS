@@ -7,6 +7,7 @@ import QtQuick.Layouts
 import Qt.labs.folderlistmodel
 import QtQuick.Controls.Fusion
 import QtQuick.Controls.Material
+import AOG
 
 import ".."
 import "../components"
@@ -17,7 +18,7 @@ Item {
     width: parent.width
     height: parent.height
     function show() {
-        boundaryInterface.update_list()
+        BoundaryInterface.updateList() // Qt 6.8 MODERN: Direct Q_INVOKABLE call
         boundaryMenuPopup.visible = true
     }
 
@@ -30,7 +31,7 @@ Item {
         anchors.centerIn: parent
         TopLine{
             id: topLine
-            titleText: "Start or Delete A Boundary"
+            titleText: qsTr("Start or Delete A Boundary")
         }
         Rectangle{
             id: boundaryMain
@@ -59,7 +60,7 @@ Item {
                 }
 
                 onChangeDriveThrough: {
-                    boundaryInterface.set_drive_through(index, drive_through)
+                    BoundaryInterface.setDriveThrough(index, drive_through) // Qt 6.8 MODERN: Direct Q_INVOKABLE call
                 }
 
             }
@@ -73,10 +74,10 @@ Item {
                 IconButtonTransparent{
                     objectName: "btnBoundaryDeleteCurrent"
                     enabled: (boundaryList.currentIndex === 0 &&
-                              boundaryInterface.boundary_list.length === 1) ||
+                              BoundaryInterface.list.length === 1) ||
                              (boundaryList.currentIndex > 0)
                     icon.source: prefix + "/images/BoundaryDelete.png"
-                    onClicked: boundaryInterface.delete_boundary(boundaryList.currentIndex)
+                    onClicked: BoundaryInterface.deleteBoundary(boundaryList.currentIndex) // Qt 6.8 MODERN: Direct Q_INVOKABLE call
                 }
                 IconButtonTransparent{
                     objectName: "btnBoundaryDeleteAll"
@@ -94,6 +95,10 @@ Item {
                 IconButtonTransparent{
                     objectName: "btnBoundaryFancyDrawer"
                     icon.source: prefix + "/images/bing.png"
+                    onClicked: {
+                        boundaryOSM.show()
+                        boundaryMenuPopup.visible = false
+                    }
                 }
                 IconButtonTransparent{
                     icon.source: prefix + "/images/AddNew.png"
@@ -120,7 +125,7 @@ Item {
         modal: true
 
         onAccepted: {
-            boundaryInterface.delete_all()
+            BoundaryInterface.deleteAll() // Qt 6.8 MODERN: Direct Q_INVOKABLE call
         }
 
         Text {
@@ -132,6 +137,10 @@ Item {
     }
     BoundaryType {
         id: boundaryType
+        visible: false
+    }
+    BoundaryOSM {
+        id: boundaryOSM
         visible: false
     }
 }

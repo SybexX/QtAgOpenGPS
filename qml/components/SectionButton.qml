@@ -1,7 +1,7 @@
 // Copyright (C) 2024 Michael Torrie and the QtAgOpenGPS Dev Team
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
 //
-// The section buttons acress the screen. This is just one button, which is replicated 
+// The section buttons acress the screen. This is just one button, which is replicated
 // in SectionButtons.qml
 import QtQuick
 /*
@@ -45,13 +45,11 @@ Rectangle {
     height: 40 * theme.scaleHeight
 
     border.width: 1
-    border.color: "black" //textColor?
+    border.color: "black"
 
-    //property color buttonColor: "white"
-    //property string buttonText: "Ok"
     property string buttonText: ""
     property color textColor: "white"
-    signal clicked
+    signal buttonClicked
 
     color: "red"
 
@@ -59,7 +57,7 @@ Rectangle {
         id: mouseArea
         anchors.fill: parent
         onClicked: {
-           parent.clicked(mouse)
+           buttonClicked()
         }
     }
 

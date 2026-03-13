@@ -14,7 +14,7 @@ Rectangle {
 
     id: fakeScreen
 
-    color: aog.backgroundColor
+    color: aogInterface.backgroundColor
 
     Dialog {
         id: testDialog

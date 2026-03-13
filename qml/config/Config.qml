@@ -7,7 +7,10 @@ import QtQuick.Controls.Fusion
 import QtQuick.Layouts
 //import QtQuick.Extras 1.4
 import QtQuick.Dialogs
+//import Settings
 import Qt.labs.folderlistmodel
+import AOG
+
 
 import ".."
 import "../components"
@@ -35,19 +38,19 @@ Dialog {
 
     Rectangle{
         id: configMain
-        color: aog.borderColor
-        border.color: aog.blackDayWhiteNight
+        color: aogInterface.borderColor
+        border.color: aogInterface.blackDayWhiteNight
         border.width: 8 * theme.scaleWidth
         visible: true
         anchors.fill: parent
-        TopLine{
-            id: topLine
-        }
+        // TopLine{
+        //     id: topLine
+        // }
 
         ScrollView {
             id: leftColumnView
-            anchors.top: topLine.bottom
-            anchors.left: topLine.left
+            anchors.top: parent.top
+            anchors.left: parent.left
             width: 110 * theme.scaleWidth
             anchors.bottom: bottomLine.top
 
@@ -185,7 +188,7 @@ Dialog {
                     icon.source: prefix + "/images/Config/Con_ModulesMenu.png"
                 }
                 ButtonGroup {
-                    buttons: [ configModulesSettings, configModulesPinsbtn ]
+                    buttons: [ configModulesSettings, configModulesPinsbtn,  configBlockageMonbtn, configRateControlbtn]
                 }
                 Column{
                     id: modulesMenu
@@ -205,6 +208,14 @@ Dialog {
                         id: configModulesPinsbtn
                         icon.source: prefix + "/images/Config/ConS_ImplementSection.png"
                     }
+                    MainConfigSecondaryBtns{
+                        id: configBlockageMonbtn
+                        icon.source: prefix + "/images/Config/ConS_Blockage.png"
+                    }
+                    MainConfigSecondaryBtns{
+                        id: configRateControlbtn
+                        icon.source: prefix + "/images/Config/Con_spray2.png"
+                    }
                 }
                 MainConfigMainBtns{
                     id:tramMenu
@@ -223,7 +234,7 @@ Dialog {
 
         Rectangle{
             id:bottomLine
-            color: aog.borderColor
+            color: aogInterface.borderColor
             visible: true
             width: parent.width - 16
             height:80 * theme.scaleHeight
@@ -233,14 +244,14 @@ Dialog {
             z: 3
             TextLine{
                 id: vehicle
-                text: utils.cm_unit()
+                text: Utils.cm_unit()
                 anchors.verticalCenter: parent.verticalCenter
                 color: "green"
                 font.pixelSize: parent.height/2
             }
             TextLine {
                 id: sections
-                text: utils.m_to_ft_string(settings.setVehicle_toolWidth)
+                text: Utils.m_to_ft_string(SettingsManager.vehicle_toolWidth)
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: saveAndClose.left
                 anchors.rightMargin: 80
@@ -260,11 +271,12 @@ Dialog {
 
                     //TODO, have to do this if rejected() also.
 
-                    if ((utils.isTrue(settings.setTool_isToolFront) && Number(settings.setVehicle_hitchLength < 0)) ||
-                            (!utils.isTrue(settings.setTool_isToolFront) && Number(settings.setVehicle_hitchLength) > 0)) {
+                    // Threading Phase 1: Tool position and hitch length validation
+                    if ((SettingsManager.tool_isToolFront && Number(SettingsManager.vehicle_hitchLength < 0)) ||
+                            (!SettingsManager.tool_isToolFront && Number(SettingsManager.vehicle_hitchLength) > 0)) {
                         //if front-mounted tool, make sure the hitchLength is positive and if rear-mounted, make sure
                         //hitchLength is negative
-                        settings.setVehicle_hitchLength = -Number(settings.setVehicle_hitchLength)
+                        SettingsManager.vehicle_hitchLength = -Number(SettingsManager.vehicle_hitchLength)
                         //console.debug("corrected sign on hitchLength")
                     }
 
@@ -274,12 +286,13 @@ Dialog {
         }
         Rectangle{
             id: mainConfig
-            anchors.top: topLine.bottom
+            anchors.top: parent.top
             anchors.right: parent.right
             anchors.left: leftColumnView.right
             anchors.bottom: bottomLine.top
             anchors.rightMargin: 8
-            color: aog.backgroundColor
+            color: aogInterface.backgroundColor
+            border.width: 1
             border.color: "lime"
         }
         ConfigVehiclePicker{
@@ -326,25 +339,25 @@ Dialog {
             id:configImplementFrontDimensions
             anchors.fill: mainConfig
             anchors.margins:1
-            visible: implementMenu.visible && configImpDim.checked && settings.setTool_isToolFront
+            visible: implementMenu.visible && configImpDim.checked && SettingsManager.tool_isToolFront
         }
         ConfigImplementRearDimensions{
             id:configImplementRearDimensions
             anchors.fill: mainConfig
             anchors.margins:1
-            visible: implementMenu.visible && configImpDim.checked && settings.setTool_isToolRearFixed
+            visible: implementMenu.visible && configImpDim.checked && SettingsManager.tool_isToolRearFixed
         }
         ConfigImplementTBTDimensions{
             id:configImplementTBTDimensions
             anchors.fill: mainConfig
             anchors.margins:1
-            visible: implementMenu.visible && configImpDim.checked && settings.setTool_isToolTBT
+            visible: implementMenu.visible && configImpDim.checked && SettingsManager.tool_isTBT
         }
         ConfigImplementTrailingDimensions{
             id:configImplementTrailingDimensions
             anchors.fill: mainConfig
             anchors.margins:1
-            visible: implementMenu.visible && configImpDim.checked && settings.setTool_isToolTrailing && !settings.setTool_isToolTBT
+            visible: implementMenu.visible && configImpDim.checked && SettingsManager.tool_isToolTrailing && !SettingsManager.tool_isTBT
         }
         ConfigImplementAxle{
             id:configImplementAxle
@@ -405,6 +418,18 @@ Dialog {
             anchors.fill: mainConfig
             anchors.margins:1
             visible: modulesMenu.visible && configModulesPinsbtn.checked
+        }
+        ConfigModulesBlockage{
+            id:configModulesBlockage
+            anchors.fill: mainConfig
+            anchors.margins:1
+            visible: modulesMenu.visible && configBlockageMonbtn.checked
+        }
+        ConfigRateControl{
+            id:configRateControl
+            anchors.fill: mainConfig
+            anchors.margins:1
+            visible: modulesMenu.visible && configRateControlbtn.checked
         }
         ConfigTrams{
             id:configTrams
