@@ -1,22 +1,28 @@
 import QtQuick
-import QtQuick.Controls
-import QtQuick.Window
+import QtQuick.Controls.Fusion
 import QtQuick.Layouts
-// Qt 6 compatible - Using TabBar + StackLayout instead of TabView
-//
-import "../components" as Comp
 import AOG
 
-Window {
-    objectName: "ethernetConfig"
-    id: ethernetConfig
-    title: "Ethernet Configuration"
-    width: 450
-    height: 750
-    visible: false
+import "../components" as Comp
 
-    // Window flags for proper dialog behavior
-    flags: Qt.Dialog | Qt.WindowCloseButtonHint
+Dialog {
+    id:ethernetConfig
+    //color: "ghostwhite"
+    visible: false
+    height: 500  * theme.scaleHeight
+    width:700  * theme.scaleWidth
+    anchors.centerIn: parent
+    modal: false
+    function show(){
+        parent.visible = true
+    }
+
+    Comp.TopLine{
+        id: topLine
+        titleText: qsTr("Ethernet Configuration")
+        onBtnCloseClicked:  ethernetConfig.close()
+    }
+
     onVisibleChanged: {
         // Only load settings and refresh if components are ready
         if (visible && spIP1 && spIP2 && spIP3) {
@@ -45,7 +51,7 @@ Window {
         id: ethIP
         visible: true
         color: aogInterface.backgroundColor
-        anchors.top: parent.top
+        anchors.top: topLine.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom

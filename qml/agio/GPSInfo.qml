@@ -7,26 +7,40 @@ import "../components"
 import "interfaces"
 import AOG
 
-Window {
-	title: "Module and GPS Info"
-	visible: true
-	width: 550
-	height: 500
+
+
+Dialog {
+    id:gpsInfo
+    //color: "ghostwhite"
+    visible: false
+    height: 500  * theme.scaleHeight
+    width:700  * theme.scaleWidth
+    anchors.centerIn: parent
+    modal: false
+    function show(){
+        parent.visible = true
+    }
+
+    TopLine{
+        id: topLine
+        titleText: qsTr("Module and GPS Info")
+        onBtnCloseClicked:  gpsInfo.close()
+    }
     NTripInterface {
-		id: ntrip
-	}
+        id: ntrip
+    }
 
     AgIOInterface {
         id: agioInterface
     }
 
-	GridLayout {
-		id: layout
+    GridLayout {
+        id: layout
         anchors.margins: 4
         anchors.bottomMargin: 132
-        anchors.top: parent.top
-		anchors.left: parent.left
-		anchors.right: parent.right
+        anchors.top: topLine.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.bottom: sentences.top
         rows: 4
         flow: Grid.TopToBottom
@@ -34,14 +48,14 @@ Window {
         Text {
             font.pixelSize: 10
             text: qsTr("Lat: ") + (Number(Backend.fixFrame.latitude).toLocaleString(Qt.locale(), 'f', 7))
-			Layout.alignment: Qt.AlignLeft
-		}
+            Layout.alignment: Qt.AlignLeft
+        }
 
         Text {
             font.pixelSize: 10
             text: qsTr("Lon: ") + (Number(Backend.fixFrame.longitude).toLocaleString(Qt.locale(), 'f', 7))
-			Layout.alignment: Qt.AlignLeft
-		}
+            Layout.alignment: Qt.AlignLeft
+        }
 
         Text {
             font.pixelSize: 10
@@ -70,8 +84,8 @@ Window {
         Text {
             font.pixelSize: 10
             text: qsTr("Altitude: ") + (Number( Backend.fixFrame.altitude).toLocaleString(Qt.locale(), 'f', 2))
-			Layout.alignment: Qt.AlignLeft
-		}
+            Layout.alignment: Qt.AlignLeft
+        }
         //age
         Text {
             font.pixelSize: 10
@@ -103,24 +117,24 @@ Window {
         Text {
             font.pixelSize: 10
             text: qsTr("Heading: ") + Number(Backend.fixFrame.imuHeading).toLocaleString(Qt.locale(), 'f', 1)
-			Layout.alignment: Qt.AlignLeft
-		}
+            Layout.alignment: Qt.AlignLeft
+        }
         Text {
             font.pixelSize: 10
             text: qsTr("Roll: ") + (Number(Backend.fixFrame.imuRoll).toLocaleString(Qt.locale(), 'f', 1))
-			Layout.alignment: Qt.AlignLeft
-		}
+            Layout.alignment: Qt.AlignLeft
+        }
         Text {
             font.pixelSize: 10
             text: qsTr("Pitch: ") + (Number(Backend.fixFrame.imuPitch).toLocaleString(Qt.locale(), 'f', 1))
-			Layout.alignment: Qt.AlignLeft
-		}
+            Layout.alignment: Qt.AlignLeft
+        }
         Text {
             font.pixelSize: 10
             text: qsTr("Yaw Rate: ") + (Number(Backend.fixFrame.yawRate).toLocaleString(Qt.locale(), 'f', 1))
-			Layout.alignment: Qt.AlignLeft
-		}
-	}
+            Layout.alignment: Qt.AlignLeft
+        }
+    }
 
     // PHASE 6.0.22.12: Dynamic protocol list - shows ALL active protocols (NMEA + PGN)
     TitleFrame {
@@ -229,6 +243,11 @@ Window {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+        ScrollView {
+            anchors.fill: parent
+            clip: true
+
+
         ColumnLayout {
             anchors.fill: parent
             anchors.bottomMargin: 0
@@ -285,5 +304,6 @@ Window {
                 text: qsTr("Unknown: ") +  AgIOService.unknownSentence
             }
         }
+    }
     }
 }

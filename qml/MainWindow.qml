@@ -1624,5 +1624,17 @@ Window {
         portName: SettingsManager.gnss_SerialPort
         moduleType: "Gnss"
     }
+    AgIOModule.EthernetConfig {
+        id: ethernetConfig
+        visible: false
+        onVisibleChanged: {
+            if(visible)
+                ethernetConfig.load_settings()
+        }
+    }
+    AgIOModule.GPSInfo {
+        id: gpsInfo
+        visible: false
+    }
 }
 

@@ -5,7 +5,6 @@
 import QtQuick
 import QtQuick.Controls.Fusion
 import QtQuick.Layouts
-import QtQuick.Controls.Material
 import AOG
 
 import ".."
@@ -33,6 +32,7 @@ Dialog {
     TopLine{
         id: topLine
         titleText: qsTr(moduleType + " Input Source")
+        onBtnCloseClicked:  portMenu.close()
     }
 
     SourseTable {

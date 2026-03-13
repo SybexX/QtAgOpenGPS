@@ -25,14 +25,14 @@ Drawer {
         id: ntrip
         visible: false
     }
-    EthernetConfig {
-        id: ethernetConfig
-        visible: false
-        onVisibleChanged: {
-            if(visible)
-                ethernetConfig.load_settings()
-        }
-    }
+    // EthernetConfig {
+    //     id: ethernetConfig
+    //     visible: false
+    //     onVisibleChanged: {
+    //         if(visible)
+    //             ethernetConfig.load_settings()
+    //     }
+    // }
 
 
 
@@ -105,10 +105,10 @@ Drawer {
         id: agio
         objectName: "agio"
     }
-    GPSInfo {
-        id: gpsInfo
-        visible: false
-    }
+    // GPSInfo {
+    //     id: gpsInfo
+    //     visible: false
+    // }
     AgDiag {
         id: agdiag
     }
@@ -209,7 +209,8 @@ Drawer {
                 isChecked: false
                 text: qsTr("Module & GPS Info")
                 icon.source: prefix + "/images/Nmea.png"
-                onClicked: gpsInfo.visible = !gpsInfo.visible
+                onClicked: {gpsInfo.visible = !gpsInfo.visible
+                    mainWindowAgIO.visible = false}
             }
 
              Comp.IconButtonTextBeside {
@@ -218,13 +219,8 @@ Drawer {
                 text: qsTr("Ethernet")
                 icon.source: prefix + "/images/B_UDP.png"
                 color:  SettingsManager.ethernet_isOn ? "green" : "red"
-                onClicked: {
-                    if (ethernetConfig.visible) {
-                        ethernetConfig.close()
-                    } else {
-                        ethernetConfig.show()
-                    }
-                }
+                onClicked: {ethernetConfig.visible = !ethernetConfig.visible
+                            mainWindowAgIO.visible = false}
             }
             // Comp.IconButtonTextBeside {
             //     //objectName: btnSettings
