@@ -14,39 +14,43 @@ import ".."
 import "../components"
 
 
-Window{
+Dialog {
     id: steerConfig
-    height: mainWindow.height
-    title: qsTr("Auto Steer Config")
-    visible: true
+    x: 0
+    y: 0
     width: mainWindow.width
+    height: mainWindow.height
+    modal: true
+    title: qsTr("Auto Steer Config")
 
+    property bool notSaved: false
 
-    onVisibleChanged:{
-        if(visible){
+    onVisibleChanged: {
+        if(visible) {
             settingsArea.load_settings()
             sensorsBtn.isChecked = true
             console.log("Settings loaded")
+            notSaved = false
         }
     }
 
-    Rectangle{//background
+    Rectangle {
         anchors.fill: parent
-        color: "lightgray"
+        color: aogInterface.backgroundColor
     }
 
     ButtonGroup{
-		buttons: settingsBtns.children
-	}
+        buttons: settingsBtns.children
+    }
 
-	RowLayout{
-		id: settingsBtns
-		spacing: 3 * theme.scaleWidth
-		width: parent.width
+    RowLayout{
+        id: settingsBtns
+        spacing: 3 * theme.scaleWidth
+        width: parent.width
         anchors.top: parent.top
         anchors.topMargin: 20 * theme.scaleHeight
         SteerConfigTopButtons{
-			id: sensorsBtn
+            id: sensorsBtn
             buttonText: qsTr("Sensors")
             icon.source: prefix + "/images/Config/ConD_Speedometer.png"
             implicitWidth: parent.width /5 -5
@@ -54,14 +58,14 @@ Window{
             onClicked: settingsWindow.visible = false
         }
         SteerConfigTopButtons{
-			id: configBtn
+            id: configBtn
             implicitWidth: parent.width /5 -5
             buttonText: qsTr("Config")
             icon.source: prefix + "/images/Config/ConS_Pins.png"
             onClicked: settingsWindow.visible = false
         }
         SteerConfigTopButtons{
-			id: settingsBtn
+            id: settingsBtn
             implicitWidth: parent.width /5 -5
             buttonText: qsTr("Settings")
             icon.source: prefix + "/images/Config/ConS_ModulesSteer.png"
@@ -75,62 +79,59 @@ Window{
             onClicked: settingsWindow.visible = false
         }
         SteerConfigTopButtons{
-			id: steerSettingsBtn
+            id: steerSettingsBtn
             implicitWidth: parent.width /5 -5
             buttonText: qsTr("Steer Settings")
             icon.source: prefix + "/images/Config/ConS_ImplementConfig.png"
             onClicked: settingsWindow.visible = false
         }
-	}
-	Item{
-		id: settingsArea
-		anchors.left: parent.left
-		anchors.right: parent.right
-		anchors.top: settingsBtns.bottom
-		anchors.bottom: bottomRightButtons.top
-		anchors.topMargin: 10 * theme.scaleHeight
-		anchors.bottomMargin: 10 * theme.scaleHeight
-		anchors.leftMargin: 10 * theme.scaleWidth
-		anchors.rightMargin: 10 * theme.scaleWidth
+    }
+    Item{
+        id: settingsArea
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: settingsBtns.bottom
+        anchors.bottom: bottomRightButtons.top
+        anchors.topMargin: 10 * theme.scaleHeight
+        anchors.bottomMargin: 10 * theme.scaleHeight
+        anchors.leftMargin: 10 * theme.scaleWidth
+        anchors.rightMargin: 10 * theme.scaleWidth
 
-		function load_settings(){ 
-			if (visible) {
+        function load_settings(){
+            if (visible) {
                 var sett = SettingsManager.ardSteer_setting0
 
-				if ((sett & 1) == 0) chkInvertWAS.checked = false;
-				else chkInvertWAS.checked = true;
+                if ((sett & 1) == 0) chkInvertWAS.checked = false;
+                else chkInvertWAS.checked = true;
 
-				if ((sett & 2) == 0) chkSteerInvertRelays.checked = false;
-				else chkSteerInvertRelays.checked = true;
+                if ((sett & 2) == 0) chkSteerInvertRelays.checked = false;
+                else chkSteerInvertRelays.checked = true;
 
-				if ((sett & 4) == 0) chkInvertSteer.checked = false;
-				else chkInvertSteer.checked = true;
+                if ((sett & 4) == 0) chkInvertSteer.checked = false;
+                else chkInvertSteer.checked = true;
 
-				//if ((sett & 8) == 0) cboxConv.currentText = "Differential";
-				//else cboxConv.currentText = "Single";
-				if ((sett & 8) == 0) cboxConv.currentIndex = 1;
-				else cboxConv.currentIndex = 0;
+                //if ((sett & 8) == 0) cboxConv.currentText = "Differential";
+                //else cboxConv.currentText = "Single";
+                if ((sett & 8) == 0) cboxConv.currentIndex = 1;
+                else cboxConv.currentIndex = 0;
 
-				//if ((sett & 16) == 0) cboxMotorDrive.currentText = "IBT2";
-				//else cboxMotorDrive.currentText = "Cytron";
-				if ((sett & 16) == 0) cboxMotorDrive.currentIndex = 1;
-				else cboxMotorDrive.currentIndex = 0;
+                //if ((sett & 16) == 0) cboxMotorDrive.currentText = "IBT2";
+                //else cboxMotorDrive.currentText = "Cytron";
+                if ((sett & 16) == 0) cboxMotorDrive.currentIndex = 1;
+                else cboxMotorDrive.currentIndex = 0;
 
-				if ((sett & 32) == 32) cboxSteerEnable.currentIndex = 1;
-				else if ((sett & 64) == 64) cboxSteerEnable.currentIndex = 2;
-				else cboxSteerEnable.currentIndex = 0;
+                if ((sett & 32) == 32) cboxSteerEnable.currentIndex = 1;
+                else if ((sett & 64) == 64) cboxSteerEnable.currentIndex = 2;
+                else cboxSteerEnable.currentIndex = 0;
 
-				if ((sett & 128) == 0){
-					console.log("encoder not checked")
-					cboxEncoder.checked = false;
-				}
-				else {
-					console.log("encoder set to checked") 
-					cboxEncoder.checked = true;
-				}
-
-                nudMaxCounts.value = SettingsManager.ardSteer_maxPulseCounts;
-                hsbarSensor.value = SettingsManager.ardSteer_maxPulseCounts;
+                if ((sett & 128) == 0){
+                    console.log("encoder not checked")
+                    cboxEncoder.checked = false;
+                }
+                else {
+                    console.log("encoder set to checked")
+                    cboxEncoder.checked = true;
+                }
 
                 sett = SettingsManager.ardSteer_setting1;
 
@@ -147,6 +148,15 @@ Window{
 
                 if ((sett & 4) == 0) cboxCurrentSensor.checked = false;
                 else cboxCurrentSensor.checked = true;
+
+                if (cboxCurrentSensor.checked || cboxPressureSensor.checked)
+                {
+                    hsbarSensor.value = SettingsManager.ardSteer_maxPulseCounts;
+                }
+                else
+                {
+                    nudMaxCounts.value = SettingsManager.ardSteer_maxPulseCounts;
+                }
 
                 /*the display logic that went here has been moved to the individual
                  *component files. They are not needed in QML
@@ -221,11 +231,11 @@ Window{
 
             if (cboxCurrentSensor.checked || cboxPressureSensor.checked)
             {
-                SettingsManager.ardSteer_ardSteerMaxPulseCounts = hsbarSensor.value;
+                SettingsManager.ardSteer_maxPulseCounts = hsbarSensor.value;
             }
             else
             {
-                SettingsManager.ardSteer_ardSteerMaxPulseCounts = nudMaxCounts.value;
+                SettingsManager.ardSteer_maxPulseCounts = nudMaxCounts.value;
             }
 
             // Settings1
@@ -262,7 +272,7 @@ Window{
 
             ModuleComm.modulesSend251()
 
-            send.enabled = false;
+            notSaved = false;
         }
         function reset_all() {
             timedMessage.addMessage(2000, "Reset To Default", "Values Set to Inital Default");
@@ -354,7 +364,7 @@ Window{
                     checkable: true
                     buttonText: qsTr("Count Sensor")
                     Layout.alignment: Qt.AlignCenter
-                    onClicked: send.enabled = true
+                    onClicked: notSaved = true
                     onCheckedChanged: nudMaxCounts.visible = checked
                 }
                 IconButtonColor{
@@ -363,7 +373,7 @@ Window{
                     checkable: true
                     buttonText: qsTr("Pressure Turn Sensor")
                     Layout.alignment: Qt.AlignCenter
-                    onClicked: send.enabled = true
+                    onClicked: notSaved = true
                 }
                 IconButtonColor{
                     id: cboxCurrentSensor
@@ -371,7 +381,7 @@ Window{
                     checkable: true
                     buttonText: qsTr("Current Turn Sensor")
                     Layout.alignment: Qt.AlignCenter
-                    onClicked: send.enabled = true
+                    onClicked: notSaved = true
                 }
             }
             Text{
@@ -403,7 +413,7 @@ Window{
                     to: 255
                     decimals: 0
                     editable: true
-                    onValueChanged: send.enabled = true
+                    onValueChanged: notSaved = true
                 }
                 ProgressBar {
                     //id: pbarSensor
@@ -439,7 +449,7 @@ Window{
                         text: Math.round((hsbarSensor.value * 0.3921568627) * 100) / 100  + " %"
                         font.bold: true
                     }
-                    onValueChanged: send.enabled = true
+                    onValueChanged: notSaved = true
                 }
             }
         }
@@ -455,108 +465,136 @@ Window{
                 rows: 4
                 columns: 2
                 flow: Grid.TopToBottom
-                IconButtonColor{
-                    id: cboxDanfoss
-                    icon.source: prefix + "/images/Config/ConST_Danfoss.png"
-                    checkable: true
-                    buttonText: qsTr("Danfoss")
-                    Layout.alignment: Qt.AlignCenter
-                    onClicked: send.enabled = true
-                }
-                IconButtonColor{
-                    id: chkInvertWAS
-                    icon.source: prefix + "/images/Config/ConSt_InvertWAS.png"
-                    checkable: true
-                    Layout.alignment: Qt.AlignCenter
-                    buttonText: "Invert WAS"
-                    onClicked: send.enabled = true
-                }
-                IconButtonColor{
-                    id: chkInvertSteer
-                    icon.source: prefix + "/images/Config/ConSt_InvertDirection.png"
-                    checkable: true
-                    buttonText: qsTr("Invert Motor Dir")
-                    Layout.alignment: Qt.AlignCenter
-                    onClicked: send.enabled = true
-                }
-                IconButtonColor{
-                    id: chkSteerInvertRelays
-                    icon.source: prefix + "/images/Config/ConSt_InvertRelay.png"
-                    checkable: true
-                    buttonText: qsTr("Invert Relays")
-                    Layout.alignment: Qt.AlignCenter
-                    onClicked: send.enabled = true
-                }
-            }
-            ColumnLayout{
-                id: columnOfDropDown
-                anchors.top: parent.top
-                anchors.leftMargin: 10 * theme.scaleWidth
-                anchors.rightMargin: 10 * theme.scaleWidth
-                anchors.topMargin: 10 * theme.scaleHeight
-                anchors.bottomMargin: 50 * theme.scaleHeight
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.right
-                height: parent.height /2
-                ComboBoxCustomized {
-                    id: cboxMotorDrive
-                    editable: false
-                    // Component.onCompleted: currentIndex = ((settings.setArdSteer_setting0 & 16) == 0) ? 1 : 0
-                    model: ListModel {
-                        id: modelmotorDriver
-                        ListElement {text: "Cytron"}
-                        ListElement {text: "IBT2"}
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    IconButtonColor{
+                        id: cboxDanfoss
+                        anchors.centerIn: parent
+                        icon.source: prefix + "/images/Config/ConST_Danfoss.png"
+                        checkable: true
+                        buttonText: qsTr("Danfoss")
+                        Layout.alignment: Qt.AlignCenter
+                        onClicked: notSaved = true
                     }
-                    text: ("Motor Driver")
-                    onActivated: send.enabled = true
                 }
-                ComboBoxCustomized {
-                    id: cboxConv
-                    editable: false
-                    // Component.onCompleted: currentIndex = ((settings.setArdSteer_setting0 & 8) == 0) ? 1 : 0
-                    model: ListModel {
-                        id: a2Dmodel
-                        ListElement {text: qsTr("Single")}
-                        ListElement {text: qsTr("Differential")}
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    IconButtonColor{
+                        id: chkInvertWAS
+                        anchors.centerIn: parent
+                        icon.source: prefix + "/images/Config/ConSt_InvertWAS.png"
+                        checkable: true
+                        Layout.alignment: Qt.AlignCenter
+                        buttonText: "Invert WAS"
+                        onClicked: notSaved = true
                     }
-                    text: qsTr("A2D Converter")
-                    onActivated: send.enabled = true
                 }
-                ComboBoxCustomized {
-                    id: cboxXY
-                    editable: false
-                    // Component.onCompleted: currentIndex = ((settings.setArdSteer_setting1 & 8) == 0) ? 0 : 1
-                    model: ListModel {
-                        id: imuAxismodel
-                        ListElement {text: "X"}
-                        ListElement {text: "Y"}
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    IconButtonColor{
+                        id: chkInvertSteer
+                        anchors.centerIn: parent
+                        icon.source: prefix + "/images/Config/ConSt_InvertDirection.png"
+                        checkable: true
+                        buttonText: qsTr("Invert Motor Dir")
+                        Layout.alignment: Qt.AlignCenter
+                        onClicked: notSaved = true
                     }
-                    text: qsTr("IMU X or Y Axis")
-                    onActivated: send.enabled = true
                 }
-
-                ComboBoxCustomized {
-                    id: cboxSteerEnable
-                    editable: false
-                    /* Component.onCompleted: if((Settings.ardSteer_setting0 & 32) == 32)
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    IconButtonColor{
+                        id: chkSteerInvertRelays
+                        anchors.centerIn: parent
+                        icon.source: prefix + "/images/Config/ConSt_InvertRelay.png"
+                        checkable: true
+                        buttonText: qsTr("Invert Relays")
+                        Layout.alignment: Qt.AlignCenter
+                        onClicked: notSaved = true
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    ComboBoxCustomized {
+                        id: cboxMotorDrive
+                        anchors.centerIn: parent
+                        editable: false
+                        // Component.onCompleted: currentIndex = ((settings.setArdSteer_setting0 & 16) == 0) ? 1 : 0
+                        model: ListModel {
+                            id: modelmotorDriver
+                            ListElement {text: "Cytron"}
+                            ListElement {text: "IBT2"}
+                        }
+                        text: ("Motor Driver")
+                        onActivated: notSaved = true
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    ComboBoxCustomized {
+                        id: cboxConv
+                        anchors.centerIn: parent
+                        editable: false
+                        // Component.onCompleted: currentIndex = ((settings.setArdSteer_setting0 & 8) == 0) ? 1 : 0
+                        model: ListModel {
+                            id: a2Dmodel
+                            ListElement {text: qsTr("Single")}
+                            ListElement {text: qsTr("Differential")}
+                        }
+                        text: qsTr("A2D Converter")
+                        onActivated: notSaved = true
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    ComboBoxCustomized {
+                        id: cboxXY
+                        anchors.centerIn: parent
+                        editable: false
+                        // Component.onCompleted: currentIndex = ((settings.setArdSteer_setting1 & 8) == 0) ? 0 : 1
+                        model: ListModel {
+                            id: imuAxismodel
+                            ListElement {text: "X"}
+                            ListElement {text: "Y"}
+                        }
+                        text: qsTr("IMU X or Y Axis")
+                        onActivated: notSaved = true
+                    }
+                }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    ComboBoxCustomized {
+                        id: cboxSteerEnable
+                        anchors.centerIn: parent
+                        editable: false
+                        /* Component.onCompleted: if((Settings.ardSteer_setting0 & 32) == 32)
                            currentIndex = 1
                            else if((Settings.ardSteer_setting0 & 64) == 64)
                            currentIndex = 2
                            else
                            currentIndex = 0*/
-                    model: ListModel {
-                        //   id: steerEnablemodel
-                        ListElement {text: qsTr("None")}
-                        ListElement {text: qsTr("Switch")}
-                        ListElement {text: qsTr("Button")}
-                    }
-                    text: qsTr("Steer Enable")
-                    onActivated: send.enabled = true
-                    Text{
-                        anchors.top: cboxSteerEnable.bottom
-                        anchors.left: cboxSteerEnable.left
-                        text: qsTr("Button- Push On, Push Off\nSwitch- Pushed On, Release Off")
-                        font.pixelSize: 10
+                        model: ListModel {
+                            //   id: steerEnablemodel
+                            ListElement {text: qsTr("None")}
+                            ListElement {text: qsTr("Switch")}
+                            ListElement {text: qsTr("Button")}
+                        }
+                        text: qsTr("Steer Enable")
+                        onActivated: notSaved = true
+                        Text{
+                            anchors.top: cboxSteerEnable.bottom
+                            anchors.left: cboxSteerEnable.left
+                            text: qsTr("Button- Push On, Push Off\nSwitch- Pushed On, Release Off")
+                            font.pixelSize: 10
+                        }
                     }
                 }
             }
@@ -719,12 +757,12 @@ Window{
         }
         //endregion steerSafetySettings
     }
-        //region steerSettingsTab
-        Item{
-            id: steerSettingsWindow
-            anchors.fill: parent
-            visible: steerSettingsBtn.checked
-            /*    Rectangle{
+    //region steerSettingsTab
+    Item{
+        id: steerSettingsWindow
+        anchors.fill: parent
+        visible: steerSettingsBtn.checked
+        /*    Rectangle{
                         id: lightbarrect
                         anchors.left: parent.left
                         anchors.top: parent.top
@@ -976,7 +1014,7 @@ Window{
 
                 // Connect new handlers for this instance
                 steerMessageDialog.accepted.connect(() => {
-                                                      settingsArea.reset_all();
+                                                        settingsArea.reset_all();
 
                                                     });
 
@@ -985,14 +1023,14 @@ Window{
         }
         IconButtonTransparent{
             id: send
-            enabled: false
+            //enabled: false
             Layout.alignment: Qt.AlignRight
-            icon.source: prefix + "/images/ToolAcceptChange.png"
+            icon.source: notSaved?prefix + "/images/ToolAcceptNotSaved.png":prefix + "/images/ToolAcceptChange.png"
             implicitWidth: 130
             anchors.right: ok.left
             anchors.rightMargin: 10 * theme.scaleWidth
-            onClicked: { settingsArea.save_settings() ; send.enabled = false ;
-            aog.settingsReload();} // Qt 6.8 MODERN: Direct Q_INVOKABLE call
+            onClicked: { settingsArea.save_settings() ; notSaved = false ;
+                aog.settingsReload();} // Qt 6.8 MODERN: Direct Q_INVOKABLE call
             Text {
                 text: qsTr("Send + Save")
                 anchors.verticalCenter: parent.verticalCenter
@@ -1000,6 +1038,7 @@ Window{
                 anchors.rightMargin: 5
             }
         }
+
         IconButtonTransparent{
             id: ok
             icon.source: prefix + "/images/OK64.png"

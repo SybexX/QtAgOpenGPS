@@ -26,41 +26,38 @@ Drawer {
     function show (){
         steerConfigWindow.visible = true
         steerBtn.isChecked = true
-	}
+    }
 
-	Rectangle{
-		id: steerConfigFirst
+    contentItem: Rectangle{
+        id: steerConfigFirst
         anchors.fill: parent
+
         border.color: aogInterface.blackDayWhiteNight
         border.width: 1
         color: aogInterface.backgroundColor
         visible: true
-        // TopLine{
-        //     id:topLine
-        //     onBtnCloseClicked:  steerConfigWindow.close()
-        //     titleText: qsTr("Auto Steer Config")
-        // }
+
         Item{
-			id: steerSlidersConfig
+            id: steerSlidersConfig
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            height: 575 * theme.scaleHeight
-            width: steerConfigWindow.width
+            height: parent.height *0.75
+            width: steerConfigFirst.width
             anchors.rightMargin: 2 * theme.scaleHeight
             anchors.leftMargin: 2 * theme.scaleHeight
             ButtonGroup {
-				buttons: buttonsTop.children
-			}
+                buttons: buttonsTop.children
+            }
 
-			RowLayout{
+            RowLayout{
                 id: buttonsTop
                 anchors.top: parent.top
                 anchors.topMargin: 5
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width - 10 * theme.scaleWidth
-				IconButtonColor{
-					id: steerBtn
+                //anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width - 2 * theme.scaleWidth
+                IconButtonColor{
+                    id: steerBtn
                     checkable: true
                     //checked: true
                     colorChecked: "lightgray"
@@ -68,16 +65,16 @@ Drawer {
                     implicitHeight: 50 * theme.scaleHeight
                     implicitWidth: parent.width /3 - 5 * theme.scaleWidth
                 }
-				IconButtonColor{
-					id: gainBtn
+                IconButtonColor{
+                    id: gainBtn
                     checkable: true
                     colorChecked: "lightgray"
                     icon.source: prefix + "/images/Steer/ST_GainTab.png"
                     implicitHeight: 50 * theme.scaleHeight
                     implicitWidth: parent.width /3 - 5 * theme.scaleWidth
                 }
-				IconButtonColor{
-					id: stanleyBtn
+                IconButtonColor{
+                    id: stanleyBtn
                     checkable: true
                     colorChecked: "lightgray"
                     icon.source: prefix + "/images/Steer/ST_StanleyTab.png"
@@ -85,8 +82,8 @@ Drawer {
                     implicitWidth: parent.width /3 - 5 * theme.scaleWidth
                     visible: SettingsManager.vehicle_isStanleyUsed
                 }
-				IconButtonColor{
-					id: ppBtn
+                IconButtonColor{
+                    id: ppBtn
                     checkable: true
                     colorChecked: "lightgray"
                     icon.source: prefix + "/images/Steer/Sf_PPTab.png"
@@ -99,7 +96,7 @@ Drawer {
             WasBar{
                 id: wasbar
                 wasvalue: ModuleComm.actualSteerAngleDegrees*10
-                width: steerConfigWindow.width - 20 * theme.scaleWidth
+                width: steerConfigFirst.width - 20 * theme.scaleWidth
                 visible: steerBtn.checked
                 anchors.top: buttonsTop.bottom
                 anchors.bottomMargin: 8 * theme.scaleHeight
@@ -107,12 +104,29 @@ Drawer {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
+            IconButtonTransparent { //was zero button
+                id: waszerobtn
+                implicitWidth: 80 * theme.scaleWidth
+                implicitHeight: 50 * theme.scaleHeight
+                anchors.horizontalCenter: parent.horizontalCenter
+                icon.source: prefix + "/images/SteerCenter.png"
+                anchors.top: wasbar.bottom
+                anchors.topMargin: 8 * theme.scaleHeight
+                visible: steerBtn.checked
+                onClicked:  {SettingsManager.as_wasOffset = SettingsManager.as_wasOffset - cpDegSlider.value * ModuleComm.actualSteerAngleDegrees;
+                    if (Math.abs(SettingsManager.as_wasOffset) < 3900){ sendUdptimer.running = true}
+                    else {timedMessage.addMessage(2000, "Exceeded Range", "Excessive Steer Angle - Cannot Zero");}
+                }
+            }
+
             Rectangle{
                 id: slidersArea
-                anchors.top: wasbar.bottom
+                color: aogInterface.backgroundColor
+                anchors.top: waszerobtn.bottom
                 anchors.right: parent.right
                 anchors.left: parent.left
                 anchors.bottom: angleInfo.top
+                anchors.topMargin: 8 * theme.scaleHeight
 
                 ColumnLayout{
                     id: slidersColumn
@@ -128,23 +142,7 @@ Drawer {
                     /* Here, we just set which Sliders we want to see, and the
                       ColumnLayout takes care of the rest. No need for
                       4 ColumnLayouts*/
-                     //region WAStab
-
-
-
-
-                    IconButtonTransparent { //was zero button
-                        implicitWidth: 80 * theme.scaleWidth
-                        implicitHeight: 50 * theme.scaleHeight
-                        Layout.alignment: Qt.AlignCenter
-                        icon.source: prefix + "/images/SteerCenter.png"
-                        //visible: false
-                        visible: steerBtn.checked
-                        onClicked:  {SettingsManager.as_wasOffset = SettingsManager.as_wasOffset - cpDegSlider.value * ModuleComm.actualSteerAngleDegrees;
-                        if (Math.abs(SettingsManager.as_wasOffset) < 3900){ sendUdptimer.running = true}
-                        else {timedMessage.addMessage(2000, "Exceeded Range", "Excessive Steer Angle - Cannot Zero");}
-                                    }
-                    }
+                    //region WAStab
 
                     SteerConfigSliderCustomized {
                         property int wasOffset: 0
@@ -348,9 +346,9 @@ Drawer {
                     anchors.left: parent.left
                     height: slidersColumn.height
                     source: prefix + (steerBtn.checked === true ? "/images/Steer/Sf_SteerTab.png" :
-                                     gainBtn.checked === true ? "/images/Steer/Sf_GainTab.png" :
-                                     stanleyBtn.checked === true ? "/images/Steer/Sf_Stanley.png" :
-                                    "/images/Steer/Sf_PP.png")
+                                                                  gainBtn.checked === true ? "/images/Steer/Sf_GainTab.png" :
+                                                                                             stanleyBtn.checked === true ? "/images/Steer/Sf_Stanley.png" :
+                                                                                                                           "/images/Steer/Sf_PP.png")
                     width: parent.width
                 }
             }
@@ -358,10 +356,10 @@ Drawer {
             Rectangle{
                 id: angleInfo
                 anchors.bottom: parent.bottom
-                //anchors.left: parent.left
-                //anchors.right: parent.right
+                anchors.left: parent.left
+                anchors.right: parent.right
                 height: 50 * theme.scaleHeight
-                width: parent.width - 10 * theme.scaleWidth
+                width: parent.width - 2 * theme.scaleWidth
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 MouseArea{
@@ -373,55 +371,58 @@ Drawer {
                 RowLayout{
                     id: angleInfoRow
                     anchors.fill: parent
-                    spacing: 10 * theme.scaleWidth
+                    spacing: 5 * theme.scaleWidth
+                    width: parent.width - 2 * theme.scaleWidth
 
                     Text {
                         text: qsTr("Set: " + steerConfigWindow.steerAngleSetRounded)
                         //text: qsTr("Set: " + VehicleInterface.driveFreeSteerAngle
-                        Layout.alignment: Qt.AlignCenter
+                        Layout.fillWidth: true
                     }
                     Text {
                         text: qsTr("Act: " + steerConfigWindow.steerAngleActualRounded)
-                        Layout.alignment: Qt.AlignCenter
+                        Layout.fillWidth: true
                     }
                     Text {
                         property double err: steerConfigWindow.steerAngleActualRounded - steerConfigWindow.steerAngleSetRounded
                         id: errorlbl
-                        Layout.alignment: Qt.AlignCenter
+                        Layout.fillWidth: true
                         onErrChanged: err > 0 ? errorlbl.color = "red" : errorlbl.color = "darkgreen"
                         text: qsTr("Err: " + Math.round(err*10)/10)
                     }
+                    // Item { Layout.fillWidth: true }
                     IconButtonTransparent{
                         //show angle info window
-                        Layout.alignment: Qt.AlignRight
+                        anchors.right: angleInfo.right
                         icon.source: prefix + "/images/ArrowRight.png"
                         implicitHeight: parent.height
-                        implicitWidth: parent.width/4
-                        onClicked: steerConfigSettings.show()
+                        implicitWidth: parent.width /4 - 5 * theme.scaleWidth
+                        onClicked: steerConfigSettings.open()
                     }
                 }
             }
         }
         Rectangle{
             id: pwmWindow
+            color: aogInterface.backgroundColor
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 8 * theme.scaleHeight
-            //anchors.left: steerSlidersConfig.left
             anchors.top: steerSlidersConfig.bottom
             anchors.topMargin: 8 * theme.scaleHeight
             visible: false
-            height: children
-            width: steerConfigWindow.width-10 * theme.scaleWidth
+            height: parent.height *0.25
+            width: steerConfigFirst.width-2 * theme.scaleWidth
             anchors.horizontalCenter: parent.horizontalCenter
 
             RowLayout{
                 id: pwmRow
                 anchors.bottomMargin: 10 * theme.scaleHeight
-                //anchors.left: parent.left
+                anchors.left: parent.left
+                anchors.right: parent.right
                 anchors.top: parent.top
                 anchors.topMargin: 10 * theme.scaleHeight
                 height: 50 * theme.scaleHeight
-                width: parent.width - 10 * theme.scaleWidth
+                width: parent.width - 2 * theme.scaleWidth
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 IconButton{
@@ -440,7 +441,7 @@ Drawer {
                     }
                 }
                 IconButton{
-                    //id: btnSteerAngleDown
+                    id: btnSteerAngleDown
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SnapLeft.png"
@@ -453,7 +454,7 @@ Drawer {
                     enabled: btnFreeDrive.checked
                 }
                 IconButton{
-                    //id: btnSteerAngleUp
+                    id: btnSteerAngleUp
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SnapRight.png"
@@ -466,7 +467,7 @@ Drawer {
                     enabled: btnFreeDrive.checked
                 }
                 IconButton{
-                    //id: btnFreeDriveZero
+                    id: btnFreeDriveZero
                     border: 2
                     color3: "white"
                     icon.source: prefix + "/images/SteerZeroSmall.png"
@@ -515,7 +516,7 @@ Drawer {
                 anchors.left: btnStartSA.right
                 anchors.leftMargin: 5 * theme.scaleWidth
                 text: SteerConfig.isSA ? qsTr("Drive Steady") :
-                                          qsTr("Steer Angle: %1°").arg(SteerConfig.calcSteerAngleInner.toLocaleString(Qt.locale(), 'f', 1))
+                                         qsTr("Steer Angle: %1°").arg(SteerConfig.calcSteerAngleInner.toLocaleString(Qt.locale(), 'f', 1))
                 Layout.alignment: Qt.AlignCenter
             }
             Text{
@@ -527,6 +528,7 @@ Drawer {
             }
         }
     }
+
     Timer {
         id: sendUdptimer
         interval: 1000;
