@@ -67,7 +67,7 @@ Rectangle {
         target: mainWindow
         function onHotKeyPressed(index) {
             var model = Tools.toolsProperties.tools[toolIndex].sectionButtonsModel;
-            if (!model || index < 0 || index >= model.count) return;
+            if (!model || index < 0 || index >= 8) return;
 
             var idx = model.index(index, 0);
             if (!idx || !idx.valid) return;
