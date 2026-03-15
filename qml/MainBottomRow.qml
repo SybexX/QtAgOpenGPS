@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import AOG
+import AOG 1.0
 import "components" as Comp
 
 Item {
