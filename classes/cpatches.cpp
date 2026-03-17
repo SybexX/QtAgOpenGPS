@@ -2,6 +2,7 @@
 #include "classes/settingsmanager.h"
 #include "qmlutil.h"
 #include "backend.h"
+#include "classes/cvehicle.h"
 #include <QLineF>
 
 inline QColor get_SectionColor(int section) {
@@ -142,7 +143,7 @@ void CPatches::AddMappingPoint(QColor section_color,
     if (triangleList->count() >= 3) {
         QVector3D lastLeft = (*triangleList)[triangleList->count() - 2];
         QVector3D lastRight = (*triangleList)[triangleList->count() - 1];
-        double minDist = SettingsManager::instance()->f_minHeadingStepDistance();
+        double minDist = CVehicle::instance()->sectionTriggerStepDistance;
         if (QLineF(leftPoint.x(), leftPoint.y(), lastLeft.x(), lastLeft.y()).length() < minDist &&
             QLineF(rightPoint.x(), rightPoint.y(), lastRight.x(), lastRight.y()).length() < minDist) {
             return;
