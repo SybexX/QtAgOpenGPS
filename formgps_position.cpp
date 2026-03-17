@@ -1641,10 +1641,6 @@ void FormGPS::CalculatePositionHeading()
         CVehicle::instance()->sectionTriggerStepDistance = distance * twist * twist;
     }
 
-    //finally fixed distance for making a curve line
-    if (!track.curve.isMakingCurve) CVehicle::instance()->sectionTriggerStepDistance = CVehicle::instance()->sectionTriggerStepDistance + 0.5;
-    //if (MainWindowState::instance()->isContourBtnOn()) CVehicle::instance()->sectionTriggerStepDistance *=0.5;
-
     //precalc the sin and cos of heading * -1
     CVehicle::instance()->sinSectionHeading = sin(-tool.toolPivotPos.heading);
     CVehicle::instance()->cosSectionHeading = cos(-tool.toolPivotPos.heading);
