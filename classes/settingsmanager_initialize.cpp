@@ -7,7 +7,7 @@
 
 void SettingsManager::initializeFromSettings()
 {
-    // Load all 396 properties from QSettings with default fallback
+    // Load all 397 properties from QSettings with default fallback
     // IMPORTANT: Uses QSettings second parameter for defaults (not hardcoded 0/false)
 
     m_menu_language.setValue(m_qsettings->value("menu/language", "en").toString());
@@ -466,7 +466,8 @@ void SettingsManager::initializeFromSettings()
     m_rate_productName2.setValue(m_qsettings->value("rate/productName2", "2").toString());
     m_rate_productName3.setValue(m_qsettings->value("rate/productName3", "3").toString());
     m_menu_isKeyboardOn.setValue(m_qsettings->value("menu/isKeyboardOn", false).toBool());
+    m_display_isPolygons.setValue(m_qsettings->value("display/isPolygons", false).toBool());
 
     // All properties loaded with proper defaults
-    qDebug() << "SettingsManager: initialized" << 396 << "properties from" << m_qsettings->fileName();
+    qDebug() << "SettingsManager: initialized" << 397 << "properties from" << m_qsettings->fileName();
 }

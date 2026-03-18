@@ -4,7 +4,7 @@
 // File 3/3: Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS members for private: section
 
 // Generated property members with Qt6 bindable support
-// Total members: 396
+// Total members: 397
 
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_menu_language, "en", &SettingsManager::menu_languageChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_feature_isOffsetFixOn, false, &SettingsManager::feature_isOffsetFixOnChanged)
@@ -402,5 +402,6 @@ Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_rate_productNam
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_rate_productName2, "2", &SettingsManager::rate_productName2Changed)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_rate_productName3, "3", &SettingsManager::rate_productName3Changed)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_menu_isKeyboardOn, false, &SettingsManager::menu_isKeyboardOnChanged)
+Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_display_isPolygons, false, &SettingsManager::display_isPolygonsChanged)
 
 // End of generated property members

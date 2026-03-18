@@ -2838,6 +2838,8 @@ bool CYouTurn::DistanceFromYouTurnLine( CNMEA &pn)
 
     if (ptCount > 0)
     {
+        A = 0;
+        B = 1;
         if (vehicle_isStanleyUsed)
         {
             pivot = CVehicle::instance()->steerAxlePos;
@@ -2869,6 +2871,13 @@ bool CYouTurn::DistanceFromYouTurnLine( CNMEA &pn)
                 return false;
             }
 
+            // Check if we have valid indices
+            if (A < 0 || A >= ptCount || B < 0 || B >= ptCount || A == B)
+            {
+                CompleteYouTurn();
+                return false;
+            }
+
             //just need to make sure the points continue ascending or heading switches all over the place
             if (A > B)
             {
@@ -2880,6 +2889,15 @@ bool CYouTurn::DistanceFromYouTurnLine( CNMEA &pn)
             if (A < 0)
             {
                 A = 0;
+            }
+            if (B < 1)
+            {
+                B = 1;
+            }
+            if (B >= ptCount)
+            {
+                CompleteYouTurn();
+                return false;
             }
             B = A + 1;
 
@@ -2974,6 +2992,13 @@ bool CYouTurn::DistanceFromYouTurnLine( CNMEA &pn)
                     minDistB = dist;
                     B = t;
                 }
+            }
+
+            // Check if we have valid indices
+            if (A < 0 || A >= ptCount || B < 0 || B >= ptCount || A == B)
+            {
+                CompleteYouTurn();
+                return false;
             }
 
             //just need to make sure the points continue ascending or heading switches all over the place

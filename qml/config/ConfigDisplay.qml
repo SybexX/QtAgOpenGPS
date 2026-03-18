@@ -109,6 +109,13 @@ Item {
                 isChecked: SettingsManager.menu_isKeyboardOn
                 onCheckedChanged: SettingsManager.menu_isKeyboardOn = checked
             }
+            DisplayAndFeaturesBtns{
+                id: polygon
+                text: qsTr("Polygons")
+                icon.source: prefix + "/images/Config/ConD_Poligons.png"
+                isChecked: SettingsManager.display_isPolygons
+                onCheckedChanged: SettingsManager.display_isPolygons = checked
+            }
             /*DisplayAndFeaturesBtns{ //appears there is no setting for this
                 id: speedo
                 text: qsTr("Speedometer")
