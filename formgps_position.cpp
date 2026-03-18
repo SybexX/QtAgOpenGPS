@@ -1621,24 +1621,26 @@ void FormGPS::CalculatePositionHeading()
 
     //used to increase triangle count when going around corners, less on straight
     //pick the slow moving side edge of tool
-    double distance = tool.width * 0.5;
-    if (distance > 5) distance = 5;
+    double distance = tool.width * 0.75;
+    if (distance > 8) distance = 8;
 
     //whichever is less
     if (tool.farLeftSpeed < tool.farRightSpeed)
     {
-        double twist = tool.farLeftSpeed / tool.farRightSpeed;
+        double twist = tool.farLeftSpeed * (tool.width / 50) / tool.farRightSpeed * (50/ tool.width);
         twist *= twist;
         if (twist < 0.2) twist = 0.2;
-        CVehicle::instance()->sectionTriggerStepDistance = distance * twist * twist;
+        sectionTriggerStepDistance = distance * twist;
+        CVehicle::instance()->sectionTriggerStepDistance = sectionTriggerStepDistance;
     }
     else
     {
-        double twist = tool.farRightSpeed / tool.farLeftSpeed;
-        //twist *= twist;
+        double twist = tool.farRightSpeed * (tool.width / 50) / tool.farLeftSpeed * (50 / tool.width);
+        twist *= twist;
         if (twist < 0.2) twist = 0.2;
 
-        CVehicle::instance()->sectionTriggerStepDistance = distance * twist * twist;
+        sectionTriggerStepDistance = distance * twist;
+        CVehicle::instance()->sectionTriggerStepDistance = sectionTriggerStepDistance;
     }
 
     //precalc the sin and cos of heading * -1
@@ -1822,19 +1824,22 @@ void FormGPS::AddSectionOrPathPoints()
     // if non zero, at least one section is on.
     patchCounter = 0;
 
-    for (int j=0; j < tool.numOfSections; j++) {
-        if (tool.section[j].isSectionOn) {
-            if(SettingsManager::instance()->color_isMultiColorSections())
-                LayerService::instance()->addSectionVertices(
+    //only add vertices when travelled far enough (same logic as OpenGL)
+    if (sectionTriggerDistance > sectionTriggerStepDistance) {
+        for (int j=0; j < tool.numOfSections; j++) {
+            if (tool.section[j].isSectionOn) {
+                if(SettingsManager::instance()->color_isMultiColorSections())
+                    LayerService::instance()->addSectionVertices(
+                            j,
+                            tool.section[j].leftPoint,
+                            tool.section[j].rightPoint,QColorWithAlpha(tool.secColors[j], alpha));
+                else
+                    LayerService::instance()->addSectionVertices(
                         j,
                         tool.section[j].leftPoint,
-                        tool.section[j].rightPoint,QColorWithAlpha(tool.secColors[j], alpha));
-            else
-                LayerService::instance()->addSectionVertices(
-                    j,
-                    tool.section[j].leftPoint,
-                    tool.section[j].rightPoint,
-                    QColorWithAlpha(SettingsManager::instance()->display_colorSectionsDay(), alpha));
+                        tool.section[j].rightPoint,
+                        QColorWithAlpha(SettingsManager::instance()->display_colorSectionsDay(), alpha));
+            }
         }
     }
 
