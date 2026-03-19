@@ -42,6 +42,7 @@ void LayersNode::update(const QMatrix4x4 &mv,
     }
 
     const QHash<int, CoverageLayer> &layers = properties->layers();
+    bool isPolygons = properties->isPolygons();
 
     // Remove layers that no longer exist
     removeOrphanedLayers(layers);
@@ -61,8 +62,26 @@ void LayersNode::update(const QMatrix4x4 &mv,
         // Get or create layer patch tracking
         LayerPatches &lp = m_layerPatches[layerId];
 
+        // Check if polygon mode changed - need to rebuild all patches
+        if (lp.isPolygonsMode != isPolygons) {
+            // Clear all existing patches
+            for (QSGGeometryNode *patch : std::as_const(lp.filledPatches)) {
+                removeChildNode(patch);
+                delete patch;
+            }
+            if (lp.currentPatch) {
+                removeChildNode(lp.currentPatch);
+                delete lp.currentPatch;
+            }
+            lp.filledPatches.clear();
+            lp.currentPatch = nullptr;
+            lp.currentPatchTriangleCount = 0;
+            lp.totalBuiltTriangles = 0;
+            lp.isPolygonsMode = isPolygons;
+        }
+
         // Process any new triangles
-        bool geometryChanged = processNewTriangles(lp, layer);
+        bool geometryChanged = processNewTriangles(lp, layer, isPolygons);
 
         // Update MVP matrix on all patches (filled + current)
         updateLayerMvp(lp, mvp, viewportSize);
@@ -74,18 +93,16 @@ void LayersNode::update(const QMatrix4x4 &mv,
     }
 }
 
-QSGGeometryNode* LayersNode::createPatchNode()
+QSGGeometryNode* LayersNode::createPatchNode(bool isPolygons)
 {
-    // Start with minimal allocation - will be resized as needed
     QSGGeometry *geometry = new QSGGeometry(AOGGeometry::colorVertexAttributes(), 0);
-    geometry->setDrawingMode(QSGGeometry::DrawTriangles);
+    geometry->setDrawingMode(isPolygons ? QSGGeometry::DrawLines : QSGGeometry::DrawTriangles);
     geometry->setVertexDataPattern(QSGGeometry::DynamicPattern);
 
     QSGGeometryNode *node = new QSGGeometryNode();
     node->setGeometry(geometry);
     node->setFlag(QSGNode::OwnsGeometry);
 
-    // Create material with per-vertex colors
     auto *material = new AOGVertexColorMaterial();
     node->setMaterial(material);
     node->setFlag(QSGNode::OwnsMaterial);
@@ -93,7 +110,7 @@ QSGGeometryNode* LayersNode::createPatchNode()
     return node;
 }
 
-bool LayersNode::processNewTriangles(LayerPatches &lp, const CoverageLayer &layer)
+bool LayersNode::processNewTriangles(LayerPatches &lp, const CoverageLayer &layer, bool isPolygons)
 {
     int totalTriangles = layer.triangles.count();
     int builtTriangles = lp.totalBuiltTriangles;
@@ -112,7 +129,7 @@ bool LayersNode::processNewTriangles(LayerPatches &lp, const CoverageLayer &laye
     while (lp.totalBuiltTriangles < totalTriangles) {
         // Ensure we have a current patch
         if (!lp.currentPatch) {
-            lp.currentPatch = createPatchNode();
+            lp.currentPatch = createPatchNode(isPolygons);
             lp.currentPatchTriangleCount = 0;
             appendChildNode(lp.currentPatch);
         }
@@ -123,7 +140,7 @@ bool LayersNode::processNewTriangles(LayerPatches &lp, const CoverageLayer &laye
 
         // Rebuild current patch with all its triangles
         fillPatchData(lp.currentPatch, layer.triangles, currentPatchStartIdx,
-                      trianglesForPatch, layer.alpha);
+                      trianglesForPatch, layer.alpha, isPolygons);
 
         lp.currentPatchTriangleCount = trianglesForPatch;
         lp.totalBuiltTriangles = currentPatchStartIdx + trianglesForPatch;
@@ -143,7 +160,7 @@ bool LayersNode::processNewTriangles(LayerPatches &lp, const CoverageLayer &laye
 }
 
 void LayersNode::fillPatchData(QSGGeometryNode *patch, const QVector<CoverageTriangle> &triangles,
-                                int startIdx, int count, float layerAlpha)
+                                int startIdx, int count, float layerAlpha, bool isPolygons)
 {
     if (count <= 0) {
         return;
@@ -151,12 +168,13 @@ void LayersNode::fillPatchData(QSGGeometryNode *patch, const QVector<CoverageTri
 
     QSGGeometry *geometry = patch->geometry();
 
-    // Allocate exact size needed
-    geometry->allocate(count * 3);
+    // In polygon mode, draw 6 vertices per triangle (all 3 edges as lines)
+    // In normal mode, draw 3 vertices per triangle (filled triangles)
+    int verticesPerTriangle = isPolygons ? 6 : 3;
+    geometry->allocate(count * verticesPerTriangle);
 
     ColorVertex *data = static_cast<ColorVertex*>(geometry->vertexData());
 
-    //qWarning() << "filling geometry data";
     for (int i = 0; i < count; ++i) {
         const CoverageTriangle &tri = triangles[startIdx + i];
 
@@ -167,35 +185,39 @@ void LayersNode::fillPatchData(QSGGeometryNode *patch, const QVector<CoverageTri
         float g = tri.color.greenF() * a;
         float b = tri.color.blueF() * a;
 
-        // Vertex 0
-        data->x = tri.v0.x();
-        data->y = tri.v0.y();
-        data->z = tri.v0.z();
-        data->r = r;
-        data->g = g;
-        data->b = b;
-        data->a = a;
-        data++;
+        if (isPolygons) {
+            // Wireframe mode: draw all 3 edges of triangle as lines
+            // Edge 0: v0 -> v1
+            data->x = tri.v0.x(); data->y = tri.v0.y(); data->z = tri.v0.z();
+            data->r = r; data->g = g; data->b = b; data->a = a; data++;
 
-        // Vertex 1
-        data->x = tri.v1.x();
-        data->y = tri.v1.y();
-        data->z = tri.v1.z();
-        data->r = r;
-        data->g = g;
-        data->b = b;
-        data->a = a;
-        data++;
+            data->x = tri.v1.x(); data->y = tri.v1.y(); data->z = tri.v1.z();
+            data->r = r; data->g = g; data->b = b; data->a = a; data++;
 
-        // Vertex 2
-        data->x = tri.v2.x();
-        data->y = tri.v2.y();
-        data->z = tri.v2.z();
-        data->r = r;
-        data->g = g;
-        data->b = b;
-        data->a = a;
-        data++;
+            // Edge 1: v1 -> v2
+            data->x = tri.v1.x(); data->y = tri.v1.y(); data->z = tri.v1.z();
+            data->r = r; data->g = g; data->b = b; data->a = a; data++;
+
+            data->x = tri.v2.x(); data->y = tri.v2.y(); data->z = tri.v2.z();
+            data->r = r; data->g = g; data->b = b; data->a = a; data++;
+
+            // Edge 2: v2 -> v0
+            data->x = tri.v2.x(); data->y = tri.v2.y(); data->z = tri.v2.z();
+            data->r = r; data->g = g; data->b = b; data->a = a; data++;
+
+            data->x = tri.v0.x(); data->y = tri.v0.y(); data->z = tri.v0.z();
+            data->r = r; data->g = g; data->b = b; data->a = a; data++;
+        } else {
+            // Filled triangle mode
+            data->x = tri.v0.x(); data->y = tri.v0.y(); data->z = tri.v0.z();
+            data->r = r; data->g = g; data->b = b; data->a = a; data++;
+
+            data->x = tri.v1.x(); data->y = tri.v1.y(); data->z = tri.v1.z();
+            data->r = r; data->g = g; data->b = b; data->a = a; data++;
+
+            data->x = tri.v2.x(); data->y = tri.v2.y(); data->z = tri.v2.z();
+            data->r = r; data->g = g; data->b = b; data->a = a; data++;
+        }
     }
 }
 

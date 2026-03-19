@@ -64,20 +64,21 @@ private:
         QSGGeometryNode* currentPatch = nullptr;   // Active patch receiving triangles
         int currentPatchTriangleCount = 0;         // Triangles in current patch
         int totalBuiltTriangles = 0;               // Total triangles across all patches
+        bool isPolygonsMode = false;               // Current rendering mode for this layer
     };
 
     QHash<int, LayerPatches> m_layerPatches;
 
     // Create a new patch geometry node
-    QSGGeometryNode* createPatchNode();
+    QSGGeometryNode* createPatchNode(bool isPolygons);
 
     // Process new triangles for a layer, creating patches as needed
     // Returns true if any geometry was modified
-    bool processNewTriangles(LayerPatches &lp, const CoverageLayer &layer);
+    bool processNewTriangles(LayerPatches &lp, const CoverageLayer &layer, bool isPolygons);
 
     // Fill vertex data for triangles into a patch
     void fillPatchData(QSGGeometryNode *patch, const QVector<CoverageTriangle> &triangles,
-                       int startIdx, int count, float layerAlpha);
+                       int startIdx, int count, float layerAlpha, bool isPolygons);
 
     // Update MVP matrix on all patches for a layer
     void updateLayerMvp(LayerPatches &lp, const QMatrix4x4 &mvp, const QSize &viewportSize);

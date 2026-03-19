@@ -29,6 +29,15 @@ LayerService::LayerService(QObject *parent)
             m_layersProperties->setTrianglesAlpha(layerId, alpha);
         }
     });
+
+    // Connect display_isPolygons to LayersProperties isPolygons
+    connect(SettingsManager::instance(), &SettingsManager::display_isPolygonsChanged,
+            this, [this]() {
+        m_layersProperties->setIsPolygons(SettingsManager::instance()->display_isPolygons());
+    });
+
+    // Initialize isPolygons from current setting
+    m_layersProperties->setIsPolygons(SettingsManager::instance()->display_isPolygons());
 }
 
 LayerService::~LayerService()
