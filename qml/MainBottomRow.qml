@@ -129,7 +129,7 @@ Item {
             icon1: prefix + "/images/YouSkipOff.png"
             icon2: prefix + "/images/YouSkipOn.png"
             icon3: prefix + "/images/YouSkipOn3.png"
-            icon4: prefix + "/images/YouSkipOn32png"
+            icon4: prefix + "/images/YouSkipOn2.png"
             onClicked: {
                 Backend.yt.toggleYouSkip()
             }

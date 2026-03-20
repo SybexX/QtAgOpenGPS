@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
 import QtQuick.Layouts
-// 
+//
 import "../components"
 import "interfaces"
 import AOG
@@ -37,11 +37,11 @@ Dialog {
     GridLayout {
         id: layout
         anchors.margins: 4
-        anchors.bottomMargin: 132
+        anchors.bottomMargin: 10
         anchors.top: topLine.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.bottom: sentences.top
+        //anchors.bottom: sentences.top
         rows: 4
         flow: Grid.TopToBottom
 
@@ -136,110 +136,11 @@ Dialog {
         }
     }
 
-    // PHASE 6.0.22.12: Dynamic protocol list - shows ALL active protocols (NMEA + PGN)
-    TitleFrame {
-        id: moduleStatus
-        title: qsTr("Active Protocols")
-        height: Math.min(400, protocolList.contentHeight + 60)  // Dynamic height based on protocol count
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: layout.bottom
-        anchors.bottom: sentences.top
-        anchors.margins: 4
-
-        // Column Headers
-        Row {
-            id: headerRow
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.margins: 4
-            spacing: 8
-
-            Text {
-                text: qsTr("Protocol")
-                font.bold: true
-                font.pixelSize: 10
-                width: 100
-            }
-            Text {
-                text: qsTr("Description")
-                font.bold: true
-                font.pixelSize: 10
-                width: 200
-            }
-            Text {
-                text: qsTr("Source")
-                font.bold: true
-                font.pixelSize: 10
-                width: 150
-            }
-            Text {
-                text: qsTr("Frequency")
-                font.bold: true
-                font.pixelSize: 10
-                width: 80
-            }
-        }
-
-        // Dynamic Protocol List
-        ListView {
-            id: protocolList
-            anchors.top: headerRow.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.margins: 4
-            clip: true
-
-            model: AgIOService.activeProtocols
-
-            delegate: Row {
-                spacing: 8
-
-                // Protocol ID
-                Text {
-                    text: modelData.id  // "$PANDA" or "PGN211"
-                    font.pixelSize: 10
-                    font.bold: modelData.id.startsWith("PGN")  // Bold for PGN binary protocols
-                    width: 100
-                }
-
-                // Protocol Description
-                Text {
-                    text: modelData.description  // "Single Antenna + IMU"
-                    font.pixelSize: 10
-                    color: "gray"
-                    width: 200
-                    elide: Text.ElideRight
-                }
-
-                // Source (Transport + ID)
-                Text {
-                    text: modelData.source  // "UDP:192.168.1.126" or "Serial:COM1"
-                    font.pixelSize: 10
-                    color: {
-                        if (modelData.source.startsWith("UDP")) return "green"
-                        if (modelData.source.startsWith("Serial")) return "orange"
-                        return "red"
-                    }
-                    width: 150
-                }
-
-                // Frequency
-                Text {
-                    text: Math.round(modelData.frequency * 10) / 10 + " Hz"
-                    font.pixelSize: 10
-                    width: 80
-                }
-            }
-        }
-    }
-
     TitleFrame{
         id: sentences
         title: qsTr("NMEA Sentences")
-        height: parent.height * .35 // Reduced to make room for module status
+        //height: parent.height * .5 // Reduced to make room for module status
+        anchors.top: layout.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
