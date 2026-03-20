@@ -1747,25 +1747,25 @@ void CTool::ProcessLookAhead(int gpsHz,
 
             QColor sectionColor = SettingsManager::instance()->display_colorSectionsDay();
 
+            // First, close all current patches before creating new ones
+            for (int z = 0; z < triStrip.count(); z++) {
+                if (triStrip[z].isDrawing && LayerService::instance()->isZonePending(z)) {
+                    LayerService::instance()->addZoneVertices(
+                        z,
+                        triStrip[z].currentStartSectionNum,
+                        triStrip[z].currentEndSectionNum,
+                        section[triStrip[z].currentStartSectionNum].leftPoint,
+                        section[triStrip[z].currentEndSectionNum].rightPoint,
+                        sectionColor);
+                }
+            }
+
+            // Reset all pending zones to start fresh
+            LayerService::instance()->flushPendingSections();
+
             //set the start and end positions from section points
             for (int j = 0; j < numOfSections; j++)
             {
-                //LayerService has no concept of patches, just sections
-                //if the section was on but is now off, we need to add
-                //the current left/right points before we flush the section
-                //otherwise we'll miss a small area.
-                if (section[j].isMappingOn || LayerService::instance()->isSectionPending(j)) {
-                    LayerService::instance()->addSectionVertices(
-                        j,
-                        section[j].leftPoint,
-                        section[j].rightPoint,
-                        sectionColor);
-                }
-
-                if (!section[j].isMappingOn) {
-                   LayerService::instance()->flushPendingSection(j);
-                }
-
                 //skip till first mapping section
                 if (!section[j].isMappingOn) continue;
 
@@ -1776,13 +1776,35 @@ void CTool::ProcessLookAhead(int gpsHz,
                 //set this strip start edge to edge of this section
                 triStrip[sectionOnOffZones].newStartSectionNum = j;
 
+                int mergedStart = j;
                 while ((j + 1) < numOfSections && section[j + 1].isMappingOn)
                 {
                     j++;
                 }
+                int mergedEnd = j;
 
                 //set the edge of this section to be end edge of strp
                 triStrip[sectionOnOffZones].newEndSectionNum = j;
+
+                // Use zone vertices for merged sections (adjacent enabled sections)
+                // Only for non-multi-colored sections (single color for all sections)
+                if (mergedEnd > mergedStart && !isMultiColoredSections) {
+                    LayerService::instance()->addZoneVertices(
+                        sectionOnOffZones,
+                        mergedStart,
+                        mergedEnd,
+                        section[mergedStart].leftPoint,
+                        section[mergedEnd].rightPoint,
+                        sectionColor);
+                } else {
+                    // Single section or multi-colored - use section vertices
+                    LayerService::instance()->addSectionVertices(
+                        j,
+                        section[j].leftPoint,
+                        section[j].rightPoint,
+                        sectionColor);
+                }
+
                 sectionOnOffZones++;
             }
 

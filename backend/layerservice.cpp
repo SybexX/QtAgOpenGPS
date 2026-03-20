@@ -238,6 +238,14 @@ bool LayerService::isSectionPending(int sectionIndex, int layerId) const
     return m_layersProperties->isSectionPending(layerId, sectionIndex);
 }
 
+bool LayerService::isZonePending(int zoneIndex, int layerId) const
+{
+    if (layerId < 0) {
+        layerId = m_defaultLayerId;
+    }
+    return m_layersProperties->isZonePending(layerId, zoneIndex);
+}
+
 int LayerService::addSectionVertices(int sectionIndex,
                                       const QVector3D &left, const QVector3D &right,
                                       const QColor &color, int layerId)
@@ -246,6 +254,16 @@ int LayerService::addSectionVertices(int sectionIndex,
         layerId = m_defaultLayerId;
     }
     return m_layersProperties->addSectionVertices(layerId, sectionIndex, left, right, color);
+}
+
+int LayerService::addZoneVertices(int zoneIndex, int startSection, int endSection,
+                                   const QVector3D &left, const QVector3D &right,
+                                   const QColor &color, int layerId)
+{
+    if (layerId < 0) {
+        layerId = m_defaultLayerId;
+    }
+    return m_layersProperties->addZoneVertices(layerId, zoneIndex, startSection, endSection, left, right, color);
 }
 
 void LayerService::flushPendingSection(int sectionIndex, int layerId)

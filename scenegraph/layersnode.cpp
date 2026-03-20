@@ -78,7 +78,8 @@ QSGGeometryNode* LayersNode::createPatchNode()
 {
     // Start with minimal allocation - will be resized as needed
     QSGGeometry *geometry = new QSGGeometry(AOGGeometry::colorVertexAttributes(), 0);
-    geometry->setDrawingMode(QSGGeometry::DrawTriangles);
+    geometry->setDrawingMode(QSGGeometry::DrawLines);
+    geometry->setLineWidth(1.0f);
     geometry->setVertexDataPattern(QSGGeometry::DynamicPattern);
 
     QSGGeometryNode *node = new QSGGeometryNode();
@@ -151,51 +152,39 @@ void LayersNode::fillPatchData(QSGGeometryNode *patch, const QVector<CoverageTri
 
     QSGGeometry *geometry = patch->geometry();
 
-    // Allocate exact size needed
-    geometry->allocate(count * 3);
+    // Allocate 6 vertices per triangle (3 edges x 2 vertices each) for wireframe
+    geometry->allocate(count * 6);
 
     ColorVertex *data = static_cast<ColorVertex*>(geometry->vertexData());
 
-    //qWarning() << "filling geometry data";
     for (int i = 0; i < count; ++i) {
         const CoverageTriangle &tri = triangles[startIdx + i];
 
-        // Apply layer alpha to the triangle color
         float a = tri.color.alphaF() * layerAlpha;
-        // Premultiply RGB by alpha for Qt scene graph blending
         float r = tri.color.redF() * a;
         float g = tri.color.greenF() * a;
         float b = tri.color.blueF() * a;
 
-        // Vertex 0
-        data->x = tri.v0.x();
-        data->y = tri.v0.y();
-        data->z = tri.v0.z();
-        data->r = r;
-        data->g = g;
-        data->b = b;
-        data->a = a;
-        data++;
+        // Edge 1: v0 -> v1
+        data->x = tri.v0.x(); data->y = tri.v0.y(); data->z = tri.v0.z();
+        data->r = r; data->g = g; data->b = b; data->a = a; data++;
 
-        // Vertex 1
-        data->x = tri.v1.x();
-        data->y = tri.v1.y();
-        data->z = tri.v1.z();
-        data->r = r;
-        data->g = g;
-        data->b = b;
-        data->a = a;
-        data++;
+        data->x = tri.v1.x(); data->y = tri.v1.y(); data->z = tri.v1.z();
+        data->r = r; data->g = g; data->b = b; data->a = a; data++;
 
-        // Vertex 2
-        data->x = tri.v2.x();
-        data->y = tri.v2.y();
-        data->z = tri.v2.z();
-        data->r = r;
-        data->g = g;
-        data->b = b;
-        data->a = a;
-        data++;
+        // Edge 2: v1 -> v2
+        data->x = tri.v1.x(); data->y = tri.v1.y(); data->z = tri.v1.z();
+        data->r = r; data->g = g; data->b = b; data->a = a; data++;
+
+        data->x = tri.v2.x(); data->y = tri.v2.y(); data->z = tri.v2.z();
+        data->r = r; data->g = g; data->b = b; data->a = a; data++;
+
+        // Edge 3: v2 -> v0
+        data->x = tri.v2.x(); data->y = tri.v2.y(); data->z = tri.v2.z();
+        data->r = r; data->g = g; data->b = b; data->a = a; data++;
+
+        data->x = tri.v0.x(); data->y = tri.v0.y(); data->z = tri.v0.z();
+        data->r = r; data->g = g; data->b = b; data->a = a; data++;
     }
 }
 
