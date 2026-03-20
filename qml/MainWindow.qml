@@ -1106,7 +1106,11 @@ Window {
         }
         ConfigSettings.SetColors{
             id: setColors
-            anchors.fill: parent
+            //anchors.fill: parent
+        }
+        ConfigSettings.SectionColors{
+            id: sectionColors
+            //anchors.fill: parent
         }
         Tracks.TrackNewButtons{
             id: trackNewButtons

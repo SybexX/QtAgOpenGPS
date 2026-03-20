@@ -145,7 +145,10 @@ Drawer{
             }
             Comp.IconButtonTextBeside{
                 text: qsTr("Section Colors")
-                onClicked: console.log("")
+                onClicked: {
+                hamburgerMenuRoot.visible = false
+                sectionColors.show()
+                }
             }
             Comp.IconButtonTextBeside{
                 text: qsTr("Enter Sim Coords")
