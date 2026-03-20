@@ -207,13 +207,12 @@ Drawer {
            
             Comp.IconButtonTextBeside {
                 isChecked: false
-                text: qsTr("Module & GPS Info")
+                text: qsTr("GPS Info")
                 icon.source: prefix + "/images/Nmea.png"
                 onClicked: {gpsInfo.visible = !gpsInfo.visible
                     mainWindowAgIO.visible = false}
             }
-
-             Comp.IconButtonTextBeside {
+            Comp.IconButtonTextBeside {
                 //objectName: btnEthernetStatus
                 isChecked: false
                 text: qsTr("Ethernet")
@@ -222,15 +221,7 @@ Drawer {
                 onClicked: {ethernetConfig.visible = !ethernetConfig.visible
                             mainWindowAgIO.visible = false}
             }
-            // Comp.IconButtonTextBeside {
-            //     //objectName: btnSettings
-            //     isChecked: false
-            //     text: qsTr("Settings")
-            //     icon.source: "../images/Settings48.png"
-            //     onClicked: settingsWindow.visible = true
-            // }
             Comp.IconButtonTextBeside {
-                //objectName: btnNTRIP
                 isChecked: false
                 text: (SettingsManager.ntrip_isTCP === false ? "Off":
                      AgIOService.ntripStatus === 0 ? "Invalid" :

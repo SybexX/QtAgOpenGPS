@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import AOG 1.0
 // Interface import removed - now QML_SINGLETON
 
 pragma ComponentBehavior: Bound

@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import AOG
+import AOG 1.0
 import "components" as Comp
 
 Item {
@@ -128,8 +128,8 @@ Item {
             id: btnYouSkip
             icon1: prefix + "/images/YouSkipOff.png"
             icon2: prefix + "/images/YouSkipOn.png"
-            icon3: prefix + "/images/YouSkipOn2.png"
-            icon4: prefix + "/images/YouSkipOn3.png"
+            icon3: prefix + "/images/YouSkipOn3.png"
+            icon4: prefix + "/images/YouSkipOn2.png"
             onClicked: {
                 Backend.yt.toggleYouSkip()
             }

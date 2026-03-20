@@ -6,7 +6,7 @@
 #include "settingsmanager_macros.h"
 
 // Generated Q_PROPERTY declarations with Qt6 bindable support
-// Total properties: 396
+// Total properties: 397
 
 
 // QString Properties (49 properties) - DECLARATIONS ONLY
@@ -60,7 +60,7 @@ SETTINGS_PROPERTY_STRING_DECLARATIONS(rate_productName1, setRate_productName1)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(rate_productName2, setRate_productName2)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(rate_productName3, setRate_productName3)
 
-// bool Properties (132 properties) - DECLARATIONS ONLY
+// bool Properties (133 properties) - DECLARATIONS ONLY
 SETTINGS_PROPERTY_DECLARATIONS(bool, feature_isOffsetFixOn, setFeature_isOffsetFixOn)
 SETTINGS_PROPERTY_DECLARATIONS(bool, ardMac_isDanFoss, setArdMac_isDanFoss)
 SETTINGS_PROPERTY_DECLARATIONS(bool, ardMac_isHydEnabled, setArdMac_isHydEnabled)
@@ -193,6 +193,7 @@ SETTINGS_PROPERTY_DECLARATIONS(bool, mod_isSteerConnected, setMod_isSteerConnect
 SETTINGS_PROPERTY_DECLARATIONS(bool, mod_isMachineConnected, setMod_isMachineConnected)
 SETTINGS_PROPERTY_DECLARATIONS(bool, udp_isSendNMEAToUDP, setUdp_isSendNMEAToUDP)
 SETTINGS_PROPERTY_DECLARATIONS(bool, menu_isKeyboardOn, setMenu_isKeyboardOn)
+SETTINGS_PROPERTY_DECLARATIONS(bool, display_isPolygons, setDisplay_isPolygons)
 
 // double Properties (104 properties) - DECLARATIONS ONLY
 SETTINGS_PROPERTY_DECLARATIONS(double, ab_lineLength, setAb_lineLength)

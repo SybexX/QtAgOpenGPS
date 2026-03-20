@@ -25,6 +25,9 @@ class LayersProperties : public QObject
     // Global visibility toggle for all layers
     Q_PROPERTY(bool visible READ visible WRITE setVisible NOTIFY visibleChanged BINDABLE bindableVisible)
 
+    // Wireframe polygon mode - shows triangle edges instead of filled triangles
+    Q_PROPERTY(bool isPolygons READ isPolygons WRITE setIsPolygons NOTIFY isPolygonsChanged BINDABLE bindableIsPolygons)
+
     // Number of sections for pending triangle building
     Q_PROPERTY(int sectionCount READ sectionCount WRITE setSectionCount NOTIFY sectionCountChanged)
 
@@ -35,6 +38,11 @@ public:
     bool visible() const { return m_visible.value(); }
     void setVisible(bool value) { m_visible.setValue(value); }
     QBindable<bool> bindableVisible() { return &m_visible; }
+
+    // Wireframe polygon mode accessors
+    bool isPolygons() const { return m_isPolygons.value(); }
+    void setIsPolygons(bool value) { m_isPolygons.setValue(value); }
+    QBindable<bool> bindableIsPolygons() { return &m_isPolygons; }
 
     // ===== Layer Management =====
 
@@ -138,6 +146,7 @@ public:
 
 signals:
     void visibleChanged();
+    void isPolygonsChanged();
     void sectionCountChanged();
     void layerAdded(int layerId);
     void layerRemoved(int layerId);
@@ -148,6 +157,7 @@ signals:
 
 private:
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(LayersProperties, bool, m_visible, true, &LayersProperties::visibleChanged)
+    Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(LayersProperties, bool, m_isPolygons, false, &LayersProperties::isPolygonsChanged)
 
     // Layer storage
     QHash<int, CoverageLayer> m_layers;

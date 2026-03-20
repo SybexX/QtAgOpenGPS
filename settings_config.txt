@@ -398,4 +398,5 @@ rate_productName1|rate/productName1|"1"|QString|
 rate_productName2|rate/productName2|"2"|QString|
 rate_productName3|rate/productName3|"3"|QString|
 menu_isKeyboardOn|menu/isKeyboardOn|false|bool|
+display_isPolygons|display/isPolygons|false|bool|
 

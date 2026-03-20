@@ -2,6 +2,8 @@
 #include "classes/settingsmanager.h"
 #include "qmlutil.h"
 #include "backend.h"
+#include "classes/cvehicle.h"
+#include <QLineF>
 
 inline QColor get_SectionColor(int section) {
     switch (section) {
@@ -131,14 +133,22 @@ void CPatches::AddMappingPoint(QColor section_color,
                                QVector<QSharedPointer<PatchTriangleList>> &patchSaveList
                                )
 {
-    //Vec2 vleftPoint = tool.section[currentStartSectionNum].leftPoint;
-    //Vec2 vrightPoint = tool.section[currentEndSectionNum].rightPoint;
     QVector3D leftPoint(vleftPoint.easting,vleftPoint.northing,0);
     QVector3D rightPoint(vrightPoint.easting,vrightPoint.northing,0);
     QVector3D color;
     QColor color_prop;
     QColor display_colorSectionsDay = SettingsManager::instance()->display_colorSectionsDay();
 
+    //skip if too close to last point (reduce point density)
+    if (triangleList->count() >= 3) {
+        QVector3D lastLeft = (*triangleList)[triangleList->count() - 2];
+        QVector3D lastRight = (*triangleList)[triangleList->count() - 1];
+        double minDist = CVehicle::instance()->sectionTriggerStepDistance;
+        if (QLineF(leftPoint.x(), leftPoint.y(), lastLeft.x(), lastLeft.y()).length() < minDist &&
+            QLineF(rightPoint.x(), rightPoint.y(), lastRight.x(), lastRight.y()).length() < minDist) {
+            return;
+        }
+    }
 
     //add two triangles for next step.
     //left side
