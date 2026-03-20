@@ -24,6 +24,10 @@ extern QOpenGLShaderProgram *interpColorShader;
 
 Q_LOGGING_CATEGORY (ctool_log, "ctool.qtagopengps")
 
+inline QColor QColorWithAlpha(const QColor &c, int a) {
+    return QColor(c.red(), c.green(), c.blue(), a);
+}
+
 #define STRINGISE_IMPL(x) #x
 #define STRINGISE(x) STRINGISE_IMPL(x)
 
@@ -1745,7 +1749,8 @@ void CTool::ProcessLookAhead(int gpsHz,
         else if (!isMultiColoredSections)
         {
 
-            QColor sectionColor = SettingsManager::instance()->display_colorSectionsDay();
+            int alpha = SettingsManager::instance()->display_isDayMode() ? 152 : 76;
+            QColor sectionColor = QColorWithAlpha(SettingsManager::instance()->display_colorSectionsDay(), alpha);
 
             // First, close all current patches before creating new ones
             for (int z = 0; z < triStrip.count(); z++) {
