@@ -387,7 +387,7 @@ void FormGPS::field_new_from_KML(QString field_name, QString file_name) {
 
     //assume the GUI will vet the name a little bit
     field_close();
-    lock.lockForWrite();
+    //lock.lockForWrite();
     FileSaveEverythingBeforeClosingField(false);  // Don't save vehicle when creating field from KML
     currentFieldDirectory = field_name.trimmed();
     SettingsManager::instance()->setF_currentDir(currentFieldDirectory);
@@ -436,7 +436,7 @@ void FormGPS::field_new_from_KML(QString field_name, QString file_name) {
     FileSaveHeadland();    // Create empty Headland.txt to prevent load errors
 
     LoadKMLBoundary(file_name);
-    lock.unlock();
+    //lock.unlock();
 }
 
 void FormGPS::field_delete(QString field_name) {
