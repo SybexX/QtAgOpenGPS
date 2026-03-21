@@ -77,25 +77,7 @@ class CTrack : public QAbstractListModel
     Q_PROPERTY(double newHeading READ newHeading WRITE setNewHeading NOTIFY newHeadingChanged BINDABLE bindableNewHeading)
     Q_PROPERTY(int count READ count WRITE setCount NOTIFY countChanged BINDABLE bindableCount)
     Q_PROPERTY(QString currentName READ currentName WRITE setCurrentName NOTIFY currentNameChanged BINDABLE bindableCurrentName)
-    Q_PROPERTY(bool isCreating READ isCreating NOTIFY creatingChanged)
-    Q_PROPERTY(QPointF pointA READ pointA NOTIFY pointAChanged)
-    Q_PROPERTY(QPointF pointB READ pointB NOTIFY pointBChanged)
-    Q_PROPERTY(QPoint pointAPixel READ pointAPixel NOTIFY pointAPixelChanged)
-    Q_PROPERTY(QPoint pointBPixel READ pointBPixel NOTIFY pointBPixelChanged)
-
-signals:
-    void pointAPixelChanged();
-    void pointBPixelChanged();
-
-private:
-    QPoint m_pointAPixel;
-    QPoint m_pointBPixel;
-    void updatePointPixels(); // метод для пересчёта пиксельных координат
-
-public:
-    QPoint pointAPixel() const { return m_pointAPixel; }
-    QPoint pointBPixel() const { return m_pointBPixel; }
-
+    Q_PROPERTY(QObject* tracksProperties READ properties CONSTANT)
 
 
 public:
@@ -154,8 +136,7 @@ public:
         ptB,
         endPtA,
         endPtB,
-        nudgeDistance,
-        CurvePtsRole
+        nudgeDistance
     };
     
     ~CTrack();
@@ -239,25 +220,12 @@ protected:
 public:
     // Constructor declaration (implementation in .cpp)
     explicit CTrack(QObject* parent = nullptr);
-    Q_INVOKABLE void startCreating(int mode);  // начало создания (AB или Curve)
-    Q_INVOKABLE void addPoint(QPointF worldPoint);  // добавить точку (первый или второй клик)
-    Q_INVOKABLE void finishCreating(QString name);  // завершить и сохранить
-    Q_INVOKABLE void cancelCreating();  // отменить создание
-
-
-    // Геттеры для свойств
-    bool isCreating() const;
-    QPointF pointA() const;
-    QPointF pointB() const;
-
+    
 
 signals:
     void propertiesChanged();
     void resetCreatedYouTurn();
     void saveTracks();
-    void creatingChanged();
-    void pointAChanged();
-    void pointBChanged();
 
     void idxChanged();
     void modeChanged();
@@ -305,9 +273,6 @@ private:
     // Used by QML model interface
     QHash<int, QByteArray> m_roleNames;
     TracksProperties *m_tracksProperties = nullptr;
-    void updatePointsFromAB();
-    void updatePointsFromCurve();
-    QPointF findClosestBoundaryPoint(const QPointF &worldPoint);
 
 
     // ===== Qt 6.8 Q_OBJECT_BINDABLE_PROPERTY Private Members =====

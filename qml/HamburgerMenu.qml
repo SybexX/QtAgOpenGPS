@@ -129,6 +129,7 @@ Drawer{
                 text: qsTr("Languages")
                 onClicked: languagesMenu.visible = !languagesMenu.visible
                 visible: true
+                icon.source: prefix + "/images/lang.png"
             }
             Comp.IconButtonTextBeside{
                 text: qsTr("Directories")
@@ -137,6 +138,7 @@ Drawer{
             }
             Comp.IconButtonTextBeside{
                 text: qsTr("Set Colors")
+                icon.source: prefix + "/images/ColourPick.png"
                 onClicked: {
                     console.log("showing")
                     hamburgerMenuRoot.visible = false
@@ -152,6 +154,7 @@ Drawer{
             }
             Comp.IconButtonTextBeside{
                 text: qsTr("Enter Sim Coords")
+                icon.source: prefix + "/images/simCoord.png"
                 onClicked: {
                     console.log("showing")
                     hamburgerMenuRoot.visible = false
@@ -182,6 +185,7 @@ Drawer{
             Comp.IconButtonTextBeside{
                 text: qsTr("HotKeys")
                 visible: true
+                icon.source: prefix + "/images/hotkey.png"
                 onClicked: {
                     hamburgerMenuRoot.visible = false
                     hotKeySettings.show()

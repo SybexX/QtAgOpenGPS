@@ -16,10 +16,6 @@
 #include "ctram.h"
 #include "cahrs.h"
 #include "backend/backend.h"
-#include "headlandinterface.h"
-
-Q_LOGGING_CATEGORY (track, "qtagopengps")
-#define QDEBUG qDebug(track)
 
 // Approche SomcoSoftware : Qt gère le singleton automatiquement
 
@@ -44,7 +40,7 @@ CTrk::CTrk(const CTrk &orig)
 
 CTrack::CTrack(QObject* parent) : QAbstractListModel(parent)
 {
-    QDEBUG << "🏗️ CTrack constructor called, parent:" << parent;
+    qDebug() << "🏗️ CTrack constructor called, parent:" << parent;
     // Initialize role names
     m_roleNames[index] = "index";
     m_roleNames[NameRole] = "name";
@@ -55,7 +51,6 @@ CTrack::CTrack(QObject* parent) : QAbstractListModel(parent)
     m_roleNames[endPtA] = "endPtA";
     m_roleNames[endPtB] = "endPtB";
     m_roleNames[nudgeDistance] = "nudgeDistance";
-    m_roleNames[CurvePtsRole] = "curvePts";
 
     // Initialize Qt 6.8 Q_OBJECT_BINDABLE_PROPERTY members
     m_idx = -1;  // Will be set again by setIdx call
@@ -654,42 +649,15 @@ QVariant CTrack::data(const QModelIndex &index, int role) const
         return QVector2D(trk.ptA.easting, trk.ptA.northing);
     case RoleNames::ptB:
         return QVector2D(trk.ptB.easting, trk.ptB.northing);
-    case RoleNames::endPtA: {
-        if (trk.mode == 2) {
-            double heading = trk.heading;
-            double dx = -sin(heading) * 2000;
-            double dy = -cos(heading) * 2000;
-            QPointF endA(trk.ptA.easting + dx, trk.ptA.northing + dy);
-            QDEBUG << "  endPtA:" << endA;
-            return endA;
-        }
-        QDEBUG << "  endPtA:" << trk.endPtA.easting << trk.endPtA.northing;
-        return QVariant::fromValue(QPointF(trk.endPtA.easting, trk.endPtA.northing));
-    }
-    case RoleNames::endPtB: {
-        if (trk.mode == 2) {
-            double heading = trk.heading;
-            double dx = sin(heading) * 2000;
-            double dy = cos(heading) * 2000;
-            QPointF endB(trk.ptB.easting + dx, trk.ptB.northing + dy);
-            QDEBUG << "  endPtB:" << endB;
-            return endB;
-        }
-        QDEBUG << "  endPtB:" << trk.endPtB.easting << trk.endPtB.northing;
-        return QVariant::fromValue(QPointF(trk.endPtB.easting, trk.endPtB.northing));
-    }
+    case RoleNames::endPtA:
+        return QVector2D(trk.endPtA.easting, trk.endPtA.northing);
+    case RoleNames::endPtB:
+        return QVector2D(trk.endPtB.easting, trk.endPtB.northing);
     case RoleNames::nudgeDistance:
         return trk.nudgeDistance;
-    case RoleNames::CurvePtsRole: {
-        QVariantList pts;
-        for (const Vec3 &v : trk.curvePts) {
-            pts.append(QVariant::fromValue(QVector2D(v.easting, v.northing)));
-        }
-        return pts;
     }
-    default:
-        return QVariant();
-    }
+
+    return QVariant();
 }
 
 QHash<int, QByteArray> CTrack::roleNames() const
@@ -776,53 +744,39 @@ void CTrack::select(int index)
 
 void CTrack::next()
 {
-    if (gArr.count() == 0) return;
+    if (idx() < 0) return;
 
-    // Если текущий индекс не задан, выбираем первый видимый
-    if (idx() < 0) {
-        for (int i = 0; i < gArr.count(); ++i) {
-            if (gArr[i].isVisible) {
-                setIdx(i);
-                return;
-            }
-        }
-        // Если нет видимых, выбираем первый попавшийся
-        setIdx(0);
-        return;
+    int visible_count = 0;
+    for(CTrk &track : gArr) {
+        if (track.isVisible) visible_count++;
     }
 
-    // Стандартный переход к следующей видимой
-    int start = (m_idx + 1) % gArr.count();
-    for (int i = start; i != m_idx; i = (i + 1) % gArr.count()) {
-        if (gArr[i].isVisible) {
-            setIdx(i);
-            return;
-        }
-    }
-    // Если ничего не нашли, остаёмся на текущем
+    if (visible_count == 0) return; //no visible tracks to choose
+
+    // Qt 6.8 FIX: Use direct member access to avoid binding loop
+    m_idx = (m_idx + 1) % gArr.count();
+    while (!gArr[m_idx].isVisible)
+        m_idx = (m_idx + 1) % gArr.count();
 }
 
 void CTrack::prev()
 {
-    if (gArr.count() == 0) return;
+    if (idx() < 0) return;
 
-    if (idx() < 0) {
-        for (int i = gArr.count() - 1; i >= 0; --i) {
-            if (gArr[i].isVisible) {
-                setIdx(i);
-                return;
-            }
-        }
-        setIdx(gArr.count() - 1);
-        return;
+    int visible_count = 0;
+    for(CTrk &track : gArr) {
+        if (track.isVisible) visible_count++;
     }
 
-    int start = (m_idx - 1 + gArr.count()) % gArr.count();
-    for (int i = start; i != m_idx; i = (i - 1 + gArr.count()) % gArr.count()) {
-        if (gArr[i].isVisible) {
-            setIdx(i);
-            return;
-        }
+    if (visible_count == 0) return; //no visible tracks to choose
+
+    int newIdx = idx() - 1;
+    if (newIdx < 0) newIdx = gArr.count() - 1;
+    setIdx(newIdx);
+    while (!gArr[idx()].isVisible) {
+        newIdx = idx() - 1;
+        if (newIdx < 0) newIdx = gArr.count() - 1;
+        setIdx(newIdx);
     }
 }
 
@@ -850,7 +804,7 @@ void CTrack::mark_start(double easting, double northing, double heading)
         ABLine.desPtA.northing = northing;
         //temporarily set the B point based on current heading
         ABLine.desPtB.easting = easting + sin(heading) * 1000;
-        ABLine.desPtB.northing = northing + cos(heading) * 1000;
+        ABLine.desPtB.northing = easting + cos(heading) * 1000;
 
         ABLine.isDesPtBSet = false;
 
@@ -978,6 +932,58 @@ void CTrack::mark_end(int refSide, double easting, double northing)
     default:
         return;
     }
+
+}
+
+void CTrack::finish_new(QString name)
+{
+    double vehicle_toolWidth = SettingsManager::instance()->vehicle_toolWidth();
+    double vehicle_toolOffset = SettingsManager::instance()->vehicle_toolOffset();
+    double vehicle_toolOverlap = SettingsManager::instance()->vehicle_toolOverlap();
+
+    double dist;
+    newTrack.name = name;
+
+    switch(newMode()) {
+    case TrackMode::AB:
+        if (!ABLine.isMakingABLine) return; //do not add line if it stopped
+
+        if (newRefSide() > 0)
+        {
+            dist = (vehicle_toolWidth - vehicle_toolOverlap) * 0.5 + vehicle_toolOffset;
+            NudgeRefABLine(newTrack, dist);
+
+        }
+        else if (newRefSide() < 0)
+        {
+            dist = (vehicle_toolWidth - vehicle_toolOverlap) * -0.5 + vehicle_toolOffset;
+            NudgeRefABLine(newTrack, dist);
+        }
+
+        ABLine.isMakingABLine = false;
+        break;
+
+    case TrackMode::Curve:
+        if (!curve.isMakingCurve) return; //do not add line if it failed.
+        curve.isMakingCurve = false;
+        break;
+
+    case TrackMode::waterPivot:
+        break;
+
+    default:
+        return;
+
+    }
+
+    newTrack.isVisible = true;
+    gArr.append(newTrack);
+
+    //emit saveTracks();
+
+    //save tracks and activate the latest one
+    select(gArr.count() - 1);
+    reloadModel();
 
 }
 
@@ -1405,246 +1411,4 @@ void CTrack::updateInterface()
         }
     }
 
-}
-bool CTrack::isCreating() const
-{
-    return ABLine.isMakingABLine || curve.isMakingCurve;
-}
-
-
-QPointF CTrack::findClosestBoundaryPoint(const QPointF &worldPoint)
-{
-    auto boundary = CBoundary::instance();
-    if (!boundary) {
-        QDEBUG << "No boundary instance, returning original point";
-        return worldPoint;
-    }
-    const auto &bndList = boundary->bndList;
-    if (bndList.isEmpty() || bndList[0].fenceLine.isEmpty()) {
-        QDEBUG << "Boundary list empty, returning original point";
-        return worldPoint;
-    }
-
-    double minDist2 = std::numeric_limits<double>::max();
-    QPointF closest = worldPoint;
-    for (const auto &pt : bndList[0].fenceLine) {
-        double dx = pt.easting - worldPoint.x();
-        double dy = pt.northing - worldPoint.y();
-        double dist2 = dx*dx + dy*dy;
-        if (dist2 < minDist2) {
-            minDist2 = dist2;
-            closest = QPointF(pt.easting, pt.northing);
-        }
-    }
-    QDEBUG << "Closest boundary point:" << closest << "distance^2:" << minDist2;
-    return closest;
-}
-
-void CTrack::cancelCreating()
-{
-    ABLine.isMakingABLine = false;
-    ABLine.isDesPtBSet = false;
-    curve.isMakingCurve = false;
-    curve.desList.clear();
-    emit creatingChanged();
-    emit pointAChanged();
-    emit pointBChanged();
-}
-
-QPointF CTrack::pointA() const
-{
-    if (ABLine.isMakingABLine && ABLine.isDesPtBSet)
-        return QPointF(ABLine.desPtA.easting, ABLine.desPtA.northing);
-    else if (curve.isMakingCurve && !curve.desList.isEmpty())
-        return QPointF(curve.desList.first().easting, curve.desList.first().northing);
-    return QPointF();
-}
-
-QPointF CTrack::pointB() const
-{
-    if (ABLine.isMakingABLine && ABLine.isDesPtBSet)
-        return QPointF(ABLine.desPtB.easting, ABLine.desPtB.northing);
-    else if (curve.isMakingCurve && curve.desList.size() > 1)
-        return QPointF(curve.desList.last().easting, curve.desList.last().northing);
-    return QPointF();
-}
-void CTrack::startCreating(int mode)
-{
-    QDEBUG << "CTrack::startCreating" << mode;
-    cancelCreating(); // сбрасываем предыдущее создание
-    if (mode == 2) {
-        ABLine.isMakingABLine = true;
-        ABLine.isDesPtBSet = false;
-        QDEBUG << "AB mode started";
-    } else if (mode == 4) {
-        curve.isMakingCurve = true;
-        curve.desList.clear();
-        QDEBUG << "Curve mode started";
-    }
-    emit creatingChanged();
-    emit pointAChanged();
-    emit pointBChanged();
-}
-
-void CTrack::addPoint(QPointF worldPoint)
-{
-    QDEBUG << "CTrack::addPoint" << worldPoint << "isCreating:" << isCreating();
-    if (!isCreating()) return;
-
-    QPointF boundaryPoint = findClosestBoundaryPoint(worldPoint);
-    QDEBUG << "Boundary point:" << boundaryPoint;
-
-    if (ABLine.isMakingABLine) {
-        if (!ABLine.isDesPtBSet) {
-            ABLine.desPtA = Vec2(boundaryPoint.x(), boundaryPoint.y());
-            ABLine.isDesPtBSet = true;
-            ABLine.desPtB = ABLine.desPtA; // временно
-            QDEBUG << "Set point A";
-            emit pointAChanged();
-            emit pointBChanged();
-        } else {
-            ABLine.desPtB = Vec2(boundaryPoint.x(), boundaryPoint.y());
-            QDEBUG << "Set point B";
-            emit pointBChanged();
-        }
-    } else if (curve.isMakingCurve) {
-        if (curve.desList.isEmpty()) {
-            curve.desList.append(Vec3(boundaryPoint.x(), boundaryPoint.y(), 0));
-            QDEBUG << "Curve first point";
-            emit pointAChanged();
-            emit pointBChanged();
-        } else if (curve.desList.size() == 1) {
-            curve.desList.append(Vec3(boundaryPoint.x(), boundaryPoint.y(), 0));
-            QDEBUG << "Curve second point";
-            emit pointBChanged();
-        } else {
-            // сброс и начало заново
-            curve.desList.clear();
-            curve.desList.append(Vec3(boundaryPoint.x(), boundaryPoint.y(), 0));
-            QDEBUG << "Curve reset, first point again";
-            emit pointAChanged();
-            emit pointBChanged();
-        }
-    }
-}
-
-void CTrack::finishCreating(QString name)
-{
-    QDEBUG << "CTrack::finishCreating" << name;
-
-    if (ABLine.isMakingABLine) {
-        if (!ABLine.isDesPtBSet || (ABLine.desPtA == ABLine.desPtB)) {
-            QDEBUG << "Insufficient points for AB line";
-            return;
-        }
-
-        QDEBUG << "AB line creation: desPtA =" << ABLine.desPtA.easting << ABLine.desPtA.northing;
-        QDEBUG << "AB line creation: desPtB =" << ABLine.desPtB.easting << ABLine.desPtB.northing;
-
-        CTrk newTrk;
-        newTrk.ptA = Vec2(ABLine.desPtA.easting, ABLine.desPtA.northing);
-        newTrk.ptB = Vec2(ABLine.desPtB.easting, ABLine.desPtB.northing);
-        newTrk.name = name;
-        newTrk.isVisible = true;
-        newTrk.mode = TrackMode::AB;
-        double dx = newTrk.ptB.easting - newTrk.ptA.easting;
-        double dy = newTrk.ptB.northing - newTrk.ptA.northing;
-        newTrk.heading = atan2(dx, dy);
-        if (newTrk.heading < 0) newTrk.heading += 2*M_PI;
-        newTrk.nudgeDistance = 0;
-
-        QDEBUG << "newTrk.ptA =" << newTrk.ptA.easting << newTrk.ptA.northing;
-        QDEBUG << "newTrk.ptB =" << newTrk.ptB.easting << newTrk.ptB.northing;
-        QDEBUG << "newTrk.heading =" << newTrk.heading;
-
-        gArr.append(newTrk);
-        QDEBUG << "gArr count now:" << gArr.count();
-
-        select(gArr.count() - 1);
-        reloadModel();
-        QDEBUG << "reloadModel() called";
-
-        ABLine.isMakingABLine = false;
-        ABLine.isDesPtBSet = false;
-    }
-    else if (curve.isMakingCurve) {
-        if (curve.desList.size() < 2) {
-            QDEBUG << "Insufficient points for curve";
-            return;
-        }
-
-        QDEBUG << "Curve creation: points count =" << curve.desList.size();
-
-        CTrk newTrk;
-        newTrk.curvePts = curve.desList;
-        newTrk.name = name;
-        newTrk.isVisible = true;
-        newTrk.mode = TrackMode::Curve;
-        newTrk.ptA = Vec2(curve.desList.first().easting, curve.desList.first().northing);
-        newTrk.ptB = Vec2(curve.desList.last().easting, curve.desList.last().northing);
-        // Вычисляем средний heading
-        double x = 0, y = 0;
-        for (const Vec3 &pt : curve.desList) {
-            x += cos(pt.heading);
-            y += sin(pt.heading);
-        }
-        newTrk.heading = atan2(y, x);
-        if (newTrk.heading < 0) newTrk.heading += 2*M_PI;
-        newTrk.nudgeDistance = 0;
-
-        QDEBUG << "newTrk.ptA =" << newTrk.ptA.easting << newTrk.ptA.northing;
-        QDEBUG << "newTrk.ptB =" << newTrk.ptB.easting << newTrk.ptB.northing;
-        QDEBUG << "newTrk.heading =" << newTrk.heading;
-
-        gArr.append(newTrk);
-        QDEBUG << "gArr count now:" << gArr.count();
-
-        select(gArr.count() - 1);
-        reloadModel();
-        QDEBUG << "reloadModel() called";
-
-        curve.isMakingCurve = false;
-        curve.desList.clear();
-    }
-
-    emit creatingChanged();
-    emit pointAChanged();
-    emit pointBChanged();
-}
-
-void CTrack::finish_new(QString name)
-{
-    double vehicle_toolWidth = SettingsManager::instance()->vehicle_toolWidth();
-    double vehicle_toolOffset = SettingsManager::instance()->vehicle_toolOffset();
-    double vehicle_toolOverlap = SettingsManager::instance()->vehicle_toolOverlap();
-
-    double dist;
-    newTrack.name = name;
-
-    switch(newMode()) {
-    case TrackMode::AB:
-        if (!ABLine.isMakingABLine) return;
-        if (newRefSide() > 0) {
-            dist = (vehicle_toolWidth - vehicle_toolOverlap) * 0.5 + vehicle_toolOffset;
-            NudgeRefABLine(newTrack, dist);
-        } else if (newRefSide() < 0) {
-            dist = (vehicle_toolWidth - vehicle_toolOverlap) * -0.5 + vehicle_toolOffset;
-            NudgeRefABLine(newTrack, dist);
-        }
-        ABLine.isMakingABLine = false;
-        break;
-    case TrackMode::Curve:
-        if (!curve.isMakingCurve) return;
-        curve.isMakingCurve = false;
-        break;
-    default:
-        return;
-    }
-
-    newTrack.isVisible = true;
-    gArr.append(newTrack);
-    QDEBUG << "Line added, total count:" << gArr.count();
-
-    select(gArr.count() - 1); // устанавливаем idx на новую линию
-    reloadModel(); // важно: уведомить QML об изменении модели
 }

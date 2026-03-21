@@ -28,6 +28,7 @@
 #include "backendaccess.h"
 #include "boundaryinterface.h"
 #include "fieldinterface.h"
+#include "trackinterface.h"
 #include "mainwindowstate.h"
 #include "flagsinterface.h"
 #include "recordedpath.h"
@@ -107,6 +108,7 @@ void FormGPS::setupGui()
     // Original architecture: qmlRegisterSingletonInstance in formgps_ui.cpp (not main.cpp)
   //  rootContext()->setContextProperty("TracksInterface", &track);
     qmlRegisterSingletonInstance("AOG", 1, 0, "TracksInterface", &track);
+    qmlRegisterSingletonInstance("AOG", 1, 0, "TrackInterface", TrackInterface::instance());
 
     // Only tram still uses setContextProperty (not yet modernized)
     rootContext()->setContextProperty("tram", &tram);
@@ -225,6 +227,7 @@ void FormGPS::on_qml_created(QObject *object, const QUrl &url)
 
     headland_form.bnd = &bnd;
     headland_form.hdl = &hdl;
+    //headland_form.track = &track;
 
     connect(&headland_form, &FormHeadland::saveHeadland, this, &FormGPS::headland_save);
 
@@ -234,6 +237,10 @@ void FormGPS::on_qml_created(QObject *object, const QUrl &url)
     connect(&headache_form, SIGNAL(saveHeadland()),this,SLOT(headland_save()));
     connect(&headache_form, SIGNAL(saveHeadlines()), this,SLOT(headlines_save()));
     connect(&headache_form, SIGNAL(loadHeadlines()), this,SLOT(headlines_load()));
+
+    trackdrawer_form.bnd = &bnd;
+    trackdrawer_form.track = &track;
+    connect(&trackdrawer_form, &FormTrackDrawer::saveTracks, this, &FormGPS::FileSaveTracks);
 
     BoundaryInterface::instance()->set_isOutOfBounds(false);
 

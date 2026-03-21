@@ -41,6 +41,7 @@
 #include "ctrack.h"
 #include "formheadland.h"
 #include "formheadache.h"
+#include "formtrackdrawer.h"
 
 #include <QVector>
 #include <QDateTime>
@@ -292,6 +293,7 @@ public:
 
     FormHeadland headland_form;
     FormHeadache headache_form;
+    FormTrackDrawer trackdrawer_form;
 
     /* GUI synchronization lock */
     QReadWriteLock lock;

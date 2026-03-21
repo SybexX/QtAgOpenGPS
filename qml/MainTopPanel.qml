@@ -77,7 +77,7 @@ import "components" as Comp
               3: Field
               4: App
               Else: Line*/
-            running: false
+            running: true
             interval: 2000
             repeat: true
             onTriggered: {

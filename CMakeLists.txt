@@ -162,6 +162,7 @@ qt_add_executable(QtAgOpenGPS
     formgps_ui_vehicle.cpp
     formheadache.h formheadache.cpp
     formheadland.h formheadland.cpp
+    formtrackdrawer.h formtrackdrawer.cpp
     glutils.h glutils.cpp
     #rhiresources.h rhiresources.cpp
     #rhihelpers.h rhihelpers.cpp
@@ -396,6 +397,7 @@ qt_add_qml_module(QtAgOpenGPS
     SOURCES backend/fieldinfo.h backend/fieldinfo.cpp
     SOURCES backend/headlandinterface.h backend/headlandinterface.cpp
     SOURCES backend/headacheinterface.h backend/headacheinterface.cpp
+    SOURCES backend/trackinterface.h backend/trackinterface.cpp
     SOURCES backend/flagsinterface.h backend/flagsinterface.cpp
     SOURCES backend/recordedpath.h backend/recordedpath.cpp
     SOURCES backend/siminterface.h backend/siminterface.cpp
