@@ -126,12 +126,19 @@ public:
     // layerId defaults to the default layer (-1 means use default)
     bool isSectionPending(int sectionIndex, int layerId = -1) const;
 
+    // Check if a zone has pending vertices (is currently drawing)
+    bool isZonePending(int zoneIndex, int layerId = -1) const;
+
     // Add two vertices for a section (triangle strip style)
     // Returns number of triangles added (0 or 2)
     // layerId defaults to the default layer (-1 means use default)
     int addSectionVertices(int sectionIndex,
                            const QVector3D &left, const QVector3D &right,
                            const QColor &color, int layerId = -1);
+
+    int addZoneVertices(int zoneIndex, int startSection, int endSection,
+                         const QVector3D &left, const QVector3D &right,
+                         const QColor &color, int layerId = -1);
 
     // Flush a single pending section for a layer (when one section turns off)
     // layerId defaults to the default layer (-1 means use default)

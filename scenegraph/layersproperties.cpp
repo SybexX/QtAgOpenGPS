@@ -242,12 +242,41 @@ int LayersProperties::addSectionVertices(int layerId, int sectionIndex,
     return added;
 }
 
+int LayersProperties::addZoneVertices(int layerId, int zoneIndex, int startSection, int endSection,
+                                      const QVector3D &left, const QVector3D &right,
+                                      const QColor &color)
+{
+    auto it = m_layers.find(layerId);
+    if (it == m_layers.end()) {
+        return 0;
+    }
+
+    int added = it->addZoneVertices(zoneIndex, startSection, endSection, left, right, color);
+
+    if (added > 0) {
+        emit trianglesChanged(layerId);
+    }
+
+    return added;
+}
+
 bool LayersProperties::isSectionPending(int layerId, int sectionIndex) const
 {
     auto it = m_layers.constFind(layerId);
     if (it != m_layers.constEnd()) {
         if (sectionIndex >= 0 && sectionIndex < it->pendingSections.size()) {
             return it->pendingSections[sectionIndex].hasPrevious;
+        }
+    }
+    return false;
+}
+
+bool LayersProperties::isZonePending(int layerId, int zoneIndex) const
+{
+    auto it = m_layers.constFind(layerId);
+    if (it != m_layers.constEnd()) {
+        if (zoneIndex >= 0 && zoneIndex < it->pendingZones.size()) {
+            return it->pendingZones[zoneIndex].hasPrevious;
         }
     }
     return false;

@@ -56,6 +56,25 @@ struct CoverageTriangle {
 };
 
 // ============================================================================
+// ZonePending - Pending vertices for triangle strip building per zone
+// ============================================================================
+
+struct ZonePending {
+    int startSection = -1;               // Start section of this zone
+    int endSection = -1;                 // End section of this zone
+    QVector3D prevLeft;                 // Previous left vertex
+    QVector3D prevRight;                // Previous right vertex
+    QColor color;                        // Zone color
+    bool hasPrevious = false;            // Do we have previous vertices?
+
+    void reset() {
+        startSection = -1;
+        endSection = -1;
+        hasPrevious = false;
+    }
+};
+
+// ============================================================================
 // CoverageLayer - A collection of triangles with visibility and alpha
 // ============================================================================
 
@@ -64,6 +83,7 @@ struct CoverageLayer {
     QString name;                       // Human-readable layer name
     QVector<CoverageTriangle> triangles; // Committed triangle data
     QVector<SectionPending> pendingSections; // Per-section pending vertices
+    QVector<ZonePending> pendingZones;  // Per-zone pending vertices
     float alpha = 1.0f;               // Layer-level alpha (AOG default)
     bool visible = true;                // Layer visibility
     QRectF boundingBox;                 // Cached bounding box for spatial queries
@@ -76,13 +96,18 @@ struct CoverageLayer {
         : id(layerId), name(layerName) {}
 
     // Configure for a given number of sections
+    // Also configures zones (max possible is sectionCount/2 + 1 for alternating pattern)
     void configureSections(int count) {
-        // Flush any pending vertices first (they become orphaned)
         flushPendingSections();
-        // Resize and reset
         pendingSections.resize(count);
         for (SectionPending &section : pendingSections) {
             section.reset();
+        }
+        // Resize zones array for worst case (alternating pattern)
+        int maxZones = (count > 0) ? (count + 1 / 3) : 1;
+        pendingZones.resize(maxZones);
+        for (ZonePending &zone : pendingZones) {
+            zone.reset();
         }
     }
 
@@ -91,6 +116,9 @@ struct CoverageLayer {
         for (SectionPending &section : pendingSections) {
             section.reset();
         }
+        for (ZonePending &zone : pendingZones) {
+            zone.reset();
+        }
     }
 
     // Flush a single pending section (when one section turns off)
@@ -98,6 +126,53 @@ struct CoverageLayer {
         if (sectionIndex >= 0 && sectionIndex < pendingSections.size()) {
             pendingSections[sectionIndex].reset();
         }
+        for (ZonePending &zone : pendingZones) {
+            if (zone.startSection == sectionIndex || zone.endSection == sectionIndex) {
+                zone.reset();
+            }
+        }
+    }
+
+    int addZoneVertices(int zoneIndex, int startSection, int endSection,
+                        const QVector3D &left, const QVector3D &right,
+                        const QColor &color) {
+        if (zoneIndex < 0 || zoneIndex >= pendingZones.size()) {
+            // Resize if needed
+            if (zoneIndex >= 0) {
+                pendingZones.resize(zoneIndex + 1); // нужно внимание!!!
+            } else {
+                return 0;
+            }
+        }
+
+        ZonePending &zone = pendingZones[zoneIndex];
+
+        if (!zone.hasPrevious) {
+            // First pair of vertices - just store them
+            zone.prevLeft = left;
+            zone.prevRight = right;
+            zone.startSection = startSection;
+            zone.endSection = endSection;
+            zone.color = color;
+            zone.hasPrevious = true;
+            return 0;
+        }
+
+        // Create triangles forming a quad (same pattern as section vertices)
+        CoverageTriangle tri1(zone.prevLeft, zone.prevRight, left, color);
+        CoverageTriangle tri2(left, zone.prevRight, right, color);
+
+        triangles.append(tri1);
+        triangles.append(tri2);
+
+        // Update previous vertices
+        zone.prevLeft = left;
+        zone.prevRight = right;
+        zone.startSection = startSection;
+        zone.endSection = endSection;
+        zone.color = color;
+
+        return 2;
     }
 
     // Add two vertices for a section (like triangle strip)

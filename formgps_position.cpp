@@ -1627,25 +1627,33 @@ void FormGPS::CalculatePositionHeading()
     //whichever is less
     if (tool.farLeftSpeed < tool.farRightSpeed)
     {
-        double twist = tool.farLeftSpeed * (tool.width / 50) / tool.farRightSpeed * (50/ tool.width);
+        double twist = tool.farLeftSpeed / tool.farRightSpeed;
         twist *= twist;
         if (twist < 0.2) twist = 0.2;
         sectionTriggerStepDistance = distance * twist;
-        CVehicle::instance()->sectionTriggerStepDistance = sectionTriggerStepDistance;
     }
     else
     {
-        double twist = tool.farRightSpeed * (tool.width / 50) / tool.farLeftSpeed * (50 / tool.width);
+        double twist = tool.farRightSpeed / tool.farLeftSpeed;
         twist *= twist;
         if (twist < 0.2) twist = 0.2;
-
         sectionTriggerStepDistance = distance * twist;
-        CVehicle::instance()->sectionTriggerStepDistance = sectionTriggerStepDistance;
+
     }
+
+    if (sectionTriggerStepDistance < 1) sectionTriggerStepDistance = 1;
+
+    CVehicle::instance()->sectionTriggerStepDistance = sectionTriggerStepDistance;
+
+    //finally fixed distance for making a curve line
+    if (!track.curve.isMakingCurve) CVehicle::instance()->sectionTriggerStepDistance += 0.5;
+    //if (MainWindowState::instance()->isContourBtnOn()) CVehicle::instance()->sectionTriggerStepDistance *=0.5;
+
 
     //precalc the sin and cos of heading * -1
     CVehicle::instance()->sinSectionHeading = sin(-tool.toolPivotPos.heading);
     CVehicle::instance()->cosSectionHeading = cos(-tool.toolPivotPos.heading);
+    qDebug(qpos) << "tool.width:" << tool.width << "sectionTriggerStepDistance" << CVehicle::instance()->sectionTriggerStepDistance;
 
 }
 
@@ -1824,26 +1832,8 @@ void FormGPS::AddSectionOrPathPoints()
     // if non zero, at least one section is on.
     patchCounter = 0;
 
-    //only add vertices when travelled far enough (same logic as OpenGL)
-    if (sectionTriggerDistance > sectionTriggerStepDistance) {
-        for (int j=0; j < tool.numOfSections; j++) {
-            if (tool.section[j].isSectionOn) {
-                if(SettingsManager::instance()->color_isMultiColorSections())
-                    LayerService::instance()->addSectionVertices(
-                            j,
-                            tool.section[j].leftPoint,
-                            tool.section[j].rightPoint,QColorWithAlpha(tool.secColors[j], alpha));
-                else
-                    LayerService::instance()->addSectionVertices(
-                        j,
-                        tool.section[j].leftPoint,
-                        tool.section[j].rightPoint,
-                        QColorWithAlpha(SettingsManager::instance()->display_colorSectionsDay(), alpha));
-            }
-        }
-    }
+    bool isMultiColoredSections = SettingsManager::instance()->color_isMultiColorSections();
 
-    //send the current and previous GPS fore/aft corrected fix to each section
     for (int j = 0; j < tool.triStrip.count(); j++)
     {
         if (tool.triStrip[j].isDrawing)
@@ -1855,9 +1845,35 @@ void FormGPS::AddSectionOrPathPoints()
             }
 
             tool.triStrip[j].AddMappingPoint(tool.secColors[j],
-                                        tool.section[tool.triStrip[j].currentStartSectionNum].leftPoint,
-                                        tool.section[tool.triStrip[j].currentEndSectionNum].rightPoint,
-                                        tool.patchSaveList);
+                                             tool.section[tool.triStrip[j].currentStartSectionNum].leftPoint,
+                                             tool.section[tool.triStrip[j].currentEndSectionNum].rightPoint,
+                                             tool.patchSaveList);
+
+            int startSection = tool.triStrip[j].currentStartSectionNum;
+            int endSection = tool.triStrip[j].currentEndSectionNum;
+
+            QColor zoneColor = isMultiColoredSections ? QColorWithAlpha(tool.secColors[j], alpha)
+                                                      : QColorWithAlpha(SettingsManager::instance()->display_colorSectionsDay(), alpha);
+
+            // Use zone vertices for merged sections (adjacent enabled sections)
+            // Only for non-multi-colored sections (single color for all sections)
+            if (endSection > startSection && !isMultiColoredSections) {
+                LayerService::instance()->addZoneVertices(
+                    j,
+                    startSection,
+                    endSection,
+                    tool.section[startSection].leftPoint,
+                    tool.section[endSection].rightPoint,
+                    zoneColor);
+            } else {
+                // Single section or multi-colored - use section vertices
+                LayerService::instance()->addSectionVertices(
+                    startSection,
+                    tool.section[startSection].leftPoint,
+                    tool.section[startSection].rightPoint,
+                    zoneColor);
+            }
+
             patchCounter++;
         }
     }

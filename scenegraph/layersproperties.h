@@ -125,8 +125,15 @@ public:
                            const QVector3D &left, const QVector3D &right,
                            const QColor &color);
 
+    int addZoneVertices(int layerId, int zoneIndex, int startSection, int endSection,
+                        const QVector3D &left, const QVector3D &right,
+                        const QColor &color);
+
     // Check if a section has pending vertices (is currently drawing)
     bool isSectionPending(int layerId, int sectionIndex) const;
+
+    // Check if a zone has pending vertices (is currently drawing)
+    bool isZonePending(int layerId, int zoneIndex) const;
 
     // Flush pending sections for a layer (e.g., when lifting tool)
     void flushPendingSections(int layerId);
