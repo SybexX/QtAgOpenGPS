@@ -1078,6 +1078,12 @@ bool CYouTurn::CreateABWideTurn(bool isTurnLeft,
         int cnt1 = ytList.count();
         int cnt2 = ytList2.count();
 
+        if (cnt1 == 0 || cnt2 == 0)
+        {
+            FailCreate();
+            return false;
+        }
+
         //Find if the turn goes same way as turnline heading
         bool isFirstTurnLineSameWay = true;
         double firstHeadingDifference = fabs(inClosestTurnPt.turnLineHeading - ytList[ytList.count() - 1].heading);

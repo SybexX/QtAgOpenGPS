@@ -1061,12 +1061,18 @@ void CTool::DrawPatchesBackQP(const CTram &tram,
 
         if (patchCount > 0)
         {
+            int bbCount = triStrip[j].patchBoundingBoxList.size();
             //for every new chunk of patch
-            for (int k = 0; k < triStrip[j].patchList.size() ; k++)
+            for (int k = 0; k < patchCount ; k++)
             {
                 isDraw = false;
                 QSharedPointer<PatchTriangleList> triList = triStrip[j].patchList[k];
-                QSharedPointer<PatchBoundingBox> bb = triStrip[j].patchBoundingBoxList[k];
+                QSharedPointer<PatchBoundingBox> bb;
+                if (k < bbCount) {
+                    bb = triStrip[j].patchBoundingBoxList[k];
+                } else {
+                    continue;
+                }
 
                 /*
                 QPolygonF patchBox({{ (*bb).minx, (*bb).miny }, {(*bb).maxx, (*bb).miny},

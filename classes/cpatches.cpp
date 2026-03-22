@@ -116,15 +116,18 @@ void CPatches::TurnMappingOff(QColor section_color,
        patchSaveList.append(triangleList);
    }
    else
-   {
-       //torriem: patch strip is too small to keep, so get rid of it
-       triangleList->clear();
-       triangleListBoundingBox.clear();
-       if (patchList.count() > 0) {
-           patchList.removeAt(patchList.count() - 1);
-           patchBoundingBoxList.removeAt(patchList.count() - 1);
-       }
-   }
+    {
+        //torriem: patch strip is too small to keep, so get rid of it
+        triangleList->clear();
+        triangleListBoundingBox.clear();
+        int lastIndex = patchList.count() - 1;
+        if (lastIndex >= 0) {
+            patchList.removeAt(lastIndex);
+            if (lastIndex < patchBoundingBoxList.count()) {
+                patchBoundingBoxList.removeAt(lastIndex);
+            }
+        }
+    }
 }
 
 void CPatches::AddMappingPoint(QColor section_color,
