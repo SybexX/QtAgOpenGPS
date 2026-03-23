@@ -102,9 +102,14 @@ public:
                                const CBoundary &bnd,
                                const CYouTurn &yt);
 
+    void waitForBuildFinished();
+
     static void BuildNewOffsetList(QPromise<QVector<Vec3>> &promise,
                                    double distAway, CTrk track,
                                    QVector<Vec2> fenceLineEar);
+
+    QVector<Vec3> BuildOffsetListSync(double distAway, CTrk track,
+                                      QVector<Vec2> fenceLineEar);
 
     void GetCurrentCurveLine(Vec3 pivot,
                              Vec3 steer,

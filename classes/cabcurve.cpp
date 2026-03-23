@@ -38,6 +38,237 @@ void CABCurve::onBuildFinished()
     m_findGlobalNearestCurvePoint = true;
 }
 
+void CABCurve::waitForBuildFinished()
+{
+    if (m_buildWatcher.isRunning())
+    {
+        m_buildWatcher.waitForFinished();
+    }
+}
+
+QVector<Vec3> CABCurve::BuildOffsetListSync(double distAway, CTrk track,
+                                           QVector<Vec2> fenceLineEar)
+{
+    QVector<Vec3> result;
+
+    try
+    {
+        if (track.mode == (int)TrackMode::AB)
+        {
+            Vec2 nudgePtA = track.ptA;
+            Vec2 nudgePtB = track.ptB;
+
+            Vec2 point1 = Vec2((cos(-track.heading) * distAway) + nudgePtA.easting,
+                               (sin(-track.heading) * distAway) + nudgePtA.northing);
+
+            Vec2 point2 = Vec2((cos(-track.heading) * distAway) + nudgePtB.easting,
+                               (sin(-track.heading) * distAway) + nudgePtB.northing);
+
+            double abLength = SettingsManager::instance()->ab_lineLength();
+
+            double easting1 = point1.easting - (sin(track.heading) * abLength);
+            double northing1 = point1.northing - (cos(track.heading) * abLength);
+
+            result.append(Vec3(easting1, northing1, track.heading));
+
+            double easting2 = point2.easting + (sin(track.heading) * abLength);
+            double northing2 = point2.northing + (cos(track.heading) * abLength);
+            result.append(Vec3(easting2, northing2, track.heading));
+        }
+        else if (track.mode == (int)TrackMode::waterPivot)
+        {
+            double Angle = glm::twoPI / qMin(qMax(ceil(glm::twoPI / (2 * acos(1 - (0.02 / fabs(distAway))))), 50.0), 500.0);
+
+            Vec3 centerPos = Vec3(track.ptA.easting, track.ptA.northing, 0);
+            double rotation = 0;
+
+            while (rotation < glm::twoPI)
+            {
+                rotation += Angle;
+                result.append(Vec3(centerPos.easting + distAway * sin(rotation), centerPos.northing + distAway * cos(rotation), 0));
+            }
+
+            if (result.count() > 1)
+            {
+                int cnt = result.count();
+                for (int i = 0; i < (cnt - 1); i++)
+                {
+                    result[i].heading = atan2(result[i + 1].easting - result[i].easting, result[i + 1].northing - result[i].northing);
+                    if (result[i].heading < 0) result[i].heading += glm::twoPI;
+                    if (result[i].heading >= glm::twoPI) result[i].heading -= glm::twoPI;
+                }
+
+                result[cnt - 1].heading = atan2(result[0].easting - result[cnt - 1].easting, result[0].northing - result[cnt - 1].northing);
+            }
+        }
+        else
+        {
+            double tool_width = SettingsManager::instance()->vehicle_toolWidth();
+            double tool_overlap = SettingsManager::instance()->vehicle_toolOverlap();
+            double step = (tool_width - tool_overlap) * 0.48;
+            if (step > 4) step = 4;
+            if (step < 1) step = 1;
+
+            double distSqAway = (distAway * distAway) - 0.01;
+
+            Vec3 point;
+            int refCount = track.curvePts.count();
+            for (int i = 0; i < refCount; i++)
+            {
+                if (i < 0 || i >= track.curvePts.count()) continue;
+                point = Vec3(
+                    track.curvePts[i].easting + (sin(glm::PIBy2 + track.curvePts[i].heading) * distAway),
+                    track.curvePts[i].northing + (cos(glm::PIBy2 + track.curvePts[i].heading) * distAway),
+                    track.curvePts[i].heading);
+                bool Add = true;
+
+                for (int t = 0; t < refCount && t < track.curvePts.count(); t++)
+                {
+                    if (t < 0 || t >= track.curvePts.count()) continue;
+                    double dist = ((point.easting - track.curvePts[t].easting) * (point.easting - track.curvePts[t].easting))
+                        + ((point.northing - track.curvePts[t].northing) * (point.northing - track.curvePts[t].northing));
+                    if (dist < distSqAway)
+                    {
+                        Add = false;
+                        break;
+                    }
+                }
+
+                if (Add)
+                {
+                    if (result.count() > 0)
+                    {
+                        double dist = ((point.easting - result[result.count() - 1].easting) * (point.easting - result[result.count() - 1].easting))
+                            + ((point.northing - result[result.count() - 1].northing) * (point.northing - result[result.count() - 1].northing));
+                        if (dist > step)
+                            result.append(point);
+                    }
+                    else
+                    {
+                        result.append(point);
+                    }
+                }
+            }
+
+            if (result.count() > 1)
+            {
+                int cnt = result.count();
+                QVector<Vec3> arr(cnt);
+                for (int i = 0; i < cnt; i++) arr[i] = result[i];
+                result.clear();
+
+                for (int i = 0; i < cnt - 1; i++)
+                {
+                    result.append(arr[i]);
+
+                    double dist = glm::Distance(arr[i], arr[i + 1]);
+                    if (dist > 2.5)
+                    {
+                        int loopTimes = (int)(dist / step);
+                        if (loopTimes < 1) loopTimes = 1;
+
+                        for (int j = 1; j < loopTimes; j++)
+                        {
+                            Vec3 pos = Vec3(glm::Catmull(j / (double)(loopTimes), arr[i], arr[i + 1], arr[i + 2], arr[i + 3]));
+                            result.append(pos);
+                        }
+                    }
+                }
+
+                result.append(arr[cnt - 2]);
+                result.append(arr[cnt - 1]);
+
+                cnt = result.count();
+                QVector<Vec3> arr2(cnt);
+                for (int i = 0; i < cnt; i++) arr2[i] = result[i];
+                cnt--;
+                result.clear();
+                result.append(Vec3(arr2[0]));
+
+                for (int i = 1; i < cnt; i++)
+                {
+                    Vec3 pt3 = Vec3(arr2[i]);
+                    if (i + 1 < arr2.count())
+                    {
+                        pt3.heading = atan2(arr2[i + 1].easting - arr2[i - 1].easting, arr2[i + 1].northing - arr2[i - 1].northing);
+                    }
+                    if (pt3.heading < 0) pt3.heading += glm::twoPI;
+                    result.append(pt3);
+                }
+
+                int k = arr2.count() - 1;
+                Vec3 pt33 = Vec3(arr2[k]);
+                if (k - 1 >= 0)
+                {
+                    pt33.heading = atan2(arr2[k].easting - arr2[k - 1].easting, arr2[k].northing - arr2[k - 1].northing);
+                }
+                if (pt33.heading < 0) pt33.heading += glm::twoPI;
+                result.append(pt33);
+
+                if (fenceLineEar.count() > 0)
+                {
+                    int numAPts = 1;
+                    Vec2 newPt1, newPt2, lastPt = Vec2(result[0].easting, result[0].northing);
+                    for (int i = 1; i < result.count(); i++)
+                    {
+                        Vec2 pt = Vec2(result[i].easting, result[i].northing);
+                        double dist = glm::Distance(lastPt, pt);
+                        if (dist > 5)
+                        {
+                            numAPts++;
+                            lastPt = pt;
+                        }
+                    }
+
+                    QVector<Vec2> arr2D(numAPts);
+                    numAPts = 1;
+                    arr2D[0] = Vec2(result[0].easting, result[0].northing);
+                    lastPt = arr2D[0];
+                    for (int i = 1; i < result.count(); i++)
+                    {
+                        Vec2 pt = Vec2(result[i].easting, result[i].northing);
+                        double dist = glm::Distance(lastPt, pt);
+                        if (dist > 5)
+                        {
+                            arr2D[numAPts] = pt;
+                            numAPts++;
+                            lastPt = pt;
+                        }
+                    }
+
+                    for (int i = 0; i < numAPts; i++)
+                    {
+                        Vec2 pointE = Vec2(arr2D[i].easting, arr2D[i].northing);
+                        for (int j = 0; j < fenceLineEar.count(); j += 2)
+                        {
+                            double intersectionX, intersectionZ;
+                            int res = glm::GetLineIntersection(fenceLineEar[j].easting, fenceLineEar[j].northing,
+                                                         fenceLineEar[j + 1].easting, fenceLineEar[j + 1].northing,
+                                                         pointE.easting - 1, pointE.northing,
+                                                         pointE.easting + 1, pointE.northing,
+                                                         intersectionX, intersectionZ);
+                            if (res == 1)
+                            {
+                                pointE.easting = intersectionX;
+                                pointE.northing = intersectionZ;
+                                break;
+                            }
+                        }
+                        result[i].easting = pointE.easting;
+                        result[i].northing = pointE.northing;
+                    }
+                }
+            }
+        }
+    }
+    catch (...)
+    {
+        result.clear();
+    }
+
+    return result;
+}
+
 void CABCurve::onGuideFinished()
 {
     if (m_guideWatcher.isCanceled())
@@ -79,7 +310,7 @@ void CABCurve::BuildCurveCurrentList(Vec3 pivot,
             //close call hit
             int cc = 0, dd;
 
-            for (int j = 0; j < refCount; j += 10)
+            for (int j = 0; j < refCount && j < track.curvePts.count(); j += 10)
             {
                 double dist = ((CVehicle::instance()->guidanceLookPos.easting - track.curvePts[j].easting)
                                * (CVehicle::instance()->guidanceLookPos.easting - track.curvePts[j].easting))
@@ -95,13 +326,14 @@ void CABCurve::BuildCurveCurrentList(Vec3 pivot,
             minDistA = minDistB = 1000000;
 
             dd = cc + 7;
-            if (dd > refCount - 1) dd = refCount;
+            if (dd > track.curvePts.count() - 1) dd = track.curvePts.count();
             cc -= 7;
             if (cc < 0) cc = 0;
 
             //find the closest 2 points to current close call
             for (int j = cc; j < dd; j++)
             {
+                if (j < 0 || j >= track.curvePts.count()) continue;
                 double dist = ((CVehicle::instance()->guidanceLookPos.easting - track.curvePts[j].easting)
                                * (CVehicle::instance()->guidanceLookPos.easting - track.curvePts[j].easting))
                               + ((CVehicle::instance()->guidanceLookPos.northing - track.curvePts[j].northing)
@@ -118,6 +350,13 @@ void CABCurve::BuildCurveCurrentList(Vec3 pivot,
                     minDistB = dist;
                     rB = j;
                 }
+            }
+
+            // Guard against rA/rB being out of bounds due to async track changes
+            if (rA >= track.curvePts.count() || rB >= track.curvePts.count())
+            {
+                curList.clear();
+                return;
             }
 
             if (rA > rB) {
@@ -301,17 +540,18 @@ void CABCurve::BuildNewOffsetList(QPromise<QVector<Vec3>> &promise,
             Vec3 point;
 
             int refCount = track.curvePts.count();
-            for (int i = 0; i < refCount; i++)
+            for (int i = 0; i < refCount && i < track.curvePts.count(); i++)
             {
                 if (promise.isCanceled())
                     break;
+                if (i < 0 || i >= track.curvePts.count()) continue;
                 point = Vec3(
                     track.curvePts[i].easting + (sin(glm::PIBy2 + track.curvePts[i].heading) * distAway),
                     track.curvePts[i].northing + (cos(glm::PIBy2 + track.curvePts[i].heading) * distAway),
                     track.curvePts[i].heading);
                 bool Add = true;
 
-                for (int t = 0; t < refCount; t++)
+                for (int t = 0; t < refCount && t < track.curvePts.count(); t++)
                 {
                     double dist = ((point.easting - track.curvePts[t].easting) * (point.easting - track.curvePts[t].easting))
                         + ((point.northing - track.curvePts[t].northing) * (point.northing - track.curvePts[t].northing));

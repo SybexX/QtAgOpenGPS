@@ -6,10 +6,14 @@
 #include <QVector>
 #include <QVector2D>
 #include <QVector4D>
+#include <QLoggingCategory>
 #include "vec4.h"
 #include "vec3.h"
 #include "vec2.h"
 #include "cabline.h"
+#include "cabcurve.h"
+
+Q_DECLARE_LOGGING_CATEGORY(cyouturn_log)
 
 class CBoundary;
 class CABCurve;
@@ -110,6 +114,7 @@ public:
     //next curve or line to build out turn and point over
     //QSharedPointer<CABCurve> nextCurve;
     //QSharedPointer<CABLine> nextLine;
+    CABCurve nextCurve;  // Persists between phases
     Vec3 nextLookPos;
 
     //if we continue on the same line or change to the next one after the uTurn
