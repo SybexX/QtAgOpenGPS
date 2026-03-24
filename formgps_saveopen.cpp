@@ -984,8 +984,25 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
     fieldFile.close();
 
     if (flags & LOAD_LINES) {
+        // Qt 6.8 TRACK RESTORATION: Save restored track index before FileLoadTracks() overwrites it
+        int savedActiveTrackIndex = track.idx();
+        qDebug() << "💾 TRACK RESTORE: Saving restored index before track loading:" << savedActiveTrackIndex;
+
         // ABLine -------------------------------------------------------------------------------------------------
         FileLoadTracks();
+
+        // Qt 6.8 TRACK RESTORATION: Restore the saved track index after loading
+        if (savedActiveTrackIndex >= 0 && savedActiveTrackIndex < track.gArr.count()) {
+            track.setIdx(savedActiveTrackIndex);
+            qDebug() << "✅ TRACK RESTORE: Restored active track index after loading:" << savedActiveTrackIndex;
+        } else if (track.gArr.count() > 0) {
+            // If saved index is invalid but we have tracks, select first track
+            track.setIdx(0);
+            qDebug() << "📍 TRACK RESTORE: Invalid saved index, defaulting to first track (0)";
+        } else {
+            // No tracks available, keep -1
+            qDebug() << "❌ TRACK RESTORE: No tracks available, keeping idx = -1";
+        }
     }
 
     if (flags & LOAD_MAPPING) {
