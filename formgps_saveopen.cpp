@@ -282,12 +282,12 @@ void FormGPS::FileSaveTracks()
             writer << track.gArr[i].heading << Qt::endl;
 
             //A and B
-            writer << qSetRealNumberPrecision(3) << track.gArr[i].ptA.easting << ","
-                   << qSetRealNumberPrecision(3) << track.gArr[i].ptA.northing << ","
+            writer << qSetRealNumberPrecision(3) << QLocale::c().toString(track.gArr[i].ptA.easting, 'f', 3) << ","
+                   << qSetRealNumberPrecision(3) << QLocale::c().toString(track.gArr[i].ptA.northing, 'f', 3) << ","
                    << Qt::endl;
 
-            writer << qSetRealNumberPrecision(3) << track.gArr[i].ptB.easting << ","
-                   << qSetRealNumberPrecision(3) << track.gArr[i].ptB.northing << ","
+            writer << qSetRealNumberPrecision(3) << QLocale::c().toString(track.gArr[i].ptB.easting, 'f', 3) << ","
+                   << qSetRealNumberPrecision(3) << QLocale::c().toString(track.gArr[i].ptB.northing, 'f', 3) << ","
                    << Qt::endl;
 
             //write out the nudgedistance
@@ -392,8 +392,12 @@ void FormGPS::FileLoadTracks()
             return;
         }
 
-        track.gArr[track.idx()].ptA = Vec2(QStringView(line).left(comma).toDouble(),
-                                            QStringView(line).mid(comma + 1).toDouble());
+        QString eastStr = QStringView(line).left(comma).toString();
+        QString northStr = QStringView(line).mid(comma + 1).toString();
+        if (northStr.endsWith(',')) northStr.chop(1);
+        eastStr.replace(',', '.');
+        northStr.replace(',', '.');
+        track.gArr[track.idx()].ptA = Vec2(eastStr.toDouble(), northStr.toDouble());
 
         line = reader.readLine();
         comma = line.indexOf(',');
@@ -404,8 +408,12 @@ void FormGPS::FileLoadTracks()
             return;
         }
 
-        track.gArr[track.idx()].ptB = Vec2(QStringView(line).left(comma).toDouble(),
-                                            QStringView(line).mid(comma + 1).toDouble());
+        QString eastStrB = QStringView(line).left(comma).toString();
+        QString northStrB = QStringView(line).mid(comma + 1).toString();
+        if (northStrB.endsWith(',')) northStrB.chop(1);
+        eastStrB.replace(',', '.');
+        northStrB.replace(',', '.');
+        track.gArr[track.idx()].ptB = Vec2(eastStrB.toDouble(), northStrB.toDouble());
 
         line = reader.readLine();
         track.gArr[track.idx()].nudgeDistance = line.toDouble();
@@ -751,7 +759,7 @@ void FormGPS::FileLoadABLines()
 
         track.gArr[i].heading = glm::toRadians(QStringView(line).mid(comma1 + 1, comma2 - comma1 - 1).toDouble());
         track.gArr[i].ptA.easting = QStringView(line).mid(comma2 + 1, comma3 - comma2 - 1).toDouble();
-        track.gArr[i].ptB.northing = QStringView(line).mid(comma3 + 1).toDouble();
+        track.gArr[i].ptA.northing = QStringView(line).mid(comma3 + 1).toDouble();
         track.gArr[i].ptB.easting = track.gArr[i].ptA.easting + (sin(track.gArr[i].heading) * 100);
         track.gArr[i].ptB.northing = track.gArr[i].ptA.northing + (cos(track.gArr[i].heading) * 100);
         track.gArr[i].isVisible = true;
@@ -975,27 +983,9 @@ bool FormGPS::FileOpenField(QString fieldDir, int flags)
 
     fieldFile.close();
 
-
     if (flags & LOAD_LINES) {
-        // Qt 6.8 TRACK RESTORATION: Save restored track index before FileLoadTracks() overwrites it
-        int savedActiveTrackIndex = track.idx();
-        qDebug() << "💾 TRACK RESTORE: Saving restored index before track loading:" << savedActiveTrackIndex;
-
         // ABLine -------------------------------------------------------------------------------------------------
         FileLoadTracks();
-
-        // Qt 6.8 TRACK RESTORATION: Restore the saved track index after loading
-        if (savedActiveTrackIndex >= 0 && savedActiveTrackIndex < track.gArr.count()) {
-            track.setIdx(savedActiveTrackIndex);
-            qDebug() << "✅ TRACK RESTORE: Restored active track index after loading:" << savedActiveTrackIndex;
-        } else if (track.gArr.count() > 0) {
-            // If saved index is invalid but we have tracks, select first track
-            track.setIdx(0);
-            qDebug() << "📍 TRACK RESTORE: Invalid saved index, defaulting to first track (0)";
-        } else {
-            // No tracks available, keep -1
-            qDebug() << "❌ TRACK RESTORE: No tracks available, keeping idx = -1";
-        }
     }
 
     if (flags & LOAD_MAPPING) {

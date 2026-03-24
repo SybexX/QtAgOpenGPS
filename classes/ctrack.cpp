@@ -804,7 +804,7 @@ void CTrack::mark_start(double easting, double northing, double heading)
         ABLine.desPtA.northing = northing;
         //temporarily set the B point based on current heading
         ABLine.desPtB.easting = easting + sin(heading) * 1000;
-        ABLine.desPtB.northing = easting + cos(heading) * 1000;
+        ABLine.desPtB.northing = northing + cos(heading) * 1000;
 
         ABLine.isDesPtBSet = false;
 
