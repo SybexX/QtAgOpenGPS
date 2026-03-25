@@ -70,7 +70,7 @@ Popup {
                 width: 24
                 height: 24
                 radius: 12
-                color: "#ffc059"
+                color: "#ff0000"
                 x: TrackInterface.apoint.x - 12
                 y: TrackInterface.apoint.y - 12
                 z: 1
@@ -82,7 +82,7 @@ Popup {
                 width: 24
                 height: 24
                 radius: 12
-                color: "#80c0ff"
+                color: "#00E5F3"
                 x: TrackInterface.bpoint.x - 12
                 y: TrackInterface.bpoint.y - 12
                 z: 1
@@ -131,8 +131,8 @@ Popup {
                 anchors.fill: parent
                 ShapePath {
                     id: currentTrackShapePath
-                    strokeColor: "#00FFFF"
-                    strokeWidth: 6
+                    strokeColor: "#4AF74A"
+                    strokeWidth: 4
                     fillColor: "transparent"
                     startX: TrackInterface.currentTrackLine && TrackInterface.currentTrackLine.length > 0 ? TrackInterface.currentTrackLine[0].x : 0
                     startY: TrackInterface.currentTrackLine && TrackInterface.currentTrackLine.length > 0 ? TrackInterface.currentTrackLine[0].y : 0
@@ -198,7 +198,7 @@ Popup {
         anchors.margins: 10
         flow: Grid.LeftToRight
         columns: 2
-        rows: 9
+        rows: 10
 
         Comp.IconButtonTransparent {
             objectName: "btnBLength"
@@ -225,6 +225,12 @@ Popup {
             onClicked: {
                 TrackInterface.curveLine = false
             }
+        }
+        Comp.IconButtonTransparent {
+            icon.source: prefix + "/images/Boundary.png"
+            Layout.columnSpan: 2
+            Layout.alignment: Qt.AlignCenter
+            onClicked: TrackInterface.createBoundaryCurve()
         }
 
         Comp.IconButtonTransparent {

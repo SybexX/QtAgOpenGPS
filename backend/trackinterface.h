@@ -58,6 +58,7 @@ public:
     SIMPLE_BINDABLE_PROPERTY(int, trackCount)
     SIMPLE_BINDABLE_PROPERTY(int, currentTrackIndex)
     SIMPLE_BINDABLE_PROPERTY(QVariantList, currentTrackLine)
+    SIMPLE_BINDABLE_PROPERTY(QVariantList, refLine)
     SIMPLE_BINDABLE_PROPERTY(bool, isTrackVisible)
 
 private:
@@ -83,6 +84,7 @@ private:
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(TrackInterface, int, m_trackCount, 0, &TrackInterface::trackCountChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(TrackInterface, int, m_currentTrackIndex, -1, &TrackInterface::currentTrackIndexChanged)
     Q_OBJECT_BINDABLE_PROPERTY(TrackInterface, QVariantList, m_currentTrackLine, &TrackInterface::currentTrackLineChanged)
+    Q_OBJECT_BINDABLE_PROPERTY(TrackInterface, QVariantList, m_refLine, &TrackInterface::refLineChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(TrackInterface, bool, m_isTrackVisible, true, &TrackInterface::isTrackVisibleChanged)
 
     FenceLineModel *m_boundaryLineModel;
@@ -107,6 +109,7 @@ signals:
 
     void createABLine();
     void createCurve();
+    void createBoundaryCurve();
     void cancelTrackCreation();
 
     void cycleForward();

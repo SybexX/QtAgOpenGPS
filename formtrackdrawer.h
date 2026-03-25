@@ -46,6 +46,7 @@ public slots:
 
     void createABLine();
     void createCurve();
+    void createBoundaryCurve();
     void cancelTrackCreation();
 
     void alength_Click();

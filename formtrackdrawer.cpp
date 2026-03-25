@@ -19,9 +19,36 @@
 #include "backend.h"
 #include "trackinterface.h"
 #include "models/fencelinemodel.h"
+#include "cvehicle.h"
 
 void CalculateHeadings(QVector<Vec3> &xList);
 void MakePointMinimumSpacing(QVector<Vec3> &xList, double minDistance);
+
+void AddFirstLastPoints(QVector<Vec3> &xList)
+{
+    if (xList.count() < 2) return;
+
+    int ptCnt = xList.count() - 1;
+    Vec3 start(xList[0]);
+
+    for (int i = 1; i < 300; i++)
+    {
+        Vec3 pt(xList[ptCnt]);
+        pt.easting += (sin(pt.heading) * i);
+        pt.northing += (cos(pt.heading) * i);
+        xList.append(pt);
+    }
+
+    start = Vec3(xList[0]);
+
+    for (int i = 1; i < 300; i++)
+    {
+        Vec3 pt(start);
+        pt.easting -= (sin(pt.heading) * i);
+        pt.northing -= (cos(pt.heading) * i);
+        xList.insert(0, pt);
+    }
+}
 
 FormTrackDrawer::FormTrackDrawer(QObject *parent)
     : QObject{parent}
@@ -38,6 +65,7 @@ FormTrackDrawer::FormTrackDrawer(QObject *parent)
     connect(TrackInterface::instance(), &TrackInterface::cancelTouch, this, &FormTrackDrawer::btnCancelTouch_Click);
     connect(TrackInterface::instance(), &TrackInterface::createABLine, this, &FormTrackDrawer::createABLine);
     connect(TrackInterface::instance(), &TrackInterface::createCurve, this, &FormTrackDrawer::createCurve);
+    connect(TrackInterface::instance(), &TrackInterface::createBoundaryCurve, this, &FormTrackDrawer::createBoundaryCurve);
     connect(TrackInterface::instance(), &TrackInterface::cancelTrackCreation, this, &FormTrackDrawer::cancelTrackCreation);
     connect(TrackInterface::instance(), &TrackInterface::saveExit, this, &FormTrackDrawer::saveExit);
     connect(TrackInterface::instance(), &TrackInterface::alength, this, &FormTrackDrawer::alength_Click);
@@ -153,6 +181,14 @@ void FormTrackDrawer::updateLines() {
 
     TrackInterface::instance()->boundaryLineModel()->setFenceLines(boundaries);
 
+    if (width > 0) {
+        p = QVector3D(CVehicle::instance()->pivotAxlePos.easting,
+                      CVehicle::instance()->pivotAxlePos.northing,
+                      0);
+        s = p.project(modelview, projection, QRect(0, 0, width, height));
+        TrackInterface::instance()->set_vehiclePoint(QPoint(s.x(), height - s.y()));
+    }
+
     TrackInterface::instance()->set_trackCount(track->gArr.count());
     TrackInterface::instance()->set_currentTrackIndex(track->idx());
 
@@ -254,6 +290,7 @@ void FormTrackDrawer::updateCurrentTrackLine(int idx) {
     int height = TrackInterface::instance()->viewportHeight();
 
     QVariantList trackLine;
+    QVariantList refLine;
     CTrk &t = track->gArr[idx];
 
     if (t.curvePts.count() > 0) {
@@ -262,17 +299,52 @@ void FormTrackDrawer::updateCurrentTrackLine(int idx) {
             s = p.project(modelview, projection, QRect(0, 0, width, height));
             trackLine.append(QPoint(s.x(), height - s.y()));
         }
-    } else {
         p = QVector3D(t.ptA.easting, t.ptA.northing, 0);
         s = p.project(modelview, projection, QRect(0, 0, width, height));
-        trackLine.append(QPoint(s.x(), height - s.y()));
+        QPoint ptA = QPoint(s.x(), height - s.y());
+        TrackInterface::instance()->set_apoint(ptA);
+        TrackInterface::instance()->set_showa(true);
 
         p = QVector3D(t.ptB.easting, t.ptB.northing, 0);
         s = p.project(modelview, projection, QRect(0, 0, width, height));
-        trackLine.append(QPoint(s.x(), height - s.y()));
+        QPoint ptB = QPoint(s.x(), height - s.y());
+        TrackInterface::instance()->set_bpoint(ptB);
+        TrackInterface::instance()->set_showb(true);
+
+        TrackInterface::instance()->set_refLine(QVariantList());
+    } else {
+        p = QVector3D(t.ptA.easting, t.ptA.northing, 0);
+        s = p.project(modelview, projection, QRect(0, 0, width, height));
+        QPoint ptA = QPoint(s.x(), height - s.y());
+        trackLine.append(ptA);
+
+        p = QVector3D(t.ptB.easting, t.ptB.northing, 0);
+        s = p.project(modelview, projection, QRect(0, 0, width, height));
+        QPoint ptB = QPoint(s.x(), height - s.y());
+        trackLine.append(ptB);
+
+        TrackInterface::instance()->set_apoint(ptA);
+        TrackInterface::instance()->set_bpoint(ptB);
+        TrackInterface::instance()->set_showa(true);
+        TrackInterface::instance()->set_showb(true);
+
+        if (t.mode == TrackMode::AB) {
+            p = QVector3D(t.endPtA.easting, t.endPtA.northing, 0);
+            s = p.project(modelview, projection, QRect(0, 0, width, height));
+            refLine.append(QPoint(s.x(), height - s.y()));
+
+            p = QVector3D(t.endPtB.easting, t.endPtB.northing, 0);
+            s = p.project(modelview, projection, QRect(0, 0, width, height));
+            refLine.append(QPoint(s.x(), height - s.y()));
+        } else {
+            TrackInterface::instance()->set_refLine(QVariantList());
+        }
     }
 
     TrackInterface::instance()->set_currentTrackLine(trackLine);
+    if (!refLine.isEmpty()) {
+        TrackInterface::instance()->set_refLine(refLine);
+    }
 }
 
 void FormTrackDrawer::mouseDragged(int fromX, int fromY, int mouseX, int mouseY) {
@@ -283,6 +355,38 @@ void FormTrackDrawer::mouseDragged(int fromX, int fromY, int mouseX, int mouseY)
 }
 
 void FormTrackDrawer::btnCycleForward_Click() {
+    if (!track) return;
+
+    int count = track->gArr.count();
+    int currentIdx = track->idx();
+
+    if (count > 0) {
+        currentIdx++;
+        if (currentIdx >= count) {
+            currentIdx = 0;
+        }
+    } else {
+        currentIdx = -1;
+    }
+
+    track->setIdx(currentIdx);
+    TrackInterface::instance()->set_currentTrackIndex(currentIdx);
+
+    if (currentIdx >= 0 && currentIdx < count) {
+        TrackInterface::instance()->set_isTrackVisible(track->gArr[currentIdx].isVisible);
+        updateCurrentTrackLine(currentIdx);
+    } else {
+        TrackInterface::instance()->set_isTrackVisible(false);
+        TrackInterface::instance()->set_currentTrackLine(QVariantList());
+        TrackInterface::instance()->set_refLine(QVariantList());
+        TrackInterface::instance()->set_showa(false);
+        TrackInterface::instance()->set_showb(false);
+    }
+
+    updateLines();
+}
+
+void FormTrackDrawer::btnCycleBackward_Click() {
     if (!track) return;
 
     int count = track->gArr.count();
@@ -306,35 +410,9 @@ void FormTrackDrawer::btnCycleForward_Click() {
     } else {
         TrackInterface::instance()->set_isTrackVisible(false);
         TrackInterface::instance()->set_currentTrackLine(QVariantList());
-    }
-    
-    updateLines();
-}
-
-void FormTrackDrawer::btnCycleBackward_Click() {
-    if (!track) return;
-
-    int count = track->gArr.count();
-    int currentIdx = track->idx();
-
-    if (count > 0) {
-        currentIdx++;
-        if (currentIdx >= count) {
-            currentIdx = 0;
-        }
-    } else {
-        currentIdx = -1;
-    }
-
-    track->setIdx(currentIdx);
-    TrackInterface::instance()->set_currentTrackIndex(currentIdx);
-    
-    if (currentIdx >= 0 && currentIdx < count) {
-        TrackInterface::instance()->set_isTrackVisible(track->gArr[currentIdx].isVisible);
-        updateCurrentTrackLine(currentIdx);
-    } else {
-        TrackInterface::instance()->set_isTrackVisible(false);
-        TrackInterface::instance()->set_currentTrackLine(QVariantList());
+        TrackInterface::instance()->set_refLine(QVariantList());
+        TrackInterface::instance()->set_showa(false);
+        TrackInterface::instance()->set_showb(false);
     }
     
     updateLines();
@@ -359,6 +437,17 @@ void FormTrackDrawer::btnDeleteTrack_Click() {
     track->reloadModel();
     TrackInterface::instance()->set_currentTrackIndex(track->idx());
     TrackInterface::instance()->set_trackCount(track->gArr.count());
+
+    if (track->gArr.count() > 0) {
+        updateCurrentTrackLine(0);
+    } else {
+        TrackInterface::instance()->set_currentTrackLine(QVariantList());
+        TrackInterface::instance()->set_refLine(QVariantList());
+        TrackInterface::instance()->set_isTrackVisible(false);
+        TrackInterface::instance()->set_showa(false);
+        TrackInterface::instance()->set_showb(false);
+    }
+
     emit saveTracks();
 }
 
@@ -509,29 +598,18 @@ void FormTrackDrawer::createCurve() {
     newTrack.heading = atan2(y, x);
     if (newTrack.heading < 0) newTrack.heading += glm::twoPI;
 
-    if (newTrack.curvePts.count() > 0) {
-        newTrack.ptA = Vec2(newTrack.curvePts[0].easting, newTrack.curvePts[0].northing);
-        newTrack.ptB = Vec2(newTrack.curvePts.last().easting, newTrack.curvePts.last().northing);
+    newTrack.ptA = Vec2(newTrack.curvePts[0].easting, newTrack.curvePts[0].northing);
+    newTrack.ptB = Vec2(newTrack.curvePts.last().easting, newTrack.curvePts.last().northing);
 
-        for (int i = 0; i < 100; i++) {
-            Vec3 pt(newTrack.curvePts.last());
-            pt.easting += sin(pt.heading);
-            pt.northing += cos(pt.heading);
-            newTrack.curvePts.append(pt);
-        }
-
-        Vec3 firstPt(newTrack.curvePts[0]);
-        for (int i = 0; i < 100; i++) {
-            Vec3 pt(firstPt);
-            pt.easting -= sin(pt.heading);
-            pt.northing -= cos(pt.heading);
-            newTrack.curvePts.insert(0, pt);
-        }
+    int cnt = newTrack.curvePts.count();
+    if (cnt > 3) {
+        AddFirstLastPoints(newTrack.curvePts);
+        CalculateHeadings(newTrack.curvePts);
     }
 
     QString name = TrackInterface::instance()->trackName();
     if (name.isEmpty()) {
-        name = QString("Curve %1").arg(QTime::currentTime().toString("mm:ss"));
+        name = QString("Cu %1\u00B0").arg(glm::toDegrees(newTrack.heading), 0, 'g', 1);
     }
     newTrack.name = name;
 
@@ -580,7 +658,7 @@ void FormTrackDrawer::alength_Click() {
     if (t.curvePts.count() < 2) return;
 
     Vec3 start = t.curvePts[0];
-    for (int i = 1; i < 10; i++) {
+    for (int i = 1; i < 50; i++) {
         Vec3 pt = start;
         pt.easting -= (sin(pt.heading) * i);
         pt.northing -= (cos(pt.heading) * i);
@@ -601,7 +679,7 @@ void FormTrackDrawer::blength_Click() {
     if (t.curvePts.count() < 2) return;
 
     int ptCnt = t.curvePts.count() - 1;
-    for (int i = 1; i < 10; i++) {
+    for (int i = 1; i < 50; i++) {
         Vec3 pt(t.curvePts[ptCnt]);
         pt.easting += (sin(pt.heading) * i);
         pt.northing += (cos(pt.heading) * i);
@@ -609,6 +687,64 @@ void FormTrackDrawer::blength_Click() {
     }
     track->reloadModel();
     updateCurrentTrackLine(idx);
+    emit saveTracks();
+}
+
+void FormTrackDrawer::createBoundaryCurve() {
+    if (!track || !bnd) return;
+
+    for (int q = 0; q < bnd->bndList.count(); q++) {
+        QVector<Vec3> desList;
+
+        for (int i = 0; i < bnd->bndList[bndSelect].fenceLine.count(); i++) {
+            Vec3 pt = bnd->bndList[bndSelect].fenceLine[i];
+            desList.append(pt);
+        }
+
+        CTrk newTrack;
+        newTrack.ptA = Vec2(desList[0].easting, desList[0].northing);
+        newTrack.ptB = Vec2(desList.last().easting, desList.last().northing);
+
+        Vec3 pt3 = desList[0];
+        desList.append(pt3);
+
+        int cnt = desList.count();
+        if (cnt > 3) {
+            pt3 = desList[0];
+            desList.append(pt3);
+
+            MakePointMinimumSpacing(desList, 1.6);
+            CalculateHeadings(desList);
+
+            newTrack.name = "Boundary Curve";
+            if (q > 0) newTrack.name = QString("Inner Boundary Curve %1").arg(q);
+
+            newTrack.heading = 0;
+            newTrack.mode = (int)TrackMode::bndCurve;
+            newTrack.isVisible = true;
+            newTrack.nudgeDistance = 0;
+
+            for (const Vec3 &item : desList) {
+                newTrack.curvePts.append(item);
+            }
+
+            track->gArr.append(newTrack);
+        }
+    }
+
+    start = 99999;
+    end = 99999;
+
+    TrackInterface::instance()->set_showa(false);
+    TrackInterface::instance()->set_showb(false);
+    TrackInterface::instance()->set_sliceCount(0);
+    TrackInterface::instance()->set_trackCount(track->gArr.count());
+    TrackInterface::instance()->set_currentTrackIndex(track->idx());
+    TrackInterface::instance()->set_trackName("");
+    TrackInterface::instance()->set_isTrackVisible(true);
+
+    track->reloadModel();
+    updateCurrentTrackLine(track->idx());
     emit saveTracks();
 }
 
