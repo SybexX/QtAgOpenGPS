@@ -1640,5 +1640,9 @@ Window {
         id: gpsInfo
         visible: false
     }
+    AgIOModule.NTrip{
+        id: ntrip
+        visible: false
+    }
 }
 

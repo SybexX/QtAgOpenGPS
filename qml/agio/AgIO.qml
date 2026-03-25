@@ -21,10 +21,10 @@ Drawer {
     Comp.Message {
         id: message
     }
-    NTrip{
-        id: ntrip
-        visible: false
-    }
+    // NTrip{
+    //     id: ntrip
+    //     visible: false
+    // }
     // EthernetConfig {
     //     id: ethernetConfig
     //     visible: false
@@ -241,7 +241,8 @@ Drawer {
                      AgIOService.ntripStatus === 4 ? "green":
                      AgIOService.ntripStatus === 5 ? "red":
                     "red")
-                onClicked: ntrip.visible = !ntrip.visible
+                onClicked: {ntrip.visible = !ntrip.visible
+                            mainWindowAgIO.visible = false}
             }
             
             // Test button for module wake-up
