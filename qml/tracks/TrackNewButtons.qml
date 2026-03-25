@@ -17,6 +17,7 @@ MoveablePopup {
     y: 40
     width: 600 * theme.scaleWidth
     height: 400 * theme.scaleHeight
+    anchors.centerIn: parent
     TitleFrame{
         color: "#f2f2f2"
         border.color: "black"

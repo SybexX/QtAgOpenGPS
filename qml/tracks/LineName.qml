@@ -5,7 +5,7 @@
 import QtQuick
 import QtQuick.Controls.Fusion
 import AOG
-import "components" as Comp
+import "../components" as Comp
 
 Rectangle{
     id: line_Name
@@ -17,6 +17,9 @@ Rectangle{
     signal accepted()
     signal rejected()
     property string abLineName //TODO: use this as input for editing the name
+
+    property string currentText: textInputBox.text
+    property int index: 0
 
     function generate_ab_name(heading_degrees) {
         var name
@@ -59,7 +62,7 @@ Rectangle{
         anchors.margins: 20
         icon.source: prefix + "/images/Time.png"
         onClicked: {
-            var time = new Date().toLocaleTimeString(Qt.locale())
+            var time = Qt.formatDateTime(new Date(), "dd-MM-yyyy HH:mm:ss")
             textInputBox.text += " " + time
         }
         Text{
@@ -91,7 +94,12 @@ Rectangle{
         onClicked:{
             line_Name.visible = false
             abLineName = textInputBox.text
-            line_Name.accepted()
+            var idx = index
+            if (idx >= 0) {
+                TracksInterface.changeName(idx, editLineName.currentText)
+            }
+            visible = false
+            onClicked: trackList.show()
         }
     }
 }

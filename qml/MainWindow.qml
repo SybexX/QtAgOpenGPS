@@ -932,6 +932,12 @@ Window {
                 visible: false
                 z: 100
             }
+            Tracks.LineName{
+                id: editLineName
+                title: qsTr("Edit Track Name")
+                visible: false
+                z: 100
+            }
             Comp.IconButtonTransparent{ //button on bottom left to show/hide the bottom and right buttons
                 id: toggleButtons
                 anchors.left: parent.left

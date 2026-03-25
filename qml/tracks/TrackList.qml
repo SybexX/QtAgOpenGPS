@@ -21,10 +21,12 @@ MoveablePopup {
 
     width: 600
     height: 450
-
+    anchors.centerIn: parent
     modal: true
 
-	function show() {
+    property bool isAllVisible: true
+
+ 	function show() {
 		trackPickerDialog.visible = true
 	}
 
@@ -41,10 +43,10 @@ MoveablePopup {
                 trackView.currentIndex = 0
     }
 
-    TrackNewButtons {
-        id: trackNewButtons
-        visible: false
-    }
+    // TrackNewButtons {
+    //     id: trackNewButtons
+    //     visible: false
+    // }
 
     Rectangle{
         anchors.fill: parent
@@ -81,6 +83,8 @@ MoveablePopup {
                     if (trackView.currentIndex > -1) {
                         editLineName.set_name(TracksInterface.getTrackName(trackView.currentIndex))
                         editLineName.visible = true
+                        editLineName.index = trackView.currentIndex
+                        trackPickerDialog.close()
                     }
                 }
             }
@@ -113,34 +117,48 @@ MoveablePopup {
 				}
 			}
 		}
-		ColumnLayout{
+ 		ColumnLayout{
 			id: rightColumn
 			anchors.top: topLine.bottom
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             anchors.rightMargin: 1
             anchors.bottomMargin: 1
-            width: childrenRect.width
-            IconButtonTransparent{ //not sure what this does in aog--doesn't work on wine
+            width: 80
+            IconButtonTransparent{
                 icon.source: prefix + "/images/UpArrow64.png"
+                onClicked: {
+                    var idx = trackView.currentIndex
+                    if (idx > 0) {
+                        TracksInterface.moveUp(idx)
+                        trackView.currentIndex = idx - 1
+                    }
+                }
             }
             IconButtonTransparent{
                 icon.source: prefix + "/images/DnArrow64.png"
+                onClicked: {
+                    var idx = trackView.currentIndex
+                    if (idx >= 0) {
+                        TracksInterface.moveDown(idx)
+                        trackView.currentIndex = idx + 1
+                    }
+                }
             }
             IconButtonTransparent{
                 icon.source: prefix + "/images/ABLinesHideShow.png"
-
                 onClicked: {
-                    TracksInterface.setVisible(trackView.currentIndex, !TracksInterface.getTrackVisible(trackView.currentIndex))
+                    isAllVisible = !isAllVisible
+                    TracksInterface.setAllVisible(isAllVisible)
                 }
             }
-			IconButtonTransparent{
-				icon.source: prefix + "/images/AddNew.png"
-				onClicked: {
-                    trackNewButtons.show()
-                    trackPickerDialog.visible = false
-				}
-			}
+ 			IconButtonTransparent{
+ 				icon.source: prefix + "/images/AddNew.png"
+ 				onClicked: {
+                     trackNewButtons.show()
+                     trackPickerDialog.visible = false
+ 				}
+ 			}
             IconButtonTransparent{
                 objectName: "btnLineExit" //this is not cancel, rather, save and exit
                 icon.source: prefix + "/images/OK64.png"
@@ -183,6 +201,20 @@ MoveablePopup {
                 clip: true
             }
         }
-    }
+
+    // LineName {
+    //     id: editLineName
+    //     title: qsTr("Edit Track Name")
+    //     visible: false
+    //     z: parent.z + 1
+    //     onAccepted: {
+    //         var idx = trackView.currentIndex
+    //         if (idx >= 0) {
+    //             TracksInterface.changeName(idx, editLineName.currentText)
+    //         }
+    //         visible = false
+    //     }
+    // }
 }
 
+}

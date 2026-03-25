@@ -264,6 +264,10 @@ public slots:
     Q_INVOKABLE void setVisible(int index, bool isVisible);
     Q_INVOKABLE void copy(int index, QString new_name);
 
+    Q_INVOKABLE void moveUp(int index);
+    Q_INVOKABLE void moveDown(int index);
+    Q_INVOKABLE void setAllVisible(bool visible);
+
     Q_INVOKABLE void ref_nudge(double dist_m);
     Q_INVOKABLE void nudge_zero();
     Q_INVOKABLE void nudge_center();

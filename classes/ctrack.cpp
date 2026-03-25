@@ -1,4 +1,5 @@
 #include <QOpenGLFunctions>
+#include <QDebug>
 #include <QMatrix4x4>
 #include <QVector>
 #include <QFuture>
@@ -1118,6 +1119,49 @@ void CTrack::copy(int index, QString new_name)
     new_track.name = new_name;
 
     gArr.append(new_track);
+    reloadModel();
+}
+
+void CTrack::moveUp(int index)
+{
+    if (index <= 0 || index >= gArr.count())
+        return;
+
+    gArr.swapItemsAt(index - 1, index);
+
+    if (m_idx == index)
+        m_idx = index - 1;
+    else if (m_idx == index - 1)
+        m_idx = index;
+
+    reloadModel();
+    emit idxChanged();
+}
+
+void CTrack::moveDown(int index)
+{
+    qDebug() << "moveDown called:" << index << "count:" << gArr.count();
+    if (index < 0 || index >= gArr.count() - 1) {
+        qDebug() << "moveDown early return";
+        return;
+    }
+
+    gArr.swapItemsAt(index, index + 1);
+
+    if (m_idx == index)
+        m_idx = index + 1;
+    else if (m_idx == index + 1)
+        m_idx = index;
+
+    reloadModel();
+    emit idxChanged();
+}
+
+void CTrack::setAllVisible(bool visible)
+{
+    for (int i = 0; i < gArr.count(); i++) {
+        gArr[i].isVisible = visible;
+    }
     reloadModel();
 }
 

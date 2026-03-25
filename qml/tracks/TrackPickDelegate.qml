@@ -5,7 +5,7 @@ import QtQuick.Controls
 import AOG
 import "../"
 
-RadioDelegate {
+ItemDelegate {
     id: trackDelegate
 
     required property int index
@@ -59,12 +59,9 @@ RadioDelegate {
         }
     }
 
-    indicator: Rectangle {
-    }
-
     background: Rectangle {
-        visible: trackDelegate.down || trackDelegate.highlighted || trackDelegate.checked
-        color: trackDelegate.checked ? aogInterface.borderColor : aogInterface.backgroundColor
+        visible: trackDelegate.down || trackDelegate.highlighted
+        color: aogInterface.backgroundColor
     }
 }
 

@@ -41,15 +41,14 @@ ListView {
 
     delegate: TrackPickDelegate {
         id: control
-        checked: control.index == tracksView.currentIndex
+        highlighted: control.index == tracksView.currentIndex
 
         scrollbar_width: scrollbar.width
 
-        onCheckedChanged: {
-            //tracksView.selected = control.index
+        onClicked: {
             tracksView.currentIndex = control.index
             tracksView.trackVisible = control.isVisible
-            console.debug("checked event... track selected is ",tracksView.currentIndex)
+            console.debug("clicked... track selected is ", tracksView.currentIndex)
         }
 
         //Component.onCompleted: {
