@@ -19,8 +19,10 @@ MoveablePopup {
     //}
     id: trackPickerDialog
 
-    width: 600
-    height: 450
+    //width: 600
+    //height: 450
+    height: 450 * theme.scaleHeight
+    width: 450 * theme.scaleWidth
     anchors.centerIn: parent
     modal: true
 
@@ -66,7 +68,8 @@ MoveablePopup {
             anchors.top: topLine.bottom
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.rightMargin: 1
+            anchors.rightMargin: 2
+            anchors.leftMargin: 2
             anchors.bottomMargin: 1
             width: childrenRect.width
             IconButtonTransparent{
@@ -119,12 +122,13 @@ MoveablePopup {
 		}
  		ColumnLayout{
 			id: rightColumn
-			anchors.top: topLine.bottom
+            anchors.top: topLine.bottom
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            anchors.rightMargin: 1
+            anchors.rightMargin: 2
+            anchors.leftMargin: 2
             anchors.bottomMargin: 1
-            width: 80
+            width: childrenRect.width
             IconButtonTransparent{
                 icon.source: prefix + "/images/UpArrow64.png"
                 onClicked: {

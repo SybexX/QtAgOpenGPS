@@ -40,8 +40,8 @@ ListView {
     keyNavigationEnabled: true
 
     delegate: TrackPickDelegate {
-        id: control
-        highlighted: control.index == tracksView.currentIndex
+        id: trackDelegate
+        highlighted: trackDelegate.index == tracksView.currentIndex
 
         scrollbar_width: scrollbar.width
     }
