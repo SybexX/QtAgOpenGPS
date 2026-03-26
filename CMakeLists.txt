@@ -45,6 +45,20 @@ if((CMAKE_CXX_COMPILER MATCHES "mingw" OR CMAKE_CROSSCOMPILING) AND NOT QT_HOST_
     message("Cross-compiling detected: QT_HOST_PATH set to ${QT_HOST_PATH}")
 endif()
 
+# MinGW-specific compiler flags for large object files
+# -Wa,-mbig-obj: Allow assembler to handle large object files with many sections
+# This is required for SettingsManager with Q_OBJECT_BINDABLE_PROPERTY which
+# generates >65,536 sections in the object file
+if(MINGW)
+    add_compile_options(-Wa,-mbig-obj)
+    message("MinGW: -Wa,-mbig-obj flag enabled for large object files")
+
+    # Increase stack size to 8MB (default is 2MB on MinGW)
+    # Required for large Qt resource initialization
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--stack,8388608")
+    message("MinGW: Stack size increased to 8MB for large resource initialization")
+endif()
+
 # MSVC-specific compiler flags
 # /bigobj: Required for SettingsManager with 389 Q_OBJECT_BINDABLE_PROPERTY
 # Phase 6.0: Qt6 property system generates >65,536 sections (MSVC default limit)
@@ -111,18 +125,18 @@ qt_standard_project_setup(REQUIRES 6.8
 
 # Because modules are not in top folder//
     set(QT_QML_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/)
-    
+
     # Configure QML import paths for Qt Creator and Qt Design Studio
-    set(QML_IMPORT_PATH 
+    set(QML_IMPORT_PATH
         ${CMAKE_SOURCE_DIR}
         ${CMAKE_BINARY_DIR}
         ${QT_QML_OUTPUT_DIRECTORY}
         CACHE STRING "Import paths for Qt Creator's code model"
         FORCE
     )
-    
+
     # Configure Designer-specific import paths
-    set(QML_DESIGNER_IMPORT_PATH 
+    set(QML_DESIGNER_IMPORT_PATH
         ${CMAKE_BINARY_DIR}
         CACHE STRING "Import paths for Qt Design Studio designer mode"
         FORCE
@@ -240,7 +254,7 @@ endif()
 
 ###### Handling Local QML Handling QML in module in LOCAL_QML OFF######
 if(NOT LOCAL_QML) #LOCAL_QML OFF or ANDROID
-    
+
     # Qt Design Studio configuration (from official examples)
     set(QT_QML_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/)
     set(QML_IMPORT_PATH ${QT_QML_OUTPUT_DIRECTORY}
@@ -271,7 +285,7 @@ if(NOT LOCAL_QML) #LOCAL_QML OFF or ANDROID
     process_files("${CMAKE_CURRENT_SOURCE_DIR}/sounds" SOUND_REL_PATHS)
 
     # message(WARNING "All image relative paths: ${IMAGE_REL_PATHS}")
-    
+
     # Function to process QML files in a given directory
     function(process_qml_files DIR)
         file(GLOB QML_FILES "${DIR}/*.qml" "${DIR}/*.js")
@@ -308,7 +322,7 @@ if(NOT LOCAL_QML) #LOCAL_QML OFF or ANDROID
     process_qml_files("${CMAKE_CURRENT_SOURCE_DIR}/qml/tracks" TRACKS_REL_PATHS)
     process_qml_files("${CMAKE_CURRENT_SOURCE_DIR}/qml/wizards" WIZARDS_REL_PATHS)
     process_qml_files("${CMAKE_CURRENT_SOURCE_DIR}/qml/singletons" SINGLETONS_REL_PATHS) #adding singletons
- 
+
     # Combine all relative paths
     set(ALL_REL_PATHS
         ${QML_REL_PATHS}
@@ -638,7 +652,3 @@ add_custom_command(TARGET QtAgOpenGPS POST_BUILD
         $<TARGET_FILE_DIR:QtAgOpenGPS>/icons
     COMMENT "Copying icons"
 )
-
-
-
-
