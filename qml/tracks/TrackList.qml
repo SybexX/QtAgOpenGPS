@@ -163,7 +163,6 @@ MoveablePopup {
                 objectName: "btnLineExit" //this is not cancel, rather, save and exit
                 icon.source: prefix + "/images/OK64.png"
                 onClicked: {
-                    trackPickerDialog.visible = false
                     if (trackView.currentIndex > -1) {
                         if (TracksInterface.getTrackVisible(trackView.currentIndex)) {
                             console.debug("Activating track ", trackView.currentIndex)

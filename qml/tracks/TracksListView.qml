@@ -44,16 +44,5 @@ ListView {
         highlighted: control.index == tracksView.currentIndex
 
         scrollbar_width: scrollbar.width
-
-        onClicked: {
-            tracksView.currentIndex = control.index
-            tracksView.trackVisible = control.isVisible
-            console.debug("clicked... track selected is ", tracksView.currentIndex)
-        }
-
-        //Component.onCompleted: {
-        //    if (control.index == tracksView.currentIndex)
-        //        checked = true
-        //}
     }
 }

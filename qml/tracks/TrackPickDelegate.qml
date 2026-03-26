@@ -19,6 +19,12 @@ ItemDelegate {
     property double controlWidth: width
     width: parent ? parent.width - scrollbar_width : 100
 
+    onClicked: {
+        ListView.view.currentIndex = trackDelegate.index
+        ListView.view.trackVisible = trackDelegate.isVisible
+        console.debug("TrackPickDelegate clicked, index:", trackDelegate.index)
+    }
+
     contentItem: RowLayout {
         anchors.left: parent.left
         anchors.right: parent.right
