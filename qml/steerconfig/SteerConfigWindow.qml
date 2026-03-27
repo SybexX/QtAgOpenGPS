@@ -113,9 +113,14 @@ Drawer {
                 anchors.top: wasbar.bottom
                 anchors.topMargin: 8 * theme.scaleHeight
                 visible: steerBtn.checked
-                onClicked:  {SettingsManager.as_wasOffset = SettingsManager.as_wasOffset - cpDegSlider.value * ModuleComm.actualSteerAngleDegrees;
-                    if (Math.abs(SettingsManager.as_wasOffset) < 3900){ sendUdptimer.running = true}
-                    else {timedMessage.addMessage(2000, "Exceeded Range", "Excessive Steer Angle - Cannot Zero");}
+                onClicked: {
+                    let newOffset = SettingsManager.as_wasOffset - cpDegSlider.value * ModuleComm.actualSteerAngleDegrees;
+                    if (Math.abs(newOffset) > 3900) {
+                        timedMessage.addMessage(2000, "Exceeded Range", "Excessive Steer Angle - Cannot Zero");
+                    } else {
+                        SettingsManager.as_wasOffset = newOffset;
+                        sendUdptimer.running = true;
+                    }
                 }
             }
 
@@ -153,6 +158,7 @@ Drawer {
                         //onValueChanged: Settings.as_wasOffset = value * cpDegSlider.value, ModuleComm.moduleSend252()
                         onValueChanged: SettingsManager.as_wasOffset = value * cpDegSlider.value, sendUdptimer.running = true
                         to: 4000
+                        stepSize: 20
                         value: SettingsManager.as_wasOffset / cpDegSlider.value
                         visible: steerBtn.checked
                         Layout.maximumWidth: 180 * theme.scaleWidth

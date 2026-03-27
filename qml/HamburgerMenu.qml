@@ -193,6 +193,7 @@ Drawer{
             }
             Comp.IconButtonTextBeside{
                 text: qsTr("All Settings")
+                icon.source: prefix + "/images/ScreenShot.png"
                 onClicked: {
                     hamburgerMenuRoot.visible = false
                     allSettings.open()

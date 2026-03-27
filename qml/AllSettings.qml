@@ -1,6 +1,9 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtCore
+import Qt.labs.settings 1.1 // Для StandardPaths
+
 import AOG
 import "components" as Comp
 
@@ -212,17 +215,39 @@ Dialog {
                 anchors.rightMargin: 20 * theme.scaleHeight
                 anchors.leftMargin: 20 * theme.scaleHeight
                 anchors.bottom: parent.bottom
-                enabled: false
-                icon.source: prefix + "/images/ToolAcceptChange.png"
+                visible: true
+                icon.source: prefix + "/images/ScreenShot.png"
                 Text{
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.left
                     anchors.rightMargin: 5
-                    text: qsTr("Send + Save")
+                    text: qsTr("ScreenShot")
                 }
                 onClicked: {
-                    saveScreenshot()
+                    configMain.grabToImage(function(result) {
+                        let folder = StandardPaths.writableLocation(StandardPaths.PicturesLocation);
+                        let fileName = "/screenshot_" + Date.now() + ".png";
+                        let fullPath = folder + fileName;
+
+                        // Условие только для Android
+                        if (Qt.platform.os === "android") {
+                            // Android требует путь без "file://" и прав доступа в Manifest
+                            fullPath = fullPath.toString().replace("file://", "");
+                            console.log("Android сохранение в: " + fullPath);
+                        } else {
+                            // Для Windows/Linux/macOS (обычно работает и с URL, и с путем)
+                            fullPath = fullPath.toString().replace("file://", "");
+                            console.log("Desktop сохранение в: " + fullPath);
+                        }
+
+                        if (result.saveToFile(fullPath)) {
+                            console.log("Скриншот успешно сохранен: " + fullPath);
+                        } else {
+                            console.error("Ошибка сохранения в: " + fullPath);
+                        }
+                    });
                 }
+
             }
 
             Comp.IconButtonTransparent{
