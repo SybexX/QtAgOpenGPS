@@ -192,6 +192,14 @@ Drawer{
                 }
             }
             Comp.IconButtonTextBeside{
+                text: qsTr("All Settings")
+                onClicked: {
+                    hamburgerMenuRoot.visible = false
+                    allSettings.open()
+                }
+                visible: true
+            }
+            Comp.IconButtonTextBeside{
                 text: qsTr("About...")
                 onClicked: console.log("")
                 visible: false//todo

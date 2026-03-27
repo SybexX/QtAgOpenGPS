@@ -1044,6 +1044,15 @@ Window {
             }
 
         }
+
+        AllSettings {
+            id: allSettings
+            x: 0
+            y: 0
+            width: parent.width
+            height: parent.height
+            visible:false
+        }
         HeadlandDesigner{
             id: headlandDesigner
             objectName: "headlandDesigner"
