@@ -196,6 +196,14 @@ Item {
                     isChecked: SettingsManager.sound_isHydLiftOn
                     onCheckedChanged: SettingsManager.sound_isHydLiftOn = checked
                 }
+
+                DisplayAndFeaturesBtns{
+                    id: sectionSound
+                    text: qsTr("Sections")
+                    icon.source: prefix + "/images/Config/ConF_SoundSections.png"
+                    isChecked: SettingsManager.sound_isSectionOn
+                    onCheckedChanged: SettingsManager.sound_isSectionOn = checked
+                }
                 /*DisplayAndFeaturesBtns{
                 id: boundaryApproachSound
                     Layout.alignment: Qt.AlignCenter

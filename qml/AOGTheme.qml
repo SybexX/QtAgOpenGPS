@@ -26,6 +26,7 @@ Item {
     property bool isRTK: false
     property double gpsAgeAlarm: 5.0
 
+    property bool hydLiftInitialized: false
     property int defaultHeight: 768
     property int defaultWidth: 1024
     property double scaleHeight: mainWindow.height / defaultHeight
@@ -98,83 +99,92 @@ Item {
 
 
     }
-//     Connections{//sounds functions for AOGInterface local properties
-//         target: aogInterface  // Target the local QML Item, not the C++ context property
-//         function onIsBtnAutoSteerOnChanged() {//will need another function for every sound option
-//             if(soundAutoSteerOn){//does the user want the sound on?
-//                 if(aog.isBtnAutoSteerOn)
-//                     engage.play()
-//                 else
-//                     disEngage.play()
-//             }
-//         }
-//         function onAutoBtnStateChanged(){
-//             if(soundSectionOn)
-//                 sectionOn.play()
-//         }
-//         function onManualBtnStateChanged(){
-//             if(soundSectionOn)
-//                 sectionOff.play()
-//         }
-//         function onAgeChanged(){
-//             if(Backend.fixFrame.age > gpsAgeAlarm)
-//                 if(isRTK)
-//                     rtkLost.play()
-//         }
-//         function onDistancePivotToTurnLineChanged(){
-//             if(Backend.distancePivotToTurnLine == 20)
-//                 if(soundUturnOn)
-//                     approachingYouTurn.play()
-//         }
-//     }
+    Connections{//sounds functions for MainWindowState properties
+        target: MainWindowState
+        function onIsBtnAutoSteerOnChanged() {
+            if(SettingsManager.sound_autoSteerSound){
+                if(MainWindowState.isBtnAutoSteerOn)
+                    engage.play()
+                else
+                    disEngage.play()
+            }
+        }
+        function onAutoBtnStateChanged(){
+            if(soundSectionOn)
+                sectionOn.play()
+        }
+        function onManualBtnStateChanged(){
+            if(SettingsManager.sound_isSectionOn)
+                sectionOff.play()
+        }
+    }
 
-//     Connections{//sounds functions for VehicleInterface properties
-//         target: VehicleInterface
-//         function onHydLiftDownChanged(){
-//             if(soundHydLiftOn){
-//                 if(VehicleInterface.hydLiftDown)
-//                     hydDown.play()
-//                 else
-//                     hydUp.play()
-//             }
-//         }
-//     }
-//     //region sounds
-//     //as far as I can tell, these are all necessary
-//     SoundEffect{
-//         id: engage
-//         source: prefix + "/sounds/SteerOn.wav"
-//     }
-//     SoundEffect{
-//         id: disEngage
-//         source: prefix + "/sounds/SteerOff.wav"
-//     }
-//     SoundEffect{
-//         id: hydDown
-//         source: prefix + "/sounds/HydDown.wav"
-//     }
-//     SoundEffect{
-//         id: hydUp
-//         source: prefix + "/sounds/HydUp.wav"
-//     }
-//     SoundEffect{
-//         id: sectionOff
-//         source: prefix + "/sounds/SectionOff.wav"
-//     }
-//     SoundEffect{
-//         id: sectionOn
-//         source: prefix + "/sounds/SectionOn.wav"
-//     }
-//     SoundEffect{
-//         id: approachingYouTurn
-//         source: prefix + "/sounds/Alarm10.wav"
-//     }
-//     SoundEffect{
-//         id: rtkLost
-//         source: prefix + "/sounds/rtk_lost.wav"
-//     }
-//     SoundEffect{
-//         id: youturnFail
-//         source: prefix + "/sounds/TF012.wav"
-//     }//endregion sounds
+    Connections{//sounds for GPS age alarm
+        target: Backend
+        function onFixFrameChanged(){
+            if(Backend.fixFrame.age > gpsAgeAlarm)
+                if(isRTK)
+                    rtkLost.play()
+        }
+    }
+
+    Connections{//sounds for youturn
+        target: Backend
+        function onDistancePivotToTurnLineChanged(){
+            if(Backend.distancePivotToTurnLine == 20)
+                if(SettingsManager.sound_isUturnOn)
+                    approachingYouTurn.play()
+        }
+    }
+
+    Connections{//sounds functions for VehicleInterface properties
+        target: VehicleInterface
+        function onHydLiftDownChanged(){
+            if(SettingsManager.sound_isHydLiftOn && hydLiftInitialized){
+                if(VehicleInterface.hydLiftDown)
+                    hydDown.play()
+                else
+                    hydUp.play()
+            }
+            hydLiftInitialized = true
+        }
+    }
+    //region sounds
+    //as far as I can tell, these are all necessary
+    SoundEffect{
+        id: engage
+        source: prefix + "/sounds/SteerOn.wav"
+    }
+    SoundEffect{
+        id: disEngage
+        source: prefix + "/sounds/SteerOff.wav"
+    }
+    SoundEffect{
+        id: hydDown
+        source: prefix + "/sounds/HydDown.wav"
+    }
+    SoundEffect{
+        id: hydUp
+        source: prefix + "/sounds/HydUp.wav"
+    }
+    SoundEffect{
+        id: sectionOff
+        source: prefix + "/sounds/SectionOff.wav"
+    }
+    SoundEffect{
+        id: sectionOn
+        source: prefix + "/sounds/SectionOn.wav"
+    }
+    SoundEffect{
+        id: approachingYouTurn
+        source: prefix + "/sounds/Alarm10.wav"
+    }
+    SoundEffect{
+        id: rtkLost
+        source: prefix + "/sounds/rtk_lost.wav"
+    }
+    SoundEffect{
+        id: youturnFail
+        source: prefix + "/sounds/TF012.wav"
+    }//endregion sounds
  }
