@@ -149,6 +149,7 @@ CTool::CTool()
     connect(SettingsManager::instance(), &SettingsManager::toolGroupChanged, this, &CTool::loadSettings);
     connect(SettingsManager::instance(), &SettingsManager::vehicleGroupChanged, this, &CTool::loadSettings);
     connect(SettingsManager::instance(), &SettingsManager::colorGroupChanged, this, &CTool::loadSettings);
+    connect(SettingsManager::instance(), &SettingsManager::headlandGroupChanged, this, &CTool::loadSettings);
 
     loadSettings();
 }
@@ -1185,7 +1186,7 @@ void CTool::DrawPatchesBackQP(const CTram &tram,
 
 
         //draw 250 green for the headland
-        if (MainWindowState::instance()->isHeadlandOn() && bnd.isSectionControlledByHeadland)
+        if (MainWindowState::instance()->isHeadlandOn() && isSectionControlledByHeadland)
         {
             DrawPolygonBack(painter, bnd.bndList[0].hdLine,3,QColor::fromRgb(0,250,0));
         }
@@ -1419,7 +1420,7 @@ void CTool::ProcessLookAhead(int gpsHz,
     //10 % min is required for overlap, otherwise it never would be on.
     int pixLimit = (int)((double)(section[0].rpSectionWidth * rpOnHeight) / (double)(5.0));
     //bnd.isSectionControlledByHeadland = true;
-    if ((rpOnHeight < rpToolHeight && MainWindowState::instance()->isHeadlandOn() && bnd.isSectionControlledByHeadland)) rpHeight = rpToolHeight + 2;
+    if ((rpOnHeight < rpToolHeight && MainWindowState::instance()->isHeadlandOn() && isSectionControlledByHeadland)) rpHeight = rpToolHeight + 2;
     else rpHeight = rpOnHeight + 2;
     //qDebug(qpos) << bnd.isSectionControlledByHeadland << "headland sections";
 
@@ -1478,11 +1479,17 @@ void CTool::ProcessLookAhead(int gpsHz,
         //is the tool completely in the headland or not
         isToolInHeadland = isToolOuterPointsInHeadland && !isHeadlandClose;
 
-        //set hydraulics based on tool in headland or not
-        emit SetHydPosition(autoBtnState);
-
-        //set hydraulics based on tool in headland or not
-        emit SetHydPosition(autoBtnState);
+        if (CVehicle::instance()->isHydLiftOn() && CVehicle::instance()->avgSpeed() > 0.2 && autoBtnState == SectionState::Auto)
+        {
+            if (isToolInHeadland)
+            {
+                ModuleComm::instance()->p_239.pgn[CPGN_EF::hydLift] = 2;
+            }
+            else
+            {
+                ModuleComm::instance()->p_239.pgn[CPGN_EF::hydLift] = 1;
+            }
+        }
 
     }
 
@@ -1490,7 +1497,7 @@ void CTool::ProcessLookAhead(int gpsHz,
 
     int endHeight = 1, startHeight = 1;
 
-    if (MainWindowState::instance()->isHeadlandOn() && bnd.isSectionControlledByHeadland)
+    if (MainWindowState::instance()->isHeadlandOn() && isSectionControlledByHeadland)
         WhereAreToolLookOnPoints(bnd);
 
     for (int j = 0; j < numOfSections; j++)

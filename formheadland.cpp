@@ -763,7 +763,6 @@ void FormHeadland::btn_Exit_Click() {
 void FormHeadland::isSectionControlled(bool wellIsIt) {
     if (!bnd) return; //FormGPS is not yet fully initialized
 
-    bnd->isSectionControlledByHeadland = wellIsIt;
     SettingsManager::instance()->setHeadland_isSectionControlled(wellIsIt);
 }
 

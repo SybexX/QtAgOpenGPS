@@ -745,9 +745,6 @@ void FormHeadache::btnExit_Click() {
 
 void FormHeadache::isSectionControlled(bool wellIsIt) {
     if (!hdl || !bnd) return; //FormGPS is not yet fully initialized
-
-    bnd->isSectionControlledByHeadland = wellIsIt;
-    qDebug() << "isSectionControlledByHeadland" << wellIsIt;
     SettingsManager::instance()->setHeadland_isSectionControlled(wellIsIt);
 }
 

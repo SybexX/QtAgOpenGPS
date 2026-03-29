@@ -866,7 +866,7 @@ void FormGPS::oglBack_Paint()
 
 
         //draw 250 green for the headland
-        if (MainWindowState::instance()->isHeadlandOn() && bnd.isSectionControlledByHeadland)
+        if (MainWindowState::instance()->isHeadlandOn() && tool.isSectionControlledByHeadland)
         {
             DrawPolygonBack(gl,projection*modelview,bnd.bndList[0].hdLine,3,QColor::fromRgb(0,250,0));
         }

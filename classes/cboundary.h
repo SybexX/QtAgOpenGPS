@@ -65,9 +65,6 @@ public:
     Vec3 closestTurnPt = Vec3(-10000, -10000, 9);
     Vec3 closePt;
 
-    bool isToolInHeadland, isToolOuterPointsInHeadland, isSectionControlledByHeadland;
-
-
     void loadSettings();
 
     //CFence.cs
@@ -81,7 +78,6 @@ public:
     void BuildTurnLines();
 
     //CHead.cs
-    void SetHydPosition(SectionState::State autoBtnState, CPGN_EF &p_239, CVehicle &vehicle); //TODO sounds, p_239
     bool IsPointInsideHeadArea(Vec2 pt) const;
 
     /*
@@ -121,7 +117,6 @@ public slots:
 
 signals:
     void TimedMessage(int timeout, QString title, QString message);
-    void soundHydLiftChange(bool);
 
     void saveBoundaryRequested();
 

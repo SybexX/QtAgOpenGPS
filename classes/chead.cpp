@@ -8,39 +8,6 @@
 #include "ctool.h"
 #include "cpgn.h"
 
-void CBoundary::SetHydPosition(SectionState::State autoBtnState, CPGN_EF &p_239, CVehicle &vehicle)
-{
-    if (CVehicle::instance()->isHydLiftOn() && CVehicle::instance()->avgSpeed() > 0.2 && autoBtnState == SectionState::Auto)
-    {
-        if (isToolInHeadland)
-        {
-            p_239.pgn[p_239.hydLift] = 2;
-            //TODO: implement sounds
-            emit soundHydLiftChange(isToolInHeadland);
-            /*
-            if (mf.sounds.isHydLiftChange != isToolInHeadland)
-            {
-                if (mf.sounds.isHydLiftSoundOn) mf.sounds.sndHydLiftUp.Play();
-                mf.sounds.isHydLiftChange = isToolInHeadland;
-            }
-            */
-        }
-        else
-        {
-            p_239.pgn[p_239.hydLift] = 1;
-            //TODO: implement sounds
-            emit soundHydLiftChange(isToolInHeadland);
-            /*
-            if (mf.sounds.isHydLiftChange != isToolInHeadland)
-            {
-                if (mf.sounds.isHydLiftSoundOn) mf.sounds.sndHydLiftDn.Play();
-                mf.sounds.isHydLiftChange = isToolInHeadland;
-            }
-            */
-        }
-    }
-}
-
 bool CBoundary::IsPointInsideHeadArea(Vec2 pt) const
 {
     //if inside outer boundary, then potentially add

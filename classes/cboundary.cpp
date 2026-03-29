@@ -58,7 +58,6 @@ CBoundary::CBoundary(QObject *parent) : QObject(parent)
 }
 
 void CBoundary::loadSettings() {
-    isSectionControlledByHeadland = SettingsManager::instance()->headland_isSectionControlled();
 }
 
 
