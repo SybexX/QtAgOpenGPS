@@ -72,7 +72,7 @@ public:
 
     bool isLeftSideInHeadland = true, isRightSideInHeadland = true, isSectionsNotZones;
     bool isHeadlandClose = false;
-    bool isToolInHeadland, isToolOuterPointsInHeadland=false, isSectionControlledByHeadland;
+    bool isToolInHeadland=false, isToolOuterPointsInHeadland=false, isSectionControlledByHeadland=false;
 
     ulong number = 0, lastNumber = 0;
 

@@ -1479,15 +1479,21 @@ void CTool::ProcessLookAhead(int gpsHz,
         //is the tool completely in the headland or not
         isToolInHeadland = isToolOuterPointsInHeadland && !isHeadlandClose;
 
-        if (CVehicle::instance()->isHydLiftOn() && CVehicle::instance()->avgSpeed() > 0.2 && autoBtnState == SectionState::Auto)
+        bool hydLiftOn = CVehicle::instance()->isHydLiftOn();
+        double avgSpd = CVehicle::instance()->avgSpeed();
+        qWarning() << "hydLift: isHydLiftOn:" << hydLiftOn << "avgSpeed:" << avgSpd << "autoBtnState:" << (int)autoBtnState;
+
+        if (hydLiftOn && avgSpd > 0.2 && autoBtnState == SectionState::Auto)
         {
             if (isToolInHeadland)
             {
                 ModuleComm::instance()->p_239.pgn[CPGN_EF::hydLift] = 2;
+                CVehicle::instance()->setHydLiftDown(false);
             }
             else
             {
                 ModuleComm::instance()->p_239.pgn[CPGN_EF::hydLift] = 1;
+                CVehicle::instance()->setHydLiftDown(true);
             }
         }
 
