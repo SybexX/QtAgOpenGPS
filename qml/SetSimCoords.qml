@@ -124,10 +124,10 @@ Rectangle{
         Comp.IconButtonTransparent{
             icon.source: prefix + "/images/OK64.png"
             onClicked: {
-                SettingsManager.gps_simLatitude = latInput.text
-                SettingsManager.gps_simLongitude = lonInput.text
+                SettingsManager.gps_simLatitude = Number(latInput.text)
+                SettingsManager.gps_simLongitude = Number(lonInput.text)
                 setSimCoordsRoot.visible = false
-                aog.settings_reload()
+                SimInterface.reset()
             }
         }
     }

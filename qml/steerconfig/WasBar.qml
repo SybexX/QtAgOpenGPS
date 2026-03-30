@@ -1,9 +1,7 @@
 import QtQuick
-import QtQuick.Controls.Fusion
-import QtQuick.Layouts
 
 Rectangle {
-    id:wasbar
+    id: wasbar
     height: 15 * theme.scaleHeight
     color: "lightGrey"
     border.color: "black"
@@ -12,18 +10,25 @@ Rectangle {
 
     Rectangle {
         id: wasbar_right
-        width: wasvalue > 0 ? (wasvalue>parent.width/2 ? parent.width/2:wasvalue) : 0
+        width: wasvalue > 0 ? (wasvalue > parent.width/2 ? parent.width/2 : wasvalue) : 0
         height: parent.height
         color: "green"
         anchors.left: wasbar.horizontalCenter
-        Layout.maximumWidth: parent.width/2
-}
+    }
+
+    Rectangle {
+        id: wasbar_center
+        width: parent.height / 3
+        height: parent.height * 1.5
+        color: "green"
+        anchors.centerIn: parent
+    }
+
     Rectangle {
         id: wasbar_left
-        width: wasvalue > 0 ? 0 : (wasvalue<parent.width/-2 ? parent.width/2:wasvalue*-1)
+        width: wasvalue > 0 ? 0 : (wasvalue < parent.width/-2 ? parent.width/2 : -wasvalue)
         height: parent.height
         color: "green"
         anchors.right: wasbar.horizontalCenter
-        Layout.maximumWidth: parent.width/2
-}
+    }
 }
