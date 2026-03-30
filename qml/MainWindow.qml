@@ -1209,6 +1209,14 @@ Window {
             }
         }
 
+        Wiz.SteerWizard{
+            id: steerWizard
+            visible: false
+            function show(){
+                steerWizard.visible = true
+            }
+        }
+
         Rectangle{//show "Are you sure?" when close button clicked
             id: closeDialog
             width: 500 * theme.scaleWidth

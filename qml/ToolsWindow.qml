@@ -31,9 +31,17 @@ import "wizards" as Wiz
             color: aogInterface.blackDayWhiteNight
         }
 
-        Comp.ScrollViewExpandableColumn {
-            id: toolsGrid
-            anchors.fill: parent
+            Grid {
+                id: toolsGrid
+                height: childrenRect.height
+                width: childrenRect.width
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.topMargin: 5
+                spacing: 10
+                flow: Grid.TopToBottom
+                rows: 8
+                columns: 1
 
             Comp.IconButtonTextBeside {
                 id: wizards
@@ -48,6 +56,16 @@ import "wizards" as Wiz
                 icon.source: prefix + "/images/Chart.png"
                 text: qsTr("Charts")
                 onClicked: chartsMenu.visible = !chartsMenu.visible
+                visible: true
+            }
+
+            Comp.IconButtonTextBeside{
+                text: qsTr("All Settings")
+                icon.source: prefix + "/images/ScreenShot.png"
+                onClicked: {
+                    toolsMenu.visible = false
+                    allSettings.open()
+                }
                 visible: true
             }
 
@@ -119,6 +137,7 @@ import "wizards" as Wiz
             Comp.IconButtonTextBeside{
                 id: steerWiz
                 text: qsTr("Steer Wizard")
+                onClicked: { wizardMenu.visible = false, toolsMenu.visible = false, steerWizard.show()}
             }
         }
     }
