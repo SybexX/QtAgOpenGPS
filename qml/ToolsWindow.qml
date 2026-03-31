@@ -136,6 +136,7 @@ import "wizards" as Wiz
 
             Comp.IconButtonTextBeside{
                 id: steerWiz
+                icon.source: prefix + "/images/AutoSteerOn.png"
                 text: qsTr("Steer Wizard")
                 onClicked: { wizardMenu.visible = false, toolsMenu.visible = false, steerWizard.show()}
             }
@@ -146,7 +147,7 @@ import "wizards" as Wiz
         width: 270 * theme.scaleWidth
         height: mainWindow.height
         modal: true
-//        onVisibleChanged: if (visible === false){
+//        onVisibleChanged: if (visible === false){ AutoSteerOn.png
 //                             toolsWindowItem.visible = false
 //                          }
 
@@ -157,9 +158,17 @@ import "wizards" as Wiz
             color: aogInterface.blackDayWhiteNight
         }
 
-        Comp.ScrollViewExpandableColumn {
+        Grid {
             id: chartsGrid
-            anchors.fill: parent
+            height: childrenRect.height
+            width: childrenRect.width
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.topMargin: 5
+            spacing: 10
+            flow: Grid.TopToBottom
+            rows: 8
+            columns: 1
 
             Comp.IconButtonTextBeside{
                 id: steerChart
