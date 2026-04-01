@@ -978,7 +978,7 @@ Dialog {
             }
         }
 
-         Item { Layout.fillWidth: true }
+        Item { Layout.fillWidth: true }
 
         Comp.IconButtonTransparent{
             id: btnPinsSave

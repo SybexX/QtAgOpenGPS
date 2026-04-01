@@ -1025,10 +1025,9 @@ Dialog {
             id: send
             //enabled: false
             Layout.alignment: Qt.AlignRight
+            Layout.rightMargin: 10 * theme.scaleWidth
             icon.source: notSaved?prefix + "/images/ToolAcceptNotSaved.png":prefix + "/images/ToolAcceptChange.png"
             implicitWidth: 130
-            anchors.right: ok.left
-            anchors.rightMargin: 10 * theme.scaleWidth
             onClicked: { settingsArea.save_settings() ; notSaved = false ;
                 aog.settingsReload();} // Qt 6.8 MODERN: Direct Q_INVOKABLE call
             Text {
@@ -1043,7 +1042,6 @@ Dialog {
             id: ok
             icon.source: prefix + "/images/OK64.png"
             Layout.alignment: Qt.AlignRight
-            anchors.right: parent.right
             onClicked: {
                 steerConfig.visible = false
             }

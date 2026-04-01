@@ -366,7 +366,6 @@ Drawer {
                 anchors.right: parent.right
                 height: 50 * theme.scaleHeight
                 width: parent.width - 2 * theme.scaleWidth
-                anchors.horizontalCenter: parent.horizontalCenter
 
                 MouseArea{
                     id: angleInfoMouse
@@ -399,7 +398,7 @@ Drawer {
                     // Item { Layout.fillWidth: true }
                     IconButtonTransparent{
                         //show angle info window
-                        anchors.right: angleInfo.right
+                        Layout.alignment: Qt.AlignRight
                         icon.source: prefix + "/images/ArrowRight.png"
                         implicitHeight: parent.height
                         implicitWidth: parent.width /4 - 5 * theme.scaleWidth
@@ -423,8 +422,6 @@ Drawer {
             RowLayout{
                 id: pwmRow
                 anchors.bottomMargin: 10 * theme.scaleHeight
-                anchors.left: parent.left
-                anchors.right: parent.right
                 anchors.top: parent.top
                 anchors.topMargin: 10 * theme.scaleHeight
                 height: 50 * theme.scaleHeight

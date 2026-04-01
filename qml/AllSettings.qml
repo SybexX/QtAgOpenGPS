@@ -197,7 +197,7 @@ Dialog {
             }
 
         }
-        Row {
+        RowLayout {
             id: bottomRow
             spacing: 10 * theme.scaleWidth
             anchors.left: parent.left
@@ -205,16 +205,17 @@ Dialog {
             anchors.bottom: parent.bottom
             height: btnSave.height + 20 * theme.scaleHeight
 
+            Item { Layout.fillWidth: true }
+
 
 
             Comp.IconButtonTransparent{
                 id: btnSave
-                anchors.right: saveAndClose.left
-                anchors.topMargin: 20 * theme.scaleHeight
-                anchors.bottomMargin: 5 * theme.scaleHeight
-                anchors.rightMargin: 20 * theme.scaleHeight
-                anchors.leftMargin: 20 * theme.scaleHeight
-                anchors.bottom: parent.bottom
+                Layout.alignment: Qt.AlignRight | Qt.AlignBottom
+                Layout.topMargin: 20 * theme.scaleHeight
+                Layout.bottomMargin: 5 * theme.scaleHeight
+                Layout.rightMargin: 10 * theme.scaleWidth
+                Layout.leftMargin: 20 * theme.scaleWidth
                 visible: true
                 icon.source: prefix + "/images/ScreenShot.png"
                 Text{
@@ -252,12 +253,10 @@ Dialog {
 
             Comp.IconButtonTransparent{
                 id: saveAndClose
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.topMargin: 20 * theme.scaleHeight
-                anchors.bottomMargin: 5 * theme.scaleHeight
-                anchors.rightMargin: 20 * theme.scaleHeight
-                anchors.leftMargin: 20 * theme.scaleHeight
+                Layout.alignment: Qt.AlignRight | Qt.AlignBottom
+                Layout.topMargin: 20 * theme.scaleHeight
+                Layout.bottomMargin: 5 * theme.scaleHeight
+                Layout.rightMargin: 20 * theme.scaleWidth
                 icon.source: prefix + "/images/OK64.png"
                 onClicked: {
                     allSettings.close()
