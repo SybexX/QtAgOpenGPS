@@ -80,6 +80,8 @@ Item {
                 id:logNMEA
                 text: qsTr("Log NMEA")
                 icon.source: prefix + "/images/Config/ConD_LogNMEA.png"
+                isChecked: Backend.isLogNMEA
+                onClicked: Backend.toggleLogNMEA()
             }
             DisplayAndFeaturesBtns{
                 id: guideLines

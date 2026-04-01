@@ -66,6 +66,7 @@ public:
         // Metadata
         QString sourceType;           // "NMEA" or "PGN"
         QString sentenceType;         // "GGA", "RMC", "PANDA", etc.
+        QString originalSentence;     // Original NMEA sentence string
         int pgnNumber = 0;            // If PGN binary (127, 128, 129, 203, etc.)
         bool isValid = false;
 

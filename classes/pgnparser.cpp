@@ -27,7 +27,10 @@ PGNParser::ParsedData PGNParser::parse(const QByteArray& data) {
     if (firstByte == '$') {
         // NMEA text format (ASCII, starts with '$')
         QString nmea = QString::fromUtf8(data).trimmed();
-        return parseNMEA(nmea);
+        result.originalSentence = nmea;
+        ParsedData parsed = parseNMEA(nmea);
+        parsed.originalSentence = nmea;
+        return parsed;
     }
     else if (data.size() >= 2 && firstByte == 0x80 &&
              static_cast<unsigned char>(data[1]) == 0x81) {
@@ -44,6 +47,7 @@ PGNParser::ParsedData PGNParser::parse(const QByteArray& data) {
 
 PGNParser::ParsedData PGNParser::parseNMEA(const QString& sentence) {
     ParsedData data;
+    data.originalSentence = sentence;
 
     if (!isValidNMEA(sentence)) {
         return data;  // Invalid sentence

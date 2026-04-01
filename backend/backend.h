@@ -103,6 +103,8 @@ public:
 
     Q_INVOKABLE void toggleContour();
 
+    Q_INVOKABLE void toggleLogNMEA();
+    SIMPLE_BINDABLE_PROPERTY(bool, isLogNMEA)
     SIMPLE_BINDABLE_PROPERTY(bool, isJobStarted)
     SIMPLE_BINDABLE_PROPERTY(bool, applicationClosing)
     SIMPLE_BINDABLE_PROPERTY(double, distancePivotToTurnLine)
@@ -171,6 +173,7 @@ private:
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(Backend, bool, m_imuCorrected, false, &Backend::imuCorrectedChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(Backend, bool, m_isReverseWithIMU, false, &Backend::isReverseWithIMUChanged)
     Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(Backend, bool, m_isPatchesChangingColor, false, &Backend::isPatchesChangingColorChanged)
+    Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(Backend, bool, m_isLogNMEA, false, &Backend::isLogNMEAChanged)
 };
 
 #endif // BACKEND_H

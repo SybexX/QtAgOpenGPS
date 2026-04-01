@@ -130,3 +130,8 @@ void Backend::toggleContour() {
         m_guidanceLookAheadTime = SettingsManager::instance()->as_guidanceLookAheadTime();
     }
 }
+
+void Backend::toggleLogNMEA()
+{
+    m_isLogNMEA = !m_isLogNMEA;
+}

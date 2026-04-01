@@ -524,7 +524,7 @@ void FormGPS::tmrWatchdog_timeout()
         // TODO:
 
         //save nmea log file
-        //TODO: if (isLogNMEA) FileSaveNMEA(;
+        if (Backend::instance()->isLogNMEA()) FileSaveNMEA();
 
         //update button lines numbers
         //TODO: UpdateGuidanceLineButtonNumbers(;

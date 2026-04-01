@@ -2114,6 +2114,14 @@ void FormGPS::onNmeaDataReady(const PGNParser::ParsedData& data)
 
     if (!data.isValid) return;
 
+    // NMEA logging
+    if (Backend::instance()->isLogNMEA()) {
+        pn.logNMEASentence += QTime::currentTime().toString("hh:mm:ss.zzz");
+        pn.logNMEASentence += "\t";
+        pn.logNMEASentence += data.originalSentence;
+        pn.logNMEASentence += "\n";
+    }
+
     // Phase 6.0.21.12: Ignore UDP GPS data when simulation is ON
     if (SettingsManager::instance()->menu_isSimulatorOn()) {
         return;  // Simulation mode active
