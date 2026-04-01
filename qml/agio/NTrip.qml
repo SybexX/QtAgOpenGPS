@@ -226,25 +226,22 @@ Dialog {
                 }
             }
         }
-        Row {
+        RowLayout {
             height: defaults.height  + 20 * theme.scaleHeight
             id: bottomButtons
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             anchors.left: parent.left
             anchors.bottomMargin: 5 * theme.scaleHeight
-            anchors.rightMargin: 5 * theme.scaleWidth
-            spacing: 25 * theme.scaleWidth
+            spacing: 20 * theme.scaleWidth
 
 
             Comp.IconButtonTransparent{
                 id: defaults
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.topMargin: 20 * theme.scaleHeight
-                anchors.bottomMargin: 5 * theme.scaleHeight
-                anchors.rightMargin: 20 * theme.scaleHeight
-                anchors.leftMargin: 20 * theme.scaleHeight
+                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+                Layout.topMargin: 20 * theme.scaleHeight
+                Layout.bottomMargin: 5 * theme.scaleHeight
+                Layout.leftMargin: 10 * theme.scaleWidth
                 icon.source: prefix + "/images/UpArrow64.png"
                 onClicked: {
                     notSaved = true
@@ -254,32 +251,26 @@ Dialog {
             Comp.ButtonColor {
                 id: ntripOn
                 text: ntripEnabled ? qsTr("NTRIP On") : qsTr("NTRIP Off")
-                anchors.bottom: parent.bottom
-                anchors.left: defaults.right
-                anchors.topMargin: 20 * theme.scaleHeight
-                anchors.bottomMargin: 5 * theme.scaleHeight
-                anchors.rightMargin: 20 * theme.scaleHeight
-                anchors.leftMargin: 20 * theme.scaleHeight
+                Layout.alignment: Qt.AlignLeft | Qt.AlignBottom
+                Layout.topMargin: 20 * theme.scaleHeight
+                Layout.bottomMargin: 5 * theme.scaleHeight
                 checkable: true
                 Component.onCompleted: ntripEnabled = SettingsManager.ntrip_isTCP
                 checked: ntripEnabled
 
                 onClicked: {
-                    // Toggle state
                     ntripEnabled = !ntripEnabled
-                    // Apply configuration (starts or stops NTRIP based on ntrip_isTCP)
                     AgIOService.configureNTRIP()
                 }
             }
 
+            Item { Layout.fillWidth: true }
+
             Comp.IconButtonTransparent{
                 id: btnSave
-                anchors.right: saveAndClose.left
-                anchors.topMargin: 20 * theme.scaleHeight
-                anchors.bottomMargin: 5 * theme.scaleHeight
-                anchors.rightMargin: 20 * theme.scaleHeight
-                anchors.leftMargin: 20 * theme.scaleHeight
-                anchors.bottom: parent.bottom
+                Layout.alignment: Qt.AlignRight | Qt.AlignBottom
+                Layout.topMargin: 20 * theme.scaleHeight
+                Layout.bottomMargin: 5 * theme.scaleHeight
                 icon.source: notSaved?prefix + "/images/ToolAcceptNotSaved.png":prefix + "/images/ToolAcceptChange.png"
                 Text{
                     anchors.verticalCenter: parent.verticalCenter
@@ -296,12 +287,10 @@ Dialog {
 
             Comp.IconButtonTransparent{
                 id: saveAndClose
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.topMargin: 20 * theme.scaleHeight
-                anchors.bottomMargin: 5 * theme.scaleHeight
-                anchors.rightMargin: 20 * theme.scaleHeight
-                anchors.leftMargin: 20 * theme.scaleHeight
+                Layout.alignment: Qt.AlignRight | Qt.AlignBottom
+                Layout.topMargin: 20 * theme.scaleHeight
+                Layout.bottomMargin: 5 * theme.scaleHeight
+                Layout.rightMargin: 10 * theme.scaleWidth
                 icon.source: prefix + "/images/OK64.png"
                 onClicked: {
                     ntrip.close()

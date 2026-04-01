@@ -16,6 +16,7 @@ Dialog {
     anchors.centerIn: parent
     modal: false
 
+    property bool notSaved: false
     property var awaitingButton: null
     property bool awaitingKey: false
     property string oldButtonText: ""
@@ -71,7 +72,7 @@ Dialog {
         Keys.onPressed: function(event) {
             keyPressed(event.key)
             if (awaitingKey && awaitingButton) {
-                btnPinsSave.enabled = true
+                notSaved = true
 
                 if (event.key === Qt.Key_Escape) {
                     awaitingButton.isWaiting = false
@@ -94,7 +95,7 @@ Dialog {
 
         function onKeyPressed(code) {
             if (awaitingKey && awaitingButton) {
-                btnPinsSave.enabled = true
+                notSaved = true
 
                 if (code === Qt.Key_Escape) {
                     awaitingButton.isWaiting = false
@@ -958,46 +959,33 @@ Dialog {
         }
     }
 
-    Row {
+    RowLayout {
         id: bottomRow
-        spacing: 10 * theme.scaleWidth
+        spacing: 20 * theme.scaleWidth
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         height: btnPinsSave.height + 20 * theme.scaleHeight
 
         Comp.IconButtonTransparent{
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.topMargin: 20 * theme.scaleHeight
-            anchors.bottomMargin: 5 * theme.scaleHeight
-            anchors.rightMargin: 20 * theme.scaleHeight
-            anchors.leftMargin: 20 * theme.scaleHeight
+            Layout.topMargin: 20 * theme.scaleHeight
+            Layout.bottomMargin: 5 * theme.scaleHeight
+            Layout.leftMargin: 20 * theme.scaleHeight
             icon.source: prefix + "/images/UpArrow64.png"
             onClicked: {
                 key_hotKeys = defaults.slice();
-                btnPinsSave.enabled = true
+                notSaved = true
             }
         }
-        Image{
-            id: mandatory
-            anchors.right: btnPinsSave.left
-            anchors.verticalCenter: btnPinsSave.verticalCenter
-            anchors.rightMargin: 20 * theme.scaleWidth
-            visible: false
-            source: prefix + "/images/Config/ConSt_Mandatory.png"
-            height: btnPinsSave.width
-        }
+
+         Item { Layout.fillWidth: true }
+
         Comp.IconButtonTransparent{
             id: btnPinsSave
-            anchors.right: saveAndClose.left
-            anchors.topMargin: 20 * theme.scaleHeight
-            anchors.bottomMargin: 5 * theme.scaleHeight
-            anchors.rightMargin: 20 * theme.scaleHeight
-            anchors.leftMargin: 20 * theme.scaleHeight
-            anchors.bottom: parent.bottom
+            Layout.topMargin: 20 * theme.scaleHeight
+            Layout.bottomMargin: 5 * theme.scaleHeight
             enabled: false
-            icon.source: prefix + "/images/ToolAcceptChange.png"
+            icon.source: notSaved?prefix + "/images/ToolAcceptNotSaved.png":prefix + "/images/ToolAcceptChange.png"
             Text{
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.left
@@ -1006,22 +994,19 @@ Dialog {
             }
             onClicked: {
                 SettingsManager.key_hotKeys = key_hotKeys
-                btnPinsSave.enabled = false
+                notSaved = false
             }
         }
 
         Comp.IconButtonTransparent{
             id: saveAndClose
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.topMargin: 20 * theme.scaleHeight
-            anchors.bottomMargin: 5 * theme.scaleHeight
-            anchors.rightMargin: 20 * theme.scaleHeight
-            anchors.leftMargin: 20 * theme.scaleHeight
+            Layout.topMargin: 20 * theme.scaleHeight
+            Layout.bottomMargin: 5 * theme.scaleHeight
+            Layout.rightMargin: 20 * theme.scaleHeight
             icon.source: prefix + "/images/OK64.png"
             onClicked: {
                 hotKeys.close()
-                btnPinsSave.enabled = false
+                notSaved = false
             }
         }
     }
