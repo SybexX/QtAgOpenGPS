@@ -85,13 +85,13 @@ import "wizards" as Wiz
                 visible: SettingsManager.feature_isHideContourOn
             }
 
-            // Comp.IconButtonTextBeside {
-            //     id: webcam
-            //     icon.source: prefix + "/images/Webcam.png"
-            //     text: qsTr("WebCam")
-            //     visible:Settings.feature_isWebCamOn
-            //     onClicked: cam1.visible = !cam1.visible, toolsMenu.visible = false
-            // }
+            Comp.IconButtonTextBeside {
+                id: webcam
+                icon.source: prefix + "/images/Webcam.png"
+                text: qsTr("IP Camera")
+                visible: true
+                onClicked: { cam1.visible = !cam1.visible; toolsMenu.close() }
+            }
 
             Comp.IconButtonTextBeside {
                 id: offsetFix

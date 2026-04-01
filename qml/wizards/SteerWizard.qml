@@ -420,7 +420,6 @@ Dialog {
                                     stepSize: 1
                                     to: 200
                                     value: Math.round(SettingsManager.as_Kp, 0)
-                                    visible: gainBtn.checked
                                     Layout.maximumWidth: 180 * theme.scaleWidth
                                     Layout.alignment: Qt.AlignLeft
                                 }
@@ -434,7 +433,6 @@ Dialog {
                                     stepSize: 1
                                     to: 254
                                     value: Math.round(SettingsManager.as_highSteerPWM, 0)
-                                    visible: gainBtn.checked
                                     Layout.maximumWidth: 180 * theme.scaleWidth
                                     Layout.alignment: Qt.AlignLeft
                                 }
@@ -448,7 +446,6 @@ Dialog {
                                     stepSize: 1
                                     to: 100
                                     value: Math.round(SettingsManager.as_minSteerPWM, 0)
-                                    visible: gainBtn.checked
                                     Layout.maximumWidth: 180 * theme.scaleWidth
                                     Layout.alignment: Qt.AlignLeft
                                 }
@@ -475,7 +472,6 @@ Dialog {
                                         to: 4
                                         leftText: Math.round(value * 10)/10
                                         value: SettingsManager.vehicle_stanleyDistanceErrorGain
-                                        visible: stanleyBtn.checked
                                         Layout.maximumWidth: 180 * theme.scaleWidth
                                         Layout.alignment: Qt.AlignLeft
                                     }
@@ -489,7 +485,6 @@ Dialog {
                                         to: 1.5
                                         leftText: Math.round(value * 10) / 10
                                         value: SettingsManager.vehicle_stanleyHeadingErrorGain
-                                        visible: stanleyBtn.checked
                                         Layout.maximumWidth: 180 * theme.scaleWidth
                                         Layout.alignment: Qt.AlignLeft
                                     }
@@ -503,7 +498,6 @@ Dialog {
                                         stepSize: 1
                                         to: 100
                                         value: Math.round(SettingsManager.vehicle_stanleyIntegralGainAB * 100, 0)
-                                        visible: stanleyBtn.checked
                                         Layout.maximumWidth: 180 * theme.scaleWidth
                                         Layout.alignment: Qt.AlignLeft
                                     }
@@ -521,7 +515,6 @@ Dialog {
                                         to: 3
                                         leftText: Math.round(value * 10) / 10
                                         value: SettingsManager.vehicle_goalPointLookAheadMult
-                                        visible: ppBtn.checked
                                         Layout.maximumWidth: 180 * theme.scaleWidth
                                         Layout.alignment: Qt.AlignLeft
                                     }
@@ -535,7 +528,6 @@ Dialog {
                                         to: 100
                                         leftText: Math.round(value *10) / 10
                                         value: SettingsManager.vehicle_purePursuitIntegralGainAB * 100
-                                        visible: ppBtn.checked
                                         Layout.maximumWidth: 180 * theme.scaleWidth
                                         Layout.alignment: Qt.AlignLeft
                                     }

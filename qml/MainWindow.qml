@@ -1194,11 +1194,15 @@ Window {
             }
         }
 
-        // Wiz.Camera{
-        //     id: cam1
-        //     height: 300  * theme.scaleHeight
-        //     width: 400  * theme.scaleWidth
-        // }
+        Wiz.Camera{
+            id: cam1
+            height: 300  * theme.scaleHeight
+            width: 500  * theme.scaleWidth
+            visible: false
+            function show(){
+                cam1.visible = true
+            }
+        }
         Wiz.WasWizard{
             id: wasWizard
             height: 300  * theme.scaleHeight

@@ -1,16 +1,14 @@
 // Copyright (C) 2024 Michael Torrie and the QtAgOpenGPS Dev Team
 // SPDX-License-Identifier: GNU General Public License v3.0 or later
 //
-// On main GL
-//import QtQuick 2.7
-//import QtQuick.Controls 2.3
-//import QtMultimedia 5.8
+// IP Camera popup with video stream
 
 import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtMultimedia
+import AOG
 
 import ".."
 import "../components"
@@ -23,40 +21,97 @@ MoveablePopup {
     visible: false
     modal: false
     x: 400 * theme.scaleWidth
-    onOpened: menuBar.autoload = true
 
-/*
     TopLine{
         id: cameraTopLine
-        titleText: qsTr("Cam1")
-        onBtnCloseClicked:  camera.close()
+        titleText: qsTr("IP Camera")
+        onBtnCloseClicked: { camera.close(); mediaPlayer.stop() }
     }
 
-*/
     MediaPlayer {
-           id: mediaPlayer
-           videoOutput: videoOutput
-           onErrorOccurred: { mediaErrorText.text = mediaPlayer.errorString; mediaError.open() }
-       }
+        id: mediaPlayer
+        videoOutput: videoOutput
+        onErrorOccurred: console.log("MediaPlayer error:", mediaPlayer.errorString)
+    }
 
-       PlayerMenuBar {
-           id: menuBar
-           anchors.left: parent.left
-           anchors.right: parent.right
-           visible: true
-           mediaPlayer: mediaPlayer
-           videoOutput: videoOutput
-           onClosePlayer: camera.close(), mediaPlayer.stop()
-       }
+    VideoOutput {
+        id: videoOutput
+        anchors.top: cameraTopLine.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+    }
 
+    MouseArea {
+        anchors.top: cameraTopLine.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        onPressAndHold: contextMenu.popup()
+        onClicked: contextMenu.visible = !contextMenu.visible
 
-       VideoOutput {
-           id: videoOutput
-           anchors.top: menuBar.bottom
-           anchors.bottom: parent.bottom
-           anchors.left: parent.left
-           anchors.right: parent.right
-       }
+        Menu {
+            id: contextMenu
+            MenuItem {
+                text: qsTr("Open URL")
+                onTriggered: urlInputDialog.open()
+            }
+            MenuItem {
+                text: qsTr("Load cam1")
+                onTriggered: loadCam1()
+            }
+            MenuItem {
+                text: mediaPlayer.playbackState === MediaPlayer.Playing ? qsTr("Stop") : qsTr("Play")
+                onTriggered: {
+                    if (mediaPlayer.playbackState === MediaPlayer.Playing) mediaPlayer.stop()
+                    else mediaPlayer.play()
+                }
+            }
+            MenuItem {
+                text: qsTr("Close")
+                onTriggered: { camera.close(); mediaPlayer.stop() }
+            }
+        }
+    }
 
+    Popup {
+        id: urlInputDialog
+        anchors.centerIn: parent
+        ColumnLayout {
+            TextField {
+                id: urlInput
+                placeholderText: qsTr("RTSP URL")
+                text: SettingsManager.cam_camLink
+                Layout.minimumWidth: 300
+            }
+            RowLayout {
+                Button {
+                    text: qsTr("Load")
+                    onClicked: {
+                        SettingsManager.cam_camLink = urlInput.text
+                        loadUrl(urlInput.text)
+                        urlInputDialog.close()
+                    }
+                }
+                Button {
+                    text: qsTr("Cancel")
+                    onClicked: urlInputDialog.close()
+                }
+            }
+        }
+    }
 
+    function loadUrl(url) {
+        mediaPlayer.stop()
+        mediaPlayer.source = url
+        mediaPlayer.play()
+    }
+
+    function loadCam1() {
+        loadUrl(SettingsManager.cam_camLink)
+    }
+
+    onVisibleChanged: {
+        if (visible) loadCam1()
+    }
 }

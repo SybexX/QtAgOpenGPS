@@ -14,7 +14,7 @@ Item{
     property alias currentText: rootCombo.currentText
 
     signal activated()
-    implicitWidth: Math.max(label.implicitWidth, rootCombo.implicitWidth)
+    implicitWidth: Math.max(combo_text.implicitWidth, rootCombo.implicitWidth)
     implicitHeight: combo_text.implicitHeight + rootCombo.implicitHeight
     TextLine{
         id: combo_text
