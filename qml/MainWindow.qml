@@ -1194,7 +1194,7 @@ Window {
             }
         }
 
-        Wiz.Camera{
+        Wiz.IPCamera{
             id: cam1
             height: 300  * theme.scaleHeight
             width: 500  * theme.scaleWidth
