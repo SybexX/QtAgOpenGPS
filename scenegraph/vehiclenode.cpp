@@ -458,6 +458,18 @@ void VehicleNode::update(const QMatrix4x4 &mv,
         }
     }
 
+    // В конце секции создания геометрии, после всех if/else:
+    if (properties->type() == 2) {
+        // Если RightWheel был создан, делаем его невидимым
+        if (m_nodes.value(VehicleNodeType::RightWheel, nullptr)) {
+            auto *material = static_cast<AOGTextureMaterial*>(m_nodes[VehicleNodeType::RightWheel]->material());
+            if (material) {
+                material->setUseColor(true);
+                material->setColor(QColor(0,0,0,0)); // Прозрачный
+            }
+        }
+    }
+
     //set up the matrices for all nodes.  Geometry may not have changed so this is
     //very fast
 
