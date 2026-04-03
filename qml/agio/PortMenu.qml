@@ -19,7 +19,7 @@ Dialog {
     anchors.centerIn: parent
     modal: false
     function show(){
-        parent.visible = true
+        visible = true
     }
 
     property int sortBy: 1

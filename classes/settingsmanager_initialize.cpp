@@ -7,7 +7,7 @@
 
 void SettingsManager::initializeFromSettings()
 {
-    // Load all 397 properties from QSettings with default fallback
+    // Load all 398 properties from QSettings with default fallback
     // IMPORTANT: Uses QSettings second parameter for defaults (not hardcoded 0/false)
 
     m_menu_language.setValue(m_qsettings->value("menu/language", "en").toString());
@@ -327,6 +327,7 @@ void SettingsManager::initializeFromSettings()
     m_aduino_isEthernet_steer.setValue(m_qsettings->value("arduino/isEthernetSteer", false).toBool());
     m_aduino_isSerial_steer.setValue(m_qsettings->value("arduino/isSerialSteer", false).toBool());
     m_aduino_isUSB_steer.setValue(m_qsettings->value("arduino/isUSBSteer", false).toBool());
+    m_ntrip_SerialPort.setValue(m_qsettings->value("ntrip/ntripSerialport", "").toString());
     m_ntrip_baud.setValue(m_qsettings->value("ntrip/baud", 115200).toInt());
     m_ntrip_casterIP.setValue(m_qsettings->value("ntrip/casterIP", "").toString());
     m_ntrip_gga.setValue(m_qsettings->value("ntrip/gga", "").toString());
@@ -402,8 +403,8 @@ void SettingsManager::initializeFromSettings()
         m_tool_zones.setValue(vector);
     }
     m_ntrip_packetSize.setValue(m_qsettings->value("agio/ntripPacketSize", 256).toInt());
-    m_ntrip_sendToSerial.setValue(m_qsettings->value("agio/ntripSendToSerial", true).toBool());
-    m_ntrip_sendToUDP.setValue(m_qsettings->value("agio/ntripSendToUDP", false).toBool());
+    m_ntrip_sendToSerial.setValue(m_qsettings->value("agio/ntripSendToSerial", false).toBool());
+    m_ntrip_sendToUDP.setValue(m_qsettings->value("agio/ntripSendToUDP", true).toBool());
     m_port_portNameGPS2.setValue(m_qsettings->value("agio/portNameGPS2", "").toString());
     m_port_portNameMachine.setValue(m_qsettings->value("agio/portNameMachine", "").toString());
     m_port_portNameRadio.setValue(m_qsettings->value("agio/portNameRadio", "").toString());
@@ -469,5 +470,5 @@ void SettingsManager::initializeFromSettings()
     m_display_isPolygons.setValue(m_qsettings->value("display/isPolygons", false).toBool());
 
     // All properties loaded with proper defaults
-    qDebug() << "SettingsManager: initialized" << 397 << "properties from" << m_qsettings->fileName();
+    qDebug() << "SettingsManager: initialized" << 398 << "properties from" << m_qsettings->fileName();
 }

@@ -18,7 +18,7 @@ Dialog {
     property bool ntripEnabled: false
 
     function show(){
-        parent.visible = true
+        visible = true
         notSaved = false
     }
 

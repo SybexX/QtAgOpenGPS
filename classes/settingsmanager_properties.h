@@ -6,10 +6,10 @@
 #include "settingsmanager_macros.h"
 
 // Generated Q_PROPERTY declarations with Qt6 bindable support
-// Total properties: 397
+// Total properties: 398
 
 
-// QString Properties (49 properties) - DECLARATIONS ONLY
+// QString Properties (50 properties) - DECLARATIONS ONLY
 SETTINGS_PROPERTY_STRING_DECLARATIONS(menu_language, setMenu_language)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(brand_HBrand, setBrand_HBrand)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(brand_TBrand, setBrand_TBrand)
@@ -35,6 +35,7 @@ SETTINGS_PROPERTY_STRING_DECLARATIONS(aduino_EthernetMac, setAduino_EthernetMac)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(aduino_SerialMacPort, setAduino_SerialMacPort)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(aduino_Ethernet_steer, setAduino_Ethernet_steer)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(aduino_SerialPort_steer, setAduino_SerialPort_steer)
+SETTINGS_PROPERTY_STRING_DECLARATIONS(ntrip_SerialPort, setNtrip_SerialPort)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(ntrip_casterIP, setNtrip_casterIP)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(ntrip_gga, setNtrip_gga)
 SETTINGS_PROPERTY_STRING_DECLARATIONS(ntrip_password, setNtrip_password)

@@ -319,6 +319,7 @@ aduino_steerPort|arduino/steerPort|8880|int|
 aduino_isEthernet_steer|arduino/isEthernetSteer|false|bool|
 aduino_isSerial_steer|arduino/isSerialSteer|false|bool|
 aduino_isUSB_steer|arduino/isUSBSteer|false|bool|
+ntrip_SerialPort|ntrip/ntripSerialport|""|QString|
 ntrip_baud|ntrip/baud|115200|int|
 ntrip_casterIP|ntrip/casterIP|""|QString|
 ntrip_gga|ntrip/gga|""|QString|
@@ -374,8 +375,8 @@ feature_isNudgeOn|feature/isNudgeOn|false|bool|
 relay_pinConfig|relay/pinConfig|1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0|QVector<int>|
 tool_zones|tool/zones|2, 10, 20, 0, 0, 0, 0, 0, 0|QVector<int>|
 ntrip_packetSize|agio/ntripPacketSize|256|int|
-ntrip_sendToSerial|agio/ntripSendToSerial|true|bool|
-ntrip_sendToUDP|agio/ntripSendToUDP|false|bool|
+ntrip_sendToSerial|agio/ntripSendToSerial|false|bool|
+ntrip_sendToUDP|agio/ntripSendToUDP|true|bool|
 port_portNameGPS2|agio/portNameGPS2|""|QString|
 port_portNameMachine|agio/portNameMachine|""|QString|
 port_portNameRadio|agio/portNameRadio|""|QString|

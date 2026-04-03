@@ -4,7 +4,7 @@
 // File 3/3: Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS members for private: section
 
 // Generated property members with Qt6 bindable support
-// Total members: 397
+// Total members: 398
 
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_menu_language, "en", &SettingsManager::menu_languageChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_feature_isOffsetFixOn, false, &SettingsManager::feature_isOffsetFixOnChanged)
@@ -323,6 +323,7 @@ Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, int, m_aduino_steerPort, 8
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_aduino_isEthernet_steer, false, &SettingsManager::aduino_isEthernet_steerChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_aduino_isSerial_steer, false, &SettingsManager::aduino_isSerial_steerChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_aduino_isUSB_steer, false, &SettingsManager::aduino_isUSB_steerChanged)
+Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_ntrip_SerialPort, "", &SettingsManager::ntrip_SerialPortChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, int, m_ntrip_baud, 115200, &SettingsManager::ntrip_baudChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_ntrip_casterIP, "", &SettingsManager::ntrip_casterIPChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_ntrip_gga, "", &SettingsManager::ntrip_ggaChanged)
@@ -378,8 +379,8 @@ Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_feature_isNudgeOn,
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QVector<int>, m_relay_pinConfig, (QVector<int>{1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}), &SettingsManager::relay_pinConfigChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QVector<int>, m_tool_zones, (QVector<int>{2, 10, 20, 0, 0, 0, 0, 0, 0}), &SettingsManager::tool_zonesChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, int, m_ntrip_packetSize, 256, &SettingsManager::ntrip_packetSizeChanged)
-Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_ntrip_sendToSerial, true, &SettingsManager::ntrip_sendToSerialChanged)
-Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_ntrip_sendToUDP, false, &SettingsManager::ntrip_sendToUDPChanged)
+Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_ntrip_sendToSerial, false, &SettingsManager::ntrip_sendToSerialChanged)
+Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, bool, m_ntrip_sendToUDP, true, &SettingsManager::ntrip_sendToUDPChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_port_portNameGPS2, "", &SettingsManager::port_portNameGPS2Changed)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_port_portNameMachine, "", &SettingsManager::port_portNameMachineChanged)
 Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS(SettingsManager, QString, m_port_portNameRadio, "", &SettingsManager::port_portNameRadioChanged)

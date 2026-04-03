@@ -1667,9 +1667,16 @@ Window {
         id: gpsInfo
         visible: false
     }
-    AgIOModule.NTrip{
-        id: ntrip
+    AgIOModule.ClientNTrip{
+        id: clientNtripDialog
         visible: false
+    }
+    AgIOModule.PortMenu{
+        id: serialNtripDialog
+        visible: false
+        portBaud: SettingsManager.ntrip_BaudRate
+        portName: SettingsManager.ntrip_SerialPort
+        moduleType: "NTRIP"
     }
 }
 

@@ -6,10 +6,10 @@
 #include "settingsmanager.h"
 
 // Generated implementations with Qt6 + QSettings persistence
-// Total implementations: 397
+// Total implementations: 398
 
 
-// QString Implementations (49 properties)
+// QString Implementations (50 properties)
 SETTINGS_PROPERTY_STRING_IMPL(menu_language, menu, "menu/language", "en", setMenu_language)
 SETTINGS_PROPERTY_STRING_IMPL(brand_HBrand, brand, "brand/HBrand", "AgOpenGPS", setBrand_HBrand)
 SETTINGS_PROPERTY_STRING_IMPL(brand_TBrand, brand, "brand/TBrand", "AGOpenGPS", setBrand_TBrand)
@@ -35,6 +35,7 @@ SETTINGS_PROPERTY_STRING_IMPL(aduino_EthernetMac, arduino, "arduino/ethernetMac"
 SETTINGS_PROPERTY_STRING_IMPL(aduino_SerialMacPort, arduino, "arduino/serialMacPort", "Auto", setAduino_SerialMacPort)
 SETTINGS_PROPERTY_STRING_IMPL(aduino_Ethernet_steer, arduino, "arduino/ethernetSteer", "192.168.1.80", setAduino_Ethernet_steer)
 SETTINGS_PROPERTY_STRING_IMPL(aduino_SerialPort_steer, arduino, "arduino/serialPortSteer", "Auto", setAduino_SerialPort_steer)
+SETTINGS_PROPERTY_STRING_IMPL(ntrip_SerialPort, ntrip, "ntrip/ntripSerialport", "", setNtrip_SerialPort)
 SETTINGS_PROPERTY_STRING_IMPL(ntrip_casterIP, ntrip, "ntrip/casterIP", "", setNtrip_casterIP)
 SETTINGS_PROPERTY_STRING_IMPL(ntrip_gga, ntrip, "ntrip/gga", "", setNtrip_gga)
 SETTINGS_PROPERTY_STRING_IMPL(ntrip_password, ntrip, "ntrip/password", "", setNtrip_password)
@@ -187,8 +188,8 @@ SETTINGS_PROPERTY_IMPL(bool, bluetooth_isOn, bluetooth, "bluetooth/isOn", false,
 SETTINGS_PROPERTY_IMPL(bool, udp_sendIPToModules, udp, "udp/sendIPToModules", false, setUdp_sendIPToModules)
 SETTINGS_PROPERTY_IMPL(bool, nmea_sendToSerial, nmea, "nmea/sendToSerial", false, setNmea_sendToSerial)
 SETTINGS_PROPERTY_IMPL(bool, feature_isNudgeOn, feature, "feature/isNudgeOn", false, setFeature_isNudgeOn)
-SETTINGS_PROPERTY_IMPL(bool, ntrip_sendToSerial, agio, "agio/ntripSendToSerial", true, setNtrip_sendToSerial)
-SETTINGS_PROPERTY_IMPL(bool, ntrip_sendToUDP, agio, "agio/ntripSendToUDP", false, setNtrip_sendToUDP)
+SETTINGS_PROPERTY_IMPL(bool, ntrip_sendToSerial, agio, "agio/ntripSendToSerial", false, setNtrip_sendToSerial)
+SETTINGS_PROPERTY_IMPL(bool, ntrip_sendToUDP, agio, "agio/ntripSendToUDP", true, setNtrip_sendToUDP)
 SETTINGS_PROPERTY_IMPL(bool, mod_isIMUConnected, agio, "agio/isIMUConnected", false, setMod_isIMUConnected)
 SETTINGS_PROPERTY_IMPL(bool, mod_isSteerConnected, agio, "agio/isSteerConnected", false, setMod_isSteerConnected)
 SETTINGS_PROPERTY_IMPL(bool, mod_isMachineConnected, agio, "agio/isMachineConnected", false, setMod_isMachineConnected)

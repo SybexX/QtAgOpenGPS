@@ -241,7 +241,7 @@ Drawer {
                      AgIOService.ntripStatus === 4 ? "green":
                      AgIOService.ntripStatus === 5 ? "red":
                     "red")
-                onClicked: {ntrip.visible = !ntrip.visible
+                onClicked: {ntripMenu.visible = !ntripMenu.visible
                             mainWindowAgIO.visible = false}
             }
             
@@ -257,5 +257,46 @@ Drawer {
                 }
             }
             }
+
+        Drawer {
+            id: ntripMenu
+            width: 270 * theme.scaleWidth
+            height: mainWindow.height
+            modal: true
+
+            contentItem: Rectangle{
+                id: ntripMenuContent
+                anchors.fill: parent
+                height: ntripMenu.height
+                color: aogInterface.blackDayWhiteNight
+            }
+
+            Grid {
+                id: grid2
+                height: childrenRect.height
+                width: childrenRect.width
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.topMargin: 5
+                spacing: 10
+                flow: Grid.TopToBottom
+                rows: 2
+                columns: 1
+
+            Comp.IconButtonTextBeside{
+                id: clientNTRIP
+                icon.source: prefix + "/images/NTRIP_Client.png"
+                text: qsTr("Client NTRIP")
+                onClicked: { ntripMenu.visible = false, mainWindowAgIO.visible = false, clientNtripDialog.visible = true}
+            }
+
+            Comp.IconButtonTextBeside{
+                id: serialNTRIP
+                icon.source: prefix + "/images/NTRIP_Serial.png"
+                text: qsTr("Serial NTRIP")
+                onClicked: { ntripMenu.visible = false, mainWindowAgIO.visible = false, serialNtripDialog.visible = true}
+            }
+        }
+    }
         }
     }

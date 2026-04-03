@@ -78,7 +78,7 @@ public:
     #include "settingsmanager_properties.h"
 
 signals:
-    // ===== GENERATED NOTIFY SIGNALS (397 signals) =====
+    // ===== GENERATED NOTIFY SIGNALS (398 signals) =====
     // Required for Q_OBJECT_BINDABLE_PROPERTY_WITH_ARGS signal references
     void menu_languageChanged();
     void feature_isOffsetFixOnChanged();
@@ -397,6 +397,7 @@ signals:
     void aduino_isEthernet_steerChanged();
     void aduino_isSerial_steerChanged();
     void aduino_isUSB_steerChanged();
+    void ntrip_SerialPortChanged();
     void ntrip_baudChanged();
     void ntrip_casterIPChanged();
     void ntrip_ggaChanged();
