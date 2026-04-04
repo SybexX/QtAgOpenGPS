@@ -14,6 +14,8 @@
 #include <QNetworkInterface>
 #include <QElapsedTimer>
 
+#include "backend/backend.h"
+
 #ifdef Q_OS_WIN
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -418,7 +420,11 @@ void AgIOService::onUdpDataReady()
 
                 QString sentence = QString::fromUtf8(datagram).trimmed();
                 if (parsedData.sentenceType == "GGA") setGgaSentence(sentence);
-                else if (parsedData.sentenceType == "VTG") setVtgSentence(sentence);
+                else if (parsedData.sentenceType == "VTG") {
+                    setVtgSentence(sentence);
+                    Backend::instance()->m_fixFrame.vtgHeading = parsedData.heading;
+                    Backend::instance()->m_fixFrame.speedKph = parsedData.speed;
+                }
                 else if (parsedData.sentenceType == "RMC") setRmcSentence(sentence);
                 else if (parsedData.sentenceType == "PANDA") setPandaSentence(sentence);
                 else if (parsedData.sentenceType == "PAOGI") setPaogiSentence(sentence);

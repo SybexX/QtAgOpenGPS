@@ -47,6 +47,22 @@ bool TextureFactory::isLoaded(TextureId id) const
     return m_textures.contains(id);
 }
 
+void TextureFactory::preload()
+{
+    if (!m_window) return;
+    texture(TextureId::Floor);
+    texture(TextureId::Font);
+    texture(TextureId::HydLift);
+    texture(TextureId::Tractor);
+    texture(TextureId::QuestionMark);
+    texture(TextureId::FrontWheels);
+    texture(TextureId::Tractor4WDFront);
+    texture(TextureId::Tractor4WDRear);
+    texture(TextureId::Harvester);
+    texture(TextureId::ToolWheels);
+    texture(TextureId::Tire);
+}
+
 int TextureFactory::textureWidth(TextureId id)
 {
     return textureSize(id).width();

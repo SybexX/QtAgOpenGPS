@@ -26,6 +26,8 @@ class FixFrame
     Q_PROPERTY(int sentenceCounter MEMBER sentenceCounter)
     Q_PROPERTY(double frameTime MEMBER frameTime)
     Q_PROPERTY(double gpsHeading MEMBER gpsHeading)
+    Q_PROPERTY(double dualHeading MEMBER dualHeading)
+    Q_PROPERTY(double vtgHeading MEMBER vtgHeading)
 
     Q_PROPERTY(double imuHeading MEMBER imuHeading)
     Q_PROPERTY(double imuRoll MEMBER imuRoll)
@@ -57,6 +59,8 @@ public:
     double hz = 0;
     double rawHz = 0;
     double gpsHeading = 0;
+    double dualHeading = 0;
+    double vtgHeading = 0;
 
     int droppedSentences = 0;
     int sentenceCounter = 0;

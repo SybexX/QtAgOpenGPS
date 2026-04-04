@@ -46,6 +46,7 @@ void FormGPS::onSimNewPosition(double vtgSpeed,
     CVehicle::instance()->AverageTheSpeed(vtgSpeed);
 
     pn.headingTrue = pn.headingTrueDual = headingTrue;
+    Backend::instance()->m_fixFrame.dualHeading = pn.headingTrueDual;
 
     // PHASE 6.0.35 FIX: Simulation IMU heading = GPS heading (as in original C# code)
     // CSim.cs:80-81: mf.ahrs.imuHeading = mf.pn.headingTrue

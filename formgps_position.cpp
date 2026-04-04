@@ -2021,9 +2021,14 @@ void FormGPS::onParsedDataReady(const PGNParser::ParsedData& data)
     // Update heading in pn structure
     if (data.headingDual > 0) {
         pn.headingTrue = pn.headingTrueDual = data.headingDual;
+        pn.headingTrueDual += pn.headingTrueDualOffset;
+        if (pn.headingTrueDual >= 360) pn.headingTrueDual -= 360;
+        else if (pn.headingTrueDual < 0) pn.headingTrueDual += 360;
+        Backend::instance()->m_fixFrame.dualHeading = pn.headingTrueDual;
     } else if (data.heading > 0) {
         pn.headingTrue = data.heading;
         pn.headingTrueDual = 0;  // No dual antenna
+        Backend::instance()->m_fixFrame.dualHeading = 0;
     }
 
     // Speed
@@ -2160,10 +2165,15 @@ void FormGPS::onNmeaDataReady(const PGNParser::ParsedData& data)
     if (data.headingDual > 0) {
         // Dual antenna heading - update BOTH headingTrue and headingTrueDual
         pn.headingTrue = pn.headingTrueDual = data.headingDual;
+        pn.headingTrueDual += pn.headingTrueDualOffset;
+        if (pn.headingTrueDual >= 360) pn.headingTrueDual -= 360;
+        else if (pn.headingTrueDual < 0) pn.headingTrueDual += 360;
+        Backend::instance()->m_fixFrame.dualHeading = pn.headingTrueDual;
     } else if (data.heading > 0) {
         // Single antenna heading - update headingTrue, clear headingTrueDual
         pn.headingTrue = data.heading;
         pn.headingTrueDual = 0;  // No dual antenna
+        Backend::instance()->m_fixFrame.dualHeading = 0;
     }
 
     // Phase 6.0.27: IMU data from NMEA (FIXED to match legacy behavior)

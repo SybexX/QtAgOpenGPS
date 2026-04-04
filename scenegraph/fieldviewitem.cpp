@@ -533,6 +533,7 @@ QSGNode *FieldViewItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
     // Initialize texture factory if needed (requires window())
     if (!m_textureFactory && window()) {
         m_textureFactory = new TextureFactory(window());
+        m_textureFactory->preload();
     }
 
     // Get WorldGrid data for field surface and grid

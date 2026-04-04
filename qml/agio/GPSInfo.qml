@@ -59,13 +59,23 @@ Dialog {
 
         Text {
             font.pixelSize: 10
-            text: qsTr("Speed KMH: ") + Math.round( aog.speedKph * 100) / 100
+            text: qsTr("Speed KMH: ") + Math.round( Backend.fixFrame.speedKph * 100) / 100
             Layout.alignment: Qt.AlignLeft
         }
         //quality
         Text {
             font.pixelSize: 10
-            text: qsTr("GPS Quality: ") + AgIOService.gpsQuality
+            text: qsTr("GPS Quality: ") + (
+                AgIOService.gpsQuality === 0 ? "Invalid" :
+                AgIOService.gpsQuality === 1 ? "GPS Single" :
+                AgIOService.gpsQuality === 2 ? "DGPS" :
+                AgIOService.gpsQuality === 3 ? "PPS" :
+                AgIOService.gpsQuality === 4 ? "RTK Fix" :
+                AgIOService.gpsQuality === 5 ? "RTK Float" :
+                AgIOService.gpsQuality === 6 ? "Estimate" :
+                AgIOService.gpsQuality === 7 ? "Man IP" :
+                AgIOService.gpsQuality === 8 ? "Sim" :
+                AgIOService.gpsQuality)
             Layout.alignment: Qt.AlignLeft
         }
 
@@ -94,29 +104,27 @@ Dialog {
         }
         Text {
             font.pixelSize: 10
-            text: qsTr("VTG: ") + "todo"
-        }
-        Text {
-            font.pixelSize: 10
-            text: qsTr("Dual: ") + "todo"
+            text: qsTr("VTG: ") + (Number(Backend.fixFrame.vtgHeading).toLocaleString(Qt.locale(), 'f', 1))
             Layout.alignment: Qt.AlignLeft
         }
-        Column{
-            Text{
-                font.pixelSize: 10
-                text: qsTr("Hz: ") + Math.round( Backend.fixFrame.hz * 100) / 100
-                Layout.alignment: Qt.AlignLeft
-            }
-            Text{
-                font.pixelSize: 10
-                text: qsTr("Raw Hz: ") + Math.round( Backend.fixFrame.rawHz * 100) / 100  // nowHz property removed
-                Layout.alignment: Qt.AlignLeft
-            }
-        }
-
         Text {
             font.pixelSize: 10
-            text: qsTr("Heading: ") + Number(Backend.fixFrame.imuHeading).toLocaleString(Qt.locale(), 'f', 1)
+            text: qsTr("Dual: ") + (Number(Backend.fixFrame.dualHeading).toLocaleString(Qt.locale(), 'f', 1))
+            Layout.alignment: Qt.AlignLeft
+        }
+        Text{
+            font.pixelSize: 10
+            text: qsTr("Hz: ") + Math.round( Backend.fixFrame.hz * 100) / 100
+            Layout.alignment: Qt.AlignLeft
+        }
+        Text{
+            font.pixelSize: 10
+            text: qsTr("Raw Hz: ") + Math.round( Backend.fixFrame.rawHz * 100) / 100
+            Layout.alignment: Qt.AlignLeft
+        }
+        Text {
+            font.pixelSize: 10
+            text: qsTr("Yaw: ") + (Backend.fixFrame.imuHeading > 360 ? "-" : Number(Backend.fixFrame.imuHeading).toLocaleString(Qt.locale(), 'f', 1))
             Layout.alignment: Qt.AlignLeft
         }
         Text {

@@ -45,6 +45,9 @@ public:
     // Check if a texture is already loaded
     bool isLoaded(TextureId id) const;
 
+    // Preload all vehicle textures (call after construction to avoid runtime delays)
+    void preload();
+
     // Clear all cached textures (call when window changes or on cleanup)
     void clear();
 

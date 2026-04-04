@@ -322,12 +322,6 @@ PGNParser::ParsedData PGNParser::parsePANDA(const QString& sentence) {
         }
 
         // Fields 12-15: IMU data (from firmware zHandlers.ino BuildNmea lines 320-333)
-        // ✅ Problem 14 Fix (Enhanced): Check isEmpty() before parsing IMU fields
-        // Note: toInt() returns 0 for BOTH empty string AND "0" - we MUST distinguish:
-        // - Empty field → IMU not connected/data unavailable (don't assign)
-        // - "0" → Valid 0° roll/pitch/heading (DO assign)
-
-        // Fields 12-15: IMU data (from firmware zHandlers.ino BuildNmea lines 320-333)
         // ALL IMU values are stored as INTEGER x10 in NMEA for precision
 
         // Field 12: IMU Heading in degrees (imuHeading - INTEGER x10)
@@ -356,6 +350,11 @@ PGNParser::ParsedData PGNParser::parsePANDA(const QString& sentence) {
             int yawRateRaw = fields[15].toInt();
             data.yawRate = yawRateRaw / 10.0;  // Convert x10 integer to degrees/sec
             data.hasIMU = true;
+        }
+
+        // Field 15: Yaw Rate in degrees/second
+        if (fields.size() >= 16 && !fields[15].isEmpty()) {
+            data.yawRate = fields[15].toDouble();
         }
 
     } else {
@@ -567,6 +566,7 @@ PGNParser::ParsedData PGNParser::parseKSXT(const QString& sentence) {
     // Field 5: Yaw/Heading (degrees true, 0-360)
     if (!fields[5].isEmpty()) {
         data.headingHDT = fields[5].toDouble();
+        data.headingDual = fields[5].toDouble();  // GNSS/INS heading as dual antenna heading
         data.imuHeading = fields[5].toDouble();  // Also store as IMU heading
     }
 
@@ -690,6 +690,7 @@ PGNParser::ParsedData PGNParser::parsePAOGI(const QString& sentence) {
         double fusedHeading = fields[headingIdx].toDouble();
         data.headingHDT = fusedHeading;  // True heading from dual antenna
         data.heading = fusedHeading;     // Also set general heading
+        data.headingDual = fusedHeading; // Dual antenna heading (used by formgps_position.cpp)
     }
 
     // Roll - FROM DUAL ANTENNA BASELINE GEOMETRY

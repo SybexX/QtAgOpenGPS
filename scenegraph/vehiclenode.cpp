@@ -203,6 +203,12 @@ void VehicleNode::update(const QMatrix4x4 &mv,
                 data[3] = {  properties->trackWidth(),  properties->wheelBase() * 0.65f, 0.0f, 1.0f, 0.0f };
 
                 QSGTexture *texture = textureFactory->texture(TextureId::Tractor4WDRear);
+                if (!texture) {
+                    texture = textureFactory->texture(TextureId::QuestionMark);
+                    if (!texture) {
+                        texture = textureFactory->texture(TextureId::Tractor);
+                    }
+                }
                 if (texture) {
                     material->setTexture(texture);
                 }
@@ -267,6 +273,12 @@ void VehicleNode::update(const QMatrix4x4 &mv,
                 data[3] = {  properties->trackWidth(),  properties->wheelBase() * 0.65f, 0.0f, 1.0f, 0.0f };
 
                 QSGTexture *texture = textureFactory->texture(TextureId::Tractor4WDFront);
+                if (!texture) {
+                    texture = textureFactory->texture(TextureId::QuestionMark);
+                    if (!texture) {
+                        texture = textureFactory->texture(TextureId::FrontWheels);
+                    }
+                }
                 if (texture) {
                     material->setTexture(texture);
                 }
@@ -318,6 +330,23 @@ void VehicleNode::update(const QMatrix4x4 &mv,
                 data[3] = {  properties->trackWidth() * 0.25f,  properties->wheelBase() * 0.5f, 0.0f, 1.0f, 0.0f };
 
                 QSGTexture *texture = textureFactory->texture(TextureId::FrontWheels);
+                if (texture) {
+                    material->setTexture(texture);
+                }
+            } else if (properties->type() == 2) {
+                //4wd tractor front right half
+                data[0] = { -properties->trackWidth(), -properties->wheelBase() * 0.65f, 0.0f, 0.0f, 1.0f };
+                data[1] = {  properties->trackWidth(), -properties->wheelBase() * 0.65f, 0.0f, 1.0f, 1.0f };
+                data[2] = { -properties->trackWidth(),  properties->wheelBase() * 0.65f, 0.0f, 0.0f, 0.0f };
+                data[3] = {  properties->trackWidth(),  properties->wheelBase() * 0.65f, 0.0f, 1.0f, 0.0f };
+
+                QSGTexture *texture = textureFactory->texture(TextureId::Tractor4WDFront);
+                if (!texture) {
+                    texture = textureFactory->texture(TextureId::QuestionMark);
+                    if (!texture) {
+                        texture = textureFactory->texture(TextureId::FrontWheels);
+                    }
+                }
                 if (texture) {
                     material->setTexture(texture);
                 }
