@@ -41,10 +41,7 @@ Rectangle{
         isChecked: false
         onClicked: {
             if (Backend.fixFrame.imuRollDegrees != 88888) {
-                // Threading Phase 1: Calculate roll with current zero offset
-                var roll = Backend.fixFrame.imuRollDegrees + SettingsManager.imu_rollZero
-                SettingsManager.imu_rollZero = roll;
-                Backend.fixFrame.imuRoll = roll;
+                SettingsManager.imu_rollZero = Backend.fixFrame.imuRollDegrees;
             }
         }
     }

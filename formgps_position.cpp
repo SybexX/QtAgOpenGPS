@@ -292,10 +292,10 @@ void FormGPS::UpdateFixPosition()
         uncorrectedEastingGraph = pn.fix.easting;
 
         // Apply roll correction
-        if (ahrs.imuRoll != 88888)
+        if (Backend::instance()->m_fixFrame.imuRoll != 88888)
         {
             //change for roll to the right is positive times -1
-            rollCorrectionDistance = sin(glm::toRadians((ahrs.imuRoll))) * -CVehicle::instance()->antennaHeight;
+            rollCorrectionDistance = sin(glm::toRadians((Backend::instance()->m_fixFrame.imuRoll))) * -CVehicle::instance()->antennaHeight;
             correctionDistanceGraph = rollCorrectionDistance;
 
             pn.fix.easting = (cos(-Backend::instance()->m_fixFrame.gpsHeading) * rollCorrectionDistance) + pn.fix.easting;
@@ -1251,10 +1251,10 @@ void FormGPS::UpdateFixPosition()
     RateControl::instance()->mBtnState = (MainWindowState::instance()->manualBtnState() == SectionState::On);
 
     // === IMU Data Updates (5 properties) ===
-    Backend::instance()->m_fixFrame.imuRoll = ahrs.imuRoll;
+    // imuRoll already contains filtered/corrected value from onImuDataReady/onSteerDataReady
+    // Do NOT overwrite with ahrs.imuRoll (raw data) - that would erase filtering
     Backend::instance()->m_fixFrame.imuPitch = ahrs.imuPitch;
     Backend::instance()->m_fixFrame.imuHeading = ahrs.imuHeading;
-    Backend::instance()->m_fixFrame.imuRollDegrees = ahrs.imuRoll;
     Backend::instance()->m_fixFrame.imuAngVel = ahrs.angVel;
 
     // === GPS Status Updates (8 properties) ===
@@ -2055,8 +2055,8 @@ void FormGPS::onParsedDataReady(const PGNParser::ParsedData& data)
         // ✅ NO THROTTLING: Assign directly to Q_PROPERTY (40 Hz)
         // Qt optimizes: only triggers QML update if value actually changed
         // Simpler architecture: no intermediate storage, no sync bugs
+        // Note: Roll filtering with rollZero/invert applied in onImuDataReady/onSteerDataReady
         Backend::instance()->m_fixFrame.imuHeading = data.imuHeading;  // 0° = north (VALID)
-        Backend::instance()->m_fixFrame.imuRoll = data.imuRoll;        // 0° = horizontal (VALID)
         Backend::instance()->m_fixFrame.imuPitch = data.imuPitch;      // 0° = no slope (VALID)
         Backend::instance()->m_fixFrame.yawRate = data.yawRate;        // 0°/s = no rotation (VALID)
     }
@@ -2181,13 +2181,27 @@ void FormGPS::onNmeaDataReady(const PGNParser::ParsedData& data)
     if (data.hasIMU) {
         // Store in ahrs structure (used by calculations)
         ahrs.imuHeading = data.imuHeading;
-        ahrs.imuRoll = data.imuRoll;
         ahrs.imuPitch = data.imuPitch;
         ahrs.imuYawRate = data.yawRate;
 
-        // Update Q_PROPERTY (used by QML display)
+        // Store raw roll for settings UI (Zero Roll button uses this)
+        Backend::instance()->m_fixFrame.imuRollDegrees = data.imuRoll;
+
+        // Apply roll corrections (invert + zero offset) - same as onImuDataReady
+        double rollK = data.imuRoll;
+        if (ahrs.isRollInvert) rollK *= -1.0;
+        rollK -= ahrs.rollZero;
+
+        // Apply exponential filter
+        double currentRoll = ahrs.imuRoll;
+        double filteredRoll = currentRoll * ahrs.rollFilter + rollK * (1.0 - ahrs.rollFilter);
+        ahrs.imuRoll = filteredRoll;  // C# style: store processed roll in ahrs
+
+        // Copy to m_fixFrame for QML display (SteerCircle)
+        Backend::instance()->m_fixFrame.imuRoll = filteredRoll;
+
+        // Update Q_PROPERTY for heading/pitch
         Backend::instance()->m_fixFrame.imuHeading = data.imuHeading; // 0° = north (VALID)
-        Backend::instance()->m_fixFrame.imuRoll = data.imuRoll;        // 0° = horizontal (VALID)
         Backend::instance()->m_fixFrame.imuPitch = data.imuPitch;      // 0° = no slope (VALID)
         Backend::instance()->m_fixFrame.yawRate = data.yawRate;        // 0°/s = no rotation (VALID)
     }
@@ -2230,8 +2244,11 @@ void FormGPS::onImuDataReady(const PGNParser::ParsedData& data)
         rollK -= ahrs.rollZero;
 
         // Apply exponential filter
-        double currentRoll = Backend::instance()->m_fixFrame.imuRoll;
+        double currentRoll = ahrs.imuRoll;
         double filteredRoll = currentRoll * ahrs.rollFilter + rollK * (1.0 - ahrs.rollFilter);
+        ahrs.imuRoll = filteredRoll;  // C# style: store processed roll in ahrs
+
+        // Copy to m_fixFrame for QML display (SteerCircle)
         Backend::instance()->m_fixFrame.imuRoll = filteredRoll;
 
         // Yaw rate
@@ -2269,9 +2286,10 @@ void FormGPS::onSteerDataReady(const PGNParser::ParsedData& data)
                 if (ahrs.isRollInvert) rollK *= -1.0;
                 rollK -= ahrs.rollZero;
 
-                double currentRoll = Backend::instance()->m_fixFrame.imuRoll;
+                double currentRoll = ahrs.imuRoll;
                 double filteredRoll = currentRoll * ahrs.rollFilter + rollK * (1.0 - ahrs.rollFilter);
-                Backend::instance()->m_fixFrame.imuRoll = filteredRoll;
+                ahrs.imuRoll = filteredRoll;  // C# style
+                Backend::instance()->m_fixFrame.imuRoll = filteredRoll;  // QML display
             }
         }
 

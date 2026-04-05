@@ -547,32 +547,32 @@ Dialog {
 
                                 CheckBox {
                                     text: qsTr("Invert Roll")
-                                    checked: SettingsManager.setIMU_invertRoll === true
-                                    onCheckedChanged: SettingsManager.setIMU_invertRoll = checked
+                                    checked: SettingsManager.imu_invertRoll === true
+                                    onCheckedChanged: SettingsManager.imu_invertRoll = checked
                                 }
 
-                                Text { text: qsTr("Roll Zero Offset: ") + (SettingsManager.setIMU_rollZero || 0) }
+                                Text { text: qsTr("Roll Zero Offset: ") + (SettingsManager.imu_rollZero || 0) }
 
                                 RowLayout {
                                     IconButton {
                                         text: qsTr("Zero Roll")
                                         icon.source: prefix + "/images/SteerZeroSmall.png"
                                         onClicked: {
-                                            var roll = ModuleComm.actualRoll
-                                            if (roll !== undefined) {
-                                                SettingsManager.setIMU_rollZero = roll
+                                            var roll = Backend.fixFrame.imuRollDegrees
+                                            if (roll !== undefined && roll !== 99999) {
+                                                SettingsManager.imu_rollZero = roll
                                             }
                                         }
                                     }
                                     IconButton {
                                         text: qsTr("Reset")
                                         icon.source: prefix + "/images/Trash.png"
-                                        onClicked: SettingsManager.setIMU_rollZero = 0
+                                        onClicked: SettingsManager.imu_rollZero = 0
                                     }
                                 }
 
                                 Text {
-                                    text: qsTr("Current Roll: ") + ((ModuleComm.actualRoll !== undefined) ? ModuleComm.actualRoll.toFixed(1) : "---") + "°"
+                                    text: qsTr("Current Roll: ") + ((Backend.fixFrame.imuRollDegrees !== undefined && Backend.fixFrame.imuRollDegrees !== 99999) ? Backend.fixFrame.imuRollDegrees.toFixed(1) : "---") + "°"
                                     font.pixelSize: 16
                                 }
 

@@ -110,4 +110,31 @@ void FormGPS::loadSettings()
     pn.loadSettings();
     CVehicle::instance()->loadSettings();
     yt.loadSettings();
+
+    // Connect SettingsManager signals to update ahrs when settings change
+    connect(SettingsManager::instance(), &SettingsManager::imu_rollZeroChanged, this, &FormGPS::onAhrsSettingsChanged);
+    connect(SettingsManager::instance(), &SettingsManager::imu_invertRollChanged, this, &FormGPS::onAhrsSettingsChanged);
+    connect(SettingsManager::instance(), &SettingsManager::imu_rollFilterChanged, this, &FormGPS::onAhrsSettingsChanged);
+}
+
+void FormGPS::onAhrsSettingsChanged()
+{
+    ahrs.rollZero = SettingsManager::instance()->imu_rollZero();
+    ahrs.isRollInvert = SettingsManager::instance()->imu_invertRoll();
+    ahrs.rollFilter = SettingsManager::instance()->imu_rollFilter();
+    
+    qDebug() << "onAhrsSettingsChanged: rollZero=" << ahrs.rollZero << " isRollInvert=" << ahrs.isRollInvert << " rollFilter=" << ahrs.rollFilter;
+    
+    // Recalculate current roll from RAW value with new settings
+    double rawRoll = Backend::instance()->m_fixFrame.imuRollDegrees;
+    if (rawRoll != 99999) {
+        double rollK = rawRoll;
+        if (ahrs.isRollInvert) rollK *= -1.0;
+        rollK -= ahrs.rollZero;
+        
+        // C# style: store processed roll in ahrs
+        ahrs.imuRoll = rollK;
+        // Also update for QML display
+        Backend::instance()->m_fixFrame.imuRoll = rollK;
+    }
 }

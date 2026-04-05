@@ -617,7 +617,7 @@ Window {
             anchors.right: rightColumn.left
             anchors.margins: 10
             visible: true
-            rollAngle: Backend.fixFrame.imuRollDegrees
+            rollAngle: Backend.fixFrame.imuRoll
             steerColor: (ModuleComm.steerModuleConnectedCounter > 30 ?
                              "#f0f218f0" :
                              (ModuleComm.steerSwitchHigh === true ?
