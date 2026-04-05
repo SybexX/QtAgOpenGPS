@@ -733,7 +733,7 @@ Dialog {
                             if (steerSwitchHigh) {
                                 parent.color = "#ff0000"
                             } else if (autoSteerOn) {
-                                perent.color = "#00ff00"
+                                parent.color = "#00ff00"
                             } else if (moduleCounter > 30) {
                                 parent.color = "#ff00ff"
                             } else {
