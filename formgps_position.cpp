@@ -2176,8 +2176,8 @@ void FormGPS::onNmeaDataReady(const PGNParser::ParsedData& data)
         Backend::instance()->m_fixFrame.dualHeading = 0;
     }
 
-    // Phase 6.0.27: IMU data from NMEA (FIXED to match legacy behavior)
-    // Update ahrs structure FIRST (used by calculations), then Q_PROPERTY (used by QML)
+    // Phase 6.0.27: IMU data from NMEA (FIXED to match C# behavior)
+    // In C#: NMEA roll has NO filter, only invert + rollZero
     if (data.hasIMU) {
         // Store in ahrs structure (used by calculations)
         ahrs.imuHeading = data.imuHeading;
@@ -2187,18 +2187,14 @@ void FormGPS::onNmeaDataReady(const PGNParser::ParsedData& data)
         // Store raw roll for settings UI (Zero Roll button uses this)
         Backend::instance()->m_fixFrame.imuRollDegrees = data.imuRoll;
 
-        // Apply roll corrections (invert + zero offset) - same as onImuDataReady
+        // Apply roll corrections (invert + zero offset) - NO FILTER for NMEA (same as C#)
         double rollK = data.imuRoll;
         if (ahrs.isRollInvert) rollK *= -1.0;
         rollK -= ahrs.rollZero;
-
-        // Apply exponential filter
-        double currentRoll = ahrs.imuRoll;
-        double filteredRoll = currentRoll * ahrs.rollFilter + rollK * (1.0 - ahrs.rollFilter);
-        ahrs.imuRoll = filteredRoll;  // C# style: store processed roll in ahrs
-
-        // Copy to m_fixFrame for QML display (SteerCircle)
-        Backend::instance()->m_fixFrame.imuRoll = filteredRoll;
+        
+        // Store in both ahrs and m_fixFrame
+        ahrs.imuRoll = rollK;
+        Backend::instance()->m_fixFrame.imuRoll = rollK;
 
         // Update Q_PROPERTY for heading/pitch
         Backend::instance()->m_fixFrame.imuHeading = data.imuHeading; // 0° = north (VALID)
@@ -2211,7 +2207,8 @@ void FormGPS::onNmeaDataReady(const PGNParser::ParsedData& data)
     // Must reset counter to 0 when NMEA data arrives to indicate GPS is working
     Backend::instance()->m_fixFrame.sentenceCounter = 0;
 
-    // NO UpdateFixPosition() here - called by timerGPS at 40 Hz fixed rate
+    // Call UpdateFixPosition immediately (like C# line 161)
+    UpdateFixPosition();
 }
 
 void FormGPS::onImuDataReady(const PGNParser::ParsedData& data)
@@ -2234,22 +2231,17 @@ void FormGPS::onImuDataReady(const PGNParser::ParsedData& data)
         return;
     }
 
-    // PGN 211: External IMU data
+    // PGN 211: External IMU data - NO FILTER (same as C#)
     if (data.hasIMU) {
         Backend::instance()->m_fixFrame.imuHeading = data.imuHeading;
 
-        // Roll with filtering and inversion
+        // Roll with inversion only - NO FILTER (same as C#)
         double rollK = data.imuRoll;
         if (ahrs.isRollInvert) rollK *= -1.0;
         rollK -= ahrs.rollZero;
-
-        // Apply exponential filter
-        double currentRoll = ahrs.imuRoll;
-        double filteredRoll = currentRoll * ahrs.rollFilter + rollK * (1.0 - ahrs.rollFilter);
-        ahrs.imuRoll = filteredRoll;  // C# style: store processed roll in ahrs
-
-        // Copy to m_fixFrame for QML display (SteerCircle)
-        Backend::instance()->m_fixFrame.imuRoll = filteredRoll;
+        
+        ahrs.imuRoll = rollK;
+        Backend::instance()->m_fixFrame.imuRoll = rollK;
 
         // Yaw rate
         if (data.yawRate != 0.0) {
@@ -2282,14 +2274,13 @@ void FormGPS::onSteerDataReady(const PGNParser::ParsedData& data)
 
             // Roll from AutoSteer BNO085 (if valid, with filtering)
             if (data.imuRoll != 8888.0) {
+                // NO FILTER - same as C# (lines 217-224 in UDPComm.Designer.cs)
                 double rollK = data.imuRoll;
                 if (ahrs.isRollInvert) rollK *= -1.0;
                 rollK -= ahrs.rollZero;
-
-                double currentRoll = ahrs.imuRoll;
-                double filteredRoll = currentRoll * ahrs.rollFilter + rollK * (1.0 - ahrs.rollFilter);
-                ahrs.imuRoll = filteredRoll;  // C# style
-                Backend::instance()->m_fixFrame.imuRoll = filteredRoll;  // QML display
+                
+                ahrs.imuRoll = rollK;
+                Backend::instance()->m_fixFrame.imuRoll = rollK;
             }
         }
 
@@ -2322,7 +2313,8 @@ void FormGPS::onBlockageDataReady(const PGNParser::ParsedData& data)
 void FormGPS::onRateControlDataReady(const PGNParser::ParsedData& data)
 {
 }
-// Phase 6.0.24: GPS timer callback - UpdateFixPosition() at 40 Hz fixed rate
+// Phase 6.0.24: GPS timer callback - only resets watchdog, no position update
+// Position update happens in onNmeaDataReady() immediately after data arrives (like C#)
 void FormGPS::onGPSTimerTimeout()
 {
     // Skip if simulation mode is active (timerSim handles position updates in simulation)
@@ -2330,8 +2322,6 @@ void FormGPS::onGPSTimerTimeout()
         return;
     }
 
-    // Call UpdateFixPosition() at 40 Hz fixed rate (independent of UDP packet arrival)
-    // Uses latest data stored in pn/ahrs structures by onParsedDataReady()
-    // Architecture matches simulation mode: timer-driven position updates
-    UpdateFixPosition();
+    // Don't call UpdateFixPosition() here - it's called immediately in onNmeaDataReady() (like C#)
+    // This prevents double-correction that causes jitter
 }
