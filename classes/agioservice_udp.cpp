@@ -425,12 +425,24 @@ void AgIOService::onUdpDataReady()
                     Backend::instance()->m_fixFrame.vtgHeading = parsedData.heading;
                     Backend::instance()->m_fixFrame.speedKph = parsedData.speed;
                 }
-                else if (parsedData.sentenceType == "RMC") setRmcSentence(sentence);
-                else if (parsedData.sentenceType == "PANDA") setPandaSentence(sentence);
-                else if (parsedData.sentenceType == "PAOGI") setPaogiSentence(sentence);
+                else if (parsedData.sentenceType == "RMC") {
+                    setRmcSentence(sentence);
+                    Backend::instance()->m_fixFrame.speedKph = parsedData.speed;
+                }
+                else if (parsedData.sentenceType == "PANDA") {
+                    setPandaSentence(sentence);
+                    Backend::instance()->m_fixFrame.speedKph = parsedData.speed;
+                }
+                else if (parsedData.sentenceType == "PAOGI") {
+                    setPaogiSentence(sentence);
+                    Backend::instance()->m_fixFrame.speedKph = parsedData.speed;
+                }
                 else if (parsedData.sentenceType == "HDT") setHdtSentence(sentence);
                 else if (parsedData.sentenceType == "AVR") setAvrSentence(sentence);
-                else if (parsedData.sentenceType == "KSXT") setSxtSentence(sentence);
+                else if (parsedData.sentenceType == "KSXT") {
+                    setSxtSentence(sentence);
+                    Backend::instance()->m_fixFrame.speedKph = parsedData.speed;
+                }
             }
             else if (parsedData.sourceType == "PGN") {
                 if (parsedData.pgnNumber == 126 || parsedData.pgnNumber == 253) {

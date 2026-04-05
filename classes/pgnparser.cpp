@@ -572,7 +572,7 @@ PGNParser::ParsedData PGNParser::parseKSXT(const QString& sentence) {
 
     // Field 6: Pitch (degrees, -90 to 90)
     if (!fields[6].isEmpty()) {
-        data.imuPitch = fields[6].toDouble();
+        data.imuRoll = fields[6].toDouble();
     }
 
     // Field 7: Speed angle / Course over ground (degrees)
@@ -587,7 +587,7 @@ PGNParser::ParsedData PGNParser::parseKSXT(const QString& sentence) {
 
     // Field 9: Roll (degrees, -90 to 90)
     if (!fields[9].isEmpty()) {
-        data.imuRoll = fields[9].toDouble();
+        data.imuPitch = fields[9].toDouble();
     }
 
     // Field 10: Position status (0=invalid, 1=single, 2=float, 3=fixed)
