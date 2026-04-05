@@ -213,7 +213,7 @@ AgIOService::AgIOService(QObject *parent)
 
 AgIOService::~AgIOService()
 {
-    qDebug() << "AgIOService destructor - shutdown already handled by FormGPS";
+    qDebug() << "AgIOService destructor - stopping threads...";
 
     // Phase 6.0.21.2: Cleanup CTraffic (no parent, must delete manually)
     if (m_traffic) {
@@ -221,6 +221,24 @@ AgIOService::~AgIOService()
         m_traffic = nullptr;
         qDebug() << "✅ CTraffic deleted in destructor";
     }
+
+    // Stop NTRIP thread to prevent crash: "QThread: Destroyed while thread is still running"
+    if (m_ntripThread) {
+        m_ntripThread->quit();
+        m_ntripThread->wait(3000);
+        m_ntripThread->deleteLater();
+        m_ntripThread = nullptr;
+    }
+
+    // Stop serial thread
+    if (m_serialThread) {
+        m_serialThread->quit();
+        m_serialThread->wait(3000);
+        m_serialThread->deleteLater();
+        m_serialThread = nullptr;
+    }
+
+    qDebug() << "✅ AgIOService destructor complete";
 }
 
 AgIOService *AgIOService::instance() {
